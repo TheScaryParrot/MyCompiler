@@ -8,13 +8,7 @@ _start:
 guess:
     print guessText, guessTextLength ;This is a test
 
-
-    ; Get input
-    mov rax, 0
-    mov rdi, 0
-    mov rsi, inputBuffer
-    mov rdx, inputBufferLength
-    syscall
+    read inputBuffer, inputBufferLength; Get input
 
     lea rbx, inputBuffer ; first string memory address
     lea rcx, wordToGuess ; second string memory address
@@ -71,9 +65,7 @@ allLettersGiven:
     print allLettersGivenText, allLettersGivenTextLength
 
 end:
-    mov rax, 60       ; exit(
-    mov rdi, 0        ;   EXIT_SUCCESS
-    syscall           ; );
+    exit 0
 
 section .rodata
     wordToGuess: db "moinsen", 0xa

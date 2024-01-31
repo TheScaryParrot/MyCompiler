@@ -2,10 +2,14 @@
 #include <fstream>
 
 #include "resources/instructions/PrintInstruction.cpp"
+#include "resources/instructions/ReadInstruction.cpp"
+#include "resources/instructions/ExitInstruction.cpp"
 #include "resources/Helper.cpp"
 
 CustomInstructonBase* CUSTOM_INSTRUCTIONS[] = {
-    new PrintInstruction()
+    new PrintInstruction(),
+    new ReadInstruction(),
+    new ExitInstruction()
 };
 
 CustomInstructonBase* GetCustomInstruction(std::string line)

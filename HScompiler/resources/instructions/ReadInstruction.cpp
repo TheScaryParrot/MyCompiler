@@ -1,6 +1,6 @@
-#include "PrintInstruction.hpp"
+#include "ReadInstruction.hpp"
 
-std::string PrintInstruction::GetAssemblyCode(unsigned int line, std::string precedingSpaces, std::vector<std::string> arguments, std::string comment)
+std::string ReadInstruction::GetAssemblyCode(unsigned int line, std::string precedingSpaces, std::vector<std::string> arguments, std::string comment)
 {
     CodeBlockHolder result = CodeBlockHolder(precedingSpaces);
 
@@ -9,8 +9,8 @@ std::string PrintInstruction::GetAssemblyCode(unsigned int line, std::string pre
         result.AddLine(comment);
     }
 
-    result.AddLine("mov rax, 1");
-    result.AddLine("mov rdi, 1");
+    result.AddLine("mov rax, 0");
+    result.AddLine("mov rdi, 0");
     result.AddLine("mov rsi, " + arguments[0]);
     result.AddLine("mov rdx, " + arguments[1]);
     result.AddLine("syscall");
