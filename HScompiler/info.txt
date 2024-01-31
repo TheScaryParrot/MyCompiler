@@ -1,0 +1,4 @@
+This is the first compiler of my compiler chain.
+It's main purpose is to implement custom instructions
+which can then be compiled to real assembly code.
+The HS code really close to x86_64 linux assembly
