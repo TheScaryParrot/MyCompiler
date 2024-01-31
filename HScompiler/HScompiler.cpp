@@ -21,6 +21,40 @@ CustomInstructonBase* GetCustomInstruction(std::string line)
     return nullptr;
 }
 
+void CompileFile(std::ifstream* inputFile, std::ofstream* outputFile)
+{
+    std::string line;
+    int lineNumber = 1;
+    
+    while (!inputFile->eof() && inputFile->good())
+    {
+        std::getline(*inputFile, line); // Reads line from inputFile into line
+
+        CustomInstructonBase* customInstruction = GetCustomInstruction(line);
+
+        if (customInstruction != nullptr)
+        {
+            std::vector<std::string> arguments = GetArguments(line);
+            std::string comment = GetComment(line);
+            std::string precidingSpaces = GetPrecedingSpaces(line);
+
+            if (!customInstruction->CheckValidUsage(lineNumber, arguments, comment))
+            {
+                // Error printing is handled by CheckValidUsage
+                return;
+            }
+
+            *outputFile << customInstruction->GetAssemblyCode(lineNumber, precidingSpaces, arguments, comment) << "\n";
+        }
+        else
+        {
+            *outputFile << line << "\n";
+        }
+
+        lineNumber++;
+    }
+}
+
 int main(int argc, char* argv[])
 {
     std::cout << "Hello from the HScompiler\n";
@@ -50,33 +84,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-
-    std::string line;
-    
-    while (!inputFile.eof() && inputFile.good())
-    {
-        std::getline(inputFile, line); // Reads line from inputFile into line
-
-        CustomInstructonBase* customInstruction = GetCustomInstruction(line);
-
-        if (customInstruction != nullptr)
-        {
-            std::vector<std::string> arguments = GetArguments(line);
-            std::string comment = GetComment(line);
-
-            if (!customInstruction->CheckValidUsage(0, arguments, comment))
-            {
-                // Error printing is handled by CheckValidUsage
-                return 1;
-            }
-
-            outputFile << customInstruction->GetAssemblyCode(0, arguments, comment) << "\n";
-        }
-        else
-        {
-            outputFile << line << "\n";
-        }
-    }
+    CompileFile(&inputFile, &outputFile);
 
     return 0;
 }

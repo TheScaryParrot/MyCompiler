@@ -6,9 +6,9 @@ CustomInstructonBase::CustomInstructonBase(std::string instructionName, unsigned
     this->argumentCount = argumentCount;
 }
 
-std::string CustomInstructonBase::GetAssemblyCode(unsigned int line, std::vector<std::string> arguments, std::string comment)
+std::string CustomInstructonBase::GetAssemblyCode(unsigned int line, std::string precedingSpaces, std::vector<std::string> arguments, std::string comment)
 {
-    return "HiIIIIIII";
+    return precedingSpaces + "HiIIIIIII";
 }
 
 bool CustomInstructonBase::CheckValidUsage(unsigned int line, std::vector<std::string> arguments, std::string comment)
@@ -24,17 +24,5 @@ bool CustomInstructonBase::CheckValidUsage(unsigned int line, std::vector<std::s
 
 bool CustomInstructonBase::IsLineCustomInstruction(std::string line)
 {
-    std::vector<std::string> lineParts = SplitString(line, ' ');
-
-    if (lineParts.size() == 0)
-    {
-        return false;
-    }
-
-    if (lineParts[0] == this->instructionName)
-    {
-        return true;
-    }
-
-    return false;
+    return GetInstructionName(line) == this->instructionName;
 }

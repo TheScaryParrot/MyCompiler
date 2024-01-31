@@ -6,6 +6,9 @@ _start:
     push -1
 
 guess:
+    print guessText, guessTextLength ;This is a test
+
+
     ; Get input
     mov rax, 0
     mov rdi, 0
@@ -32,7 +35,7 @@ compareLoop:
     jmp compareLoop
 
 success:
-    print successText successTextLength
+    print successText, successTextLength
     jmp end
 
 failed:
@@ -46,7 +49,7 @@ failed:
 
     push rcx
 
-    print failedText failedTextLength
+    print failedText, failedTextLength
 
     ; write next letter of wordToGuess
     pop rcx
@@ -60,12 +63,12 @@ failed:
     syscall
 
     ; write \n
-    print newLine newLineLength
+    print newLine, newLineLength
 
     jmp guess
 
 allLettersGiven:
-    print allLettersGivenText allLettersGivenTextLength
+    print allLettersGivenText, allLettersGivenTextLength
 
 end:
     mov rax, 60       ; exit(
