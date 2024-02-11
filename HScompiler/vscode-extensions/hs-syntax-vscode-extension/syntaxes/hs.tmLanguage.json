@@ -22,6 +22,9 @@
 		},
 		{
 			"include": "#number"
+		},
+		{
+			"include": "#string"
 		}
 	],
 	"repository": {
@@ -36,14 +39,14 @@
 			"name": "assemblyInstruction",
 			"patterns": [{
 				"name": "keyword",
-				"match": "\\b(mov|lea|inc|dec|jmp|je|jne|push|pop|cmp|add|sub|mul)\\b"
+				"match": "\\b(mov|lea|inc|dec|jmp|je|jne|push|pop|cmp|add|sub|mul|syscall)\\b"
 			}]
 		},
 		"registries": {
 			"name": "registry",
 			"patterns": [{
 				"name": "variable.name",
-				"match": "\\b(rax|rbx|rcx|rdx)\\b"
+				"match": "\\b(rax|rbx|rcx|rdx|rdi|rsi|ah|al)\\b"
 			}]
 		},
 		"comment": {
@@ -77,6 +80,15 @@
 				"name": "constant.numeric",
 				"match": "\\b(0x[0-9a-fA-F]+|\\d+)\\b"
 			}]
+		},
+		"string": {
+			"name": "string",
+			"patterns": [
+				{
+					"name": "string.quoted.double",
+					"match": "\\B(\".*\"|'.*')\\B"
+				}
+			]
 		}
 	},
 	"scopeName": "source.hs"

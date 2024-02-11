@@ -67,7 +67,7 @@ section .rodata
     successText: db "Success!", 0xa
     successTextLength: equ $ - successText
 
-    allLettersGivenText: db "All Letters have been given. You are stupid!", 0xa
+    allLettersGivenText: db 'All Letters have been given. You are stupid!', 0xa
     allLettersGivenTextLength: equ $-allLettersGivenText
 
     newLine: db 0xa
