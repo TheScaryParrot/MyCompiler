@@ -143,3 +143,17 @@ std::string GetPrecedingSpaces(std::string str)
 
     return result;
 }
+
+/// @brief Gets the directory path from a file path
+std::string GetDirectoryPath(std::string path)
+{
+    std::vector<std::string> pathParts = SplitString(path, '/');
+    std::string result = "";
+
+    for (int i = 0; i < pathParts.size() - 1; i++)
+    {
+        result += pathParts[i] + "/";
+    }
+
+    return result;
+}

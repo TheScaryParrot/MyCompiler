@@ -6,6 +6,15 @@
 #include "resources/instructions/ExitInstruction.cpp"
 #include "resources/Helper.cpp"
 
+const std::string HELP_TEXT = 
+    "HScompiler\n"
+    "Usage: HScompiler [INPUT_FILE] [OPTIONS]\n"
+    "Options:\n"
+    "    -o [OUTPUT_FILE]    Specify the output file\n"
+    "    -c                  Compile to an executable\n"
+    "    -k                  Keep temporary files\n"
+    "    -h                  Display this help text\n";
+
 CustomInstructonBase* CUSTOM_INSTRUCTIONS[] = {
     new PrintInstruction(),
     new ReadInstruction(),
@@ -25,7 +34,7 @@ CustomInstructonBase* GetCustomInstruction(std::string line)
     return nullptr;
 }
 
-void CompileFile(std::ifstream* inputFile, std::ofstream* outputFile)
+void CompileFile(std::string inputFileDirectory, std::ifstream* inputFile, std::ofstream* outputFile)
 {
     std::string line;
     int lineNumber = 1;
@@ -33,6 +42,12 @@ void CompileFile(std::ifstream* inputFile, std::ofstream* outputFile)
     while (!inputFile->eof() && inputFile->good())
     {
         std::getline(*inputFile, line); // Reads line from inputFile into line
+
+        if (GetInstructionName(line) == "include")
+        {
+            CompileFile(inputFileDirectory, new std::ifstream(inputFileDirectory + "/" + GetArguments(line)[0]), outputFile);
+            continue;
+        }
 
         CustomInstructonBase* customInstruction = GetCustomInstruction(line);
 
@@ -63,7 +78,7 @@ void CompileFile(std::ifstream* inputFile, std::ofstream* outputFile)
 /// @param inputFilePath Path to the file to compile
 /// @param outputFilePath Path to the file to output to
 /// @param compileToExe Whether to compile all the way to an executable
-void Execute(std::string inputFilePath, std::string outputFilePath, bool compileToExe)
+void Execute(std::string inputFilePath, std::string outputFilePath, bool compileToExe, bool keepTemporaries)
 {
     // INPUT FILE
     if (inputFilePath == "")
@@ -82,12 +97,33 @@ void Execute(std::string inputFilePath, std::string outputFilePath, bool compile
 
 
     // OUTPUT FILE
-    if (outputFilePath == "")
-    {
-        outputFilePath = "output.s";
-    }
+    std::string assemblyFilePath;
+    std::string objectFilePath;
+    std::string exeFilePath;
 
-    std::ofstream outputFile(outputFilePath);
+    if (compileToExe)
+    {
+        if (outputFilePath == "")
+        {
+            outputFilePath = "output";
+        }
+
+        assemblyFilePath = outputFilePath + ".s";
+        objectFilePath = outputFilePath + ".o";
+        exeFilePath = outputFilePath;
+    }
+    else
+    {
+        if (outputFilePath == "")
+        {
+            outputFilePath = "output.s";
+        }
+
+        assemblyFilePath = outputFilePath;
+    }
+    
+
+    std::ofstream outputFile(assemblyFilePath);
 
     if (!outputFile.is_open())
     {
@@ -96,20 +132,31 @@ void Execute(std::string inputFilePath, std::string outputFilePath, bool compile
     }
 
     // COMPILATION
-    CompileFile(&inputFile, &outputFile);
+    CompileFile(GetDirectoryPath(inputFilePath), &inputFile, &outputFile);
 
-    /*if (compileToExe)
+    inputFile.close();
+    outputFile.close(); // Important to close the file before compiling to an executable. As otherwise an empty file will be compiled
+
+    if (compileToExe)
     {
-        std::string objectFilePath = outputFilePath + ".o";
-        system(std::string("nasm -f elf64 " + assemblyFilePath + " -o " + objectFilePath).c_str()); //command = "nasm -f elf64 OUTFILE -o OUTFILE.o"
+        // Compile to an executable
+        std::string nasmCommand = "nasm -f elf64 " + assemblyFilePath + " -o " + objectFilePath;
+        std::system(nasmCommand.c_str()); //command = "nasm -f elf64 OUTFILE -o OUTFILE.o"
 
-        std::string exeFilePath = outputFilePath;
-        system(std::string("ld " + objectFilePath + " -o " + outputFilePath).c_str()); //command = "ld OUTFILE.o -o OUTFILE"
+        std::string linkCommand = "ld " + objectFilePath + " -o " + exeFilePath; 
+        std::system(linkCommand.c_str()); //command = "ld OUTFILE.o -o OUTFILE"
+
+        if (keepTemporaries) return;
 
         // Remove the object file and assembly file
-        //system(std::string("rm " + objectFilePath).c_str()); //command = "rm OUTFILE.o"
-        //system(std::string("rm " + assemblyFilePath).c_str()); //command = "rm OUTFILE.s"
-    }*/
+        std::system(std::string("rm " + assemblyFilePath).c_str()); //command = "rm OUTFILE.s"
+        std::system(std::string("rm " + objectFilePath).c_str()); //command = "rm OUTFILE.o"
+    }
+}
+
+void PrintHelpText()
+{
+    std::cout << HELP_TEXT;
 }
 
 int main(int argc, char* argv[])
@@ -118,15 +165,16 @@ int main(int argc, char* argv[])
     
     if (argc < 2)
     {
-        std::cout << "No input file specified\n";
+        std::cout << "No input file specified. Use -h for help\n";
         return 1;
     }
 
-    std::string inputFile = argv[1];
-
-    int currentArgIndex = 2;
+    
+    int currentArgIndex = 1;
+    std::string inputFile = "";
     std::string outputFile = "";
     bool compileToExe = false;
+    bool keepTemporaries = false;
 
     while (currentArgIndex < argc)
     {
@@ -150,15 +198,29 @@ int main(int argc, char* argv[])
             compileToExe = true;
             currentArgIndex++;
         }
-        
+        else if (arg == "-k")
+        {
+            keepTemporaries = true;
+            currentArgIndex++;
+        }
+        else if (arg == "-h")
+        {
+            PrintHelpText();
+            return 0;
+        }
+        else if (inputFile == "")
+        {
+            inputFile = arg;
+            currentArgIndex++;
+        }
         else
         {
-            std::cout << "Unknown argument: " << arg << "\n";
+            std::cout << "Unknown argument: " << arg << ". Use -h for help\n";
             return 1;
         }
     }
     
-    Execute(inputFile, outputFile, compileToExe);
+    Execute(inputFile, outputFile, compileToExe, keepTemporaries);
 
     return 0;
 }
