@@ -1,0 +1,21 @@
+{
+  "name": "hs-theme-vscode-extension",
+  "displayName": "hs-theme-vscode-extension",
+  "description": "Color theme for HS. Should have hs-syntax extension installed",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "The HS Theme",
+        "uiTheme": "vs-dark",
+        "path": "./themes/The HS Theme-color-theme.json"
+      }
+    ]
+  }
+}

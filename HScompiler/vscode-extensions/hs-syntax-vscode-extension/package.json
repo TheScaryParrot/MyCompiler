@@ -1,0 +1,25 @@
+{
+  "name": "hs-vscode-extension",
+  "displayName": "hs-vscode-extension",
+  "description": "Adds autocomplete, syntax highlights and error detection for HS as a VScode extension",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "hs",
+      "aliases": ["HS", "hs"],
+      "extensions": ["hs"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "hs",
+      "scopeName": "source.hs",
+      "path": "./syntaxes/hs.tmLanguage.json"
+    }]
+  }
+}

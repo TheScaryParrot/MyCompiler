@@ -1,0 +1,83 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "HS",
+	"patterns": [
+		{
+			"include": "#custominstructions"
+		},
+		{
+			"include": "#assemblyinstructions"
+		},
+		{
+			"include": "#registries"
+		},
+		{
+			"include": "#comment"
+		},
+		{
+			"include": "#label"
+		},
+		{
+			"include": "#section"
+		},
+		{
+			"include": "#number"
+		}
+	],
+	"repository": {
+		"custominstructions": {
+			"name": "customInstruction",
+			"patterns": [{
+				"name": "keyword",
+				"match": "\\b(read|print|exit|include)\\b"
+			}]
+		},
+		"assemblyinstructions": {
+			"name": "assemblyInstruction",
+			"patterns": [{
+				"name": "keyword",
+				"match": "\\b(mov|lea|inc|dec|jmp|je|jne|push|pop|cmp|add|sub|mul)\\b"
+			}]
+		},
+		"registries": {
+			"name": "registry",
+			"patterns": [{
+				"name": "variable.name",
+				"match": "\\b(rax|rbx|rcx|rdx)\\b"
+			}]
+		},
+		"comment": {
+			"name": "comment",
+			"begin": ";",
+			"end": "$",
+			"patterns": [
+				{
+					"name": "comment",
+					"match": ";.*$"
+				}
+			]
+		},
+		"label": {
+			"name": "label",
+			"patterns": [{
+				"name": "entity.name.function",
+				"match": "\\b[a-zA-Z0-9]+:\\B"
+			}]
+		},
+		"section": {
+			"name": "section",
+			"patterns": [{
+				"name": "keyword.control",
+				"match": "\\b(section .(text|bss|data|rodata))\\b"
+			}]
+		},
+		"number": {
+			"name": "number",
+			"patterns": [{
+				"name": "constant.numeric",
+				"match": "\\b(0x[0-9a-fA-F]+|\\d+)\\b"
+			}]
+		}
+	},
+	"scopeName": "source.hs"
+}
