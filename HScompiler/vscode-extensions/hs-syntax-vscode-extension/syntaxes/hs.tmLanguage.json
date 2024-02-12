@@ -32,7 +32,7 @@
 			"name": "customInstruction",
 			"patterns": [{
 				"name": "keyword",
-				"match": "\\b(read|print|exit|include)\\b"
+				"match": "\\b(read|print|exit|include *absolute|include *relative)\\b"
 			}]
 		},
 		"assemblyinstructions": {
