@@ -99,12 +99,10 @@ std::string RemoveInstructionName(std::string line)
 }
 
 /// @brief Removes leading and trailing whitespace from a string
-std::string RemoveLeadingAndTrailingWhitespace(std::string str)
+void RemoveLeadingAndTrailingWhitespace(std::string* str)
 {
-    str.erase(0, str.find_first_not_of(' '));
-    str.erase(str.find_last_not_of(' ') + 1);
-
-    return str;
+    str->erase(0, str->find_first_not_of(' '));
+    str->erase(str->find_last_not_of(' ') + 1);
 }   
 
 /// @brief Gets the arguments from a line
@@ -119,7 +117,7 @@ std::vector<std::string> GetArguments(std::string line)
     for (std::string part : lineParts)
     {
         // Remove leading and trailing whitespace
-        RemoveLeadingAndTrailingWhitespace(part);
+        RemoveLeadingAndTrailingWhitespace(&part);
         result.push_back(part);
     }
 

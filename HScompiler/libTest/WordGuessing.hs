@@ -13,7 +13,7 @@ guess:
     lea rbx, inputBuffer ; first string memory address
     lea rcx, wordToGuess ; second string memory address
 
-include WordGuessLib.hs
+include relative, WordGuessLib.hs
 
 success:
     print successText, successTextLength

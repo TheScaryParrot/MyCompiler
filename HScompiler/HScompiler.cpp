@@ -45,7 +45,41 @@ void CompileFile(std::string inputFileDirectory, std::ifstream* inputFile, std::
 
         if (GetInstructionName(line) == "include")
         {
-            CompileFile(inputFileDirectory, new std::ifstream(inputFileDirectory + "/" + GetArguments(line)[0]), outputFile);
+            std::vector<std::string> arguments = GetArguments(line);
+
+            if (arguments.size() < 2)
+            {
+                std::cout << "Invalid usage of include on line " << lineNumber << ". Missing argument\n";
+                return;
+            }
+
+            bool isAbsolutePath = false;
+            
+            if (arguments[0] == "absolute")
+            {
+                isAbsolutePath = true;
+            }
+            else if (arguments[0] != "relative")
+            {
+                std::cout << "Invalid usage of include on line " << lineNumber << ". First argument must be 'absolute' or 'relative'\n";
+                return;
+            }
+            
+            std::string includeFilePath = isAbsolutePath ? arguments[1] : inputFileDirectory + arguments[1];
+
+            std::ifstream* includeFile = new std::ifstream(includeFilePath);
+
+            if (!includeFile->is_open())
+            {
+                std::cout << "Could not open include file " << includeFilePath << " on line " << lineNumber << "\n";
+                return;
+            }
+
+            CompileFile(inputFileDirectory, includeFile, outputFile);
+
+            includeFile->close();
+            delete includeFile;
+
             continue;
         }
 
