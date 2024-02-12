@@ -10,7 +10,7 @@ const std::string HELP_TEXT =
     "HScompiler\n"
     "Usage: HScompiler [INPUT_FILE] [OPTIONS]\n"
     "Options:\n"
-    "    -o [OUTPUT_FILE]    Specify the output file\n"
+    "    -o [OUTPUT_FILE]    Specify the output file. If not used the output file will be named output\n"
     "    -c                  Compile to an executable\n"
     "    -k                  Keep temporary files\n"
     "    -h                  Display this help text\n";
