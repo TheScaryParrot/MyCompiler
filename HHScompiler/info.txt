@@ -1,0 +1,2 @@
+The compiler for HHS, the language one level higher than HS.
+It mainly introduces functions, and basic control statements (if, else, while)

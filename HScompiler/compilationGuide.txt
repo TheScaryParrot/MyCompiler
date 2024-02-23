@@ -1,1 +1,2 @@
 adding custom VScode extension: copy EXTENSIONFOLDER to /home/USER/.vscode/extensions
+compile using the compiler: [COMPILERFILE] -h (this will give you all the information)
