@@ -3,17 +3,12 @@
 
 #include "library/FileParsingHelper.cpp"
 
-std::string CompileLine(std::string line)
-{
-
-}
-
 void CompileFile(std::ifstream* file)
 {
     while (file->good())
     {
-        std::string line = FileParsingHelper.GetNextLine(file);
-        std::cout << CompileLine(line) << "\n";
+        CodeLine codeLine = FileParsingHelper.GetNextLine(file);
+        std::cout << codeLine.ToString() << "\n";
     }
 }
 
