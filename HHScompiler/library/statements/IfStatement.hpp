@@ -1,4 +1,4 @@
-#include "AbstractStatement.hpp"
+#include "AbstractStatement.cpp"
 
 class IfStatement : public AbstractStatement
 {

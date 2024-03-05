@@ -1,28 +1,28 @@
 #include <iostream>
 #include <string>
 
-#include "library/FileParsingHelper.cpp"
+#include "library/InputFile.cpp"
 
-void CompileFile(std::ifstream* file)
+void CompileFile(InputFile* file)
 {
-    while (file->good())
+    while (file->IsGood())
     {
-        CodeLine codeLine = FileParsingHelper.GetNextLine(file);
+        CodeLine codeLine = file->GetNextLine();
         std::cout << codeLine.ToString() << "\n";
     }
 }
 
 void Execute(std::string inputFileName)
 {
-    std::ifstream file(inputFileName);
+    InputFile* inputFile = new InputFile(inputFileName);
 
-    if (!file.is_open())
+    if (!inputFile->IsOpen())
     {
         std::cout << "Error: Could not open file " << inputFileName << "\n";
         return;
     }
 
-    CompileFile(&file);
+    CompileFile(inputFile);
 }
 
 
