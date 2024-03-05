@@ -67,8 +67,18 @@ public:
                 if (codeLine.IsEmpty()) {continue;}
                 else {break;}
             }
-            else if (character == '{') {currentString += character; break;}
-            else if (character == '}') {currentString += character; break;}
+            else if (character == '{') 
+            {
+                currentString += character;
+                codeLine.AddString(currentString);
+                break;
+            }
+            else if (character == '}')
+            {
+                currentString += character;
+                codeLine.AddString(currentString);
+                break;
+            }
 
             // If end of word is reached, add it to the code line
             if (character == ' ')

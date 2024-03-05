@@ -9,10 +9,10 @@ public:
     CodeLine(std::string instruction, std::vector<std::string> arguments, int lineNumber);
     ~CodeLine();
     
-    std::string ToString();
-
     void AddString(std::string string);
     
+    std::string ToString();
+
     bool IsEmpty() {return instruction == "" && arguments.size() == 0;}
 
     std::string instruction;
@@ -37,18 +37,6 @@ CodeLine::~CodeLine()
 {
 }
 
-std::string CodeLine::ToString()
-{
-    std::string result = instruction;
-
-    for (std::string argument : arguments)
-    {
-        result += " " + argument;
-    }
-
-    return result;
-}
-
 void CodeLine::AddString(std::string string)
 {
     if (string == "") return;
@@ -61,3 +49,16 @@ void CodeLine::AddString(std::string string)
     
     arguments.push_back(string);
 }
+
+std::string CodeLine::ToString()
+{
+    std::string result = instruction;
+
+    for (std::string argument : arguments)
+    {
+        result += " " + argument;
+    }
+
+    return result;
+}
+

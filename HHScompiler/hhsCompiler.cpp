@@ -2,13 +2,13 @@
 #include <string>
 
 #include "library/InputFile.cpp"
+#include "library/CompilationHandler.cpp"
 
 void CompileFile(InputFile* file)
 {
     while (file->IsGood())
     {
-        CodeLine codeLine = file->GetNextLine();
-        std::cout << codeLine.ToString() << "\n";
+        std::cout << CompilationHandler.Compile(file->GetNextLine()) << "\n";
     }
 }
 
