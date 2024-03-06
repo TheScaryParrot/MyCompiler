@@ -57,8 +57,7 @@ public:
                 }
             }
             else if (isInComment) {continue;}
-            else if (character == '\n') {character = ' '; this->currentLine++;}
-            else if (character == '\r') {character = ' '; this->currentLine++;}
+            else if (character == '\n' || character == '\r') {character = ' '; this->currentLine++;}
             else if (character == '\t') {character = ' ';}
             else if (character == ';') 
             {
@@ -67,17 +66,18 @@ public:
                 if (codeLine.IsEmpty()) {continue;}
                 else {break;}
             }
-            else if (character == '{') 
+            else if (character == '{' || character == '}')
             {
                 currentString += character;
                 codeLine.AddString(currentString);
                 break;
             }
-            else if (character == '}')
+            else if (character == '(' || character == ')')
             {
-                currentString += character;
                 codeLine.AddString(currentString);
-                break;
+                currentString = "";
+                codeLine.AddString(std::string(1, character));
+                continue;
             }
 
             // If end of word is reached, add it to the code line
