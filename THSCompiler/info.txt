@@ -1,0 +1,5 @@
+I think I need to rework my approach...
+Might rather do one big compiler for all the functionality
+I think it's actually gonna be simpler and definitally faster
+So yeah this is what I'm doing
+A complete compiler hell yeah
