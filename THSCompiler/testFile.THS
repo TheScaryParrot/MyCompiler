@@ -1,0 +1,37 @@
+class Base
+{
+    if
+    elif
+
+    Base(int amount)
+    {
+        print("Base" + amount);
+    }
+
+    else
+}
+
+class Derived : Base
+{
+    if ()
+
+    Derived(int amount) : base(amount)
+    {
+        print("Derived: " + amount);
+        elif
+    }
+
+    else
+}
+
+void main(int argc, string[] argv)
+{
+    Derived d = new Derived(10);
+
+    if (true && false)
+    {
+        print("This should not be printed");
+    }
+
+    print("Done");
+}
