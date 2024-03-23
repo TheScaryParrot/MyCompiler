@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../tokens/TokenList.cpp"
+#include "../tokens/expressions/value/IdentifierToken.cpp"
 #include "../InputFile.cpp"
 #include "characterGroups/CharacterGroups.cpp"
 #include "characterGroups/Keywords.cpp"
@@ -106,20 +107,21 @@ TokenList Scanner::Scan(InputFile* file) {
 
         // Identifier
         if (CharacterGroups.ALPHABET.Contains(character)) {
-            std::string identifier = character;
+            std::string identifierString = character;
             while (CharacterGroups.ALPHANUMERIC.Contains(file->PeekNext())) {
-                identifier += file->ReadNext();
+                identifierString += file->ReadNext();
             }
 
-            AbstractToken* token = Keywords.GetKeywordToken(identifier);
+            // Check whether the identifier is a keyword
+            AbstractToken* keywordToken = Keywords.GetKeywordToken(identifierString);
 
-            if (token != nullptr)
+            if (keywordToken != nullptr)
             {
-                tokens.AddToken(token);
+                tokens.AddToken(keywordToken);
             }
             else 
             {
-                //TODO: Add identifier token to tokens
+                tokens.AddToken(new IdentifierToken(identifierString));
             }
 
             continue;

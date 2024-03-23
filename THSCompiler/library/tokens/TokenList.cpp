@@ -11,12 +11,17 @@ public:
     ~TokenList();
 
     void AddToken(AbstractToken* token);
-    int GetSize();
+    unsigned int GetSize();
+
+    AbstractToken* Next();
+    AbstractToken* Peek(int offset);
+    bool HasNext();
 
     std::string ToString();
 
 private:
     std::vector<AbstractToken*> tokens;
+    unsigned int readIndex = 0;
 };
 
 TokenList::TokenList() {
@@ -31,8 +36,27 @@ void TokenList::AddToken(AbstractToken* token) {
     tokens.push_back(token);
 }
 
-int TokenList::GetSize() {
+unsigned int TokenList::GetSize() {
     return tokens.size();
+}
+
+AbstractToken* TokenList::Next() {
+    if (HasNext()) {
+        return tokens[readIndex++];
+    }
+    return nullptr;
+}
+
+AbstractToken* TokenList::Peek(int offset) {
+    if (readIndex + offset < 0 || readIndex + offset >= GetSize()) {
+        return nullptr;
+    }
+
+    return tokens[readIndex + offset];
+}
+
+bool TokenList::HasNext() {
+    return readIndex < tokens.size();
 }
 
 std::string TokenList::ToString() {
