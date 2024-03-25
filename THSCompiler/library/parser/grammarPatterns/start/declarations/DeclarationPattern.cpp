@@ -2,6 +2,9 @@
 
 #include <library/parser/grammarPatterns/IGrammarPattern.cpp>
 #include "ClassDeclaration.cpp"
+#include "VarFuncDeclaration.cpp"
+#include "FuncDeclaration.cpp"
+#include "VarDeclaration.cpp"
 
 class DeclarationPattern : public IGrammarPattern
 {
@@ -11,6 +14,8 @@ public:
 
 private:
     ClassDeclaration* classDeclaration;
+    FuncDeclaration* funcDeclaration;
+    VarDeclaration* varDeclaration;
 };
 
 ELookAheadCertainties DeclarationPattern::LookAhead(TokenList* tokens)
@@ -19,10 +24,7 @@ ELookAheadCertainties DeclarationPattern::LookAhead(TokenList* tokens)
         return ELookAheadCertainties::CertainlyPresent;
     }
 
-    // VAR DECLARATION
-    // FUNCTION DECLARATION
-
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return VarFuncDeclaration::LookAhead(tokens);
 }
 
 DeclarationPattern* DeclarationPattern::Parse(TokenList* tokens)
@@ -34,6 +36,18 @@ DeclarationPattern* DeclarationPattern::Parse(TokenList* tokens)
         return declarationPattern;
     }
 
+    VarFuncDeclaration* varFuncDeclaration = VarFuncDeclaration::Parse(tokens);
+
+    if (FuncDeclaration::LookAhead(tokens) == ELookAheadCertainties::CertainlyPresent) {
+        declarationPattern->funcDeclaration = FuncDeclaration::Parse(tokens, varFuncDeclaration);
+        delete varFuncDeclaration;
+        return declarationPattern;
+    }
+
+    declarationPattern->varDeclaration = VarDeclaration::Parse(tokens, varFuncDeclaration);
+    delete varFuncDeclaration;
+    return declarationPattern;
+
     delete declarationPattern;
-    return nullptr;
+    throw "Could not parse declaration. Did you run LookAhead before Parse?";
 }

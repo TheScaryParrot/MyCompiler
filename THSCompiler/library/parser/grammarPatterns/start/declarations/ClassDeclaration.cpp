@@ -1,7 +1,5 @@
 #pragma once
 
-#include <typeinfo>
-
 #include <library/parser/grammarPatterns/IGrammarPattern.cpp>
 
 #include <library/tokens/keywords/classes/ClassKeyword.cpp>
@@ -19,17 +17,13 @@ private:
 
 ELookAheadCertainties ClassDeclaration::LookAhead(TokenList* tokens)
 {
-    if (typeid(tokens->Peek(0)) != typeid(ClassKeyword)) {
-        return ELookAheadCertainties::CertainlyNotPresent;
+    
+
+    if (tokens->IsPeekOfType<ClassKeyword>(0)) {
+        return ELookAheadCertainties::CertainlyPresent;
     }
-
-    if (typeid(tokens->Peek(1)) != typeid(IdentifierToken)) {
-        return ELookAheadCertainties::CertainlyNotPresent;
-    }
-
-    // BODY: Check if the class declaration is valid
-
-    return ELookAheadCertainties::CertainlyPresent;
+    
+    return ELookAheadCertainties::CertainlyNotPresent;
 }
 
 ClassDeclaration* ClassDeclaration::Parse(TokenList* tokens)

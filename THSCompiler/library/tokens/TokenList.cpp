@@ -15,6 +15,16 @@ public:
 
     AbstractToken* Next();
     AbstractToken* Peek(int offset);
+
+    template <typename T> bool IsPeekOfType(int offset)
+    {
+        if (Peek(offset) == nullptr) {
+            return false;
+        }
+
+        return typeid(*Peek(offset)) == typeid(T);
+    };
+
     bool HasNext();
 
     std::string ToString();

@@ -1,16 +1,25 @@
 #pragma once
 
-#include "../tokens/TokenList.cpp"
-#include "../tokens/expressions/value/IdentifierToken.cpp"
+#include <iostream>
+
 #include "../InputFile.cpp"
-#include "characterGroups/CharacterGroups.cpp"
-#include "characterGroups/Keywords.cpp"
+
+#include "../InputFile.cpp"
+
+#include "../tokens/TokenList.cpp"
+
+#include "../tokens/ConstTokens.cpp"
+#include "../tokens/Keywords.cpp"
+#include "../tokens/notConstTokens/IdentifierToken.cpp"
+#include "../tokens/notConstTokens/StringConst.cpp"
+#include "../tokens/notConstTokens/NumberConst.cpp"
+
+#include "../tokens/characterGroups/CharacterGroups.cpp"
+
 
 static class Scanner {
 public:
     TokenList Scan(InputFile* file);
-
-private:
 
 }Scanner;
 
@@ -27,33 +36,38 @@ TokenList Scanner::Scan(InputFile* file) {
         // Ignore whitespaces
         if (CharacterGroups.WHITESPACES.Contains(character)) {continue;}
 
-        // Statement end
-        if (CharacterGroups.STATEMENT_END.Contains(character)) {
-            // TODO: Add statement end token to tokens
+        // --- Delimitors ---
+        if (ConstTokens.STATEMENT_END_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.STATEMENT_END_TOKEN);
             continue;
         }
 
-        if (CharacterGroups.BODY_OPEN.Contains(character)) {
-            // TODO: Add body open token to tokens
+        if (ConstTokens.BODY_OPEN_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.BODY_OPEN_TOKEN);
             continue;
         }
 
-        if (CharacterGroups.BODY_CLOSE.Contains(character)) {
-            // TODO: Add body close token to tokens
+        if (ConstTokens.BODY_CLOSE_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.BODY_CLOSE_TOKEN);
+            continue;
+        }
+        
+        if (ConstTokens.PARENTHESIS_OPEN_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.PARENTHESIS_OPEN_TOKEN);
             continue;
         }
 
-        if (CharacterGroups.PARENTHESIS_OPEN.Contains(character)) {
-            //TODO: Add parenthesis open token to tokens
+        if (ConstTokens.PARENTHESIS_CLOSE_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.PARENTHESIS_CLOSE_TOKEN);
             continue;
         }
 
-        if (CharacterGroups.PARENTHESIS_CLOSE.Contains(character)) {
-            //TODO: Add parenthesis close token to tokens
+        if (ConstTokens.SEPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.SEPERATOR_TOKEN);
             continue;
         }
 
-        // Single-line comment
+        // --- Single-line comment ---
         if (character == "/") {
             if (file->PeekNext() == "/") {
                 while (file->PeekNext() != "\n") {
@@ -64,29 +78,36 @@ TokenList Scanner::Scan(InputFile* file) {
             continue;
         }
 
-        // Multi-line comment
-        if (character == "\\\\") {
-            std::string string = character;
-            while (file->PeekNext() != "\\\\") {
-                string += file->ReadNext();
+        // --- Multi-line comment ---
+        if (character == "\\") {
+            if (file->PeekNext() == "\\") {
+                while (true) {
+                    if (file->PeekNext() == "\\") {
+                        if (file->PeekNext() == "\\") {
+                            break;
+                        }
+                    }
+
+                    file->ReadNext();
+                }
             }
 
             continue;
         }
 
-        // Number
+        // --- Number ---
         if (CharacterGroups.NUMBERS.Contains(character)) {
             std::string number = character;
             while (CharacterGroups.NUMBERS.Contains(file->PeekNext())) {
                 number += file->ReadNext();
             }
 
-            // TODO: Add number token to tokens
+            tokens.AddToken(new NumberConst(number));
 
             continue;
         }
         
-        // String
+        // --- String ---
         if (character == "\"") {
             std::string string = "";
             std::string next = "";
@@ -100,20 +121,20 @@ TokenList Scanner::Scan(InputFile* file) {
                 i++;
             }
 
-            // TODO: Add string token to tokens
+            tokens.AddToken(new StringConst(string));
 
             continue;
         }
 
-        // Identifier
-        if (CharacterGroups.ALPHABET.Contains(character)) {
+        // --- Identifier ---
+        if (CharacterGroups.IDENTIFIER_START_CHAR.Contains(character)) {
             std::string identifierString = character;
-            while (CharacterGroups.ALPHANUMERIC.Contains(file->PeekNext())) {
+            while (CharacterGroups.IDENTIFIER_CHAR.Contains(file->PeekNext())) {
                 identifierString += file->ReadNext();
             }
 
             // Check whether the identifier is a keyword
-            AbstractToken* keywordToken = Keywords.GetKeywordToken(identifierString);
+            AbstractKeywordToken* keywordToken = Keywords.GetKeywordToken(identifierString);
 
             if (keywordToken != nullptr)
             {
@@ -126,6 +147,131 @@ TokenList Scanner::Scan(InputFile* file) {
 
             continue;
         }
+
+        // --- Arithmetic Operators ---
+        if (ConstTokens.ADD_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.ADD_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.SUB_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.SUB_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.MUL_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.MUL_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.DIV_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.DIV_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.MOD_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.MOD_OPERATOR_TOKEN);
+            continue;
+        }
+
+        // --- Equal Operators ---
+        if (ConstTokens.EQUAL_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.EQUAL_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.NOT_EQUAL_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.NOT_EQUAL_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.GREATER_THAN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.GREATER_THAN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.LESS_THAN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.LESS_THAN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN);
+            continue;
+        }
+
+        // --- Assign Operators ---
+        if (ConstTokens.ASSIGN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.ASSIGN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.SUB_ASSIGN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.SUB_ASSIGN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.MUL_ASSIGN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.MUL_ASSIGN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.DIV_ASSIGN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.DIV_ASSIGN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.MOD_ASSIGN_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.MOD_ASSIGN_OPERATOR_TOKEN);
+            continue;
+        }
+
+        // --- Increment and Decrement Operators ---
+        if (ConstTokens.INCREMENT_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.INCREMENT_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.DECREMENT_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.DECREMENT_OPERATOR_TOKEN);
+            continue;
+        }
+
+        // --- Negate Operator ---
+        if (ConstTokens.NEGATE_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.NEGATE_OPERATOR_TOKEN);
+            continue;
+        }
+
+        // --- Logical Operators ---
+        if (ConstTokens.AND_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.AND_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.OR_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.OR_OPERATOR_TOKEN);
+            continue;
+        }
+
+        if (ConstTokens.NOT_OPERATOR_TOKEN.IsInCharacterGroup(character)) {
+            tokens.AddToken(&ConstTokens.NOT_OPERATOR_TOKEN);
+            continue;
+        }
+
+
+        // --- Unknown Token ---
+        std::cout << "Unknown token: " << character << std::endl;
     }
 
     return tokens;
