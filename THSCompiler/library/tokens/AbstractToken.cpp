@@ -25,7 +25,6 @@ AbstractToken::AbstractToken(std::string tokenName, CharacterGroup* characterGro
 }
 
 AbstractToken::~AbstractToken() {
-    delete characterGroup;
 }
 
 bool AbstractToken::IsThisToken(AbstractToken& other)

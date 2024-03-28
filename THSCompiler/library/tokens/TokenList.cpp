@@ -10,7 +10,7 @@ public:
     TokenList();
     ~TokenList();
 
-    void AddToken(AbstractToken token);
+    void AddToken(AbstractToken* token);
     unsigned int GetSize();
 
     AbstractToken* Next();
@@ -30,29 +30,29 @@ public:
     std::string ToString();
 
 private:
-    std::vector<AbstractToken> tokens;
+    std::vector<AbstractToken*>* tokens;
     unsigned int readIndex = 0;
 };
 
 TokenList::TokenList() {
-    tokens = std::vector<AbstractToken>();
+    tokens = new std::vector<AbstractToken*>();
 }
 
 TokenList::~TokenList() {
-    tokens.clear();
+    delete tokens;
 }
 
-void TokenList::AddToken(AbstractToken token) {
-    tokens.push_back(token);
+void TokenList::AddToken(AbstractToken* token) {
+    tokens->push_back(token);
 }
 
 unsigned int TokenList::GetSize() {
-    return tokens.size();
+    return tokens->size();
 }
 
 AbstractToken* TokenList::Next() {
     if (HasNext()) {
-        return &tokens[readIndex++];
+        return (*tokens)[readIndex++];
     }
     return nullptr;
 }
@@ -62,17 +62,17 @@ AbstractToken* TokenList::Peek(int offset) {
         return nullptr;
     }
 
-    return &tokens[readIndex + offset];
+    return (*tokens)[readIndex + offset];
 }
 
 bool TokenList::HasNext() {
-    return readIndex < tokens.size();
+    return readIndex < tokens->size();
 }
 
 std::string TokenList::ToString() {
     std::string result = "";
-    for (int i = 0; i < tokens.size(); i++) {
-        result += tokens[i].ToString() + "\n";
+    for (int i = 0; i < tokens->size(); i++) {
+        result += (*tokens)[i]->ToString() + "\n";
     }
     return result;
 }

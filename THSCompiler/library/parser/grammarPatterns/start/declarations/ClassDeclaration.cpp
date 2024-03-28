@@ -2,7 +2,7 @@
 
 #include <library/parser/grammarPatterns/IGrammarPattern.cpp>
 
-#include <library/tokens/keywords/classes/ClassKeyword.cpp>
+#include <library/tokens/Keywords.cpp>
 #include <library/tokens/expressions/value/IdentifierToken.cpp>
 
 class ClassDeclaration : public IGrammarPattern
