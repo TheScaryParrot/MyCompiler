@@ -1,6 +1,6 @@
 #pragma once
 
-#include <library/parser/grammarPatterns/IGrammarPattern.cpp>
+#include "../IGrammarPattern.cpp"
 #include "declarations/DeclarationPattern.cpp"
 #include "statements/StatementPattern.cpp"
 
@@ -9,6 +9,8 @@ class CodeLine : public IGrammarPattern
 public:
     static ELookAheadCertainties LookAhead(TokenList* tokens);
     static CodeLine* Parse(TokenList* tokens);
+
+    virtual std::string ToString() override;
 
     DeclarationPattern* declaration;
     StatementPattern* statement;
@@ -43,4 +45,17 @@ CodeLine* CodeLine::Parse(TokenList* tokens)
 
     delete codeLine;
     return nullptr;
+}
+
+std::string CodeLine::ToString()
+{
+    if (declaration != nullptr) {
+        return declaration->ToString();
+    }
+
+    if (statement != nullptr) {
+        return statement->ToString();
+    }
+
+    return "";
 }

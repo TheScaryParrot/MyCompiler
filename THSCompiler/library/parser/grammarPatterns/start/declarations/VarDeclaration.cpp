@@ -1,15 +1,17 @@
 #pragma once
 
-#include <library/parser/grammarPatterns/IGrammarPattern.cpp>
+#include "../../IGrammarPattern.cpp"
 #include "VarFuncDeclaration.cpp"
 
-#include <library/tokens/expressions/value/IdentifierToken.cpp>
+#include "../../../../tokens/ConstTokens.cpp"
 
 class VarDeclaration : IGrammarPattern
 {
 public:
     static ELookAheadCertainties LookAhead(TokenList* tokens);
     static VarDeclaration* Parse(TokenList* tokens, VarFuncDeclaration* varFuncDeclaration);
+
+    virtual std::string ToString() override;
 
 private:
     std::string name;
@@ -19,7 +21,7 @@ private:
 
 ELookAheadCertainties VarDeclaration::LookAhead(TokenList* tokens)
 {
-    
+    return ELookAheadCertainties::CertainlyPresent;
 }
 
 VarDeclaration* VarDeclaration::Parse(TokenList* tokens, VarFuncDeclaration* varFuncDeclaration)
@@ -28,8 +30,14 @@ VarDeclaration* VarDeclaration::Parse(TokenList* tokens, VarFuncDeclaration* var
 
     varDeclaration->type = varFuncDeclaration->type;
     varDeclaration->name = varFuncDeclaration->name;
+    //Parse scope of varFuncDeclaration
     
     // CONSUME EXPRESSION
 
     return varDeclaration;
+}
+
+std::string VarDeclaration::ToString()
+{
+    return "var declaration: " + type + " " + name;
 }

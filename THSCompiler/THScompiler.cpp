@@ -1,12 +1,17 @@
 #include <iostream>
 
 #include "library/scanner/Scanner.cpp"
+#include "library/parser/SyntaxTree.cpp"
 
 void CompileFile(std::string filename) {
     InputFile* file = new InputFile(filename);
     TokenList* tokens = Scanner.Scan(file);
     delete file;
-    std::cout << tokens->ToString() << std::endl;
+    
+    SyntaxTree* syntaxTree = new SyntaxTree(tokens);
+    std::cout << syntaxTree->ToString() << std::endl;
+    delete syntaxTree;
+
     delete tokens;
 }
 

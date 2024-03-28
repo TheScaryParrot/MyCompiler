@@ -1,6 +1,6 @@
 #pragma once
 
-#include <library/parser/grammarPatterns/IGrammarPattern.cpp>
+#include "../../IGrammarPattern.cpp"
 #include "ClassDeclaration.cpp"
 #include "VarFuncDeclaration.cpp"
 #include "FuncDeclaration.cpp"
@@ -11,6 +11,8 @@ class DeclarationPattern : public IGrammarPattern
 public:
     static ELookAheadCertainties LookAhead(TokenList* tokens);
     static DeclarationPattern* Parse(TokenList* tokens);
+
+    virtual std::string ToString() override;
 
 private:
     ClassDeclaration* classDeclaration;
@@ -50,4 +52,17 @@ DeclarationPattern* DeclarationPattern::Parse(TokenList* tokens)
 
     delete declarationPattern;
     throw "Could not parse declaration. Did you run LookAhead before Parse?";
+}
+
+std::string DeclarationPattern::ToString()
+{
+    if (classDeclaration != nullptr) {
+        return classDeclaration->ToString();
+    }
+
+    if (funcDeclaration != nullptr) {
+        return funcDeclaration->ToString();
+    }
+
+    return varDeclaration->ToString();
 }

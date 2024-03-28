@@ -1,6 +1,6 @@
 #pragma once
 
-#include <library/parser/grammarPatterns/IGrammarPattern.cpp>
+#include "../IGrammarPattern.cpp"
 #include "CodeLine.cpp"
 #include <iostream>
 
@@ -12,6 +12,8 @@ public:
 
     void AddLine(CodeLine* line);
 
+    virtual std::string ToString() override;
+
 private:
     std::vector<CodeLine*> lines;
 };
@@ -21,9 +23,11 @@ CodeBlock* CodeBlock::Parse(TokenList* tokens) {
 
     while (tokens->HasNext()) {
         if (CodeLine::LookAhead(tokens) != ELookAheadCertainties::CertainlyPresent) {
-            break;   
+            tokens->Next();
+            continue;   
         }
         
+        std::cout << "Parsing code line: " << tokens->Peek()->ToString() << std::endl;
         codeBlock->AddLine(CodeLine::Parse(tokens));
     }
 
@@ -32,4 +36,13 @@ CodeBlock* CodeBlock::Parse(TokenList* tokens) {
 
 void CodeBlock::AddLine(CodeLine* line) {
     lines.push_back(line);
+}
+
+std::string CodeBlock::ToString() {
+    std::string str = "{\n";
+    for (CodeLine* line : lines) {
+        str += line->ToString() + "\n";
+    }
+    str += "}\n";
+    return str;
 }

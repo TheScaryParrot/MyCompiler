@@ -1,4 +1,8 @@
-class Base
+hello;
+
+public static int yomamam;
+
+static class Base
 {
     if
     elif
@@ -23,6 +27,8 @@ class Derived : Base
 
     else
 }
+
+hei moin() {}
 
 void main(int argc, string[] argv)
 {

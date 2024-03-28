@@ -11,8 +11,8 @@
 #include "../tokens/ConstTokens.cpp"
 #include "../tokens/Keywords.cpp"
 #include "../tokens/notConstTokens/IdentifierToken.cpp"
-#include "../tokens/notConstTokens/StringConst.cpp"
-#include "../tokens/notConstTokens/NumberConst.cpp"
+#include "../tokens/notConstTokens/StringConstToken.cpp"
+#include "../tokens/notConstTokens/NumberConstToken.cpp"
 
 #include "../tokens/characterGroups/CharacterGroups.cpp"
 

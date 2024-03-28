@@ -14,18 +14,10 @@ public:
     unsigned int GetSize();
 
     AbstractToken* Next();
-    AbstractToken* Peek(int offset);
+    AbstractToken* Peek(int offset = 0);
+    bool IsPeekOfTokenType(AbstractToken& other, int offset = 0);
 
-    template <typename T> bool IsPeekOfType(int offset)
-    {
-        if (Peek(offset) == nullptr) {
-            return false;
-        }
-
-        return typeid(*Peek(offset)) == typeid(T);
-    };
-
-    bool HasNext();
+    bool HasNext(int offset = 0);
 
     std::string ToString();
 
@@ -64,8 +56,16 @@ AbstractToken* TokenList::Peek(int offset) {
     return tokens[readIndex + offset];
 }
 
-bool TokenList::HasNext() {
-    return readIndex < tokens.size();
+bool TokenList::IsPeekOfTokenType(AbstractToken& other, int offset) {
+    if (!HasNext(offset)) {
+        return false;
+    }
+
+    return Peek(offset)->IsThisToken(other);
+}
+
+bool TokenList::HasNext(int offset) {
+    return readIndex + offset < tokens.size();
 }
 
 std::string TokenList::ToString() {
