@@ -102,7 +102,7 @@ TokenList* Scanner::Scan(InputFile* file) {
                 number += file->ReadNext();
             }
 
-            tokens->AddToken(new NumberConst(number));
+            tokens->AddToken(new NumberConstToken(number));
 
             continue;
         }
@@ -121,7 +121,7 @@ TokenList* Scanner::Scan(InputFile* file) {
                 i++;
             }
 
-            tokens->AddToken(new StringConst(string));
+            tokens->AddToken(new StringConstToken(string));
 
             continue;
         }

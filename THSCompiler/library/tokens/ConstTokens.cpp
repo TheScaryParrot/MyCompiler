@@ -1,6 +1,9 @@
 #pragma once
 
 #include "AbstractToken.cpp"
+#include "notConstTokens/IdentifierToken.cpp"
+#include "notConstTokens/NumberConstToken.cpp"
+#include "notConstTokens/StringConstToken.cpp"
 #include "characterGroups/CharacterGroups.cpp"
 
 static class ConstTokens {
@@ -41,12 +44,10 @@ public:
     AbstractToken AND_OPERATOR_TOKEN = AbstractToken("andOperator", &CharacterGroups.AND_OPERATOR);
     AbstractToken OR_OPERATOR_TOKEN = AbstractToken("orOperator", &CharacterGroups.OR_OPERATOR);
 
-    static AbstractToken* GetToken(std::string character);
+    /* ----- Const version of Not Constant Tokens (IdentifierToken, NumberToken, StringToken...) -----
+        Their main usage is for their IsThisToken method. Which cannot be used static*/
+    IdentifierToken CONST_IDENTIFIER_TOKEN = IdentifierToken("");
+    NumberConstToken CONST_NUMBER_TOKEN = NumberConstToken("0");
+    StringConstToken CONST_STRING_TOKEN = StringConstToken("");
 
 }ConstTokens;
-
-AbstractToken* ConstTokens::GetToken(std::string character)
-{
-    // TODO: Do this
-    return nullptr;
-}
