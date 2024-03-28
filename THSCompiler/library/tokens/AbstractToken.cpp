@@ -7,9 +7,9 @@
 class AbstractToken {
 public:
     AbstractToken(std::string tokenName, CharacterGroup* characterGroup = nullptr);
-    ~AbstractToken();
+    virtual ~AbstractToken();
 
-    virtual bool IsThisToken(AbstractToken* other);
+    virtual bool IsThisToken(AbstractToken& other);
     virtual bool IsInCharacterGroup(std::string character);
 
     virtual std::string ToString();
@@ -25,11 +25,12 @@ AbstractToken::AbstractToken(std::string tokenName, CharacterGroup* characterGro
 }
 
 AbstractToken::~AbstractToken() {
+    delete characterGroup;
 }
 
-bool AbstractToken::IsThisToken(AbstractToken* other)
+bool AbstractToken::IsThisToken(AbstractToken& other)
 {
-    return this->tokenName == other->tokenName;
+    return this->tokenName == other.tokenName;
 }
 
 bool AbstractToken::IsInCharacterGroup(std::string character) {

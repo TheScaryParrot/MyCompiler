@@ -21,7 +21,7 @@ IdentifierToken::IdentifierToken(std::string value) : AbstractToken("identifier"
     this->value = value;
 }
 
-IdentifierToken::~IdentifierToken() {
+IdentifierToken::~IdentifierToken(){
 }
 
 std::string IdentifierToken::ToString() {

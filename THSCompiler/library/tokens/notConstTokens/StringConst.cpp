@@ -11,6 +11,7 @@ public:
     ~StringConst();
 
     virtual std::string ToString() override;
+    
     std::string GetValue();
 
 private:

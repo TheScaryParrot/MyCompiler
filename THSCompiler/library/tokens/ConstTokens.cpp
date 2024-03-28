@@ -41,4 +41,12 @@ public:
     AbstractToken AND_OPERATOR_TOKEN = AbstractToken("andOperator", &CharacterGroups.AND_OPERATOR);
     AbstractToken OR_OPERATOR_TOKEN = AbstractToken("orOperator", &CharacterGroups.OR_OPERATOR);
 
+    static AbstractToken* GetToken(std::string character);
+
 }ConstTokens;
+
+AbstractToken* ConstTokens::GetToken(std::string character)
+{
+    // TODO: Do this
+    return nullptr;
+}
