@@ -5,29 +5,41 @@
 
 class CharacterGroup {
 public:
-    CharacterGroup(std::vector<std::string>* characters = nullptr, std::vector<CharacterGroup>* characterGroups = nullptr);
+    CharacterGroup();
+    CharacterGroup(std::vector<std::string> characters);
+    CharacterGroup(std::vector<CharacterGroup> characterGroups);
+    CharacterGroup(std::vector<std::string> characters, std::vector<CharacterGroup> characterGroups);
     ~CharacterGroup();
 
     bool Contains(std::string character);
 
-private:
+    static CharacterGroup Empty() {
+        return CharacterGroup();
+    }
+    
     std::vector<std::string> characters;
 };
 
-CharacterGroup::CharacterGroup(std::vector<std::string>* characters, std::vector<CharacterGroup>* characterGroups) {
-    if (characters == nullptr) {
-        this->characters = std::vector<std::string>();
-    }
-    else
-    {
-        this->characters = *characters;
-    }
-    
-    if (characterGroups == nullptr) {
-        return;
-    }
+CharacterGroup::CharacterGroup() {
+    characters = std::vector<std::string>();
+}
 
-    for (CharacterGroup group : *characterGroups) {
+CharacterGroup::CharacterGroup(std::vector<std::string> characters) {
+    this->characters = characters;
+}
+
+CharacterGroup::CharacterGroup(std::vector<CharacterGroup> characterGroups) {
+    for (CharacterGroup group : characterGroups) {
+        for (std::string character : group.characters) {
+            this->characters.push_back(character);
+        }
+    }
+}
+
+CharacterGroup::CharacterGroup(std::vector<std::string> characters, std::vector<CharacterGroup> characterGroups) {
+    this->characters = characters;
+
+    for (CharacterGroup group : characterGroups) {
         for (std::string character : group.characters) {
             this->characters.push_back(character);
         }
@@ -35,7 +47,6 @@ CharacterGroup::CharacterGroup(std::vector<std::string>* characters, std::vector
 }
 
 CharacterGroup::~CharacterGroup() {
-    characters.clear();
 }
 
 bool CharacterGroup::Contains(std::string character) {

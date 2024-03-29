@@ -30,7 +30,9 @@ TokenList::TokenList() {
 }
 
 TokenList::~TokenList() {
-    tokens.clear();
+    for (int i = 0; i < tokens.size(); i++) {
+        delete tokens[i];
+    }
 }
 
 void TokenList::AddToken(AbstractToken* token) {

@@ -9,16 +9,30 @@
 class DeclarationPattern : public IGrammarPattern
 {
 public:
+    DeclarationPattern();
+    ~DeclarationPattern();
+
     static ELookAheadCertainties LookAhead(TokenList* tokens);
     static DeclarationPattern* Parse(TokenList* tokens);
 
     virtual std::string ToString() override;
 
 private:
-    ClassDeclaration* classDeclaration;
-    FuncDeclaration* funcDeclaration;
-    VarDeclaration* varDeclaration;
+    ClassDeclaration* classDeclaration = nullptr;
+    FuncDeclaration* funcDeclaration = nullptr;
+    VarDeclaration* varDeclaration = nullptr;
 };
+
+DeclarationPattern::DeclarationPattern()
+{
+}
+
+DeclarationPattern::~DeclarationPattern()
+{
+    delete classDeclaration;
+    delete funcDeclaration;
+    delete varDeclaration;
+}
 
 ELookAheadCertainties DeclarationPattern::LookAhead(TokenList* tokens)
 {

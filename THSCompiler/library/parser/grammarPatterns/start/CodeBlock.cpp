@@ -7,6 +7,9 @@
 class CodeBlock : public IGrammarPattern
 {
 public:
+    CodeBlock();
+    ~CodeBlock();
+
     static ELookAheadCertainties LookAhead(TokenList* tokens);
     static CodeBlock* Parse(TokenList* tokens);
 
@@ -18,6 +21,15 @@ private:
     std::vector<CodeLine*> lines;
 };
 
+CodeBlock::CodeBlock() {
+}
+
+CodeBlock::~CodeBlock() {
+    for (CodeLine* line : lines) {
+        delete line;
+    }
+}
+
 CodeBlock* CodeBlock::Parse(TokenList* tokens) {
     CodeBlock* codeBlock = new CodeBlock();
 
@@ -27,7 +39,6 @@ CodeBlock* CodeBlock::Parse(TokenList* tokens) {
             continue;   
         }
         
-        std::cout << "Parsing code line: " << tokens->Peek()->ToString() << std::endl;
         codeBlock->AddLine(CodeLine::Parse(tokens));
     }
 

@@ -7,14 +7,27 @@
 class CodeLine : public IGrammarPattern
 {
 public:
+    CodeLine();
+    ~CodeLine();
+
     static ELookAheadCertainties LookAhead(TokenList* tokens);
     static CodeLine* Parse(TokenList* tokens);
 
     virtual std::string ToString() override;
 
-    DeclarationPattern* declaration;
-    StatementPattern* statement;
+    DeclarationPattern* declaration = nullptr;
+    StatementPattern* statement = nullptr;
 };
+
+CodeLine::CodeLine()
+{
+}
+
+CodeLine::~CodeLine()
+{
+    delete declaration;
+    delete statement;
+}
 
 ELookAheadCertainties CodeLine::LookAhead(TokenList* tokens)
 {
