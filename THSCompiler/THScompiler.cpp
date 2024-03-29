@@ -3,6 +3,8 @@
 #include "library/scanner/Scanner.cpp"
 #include "library/parser/SyntaxTree.cpp"
 
+#include "library/parser/grammarPatterns/start/expressions/ExpressionPattern.cpp"
+
 void CompileFile(std::string filename) {
     InputFile* file = new InputFile(filename);
     TokenList* tokens = Scanner.Scan(file);

@@ -4,7 +4,7 @@
 
 enum ELookAheadCertainties
 {
-    CertainlyPresent,
     CertainlyNotPresent,
+    CertainlyPresent,
     Unknown
 };

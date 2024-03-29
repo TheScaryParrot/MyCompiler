@@ -4,6 +4,7 @@
 
 #include "declarationPatterns/ScopeDeclarationPattern.cpp"
 #include "declarationPatterns/ReadWriteDeclarationPattern.cpp"
+#include "declarationPatterns/TypePattern.cpp"
 
 #include "../../../../tokens/ConstTokens.cpp"
 #include "../../../../tokens/Keywords.cpp"
@@ -36,11 +37,15 @@ ELookAheadCertainties VarFuncDeclaration::LookAhead(TokenList* tokens)
         return ELookAheadCertainties::CertainlyPresent;
     }
 
-    if (tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1)) {
-        return ELookAheadCertainties::CertainlyPresent;
+    ELookAheadCertainties typePatternLookAhead = TypePattern::LookAhead(tokens);
+
+    // If it's unknown, we need to check if the next token is an identifier
+    if (typePatternLookAhead == ELookAheadCertainties::Unknown) {
+        return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1) ? ELookAheadCertainties::CertainlyPresent : ELookAheadCertainties::CertainlyNotPresent;
     }
 
-    return ELookAheadCertainties::CertainlyNotPresent;
+    // As unknown was checked above, we can safely return the result of the type pattern look ahead
+    return typePatternLookAhead;
 }
 
 VarFuncDeclaration* VarFuncDeclaration::Parse(TokenList* tokens)
