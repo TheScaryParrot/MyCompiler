@@ -13,7 +13,14 @@ public:
     void AddToken(AbstractToken* token);
     unsigned int GetSize();
 
+    template <typename T>
+    T* Next()
+    {
+        return dynamic_cast<T*>(Next());
+    }
+
     AbstractToken* Next();
+
     AbstractToken* Peek(int offset = 0);
     bool IsPeekOfTokenType(AbstractToken& other, int offset = 0);
 

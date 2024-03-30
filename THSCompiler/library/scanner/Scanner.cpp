@@ -67,32 +67,33 @@ TokenList* Scanner::Scan(InputFile* file) {
             continue;
         }
 
-        // --- Single-line comment ---
+        // --- Comments ---
         if (character == "/") {
+
+            // Single line
             if (file->PeekNext() == "/") {
                 while (file->PeekNext() != "\n") {
                     file->ReadNext();
                 }
+
+                continue;
             }
 
-            continue;
-        }
-
-        // --- Multi-line comment ---
-        if (character == "\\") {
-            if (file->PeekNext() == "\\") {
+            // Multi line
+            if (file->PeekNext() == "*") {
                 while (true) {
-                    if (file->PeekNext() == "\\") {
-                        if (file->PeekNext() == "\\") {
+                    character = file->ReadNext();
+
+                    if (character == "*") {
+                        if (file->PeekNext() == "/") {
+                            file->ReadNext();
                             break;
                         }
                     }
-
-                    file->ReadNext();
                 }
-            }
 
-            continue;
+                continue;
+            }
         }
 
         // --- Number ---

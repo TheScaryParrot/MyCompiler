@@ -6,9 +6,9 @@
 class CharacterGroup {
 public:
     CharacterGroup();
-    CharacterGroup(std::vector<std::string> characters);
+    CharacterGroup(std::vector<std::string> strings);
     CharacterGroup(std::vector<CharacterGroup> characterGroups);
-    CharacterGroup(std::vector<std::string> characters, std::vector<CharacterGroup> characterGroups);
+    CharacterGroup(std::vector<std::string> strings, std::vector<CharacterGroup> characterGroups);
     ~CharacterGroup();
 
     bool Contains(std::string character);
@@ -16,32 +16,33 @@ public:
     static CharacterGroup Empty() {
         return CharacterGroup();
     }
-    
-    std::vector<std::string> characters;
+
+private:
+    std::vector<std::string> strings;
 };
 
 CharacterGroup::CharacterGroup() {
-    characters = std::vector<std::string>();
+    strings = std::vector<std::string>();
 }
 
-CharacterGroup::CharacterGroup(std::vector<std::string> characters) {
-    this->characters = characters;
+CharacterGroup::CharacterGroup(std::vector<std::string> strings) {
+    this->strings = strings;
 }
 
 CharacterGroup::CharacterGroup(std::vector<CharacterGroup> characterGroups) {
     for (CharacterGroup group : characterGroups) {
-        for (std::string character : group.characters) {
-            this->characters.push_back(character);
+        for (std::string character : group.strings) {
+            this->strings.push_back(character);
         }
     }
 }
 
-CharacterGroup::CharacterGroup(std::vector<std::string> characters, std::vector<CharacterGroup> characterGroups) {
-    this->characters = characters;
+CharacterGroup::CharacterGroup(std::vector<std::string> strings, std::vector<CharacterGroup> characterGroups) {
+    this->strings = strings;
 
     for (CharacterGroup group : characterGroups) {
-        for (std::string character : group.characters) {
-            this->characters.push_back(character);
+        for (std::string character : group.strings) {
+            this->strings.push_back(character);
         }
     }
 }
@@ -49,9 +50,9 @@ CharacterGroup::CharacterGroup(std::vector<std::string> characters, std::vector<
 CharacterGroup::~CharacterGroup() {
 }
 
-bool CharacterGroup::Contains(std::string character) {
-    for (std::string c : characters) {
-        if (c == character) {
+bool CharacterGroup::Contains(std::string otherString) {
+    for (std::string containedString : strings) {
+        if (containedString == otherString) {
             return true;
         }
     }
