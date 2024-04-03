@@ -1,8 +1,6 @@
 #pragma once
 
-#include "nodes/line/CodeLineNode.cpp"
-
-#include <vector>
+#include "nodes/line/CodeblockNode.cpp"
 
 class SyntaxTree
 {
@@ -10,12 +8,12 @@ public:
     SyntaxTree();
     ~SyntaxTree();
 
-    void AddCodeLineNode(CodeLineNode* codeLine);
+    void AddCodeLineNode(AbstractLineNode* codeLine);
 
     std::string ToString();
 
 private:
-    std::vector<CodeLineNode*> codeLines;
+    CodeblockNode* codeBlock;
 };
 
 SyntaxTree::SyntaxTree()
@@ -24,27 +22,15 @@ SyntaxTree::SyntaxTree()
 
 SyntaxTree::~SyntaxTree()
 {
-    for (CodeLineNode* codeLine : codeLines)
-    {
-        delete codeLine;
-    }
+    delete codeBlock;
 }
 
-void SyntaxTree::AddCodeLineNode(CodeLineNode* codeLine)
+void SyntaxTree::AddCodeLineNode(AbstractLineNode* codeLine)
 {
-    codeLines.push_back(codeLine);
+    codeBlock->AddCodeline(codeLine);
 }
 
 std::string SyntaxTree::ToString()
 {
-    std::string result = "SyntaxTree: {\n";
-
-    for (CodeLineNode* codeLine : codeLines)
-    {
-        result += "\t" + codeLine->ToString() + "\n";
-    }
-
-    result += "}";
-
-    return result;
+    return "SyntaxTree: " + codeBlock->ToString();
 }

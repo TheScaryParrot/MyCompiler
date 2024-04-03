@@ -37,8 +37,8 @@ TokenList::TokenList() {
 }
 
 TokenList::~TokenList() {
-    for (int i = 0; i < tokens.size(); i++) {
-        delete tokens[i];
+    for (AbstractToken* token : tokens) {
+        delete token;
     }
 }
 

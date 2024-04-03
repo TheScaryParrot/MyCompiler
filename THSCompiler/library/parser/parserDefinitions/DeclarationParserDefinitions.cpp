@@ -34,7 +34,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_ClassDeclaration(TokenList* to
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-ClassDeclarationNode* PredictiveParser::Parse_ClassDeclaration(TokenList* tokens /*, Node*/)
+ClassDeclarationNode* PredictiveParser::Parse_ClassDeclaration(TokenList* tokens )
 {
     // STATIC? CLASS ID BODY_OPEN <varFuncDeclaration>* BODY_CLOSE
     bool isStatic = false;
@@ -66,7 +66,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclaration(TokenList* 
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-AbstractVarFuncDeclarationNode* PredictiveParser::Parse_VarFuncDeclaration(TokenList* tokens /*, Node*/)
+AbstractVarFuncDeclarationNode* PredictiveParser::Parse_VarFuncDeclaration(TokenList* tokens )
 {
     if (LookAhead_FuncDeclaration(tokens) == ELookAheadCertainties::CertainlyPresent) return Parse_FuncDeclaration(tokens);
     return Parse_VarDeclaration(tokens);
@@ -83,7 +83,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_VarDeclaration(TokenList* toke
 
     return ELookAheadCertainties::CertainlyPresent;
 }
-VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens /*, Node*/)
+VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens )
 {
     DeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
     TypeNode type = TypeNode(tokens->Next<IdentifierToken>()->GetValue());
@@ -107,16 +107,21 @@ ELookAheadCertainties PredictiveParser::LookAhead_FuncDeclaration(TokenList* tok
 
     return ELookAheadCertainties::CertainlyPresent;
 }
-FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens /*, Node*/)
+FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens )
 {
     DeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
     FunctionReturnTypeNode returnType = FunctionReturnTypeNode(tokens->Next<IdentifierToken>()->GetValue());
     std::string name = tokens->Next<IdentifierToken>()->GetValue();
     std::vector<ParameterDeclarationNode*>* parameters = Parse_Params(tokens);
 
-    // TODO Handle Body
+    BodyNode* body = nullptr;
 
-    return new FuncDeclarationNode(attributes, returnType, name, parameters);
+    if (LookAhead_Body(tokens) == ELookAheadCertainties::CertainlyPresent)
+    {
+        body = Parse_Body(tokens);
+    }
+
+    return new FuncDeclarationNode(attributes, returnType, name, parameters, body);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclarationAttributes(TokenList* tokens)
@@ -141,7 +146,7 @@ unsigned int PredictiveParser::Skip_VarFuncDeclarationAttributes(TokenList* toke
 
     return skippedTokens;
 }
-DeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttributes(TokenList* tokens /*, Node*/)
+DeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttributes(TokenList* tokens )
 {
     DeclarationAttributes attributes;
 
@@ -173,7 +178,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Params(TokenList* tokens)
     // <paramDeclaration> (SEPERATOR <paramDeclaration>)* can be empty, therefore always unknown
     return ELookAheadCertainties::Unknown;
 }
-std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList* tokens /*, Node*/)
+std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList* tokens )
 {
     std::vector<ParameterDeclarationNode*>* parameters = new std::vector<ParameterDeclarationNode*>();
 
@@ -201,7 +206,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_ParamDeclaration(TokenList* to
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* tokens /*, Node*/)
+ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* tokens )
 {
     // TODO Implement type
     return new ParameterDeclarationNode(tokens->Next<IdentifierToken>()->GetValue());
@@ -214,8 +219,20 @@ ELookAheadCertainties PredictiveParser::LookAhead_Body(TokenList* tokens)
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_Body(TokenList* tokens /*, Node*/)
+BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
 {
+    BodyNode* bodynode = new BodyNode();
+
+    tokens->Next(); // Consume BODY_OPEN
+
+    while (tokens->Peek()->IsThisToken(ConstTokens.BODY_CLOSE_TOKEN))
+    {
+        bodynode->AddCodeLine(Parse_Line(tokens));
+    }
+
+    tokens->Next(); // Consume BODY_CLOSE
+
+    return bodynode;
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ScopeAttribute(TokenList* tokens)
@@ -225,8 +242,17 @@ ELookAheadCertainties PredictiveParser::LookAhead_ScopeAttribute(TokenList* toke
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-EScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens /*, Node*/)
+EScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens )
 {
+    AbstractToken* nextToken = tokens->Next(); // Consume scope keyword
+
+    if (nextToken->IsThisToken(Keywords.PUBLIC_KEYWORD)) return EScopes::PUBLIC;
+
+    if (nextToken->IsThisToken(Keywords.PRIVATE_KEYWORD)) return EScopes::PRIVATE;
+
+    delete nextToken;
+
+    return EScopes::PROTECTED;
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_StaticAttribute(TokenList* tokens)
@@ -236,8 +262,10 @@ ELookAheadCertainties PredictiveParser::LookAhead_StaticAttribute(TokenList* tok
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-bool PredictiveParser::Parse_StaticAttribute(TokenList* tokens /*, Node*/)
+bool PredictiveParser::Parse_StaticAttribute(TokenList* tokens )
 {
+    tokens->Next(); // Constume STATIC
+    return true; // As LookAhead_StaticAttribute() has returned CertainlyPresent, we know that static must be present
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ReadWriteAttribute(TokenList* tokens)
@@ -247,6 +275,10 @@ ELookAheadCertainties PredictiveParser::LookAhead_ReadWriteAttribute(TokenList* 
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-EReadWrites PredictiveParser::Parse_ReadWriteAttribute(TokenList* tokens /*, Node*/)
+EReadWrites PredictiveParser::Parse_ReadWriteAttribute(TokenList* tokens )
 {
+    if (tokens->Next()->IsThisToken(Keywords.READ_ONLY_KEYWORD)) return EReadWrites::READONLY;
+
+    // LookAhead returned CertainlyPresent. Therefore it's either Readonly or Const
+    return EReadWrites::CONST;
 }

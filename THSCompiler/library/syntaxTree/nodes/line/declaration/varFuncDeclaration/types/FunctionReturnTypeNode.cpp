@@ -30,5 +30,5 @@ bool FunctionReturnTypeNode::IsVoid()
 
 std::string FunctionReturnTypeNode::ToString()
 {
-    return "FunctionReturnType: " + name;
+    return name;
 }

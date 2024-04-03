@@ -7,7 +7,7 @@
 #include "../syntaxTree/SyntaxTree.cpp"
 
 #pragma region Nodes
-#include "../syntaxTree/nodes/line/CodeLineNode.cpp"
+#include "../syntaxTree/nodes/line/AbstractLineNode.cpp"
 
 #pragma region Declarations
 #include "../syntaxTree/nodes/line/declaration/ClassDeclarationNode.cpp"
@@ -16,6 +16,7 @@
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/declarationAttributes/DeclarationAttributes.cpp"
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/ParameterDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/types/FunctionReturnTypeNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/BodyNode.cpp"
 
 #pragma endregion
 
@@ -28,7 +29,7 @@ public:
 
 private:
     ELookAheadCertainties LookAhead_Line(TokenList* tokens);
-    CodeLineNode* Parse_Line(TokenList* tokens);
+    AbstractLineNode* Parse_Line(TokenList* tokens);
 
     // ------- Declarations -------
     #pragma region Declarations
@@ -59,7 +60,7 @@ private:
     ParameterDeclarationNode* Parse_ParamDeclaration(TokenList* tokens /*, Node*/);
 
     ELookAheadCertainties LookAhead_Body(TokenList* tokens);
-    void Parse_Body(TokenList* tokens /*, Node*/);
+    BodyNode* Parse_Body(TokenList* tokens /*, Node*/);
 
     ELookAheadCertainties LookAhead_ScopeAttribute(TokenList* tokens);
     EScopes Parse_ScopeAttribute(TokenList* tokens /*, Node*/);
