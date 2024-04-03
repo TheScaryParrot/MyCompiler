@@ -2,23 +2,22 @@
 
 #include "AbstractExpressionNode.cpp"
 
-#include "ValueNode.cpp"
 #include "operators/EUnaryOperators.cpp"
 
-class UnaryExpressionNode : AbstractExpressionNode
+class UnaryExpressionNode : public AbstractExpressionNode
 {
 public:
-    UnaryExpressionNode(EUnaryOperators unaryOperator, ValueNode* value);
+    UnaryExpressionNode(EUnaryOperators unaryOperator, AbstractExpressionNode* value);
     ~UnaryExpressionNode();
 
     virtual std::string ToString() override;
 
 private:
     EUnaryOperators unaryOperator;
-    ValueNode* value;
+    AbstractExpressionNode* value;
 };
 
-UnaryExpressionNode::UnaryExpressionNode(EUnaryOperators unaryOperator, ValueNode* value) : AbstractExpressionNode()
+UnaryExpressionNode::UnaryExpressionNode(EUnaryOperators unaryOperator, AbstractExpressionNode* value) : AbstractExpressionNode()
 {
     this->unaryOperator = unaryOperator;
     this->value = value;

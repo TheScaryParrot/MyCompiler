@@ -22,7 +22,13 @@
 
 #pragma region Expressions
 #include "../syntaxTree/nodes/line/expression/AbstractExpressionNode.cpp"
-#include "../syntaxTree/nodes/line/expression/ValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/IDValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/NumberConstValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/StringConstValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/LogicalConstValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/functionCall/CallNode.cpp"
+#include "../syntaxTree/nodes/line/expression/OperatorExpressionNode.cpp"
+#include "../syntaxTree/nodes/line/expression/UnaryExpressionNode.cpp"
 #include "../syntaxTree/nodes/line/expression/operators/EUnaryOperators.cpp"
 #include "../syntaxTree/nodes/line/expression/operators/EOperators.cpp"
 
@@ -57,7 +63,7 @@ private:
     ELookAheadCertainties LookAhead_FuncDeclaration(TokenList* tokens);
     FuncDeclarationNode* Parse_FuncDeclaration(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_VarFuncDeclarationAttributes(TokenList* tokens);
+    ELookAheadCertainties LookAhead_VarFuncDeclarationAttributes(TokenList* tokens, unsigned int offset = 0); // Has offset to allow for skipping tokens
     unsigned int Skip_VarFuncDeclarationAttributes(TokenList* tokens); // Returns the number of tokens that belong to VarFuncDeclarationAttributes. Allows skipping the tokens
     DeclarationAttributes Parse_VarFuncDeclarationAttributes(TokenList* tokens);
 
@@ -70,13 +76,13 @@ private:
     ELookAheadCertainties LookAhead_Body(TokenList* tokens);
     BodyNode* Parse_Body(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_ScopeAttribute(TokenList* tokens);
+    ELookAheadCertainties LookAhead_ScopeAttribute(TokenList* tokens, unsigned int offset = 0);
     EScopes Parse_ScopeAttribute(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_StaticAttribute(TokenList* tokens);
+    ELookAheadCertainties LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset = 0);
     bool Parse_StaticAttribute(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_ReadWriteAttribute(TokenList* tokens);
+    ELookAheadCertainties LookAhead_ReadWriteAttribute(TokenList* tokens, unsigned int offset = 0);
     EReadWrites Parse_ReadWriteAttribute(TokenList* tokens);
 
     #pragma endregion
@@ -118,25 +124,25 @@ private:
     EUnaryOperators Parse_UnaryOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Value(TokenList* tokens);
-    ValueNode* Parse_Value(TokenList* tokens);
+    AbstractExpressionNode* Parse_Value(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Mutable(TokenList* tokens);
-    void Parse_Mutable(TokenList* tokens);
+    IDValueNode* Parse_Mutable(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Immutable(TokenList* tokens);
-    void Parse_Immutable(TokenList* tokens);
+    AbstractExpressionNode* Parse_Immutable(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Call(TokenList* tokens);
-    void Parse_Call(TokenList* tokens);
+    CallNode* Parse_Call(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Constant(TokenList* tokens);
-    void Parse_Constant(TokenList* tokens);
+    AbstractConstValueNode* Parse_Constant(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_LogicalConstant(TokenList* tokens);
-    void Parse_LogicalConstant(TokenList* tokens);
+    LogicalConstValueNode* Parse_LogicalConstant(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Arguments(TokenList* tokens);
-    void Parse_Arguments(TokenList* tokens);
+    std::vector<CallArgument*> Parse_Arguments(TokenList* tokens);
 
     #pragma endregion
 

@@ -1,4 +1,4 @@
-public static int yomamam;
+public static int yomamam = 5;
 
 static class Base
 {

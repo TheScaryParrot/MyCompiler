@@ -2,6 +2,8 @@
 
 #include "nodes/line/CodeblockNode.cpp"
 
+#include <iostream>
+
 class SyntaxTree
 {
 public: 
@@ -27,6 +29,7 @@ SyntaxTree::~SyntaxTree()
 
 void SyntaxTree::AddCodeLineNode(AbstractLineNode* codeLine)
 {
+    std::cout << "Line: " << codeLine->ToString() << "\n";
     codeBlock->AddCodeline(codeLine);
 }
 
