@@ -9,7 +9,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Expression(TokenList* tokens)
 {
     return LookAhead_UnaryExpression(tokens);
 }
-void PredictiveParser::Parse_Expression(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_Expression(TokenList* tokens)
 {
 }
 
@@ -17,7 +17,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_OrExpression(TokenList* tokens
 {
     return LookAhead_UnaryExpression(tokens);
 }
-void PredictiveParser::Parse_OrExpression(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_OrExpression(TokenList* tokens)
 {
 }
 
@@ -25,7 +25,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_AndExpression(TokenList* token
 {
     return LookAhead_UnaryExpression(tokens);
 }
-void PredictiveParser::Parse_AndExpression(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_AndExpression(TokenList* tokens)
 {
 }
 
@@ -33,7 +33,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_EqualExpression(TokenList* tok
 {
     return LookAhead_UnaryExpression(tokens);
 }
-void PredictiveParser::Parse_EqualExpression(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_EqualExpression(TokenList* tokens)
 {
 }
 
@@ -48,7 +48,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_EqualOperator(TokenList* token
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_EqualOperator(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_EqualOperator(TokenList* tokens)
 {
 }
 
@@ -56,7 +56,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_SumExpression(TokenList* token
 {
     return LookAhead_UnaryExpression(tokens);
 }
-void PredictiveParser::Parse_SumExpression(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_SumExpression(TokenList* tokens)
 {
 }
 
@@ -67,7 +67,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_SumOperator(TokenList* tokens)
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_SumOperator(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_SumOperator(TokenList* tokens)
 {
 }
 
@@ -75,7 +75,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_MulExpression(TokenList* token
 {
     return LookAhead_UnaryExpression(tokens);
 }
-void PredictiveParser::Parse_MulExpression(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_MulExpression(TokenList* tokens)
 {
 }
 
@@ -87,7 +87,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_MulOperator(TokenList* tokens)
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_MulOperator(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_MulOperator(TokenList* tokens)
 {
 }
 
@@ -97,7 +97,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_UnaryExpression(TokenList* tok
     if (LookAhead_UnaryOperator(tokens) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
     return LookAhead_Value(tokens);
 }
-void PredictiveParser::Parse_UnaryExpression(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_UnaryExpression(TokenList* tokens)
 {
 }
 
@@ -108,7 +108,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_UnaryOperator(TokenList* token
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_UnaryOperator(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_UnaryOperator(TokenList* tokens)
 {
 }
 
@@ -118,7 +118,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Value(TokenList* tokens)
     if (LookAhead_Mutable(tokens) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
     return LookAhead_Immutable(tokens);
 }
-void PredictiveParser::Parse_Value(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_Value(TokenList* tokens)
 {
 }
 
@@ -129,7 +129,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Mutable(TokenList* tokens)
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_Mutable(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_Mutable(TokenList* tokens)
 {
 }
 
@@ -140,7 +140,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Immutable(TokenList* tokens)
     if (LookAhead_Call(tokens) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
     return LookAhead_Constant(tokens);
 }
-void PredictiveParser::Parse_Immutable(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_Immutable(TokenList* tokens)
 {
 }
 
@@ -152,7 +152,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Call(TokenList* tokens)
 
     return ELookAheadCertainties::CertainlyPresent;
 }
-void PredictiveParser::Parse_Call(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_Call(TokenList* tokens)
 {
 }
 
@@ -163,7 +163,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Constant(TokenList* tokens)
     if (tokens->IsPeekOfTokenType(ConstTokens.CONST_STRING_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
     return LookAhead_LogicalConstant(tokens);
 }
-void PredictiveParser::Parse_Constant(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_Constant(TokenList* tokens)
 {
 }
 
@@ -175,7 +175,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_LogicalConstant(TokenList* tok
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_LogicalConstant(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_LogicalConstant(TokenList* tokens)
 {
 }
 
@@ -184,7 +184,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Arguments(TokenList* tokens)
     // <expression>? (SEPERATOR <expression>)* can be empty, therefore always unknown
     return ELookAheadCertainties::Unknown;
 }
-void PredictiveParser::Parse_Arguments(TokenList* tokens /*, Node*/)
+void PredictiveParser::Parse_Arguments(TokenList* tokens)
 {
 }
 

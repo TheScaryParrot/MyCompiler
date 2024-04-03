@@ -20,6 +20,14 @@
 
 #pragma endregion
 
+#pragma region Expressions
+#include "../syntaxTree/nodes/line/expression/AbstractExpressionNode.cpp"
+#include "../syntaxTree/nodes/line/expression/ValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/operators/EUnaryOperators.cpp"
+#include "../syntaxTree/nodes/line/expression/operators/EOperators.cpp"
+
+#pragma endregion
+
 #pragma endregion
 
 
@@ -38,38 +46,38 @@ private:
     AbstractDeclarationNode* Parse_Declaration(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ClassDeclaration(TokenList* tokens);
-    ClassDeclarationNode* Parse_ClassDeclaration(TokenList* tokens /*, Node*/);
+    ClassDeclarationNode* Parse_ClassDeclaration(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_VarFuncDeclaration(TokenList* tokens);
-    AbstractVarFuncDeclarationNode* Parse_VarFuncDeclaration(TokenList* tokens /*, Node*/);
+    AbstractVarFuncDeclarationNode* Parse_VarFuncDeclaration(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_VarDeclaration(TokenList* tokens);
-    VarDeclarationNode* Parse_VarDeclaration(TokenList* tokens /*, Node*/);
+    VarDeclarationNode* Parse_VarDeclaration(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_FuncDeclaration(TokenList* tokens);
-    FuncDeclarationNode* Parse_FuncDeclaration(TokenList* tokens /*, Node*/);
+    FuncDeclarationNode* Parse_FuncDeclaration(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_VarFuncDeclarationAttributes(TokenList* tokens);
     unsigned int Skip_VarFuncDeclarationAttributes(TokenList* tokens); // Returns the number of tokens that belong to VarFuncDeclarationAttributes. Allows skipping the tokens
-    DeclarationAttributes Parse_VarFuncDeclarationAttributes(TokenList* tokens /*, Node*/);
+    DeclarationAttributes Parse_VarFuncDeclarationAttributes(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Params(TokenList* tokens);
-    std::vector<ParameterDeclarationNode*>* Parse_Params(TokenList* tokens /*, Node*/);
+    std::vector<ParameterDeclarationNode*>* Parse_Params(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ParamDeclaration(TokenList* tokens);
-    ParameterDeclarationNode* Parse_ParamDeclaration(TokenList* tokens /*, Node*/);
+    ParameterDeclarationNode* Parse_ParamDeclaration(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Body(TokenList* tokens);
-    BodyNode* Parse_Body(TokenList* tokens /*, Node*/);
+    BodyNode* Parse_Body(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ScopeAttribute(TokenList* tokens);
-    EScopes Parse_ScopeAttribute(TokenList* tokens /*, Node*/);
+    EScopes Parse_ScopeAttribute(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_StaticAttribute(TokenList* tokens);
-    bool Parse_StaticAttribute(TokenList* tokens /*, Node*/);
+    bool Parse_StaticAttribute(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ReadWriteAttribute(TokenList* tokens);
-    EReadWrites Parse_ReadWriteAttribute(TokenList* tokens /*, Node*/);
+    EReadWrites Parse_ReadWriteAttribute(TokenList* tokens);
 
     #pragma endregion
 
@@ -77,58 +85,58 @@ private:
     #pragma region Expressions
 
     ELookAheadCertainties LookAhead_Expression(TokenList* tokens);
-    void Parse_Expression(TokenList* tokens /*, Node*/);
+    AbstractExpressionNode* Parse_Expression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_OrExpression(TokenList* tokens);
-    void Parse_OrExpression(TokenList* tokens /*, Node*/);
+    AbstractExpressionNode* Parse_OrExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_AndExpression(TokenList* tokens);
-    void Parse_AndExpression(TokenList* tokens /*, Node*/);
+    AbstractExpressionNode* Parse_AndExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_EqualExpression(TokenList* tokens);
-    void Parse_EqualExpression(TokenList* tokens /*, Node*/);
+    AbstractExpressionNode* Parse_EqualExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_EqualOperator(TokenList* tokens);
-    void Parse_EqualOperator(TokenList* tokens /*, Node*/);
+    EOperators Parse_EqualOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_SumExpression(TokenList* tokens);
-    void Parse_SumExpression(TokenList* tokens /*, Node*/);
+    AbstractExpressionNode* Parse_SumExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_SumOperator(TokenList* tokens);
-    void Parse_SumOperator(TokenList* tokens /*, Node*/);
+    EOperators Parse_SumOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_MulExpression(TokenList* tokens);
-    void Parse_MulExpression(TokenList* tokens /*, Node*/);
+    AbstractExpressionNode* Parse_MulExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_MulOperator(TokenList* tokens);
-    void Parse_MulOperator(TokenList* tokens /*, Node*/);
+    EOperators Parse_MulOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_UnaryExpression(TokenList* tokens);
-    void Parse_UnaryExpression(TokenList* tokens /*, Node*/);
+    AbstractExpressionNode* Parse_UnaryExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_UnaryOperator(TokenList* tokens);
-    void Parse_UnaryOperator(TokenList* tokens /*, Node*/);
+    EUnaryOperators Parse_UnaryOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Value(TokenList* tokens);
-    void Parse_Value(TokenList* tokens /*, Node*/);
+    ValueNode* Parse_Value(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Mutable(TokenList* tokens);
-    void Parse_Mutable(TokenList* tokens /*, Node*/);
+    void Parse_Mutable(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Immutable(TokenList* tokens);
-    void Parse_Immutable(TokenList* tokens /*, Node*/);
+    void Parse_Immutable(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Call(TokenList* tokens);
-    void Parse_Call(TokenList* tokens /*, Node*/);
+    void Parse_Call(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Constant(TokenList* tokens);
-    void Parse_Constant(TokenList* tokens /*, Node*/);
+    void Parse_Constant(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_LogicalConstant(TokenList* tokens);
-    void Parse_LogicalConstant(TokenList* tokens /*, Node*/);
+    void Parse_LogicalConstant(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Arguments(TokenList* tokens);
-    void Parse_Arguments(TokenList* tokens /*, Node*/);
+    void Parse_Arguments(TokenList* tokens);
 
     #pragma endregion
 
@@ -136,46 +144,46 @@ private:
     #pragma region Statements
 
     ELookAheadCertainties LookAhead_Statement(TokenList* tokens);
-    void Parse_Statement(TokenList* tokens /*, Node*/);
+    void Parse_Statement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Assignment(TokenList* tokens);
-    void Parse_Assignment(TokenList* tokens /*, Node*/);
+    void Parse_Assignment(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_AssignOperator(TokenList* tokens);
-    void Parse_AssignOperator(TokenList* tokens /*, Node*/);
+    void Parse_AssignOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ValueAssignOperator(TokenList* tokens);
-    void Parse_ValueAssignOperator(TokenList* tokens /*, Node*/);
+    void Parse_ValueAssignOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_KeywordStatement(TokenList* tokens);
-    void Parse_KeywordStatement(TokenList* tokens /*, Node*/);
+    void Parse_KeywordStatement(TokenList* tokens);
 
     // ------- Keyword Statements -------
     #pragma region KeywordStatements
 
     ELookAheadCertainties LookAhead_IfStatement(TokenList* tokens);
-    void Parse_IfStatement(TokenList* tokens /*, Node*/);
+    void Parse_IfStatement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ElifStatement(TokenList* tokens);
-    void Parse_ElifStatement(TokenList* tokens /*, Node*/);
+    void Parse_ElifStatement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ElseStatement(TokenList* tokens);
-    void Parse_ElseStatement(TokenList* tokens /*, Node*/);
+    void Parse_ElseStatement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ReturnStatement(TokenList* tokens);
-    void Parse_ReturnStatement(TokenList* tokens /*, Node*/);
+    void Parse_ReturnStatement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_WhileStatement(TokenList* tokens);
-    void Parse_WhileStatement(TokenList* tokens /*, Node*/);
+    void Parse_WhileStatement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ForStatement(TokenList* tokens);
-    void Parse_ForStatement(TokenList* tokens /*, Node*/);
+    void Parse_ForStatement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_BreakStatement(TokenList* tokens);
-    void Parse_BreakStatement(TokenList* tokens /*, Node*/);
+    void Parse_BreakStatement(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ContinueStatement(TokenList* tokens);
-    void Parse_ContinueStatement(TokenList* tokens /*, Node*/);
+    void Parse_ContinueStatement(TokenList* tokens);
 
     #pragma endregion
     #pragma endregion
