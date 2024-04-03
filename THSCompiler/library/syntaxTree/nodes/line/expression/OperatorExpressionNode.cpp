@@ -6,7 +6,7 @@
 
 #include "operators/OperatorExpressionPair.cpp"
 
-class OperatorExpressionNode : AbstractExpressionNode
+class OperatorExpressionNode : public AbstractExpressionNode
 {
 public:
     OperatorExpressionNode(AbstractExpressionNode* firstExpression, std::vector<OperatorExpressionPair*>* OperatorValuePairs = nullptr);
