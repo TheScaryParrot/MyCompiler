@@ -40,6 +40,11 @@ std::string OperatorExpressionNode::ToString()
 {
     std::string result = firstExpression->ToString();
 
+    if (operatorExpressionPairs == nullptr)
+    {
+        return result;
+    }
+
     for (OperatorExpressionPair* pair : *operatorExpressionPairs)
     {
         result += pair->ToString();

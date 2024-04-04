@@ -21,18 +21,15 @@ ELookAheadCertainties PredictiveParser::LookAhead_OrExpression(TokenList* tokens
 AbstractExpressionNode* PredictiveParser::Parse_OrExpression(TokenList* tokens)
 {
     AbstractExpressionNode* firstExpression = Parse_AndExpression(tokens);
+
+    if (!tokens->IsPeekOfTokenType(ConstTokens.OR_OPERATOR_TOKEN)) return firstExpression; // No OR_OPERATOR found
+
     std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
 
     while (tokens->IsPeekOfTokenType(ConstTokens.OR_OPERATOR_TOKEN))
     {
         tokens->Next(); // Consume OR_OPERATOR
-        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::OR_OPERATOR, Parse_AndExpression(tokens)));
-    }
-
-    if (operatorValuePairs->size() == 0)
-    {
-        delete operatorValuePairs;
-        return new OperatorExpressionNode(firstExpression);
+        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::ADD_OPERATOR, Parse_AndExpression(tokens)));
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -45,18 +42,15 @@ ELookAheadCertainties PredictiveParser::LookAhead_AndExpression(TokenList* token
 AbstractExpressionNode* PredictiveParser::Parse_AndExpression(TokenList* tokens)
 {
     AbstractExpressionNode* firstExpression = Parse_EqualExpression(tokens);
+
+    if (!tokens->IsPeekOfTokenType(ConstTokens.AND_OPERATOR_TOKEN)) return firstExpression; // No AND_OPERATOR found
+
     std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
 
     while (tokens->IsPeekOfTokenType(ConstTokens.AND_OPERATOR_TOKEN))
     {
         tokens->Next(); // Consume AND_OPERATOR
         operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::ADD_OPERATOR, Parse_EqualExpression(tokens)));
-    }
-
-    if (operatorValuePairs->size() == 0)
-    {
-        delete operatorValuePairs;
-        return new OperatorExpressionNode(firstExpression);
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -69,17 +63,15 @@ ELookAheadCertainties PredictiveParser::LookAhead_EqualExpression(TokenList* tok
 AbstractExpressionNode* PredictiveParser::Parse_EqualExpression(TokenList* tokens)
 {
     AbstractExpressionNode* firstExpression = Parse_SumExpression(tokens);
+
+    if (LookAhead_EqualOperator(tokens) == ELookAheadCertainties::CertainlyNotPresent) return firstExpression; // No EqualOperator found
+
     std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
 
     while (LookAhead_EqualOperator(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
+        tokens->Next(); // Consume EqualOperator
         operatorValuePairs->push_back(new OperatorExpressionPair(Parse_EqualOperator(tokens), Parse_SumExpression(tokens)));
-    }
-
-    if (operatorValuePairs->size() == 0)
-    {
-        delete operatorValuePairs;
-        return new OperatorExpressionNode(firstExpression);
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -116,18 +108,15 @@ ELookAheadCertainties PredictiveParser::LookAhead_SumExpression(TokenList* token
 AbstractExpressionNode* PredictiveParser::Parse_SumExpression(TokenList* tokens)
 {
     AbstractExpressionNode* firstExpression = Parse_MulExpression(tokens);
+
+    if (LookAhead_SumOperator(tokens) == ELookAheadCertainties::CertainlyNotPresent) return firstExpression; // No SumOperator found
+
     std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
 
-    while (LookAhead_SumExpression(tokens) == ELookAheadCertainties::CertainlyPresent)
+    while (LookAhead_SumOperator(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
         tokens->Next(); // Consume SumOperator
         operatorValuePairs->push_back(new OperatorExpressionPair(Parse_SumOperator(tokens), Parse_MulExpression(tokens)));
-    }
-
-    if (operatorValuePairs->size() == 0)
-    {
-        delete operatorValuePairs;
-        return new OperatorExpressionNode(firstExpression);
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -156,18 +145,15 @@ ELookAheadCertainties PredictiveParser::LookAhead_MulExpression(TokenList* token
 AbstractExpressionNode* PredictiveParser::Parse_MulExpression(TokenList* tokens)
 {
     AbstractExpressionNode* firstExpression = Parse_UnaryExpression(tokens);
+
+    if (LookAhead_MulOperator(tokens) == ELookAheadCertainties::CertainlyNotPresent) return firstExpression; // No MulOperator found
+
     std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
 
     while (LookAhead_MulOperator(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
-        tokens->Next(); // Consume SumOperator
+        tokens->Next(); // Consume MulOperator
         operatorValuePairs->push_back(new OperatorExpressionPair(Parse_MulOperator(tokens), Parse_UnaryExpression(tokens)));
-    }
-
-    if (operatorValuePairs->size() == 0)
-    {
-        delete operatorValuePairs;
-        return new OperatorExpressionNode(firstExpression);
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);

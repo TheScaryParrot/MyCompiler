@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 enum EReadWrites
 {
     FULL,
@@ -16,5 +18,5 @@ std::string EReadWritesToString(EReadWrites readwrite)
         case CONST: return "const";
     }
 
-    return "Couldn't convert EReadWrites to String. Did you forget to update EReadWritesToString()";
+    throw "Couldn't convert EReadWrites to String. Did you forget to update EReadWritesToString()";
 }

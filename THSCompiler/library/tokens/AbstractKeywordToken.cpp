@@ -14,6 +14,8 @@ public:
 
     bool IsThisKeyword(std::string keyword);
 
+    virtual bool IsKeyword() override; // returns true
+
 private: 
     std::string keyword;
 };
@@ -35,4 +37,8 @@ std::string AbstractKeywordToken::ToString() {
 
 bool AbstractKeywordToken::IsThisKeyword(std::string keyword) {
     return this->keyword == keyword;
+}
+
+bool AbstractKeywordToken::IsKeyword() {
+    return true;
 }

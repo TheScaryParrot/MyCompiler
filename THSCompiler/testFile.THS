@@ -2,28 +2,18 @@ public static int yomamam = 5;
 
 static class Base
 {
-    if
-    elif
-
-    Base(int amount)
+    void Base(int amount)
     {
         print("Base" + amount);
     }
-
-    else
 }
 
 class Derived //: Base
 {
-    if ()
-
     Derived(int amount) //: Base(amount)
     {
         print("Derived: " + amount);
-        elif
     }
-
-    else
 }
 
 hei moin() {}

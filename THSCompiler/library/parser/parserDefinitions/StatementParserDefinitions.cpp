@@ -14,8 +14,16 @@ ELookAheadCertainties PredictiveParser::LookAhead_Statement(TokenList* tokens)
 
     return LookAhead_Call(tokens);
 }
-void PredictiveParser::Parse_Statement(TokenList* tokens /*, Node*/)
+AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 {
+    if (tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN)) return new EmptyStatementNode();
+    if (LookAhead_Body(tokens) == ELookAheadCertainties::CertainlyPresent) return Parse_Body(tokens);
+    if (tokens->Peek()->IsKeyword()) return Parse_KeywordStatement(tokens);
+    if (LookAhead_Assignment(tokens) == ELookAheadCertainties::CertainlyPresent) return Parse_Assignment(tokens);
+
+    AbstractExpressionNode* expressionNode = Parse_Expression(tokens);
+    tokens->Next(); // Consume STATEMENT_END_TOKEN
+    return expressionNode;
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_Assignment(TokenList* tokens)
@@ -24,8 +32,17 @@ ELookAheadCertainties PredictiveParser::LookAhead_Assignment(TokenList* tokens)
 
     return LookAhead_AssignOperator(tokens);
 }
-void PredictiveParser::Parse_Assignment(TokenList* tokens /*, Node*/)
+AssignmentNode* PredictiveParser::Parse_Assignment(TokenList* tokens)
 {
+    std::string variableName = tokens->Next<IdentifierToken>()->GetValue();
+
+    // If it's not a value assignment, it's a simple assignment
+    if (LookAhead_ValueAssignOperator(tokens) == ELookAheadCertainties::CertainlyNotPresent) return new AssignmentNode(variableName, Parse_AssignOperator(tokens));
+
+    EAssignOperators assignOperator = Parse_AssignOperator(tokens);
+    AbstractExpressionNode* expression = Parse_Expression(tokens);
+
+    return new ValueAssignmentNode(variableName, assignOperator, expression);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_AssignOperator(TokenList* tokens)
@@ -35,8 +52,12 @@ ELookAheadCertainties PredictiveParser::LookAhead_AssignOperator(TokenList* toke
 
     return LookAhead_ValueAssignOperator(tokens);
 }
-void PredictiveParser::Parse_AssignOperator(TokenList* tokens /*, Node*/)
+EAssignOperators PredictiveParser::Parse_AssignOperator(TokenList* tokens)
 {
+    if (tokens->IsPeekOfTokenType(ConstTokens.INCREMENT_OPERATOR_TOKEN)) return EAssignOperators::INCREMENT;
+    if (tokens->IsPeekOfTokenType(ConstTokens.DECREMENT_OPERATOR_TOKEN)) return EAssignOperators::DECREMENT;
+
+    return Parse_ValueAssignOperator(tokens);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ValueAssignOperator(TokenList* tokens)
@@ -50,8 +71,17 @@ ELookAheadCertainties PredictiveParser::LookAhead_ValueAssignOperator(TokenList*
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_ValueAssignOperator(TokenList* tokens /*, Node*/)
+EAssignOperators PredictiveParser::Parse_ValueAssignOperator(TokenList* tokens)
 {
+    AbstractToken* token = tokens->Next();
+
+    if (token->IsThisToken(ConstTokens.ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ASSIGN;
+    if (token->IsThisToken(ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ADD_ASSIGN;
+    if (token->IsThisToken(ConstTokens.SUB_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::SUB_ASSIGN;
+    if (token->IsThisToken(ConstTokens.MUL_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::MUL_ASSIGN;
+    if (token->IsThisToken(ConstTokens.DIV_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::DIV_ASSIGN;
+    
+    return EAssignOperators::MOD_ASSIGN;
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_KeywordStatement(TokenList* tokens)
@@ -65,8 +95,17 @@ ELookAheadCertainties PredictiveParser::LookAhead_KeywordStatement(TokenList* to
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_KeywordStatement(TokenList* tokens /*, Node*/)
+AbstractKeywordStatementNode* PredictiveParser::Parse_KeywordStatement(TokenList* tokens)
 {
+    AbstractToken* token = tokens->Next();
+
+    if (token->IsThisToken(Keywords.IF_KEYWORD)) return Parse_IfStatement(tokens);
+    if (token->IsThisToken(Keywords.RETURN_KEYWORD)) return Parse_ReturnStatement(tokens);
+    if (token->IsThisToken(Keywords.WHILE_KEYWORD)) return Parse_WhileStatement(tokens);
+    if (token->IsThisToken(Keywords.FOR_KEYWORD)) return Parse_ForStatement(tokens);
+    if (token->IsThisToken(Keywords.BREAK_KEYWORD)) return Parse_BreakStatement(tokens);
+
+    return Parse_ContinueStatement(tokens);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_IfStatement(TokenList* tokens)
@@ -75,8 +114,34 @@ ELookAheadCertainties PredictiveParser::LookAhead_IfStatement(TokenList* tokens)
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_IfStatement(TokenList* tokens /*, Node*/)
+IfStatementNode* PredictiveParser::Parse_IfStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume IF_KEYWORD
+    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+
+    AbstractExpressionNode* expression = Parse_Expression(tokens);
+
+    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+
+    AbstractStatementNode* statement = Parse_Statement(tokens);
+
+    std::vector<ElifStatementNode*>* elifStatements = nullptr;
+
+    while (LookAhead_ElifStatement(tokens) == ELookAheadCertainties::CertainlyPresent)
+    {
+        if (elifStatements == nullptr) elifStatements = new std::vector<ElifStatementNode*>();
+
+        elifStatements->push_back(Parse_ElifStatement(tokens));
+    }
+
+    AbstractStatementNode* elseStatement = nullptr;
+
+    if (LookAhead_ElseStatement(tokens) == ELookAheadCertainties::CertainlyPresent)
+    {
+        elseStatement = Parse_ElseStatement(tokens);
+    }
+
+    return new IfStatementNode(expression, statement, elifStatements, elseStatement);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ElifStatement(TokenList* tokens)
@@ -85,8 +150,18 @@ ELookAheadCertainties PredictiveParser::LookAhead_ElifStatement(TokenList* token
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_ElifStatement(TokenList* tokens /*, Node*/)
+ElifStatementNode* PredictiveParser::Parse_ElifStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume ELIF_KEYWORD
+    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+
+    AbstractExpressionNode* expression = Parse_Expression(tokens);
+
+    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+
+    AbstractStatementNode* statement = Parse_Statement(tokens);
+
+    return new ElifStatementNode(expression, statement);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ElseStatement(TokenList* tokens)
@@ -95,8 +170,11 @@ ELookAheadCertainties PredictiveParser::LookAhead_ElseStatement(TokenList* token
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_ElseStatement(TokenList* tokens /*, Node*/)
+AbstractStatementNode* PredictiveParser::Parse_ElseStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume ELSE_KEYWORD
+
+    return Parse_Statement(tokens);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ReturnStatement(TokenList* tokens)
@@ -105,8 +183,15 @@ ELookAheadCertainties PredictiveParser::LookAhead_ReturnStatement(TokenList* tok
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_ReturnStatement(TokenList* tokens /*, Node*/)
+ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume RETURN_KEYWORD
+
+    AbstractExpressionNode* expression = Parse_Expression(tokens);
+
+    tokens->Next(); // Consume STATEMENT_END_TOKEN
+
+    return new ReturnStatementNode(expression);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_WhileStatement(TokenList* tokens)
@@ -115,8 +200,16 @@ ELookAheadCertainties PredictiveParser::LookAhead_WhileStatement(TokenList* toke
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_WhileStatement(TokenList* tokens /*, Node*/)
+WhileStatementNode* PredictiveParser::Parse_WhileStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume WHILE_KEYWORD
+    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+
+    AbstractExpressionNode* expression = Parse_Expression(tokens);
+
+    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+
+    return new WhileStatementNode(expression, Parse_Statement(tokens));
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ForStatement(TokenList* tokens)
@@ -125,8 +218,18 @@ ELookAheadCertainties PredictiveParser::LookAhead_ForStatement(TokenList* tokens
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_ForStatement(TokenList* tokens /*, Node*/)
+ForStatementNode* PredictiveParser::Parse_ForStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume FOR_KEYWORD
+    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+
+    VarDeclarationNode* initialization = Parse_VarDeclaration(tokens);
+    AbstractExpressionNode* condition = Parse_Expression(tokens);
+    AbstractStatementNode* increment = Parse_Statement(tokens);
+    
+    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+
+    return new ForStatementNode(initialization, condition, increment, Parse_Statement(tokens));
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_BreakStatement(TokenList* tokens)
@@ -135,8 +238,11 @@ ELookAheadCertainties PredictiveParser::LookAhead_BreakStatement(TokenList* toke
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_BreakStatement(TokenList* tokens /*, Node*/)
+BreakStatementNode* PredictiveParser::Parse_BreakStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume BREAK_KEYWORD
+    tokens->Next(); // Consume STATEMENT_END_TOKEN
+    return new BreakStatementNode();
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_ContinueStatement(TokenList* tokens)
@@ -145,7 +251,10 @@ ELookAheadCertainties PredictiveParser::LookAhead_ContinueStatement(TokenList* t
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-void PredictiveParser::Parse_ContinueStatement(TokenList* tokens /*, Node*/)
+ContinueStatementNode* PredictiveParser::Parse_ContinueStatement(TokenList* tokens)
 {
+    tokens->Next(); // Consume CONTINUE_KEYWORD
+    tokens->Next(); // Consume STATEMENT_END_TOKEN
+    return new ContinueStatementNode();
 }
 

@@ -27,10 +27,12 @@ NumberConstValueNode::~NumberConstValueNode()
 
 std::string NumberConstValueNode::GetValue()
 {
-    return this->value;
+    std::string valueString = this->value;
+    return valueString;
 }
 
 std::string NumberConstValueNode::ToString()
 {
-    return GetValue();
+    std::string value = GetValue();
+    return value;
 }

@@ -26,5 +26,5 @@ TypeNode::~TypeNode()
 
 std::string TypeNode::ToString()
 {
-    return "Type: " + name;
+    return name;
 }

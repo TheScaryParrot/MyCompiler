@@ -46,11 +46,11 @@ ClassDeclarationNode* PredictiveParser::Parse_ClassDeclaration(TokenList* tokens
 
     tokens->Next(); // Consume CLASS
 
-    std::string className = tokens->Next<IdentifierToken>()->GetValue();
+    std::string className = tokens->Next<IdentifierToken>()->GetValue(); // Consume ID
 
-    // TODO: Handle Body
+    BodyNode* body = Parse_Body(tokens);
 
-    return new ClassDeclarationNode(isStatic, className);
+    return new ClassDeclarationNode(isStatic, className, body);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclaration(TokenList* tokens)
@@ -117,11 +117,26 @@ ELookAheadCertainties PredictiveParser::LookAhead_FuncDeclaration(TokenList* tok
 }
 FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens )
 {
-    std::cout << "Parsing Func\n";
     DeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
-    FunctionReturnTypeNode returnType = FunctionReturnTypeNode(tokens->Next<IdentifierToken>()->GetValue());
+    FunctionReturnTypeNode returnType;
+
+    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD))
+    {
+        tokens->Next(); // Consume VOID
+        returnType = FunctionReturnTypeNode("void");
+    }
+    else
+    {
+        returnType = FunctionReturnTypeNode(tokens->Next<IdentifierToken>()->GetValue());
+    }
+
     std::string name = tokens->Next<IdentifierToken>()->GetValue();
+
+    tokens->Next(); // Consume PARENTHESIS_OPEN
+
     std::vector<ParameterDeclarationNode*>* parameters = Parse_Params(tokens);
+
+    tokens->Next(); // Consume PARENTHESIS_CLOSE
 
     BodyNode* body = nullptr;
 
@@ -221,8 +236,8 @@ ELookAheadCertainties PredictiveParser::LookAhead_ParamDeclaration(TokenList* to
 }
 ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* tokens )
 {
-    // TODO Implement type
-    return new ParameterDeclarationNode(tokens->Next<IdentifierToken>()->GetValue());
+    std::string type = tokens->Next<IdentifierToken>()->GetValue();
+    return new ParameterDeclarationNode(type, tokens->Next<IdentifierToken>()->GetValue());
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_Body(TokenList* tokens)
@@ -238,7 +253,7 @@ BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
 
     tokens->Next(); // Consume BODY_OPEN
 
-    while (tokens->Peek()->IsThisToken(ConstTokens.BODY_CLOSE_TOKEN))
+    while (!tokens->IsPeekOfTokenType(ConstTokens.BODY_CLOSE_TOKEN))
     {
         bodynode->AddCodeLine(Parse_Line(tokens));
     }

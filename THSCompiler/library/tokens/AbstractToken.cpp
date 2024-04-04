@@ -15,6 +15,8 @@ public:
 
     virtual std::string ToString();
 
+    virtual bool IsKeyword(); // returns false
+
 private:
     std::string tokenName;
     CharacterGroup characterGroup;
@@ -44,4 +46,8 @@ bool AbstractToken::IsInCharacterGroup(std::string character) {
 
 std::string AbstractToken::ToString() {
     return tokenName;
+}
+
+bool AbstractToken::IsKeyword() {
+    return false;
 }

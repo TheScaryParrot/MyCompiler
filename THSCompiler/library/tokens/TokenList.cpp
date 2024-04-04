@@ -54,6 +54,7 @@ AbstractToken* TokenList::Next() {
     if (HasNext()) {
         return tokens[readIndex++];
     }
+    
     return nullptr;
 }
 

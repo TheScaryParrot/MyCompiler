@@ -15,7 +15,7 @@ public:
     std::string ToString();
 
 private:
-    CodeblockNode* codeBlock;
+    CodeblockNode* codeBlock = new CodeblockNode();
 };
 
 SyntaxTree::SyntaxTree()

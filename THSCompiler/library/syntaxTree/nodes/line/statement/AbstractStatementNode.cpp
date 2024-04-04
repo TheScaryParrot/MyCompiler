@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../AbstractLineChildNode.cpp"
+#include "../AbstractLineNode.cpp"
 
-class AbstractStatementNode : public AbstractLineChildNode
+class AbstractStatementNode : public AbstractLineNode
 {
 public:
     AbstractStatementNode();
     virtual ~AbstractStatementNode();
 };
 
-AbstractStatementNode::AbstractStatementNode() : AbstractLineChildNode()
+AbstractStatementNode::AbstractStatementNode() : AbstractLineNode()
 {
 }
 

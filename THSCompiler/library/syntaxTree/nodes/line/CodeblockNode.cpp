@@ -17,7 +17,6 @@ public:
 
 private:
     std::vector<AbstractLineNode*> lines;
-
 };
 
 CodeblockNode::CodeblockNode()

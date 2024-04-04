@@ -1,8 +1,10 @@
 #pragma once
 
+#include "../statement/AbstractStatementNode.cpp"
+
 #include "../CodeblockNode.cpp"
 
-class BodyNode : AbstractTreeNode
+class BodyNode : public AbstractStatementNode
 {
 public:
     BodyNode();
@@ -17,12 +19,12 @@ private:
     CodeblockNode* codeblockNode;
 };
 
-BodyNode::BodyNode() : AbstractTreeNode()
+BodyNode::BodyNode() : AbstractStatementNode()
 {
     this->codeblockNode = new CodeblockNode();
 }
 
-BodyNode::BodyNode(CodeblockNode* codeblockNode) : AbstractTreeNode()
+BodyNode::BodyNode(CodeblockNode* codeblockNode) : AbstractStatementNode()
 {
     this->codeblockNode = codeblockNode;
 }
@@ -39,5 +41,5 @@ void BodyNode::AddCodeLine(AbstractLineNode* codeLine)
 
 std::string BodyNode::ToString()
 {
-    return "Body: " + codeblockNode->ToString();
+    return codeblockNode->ToString();
 }

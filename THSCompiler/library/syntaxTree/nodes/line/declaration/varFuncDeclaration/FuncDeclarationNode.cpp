@@ -57,8 +57,8 @@ std::string FuncDeclarationNode::ToString()
 
     result += ")";
 
-    if (bodyNode != nullptr) result += bodyNode->ToString();
-    else result += ";";
+    if (bodyNode == nullptr) result += ";";
+    else result += bodyNode->ToString();
 
     return result;
 }

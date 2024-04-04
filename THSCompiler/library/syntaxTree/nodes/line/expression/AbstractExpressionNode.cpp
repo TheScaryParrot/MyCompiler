@@ -1,16 +1,16 @@
 #pragma once
 
-#include "../../AbstractTreeNode.cpp"
+#include "../statement/AbstractStatementNode.cpp"
 
 /// @brief Node used for everything that is an expression. So also sumExp or unaryExp
-class AbstractExpressionNode : public AbstractTreeNode
+class AbstractExpressionNode : public AbstractStatementNode
 {
 public:
     AbstractExpressionNode();
     virtual ~AbstractExpressionNode();
 };
 
-AbstractExpressionNode::AbstractExpressionNode() : AbstractTreeNode()
+AbstractExpressionNode::AbstractExpressionNode() : AbstractStatementNode()
 {
 
 }

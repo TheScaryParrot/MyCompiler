@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 enum EScopes
 {
     PUBLIC,
@@ -16,5 +18,5 @@ std::string EScopesToString(EScopes scope)
         case PRIVATE: return "private";
     }
 
-    return "Couldn't convert EScopes to String. Did you forget to update EScopesToString()";
+    throw "Couldn't convert EScopes to String. Did you forget to update EScopesToString()";
 }
