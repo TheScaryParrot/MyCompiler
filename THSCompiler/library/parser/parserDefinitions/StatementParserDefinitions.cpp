@@ -78,7 +78,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_ValueAssignOperator(TokenList*
 }
 EAssignOperators PredictiveParser::Parse_ValueAssignOperator(TokenList* tokens)
 {
-    AbstractToken* token = tokens->Next();
+    std::shared_ptr<AbstractToken> token = tokens->Next();
 
     if (token->IsThisToken(ConstTokens.ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ASSIGN;
     if (token->IsThisToken(ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ADD_ASSIGN;
@@ -102,7 +102,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_KeywordStatement(TokenList* to
 }
 AbstractKeywordStatementNode* PredictiveParser::Parse_KeywordStatement(TokenList* tokens)
 {
-    AbstractToken* token = tokens->Next();
+    std::shared_ptr<AbstractToken> token = tokens->Next();
 
     if (token->IsThisToken(Keywords.IF_KEYWORD)) return Parse_IfStatement(tokens);
     if (token->IsThisToken(Keywords.RETURN_KEYWORD)) return Parse_ReturnStatement(tokens);

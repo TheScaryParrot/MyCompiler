@@ -89,7 +89,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_EqualOperator(TokenList* token
 }
 EOperators PredictiveParser::Parse_EqualOperator(TokenList* tokens)
 {
-    AbstractToken* nextToken = tokens->Next();
+    std::shared_ptr<AbstractToken> nextToken = tokens->Next();
 
     if (nextToken->IsThisToken(ConstTokens.EQUAL_OPERATOR_TOKEN)) return EOperators::EQUAL_OPERATOR;
     if (nextToken->IsThisToken(ConstTokens.NOT_EQUAL_OPERATOR_TOKEN)) return EOperators::NOT_EQUAL_OPERATOR;
@@ -130,7 +130,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_SumOperator(TokenList* tokens)
 }
 EOperators PredictiveParser::Parse_SumOperator(TokenList* tokens)
 {
-    AbstractToken* nextToken = tokens->Next(); // Consume SumOperator
+    std::shared_ptr<AbstractToken> nextToken = tokens->Next(); // Consume SumOperator
 
     if (nextToken->IsThisToken(ConstTokens.ADD_OPERATOR_TOKEN)) return EOperators::ADD_OPERATOR;
 
@@ -168,7 +168,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_MulOperator(TokenList* tokens)
 }
 EOperators PredictiveParser::Parse_MulOperator(TokenList* tokens)
 {
-    AbstractToken* nextToken = tokens->Next(); // Consume MulOperator
+    std::shared_ptr<AbstractToken> nextToken = tokens->Next(); // Consume MulOperator
 
     if (nextToken->IsThisToken(ConstTokens.MUL_OPERATOR_TOKEN)) return EOperators::MUL_OPERATOR;
     if (nextToken->IsThisToken(ConstTokens.DIV_OPERATOR_TOKEN)) return EOperators::DIV_OPERATOR;
@@ -201,7 +201,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_UnaryOperator(TokenList* token
 }
 EUnaryOperators PredictiveParser::Parse_UnaryOperator(TokenList* tokens)
 {
-    AbstractToken* nextToken = tokens->Next(); // Consume UnaryOperator
+    std::shared_ptr<AbstractToken> nextToken = tokens->Next(); // Consume UnaryOperator
 
     if (nextToken->IsThisToken(ConstTokens.NEGATE_OPERATOR_TOKEN)) return EUnaryOperators::NEGATE;
 
@@ -302,7 +302,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_LogicalConstant(TokenList* tok
 }
 LogicalConstValueNode* PredictiveParser::Parse_LogicalConstant(TokenList* tokens)
 {
-    AbstractToken* nextToken = tokens->Next(); // Consume LogicalConstant
+    std::shared_ptr<AbstractToken> nextToken = tokens->Next(); // Consume LogicalConstant
 
     if (nextToken->IsThisToken(Keywords.LOGICAL_TRUE_KEYWORD)) return new LogicalConstValueNode(true);
 

@@ -9,7 +9,7 @@ public:
     AbstractKeywordToken(std::string keyword);
     ~AbstractKeywordToken();
 
-    virtual bool IsThisToken(AbstractToken* other) override;
+    virtual bool IsThisToken(std::shared_ptr<AbstractToken> other) override;
     virtual std::string ToString() override;
 
     bool IsThisKeyword(std::string keyword);
@@ -27,8 +27,8 @@ AbstractKeywordToken::AbstractKeywordToken(std::string keyword) : AbstractToken(
 AbstractKeywordToken::~AbstractKeywordToken() {
 }
 
-bool AbstractKeywordToken::IsThisToken(AbstractToken* other) {
-    return AbstractToken::IsThisToken(other) && this->IsThisKeyword(((AbstractKeywordToken*)other)->keyword);
+bool AbstractKeywordToken::IsThisToken(std::shared_ptr<AbstractToken> other) {
+    return AbstractToken::IsThisToken(other) && this->IsThisKeyword(std::dynamic_pointer_cast<AbstractKeywordToken>(other)->keyword);
 }
 
 std::string AbstractKeywordToken::ToString() {

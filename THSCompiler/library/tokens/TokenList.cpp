@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "AbstractToken.cpp"
 
@@ -10,26 +11,26 @@ public:
     TokenList();
     ~TokenList();
 
-    void AddToken(AbstractToken* token);
+    void AddToken(std::shared_ptr<AbstractToken> token);
     unsigned int GetSize();
 
     template <typename T>
-    T* Next()
+    std::shared_ptr<T> Next()
     {
-        return dynamic_cast<T*>(Next());
+        return std::dynamic_pointer_cast<T>(Next());
     }
 
-    AbstractToken* Next();
+    std::shared_ptr<AbstractToken> Next();
 
-    AbstractToken* Peek(int offset = 0);
-    bool IsPeekOfTokenType(AbstractToken* other, int offset = 0);
+    std::shared_ptr<AbstractToken> Peek(int offset = 0);
+    bool IsPeekOfTokenType(std::shared_ptr<AbstractToken> other, int offset = 0);
 
     bool HasNext(int offset = 0);
 
     std::string ToString();
 
 private:
-    std::vector<AbstractToken*> tokens = std::vector<AbstractToken*>();
+    std::vector<std::shared_ptr<AbstractToken>> tokens = std::vector<std::shared_ptr<AbstractToken>>();
     unsigned int readIndex = 0;
 };
 
@@ -37,17 +38,17 @@ TokenList::TokenList() {
 }
 
 TokenList::~TokenList() {
-    for (int i = 0; i < tokens.size(); i++) {
+    /*for (int i = 0; i < tokens.size(); i++) {
         if (tokens[i] == nullptr) {
             continue;
         }
 
         delete tokens[i];
         tokens[i] = nullptr;
-    }
+    }*/
 }
 
-void TokenList::AddToken(AbstractToken* token) {
+void TokenList::AddToken(std::shared_ptr<AbstractToken> token) {
     tokens.push_back(token);
 }
 
@@ -55,7 +56,7 @@ unsigned int TokenList::GetSize() {
     return tokens.size();
 }
 
-AbstractToken* TokenList::Next() {
+std::shared_ptr<AbstractToken> TokenList::Next() {
     if (HasNext()) {
         return tokens[readIndex++];
     }
@@ -63,7 +64,7 @@ AbstractToken* TokenList::Next() {
     return nullptr;
 }
 
-AbstractToken* TokenList::Peek(int offset) {
+std::shared_ptr<AbstractToken> TokenList::Peek(int offset) {
     if (readIndex + offset < 0 || readIndex + offset >= GetSize()) {
         return nullptr;
     }
@@ -71,7 +72,7 @@ AbstractToken* TokenList::Peek(int offset) {
     return tokens[readIndex + offset];
 }
 
-bool TokenList::IsPeekOfTokenType(AbstractToken* other, int offset) {
+bool TokenList::IsPeekOfTokenType(std::shared_ptr<AbstractToken> other, int offset) {
     if (!HasNext(offset)) {
         return false;
     }

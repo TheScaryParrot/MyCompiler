@@ -6,37 +6,35 @@
 
 static class Keywords {
 public:
-    // Deletion of the pointers is handled by TokenList.cpp. Because for NotConstTokens, we need to delete all instances of them
+    std::shared_ptr<AbstractKeywordToken> IF_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("if"));
+    std::shared_ptr<AbstractKeywordToken> ELSE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("else"));
+    std::shared_ptr<AbstractKeywordToken> ELIF_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("elif"));
 
-    AbstractKeywordToken* IF_KEYWORD = new AbstractKeywordToken("if");
-    AbstractKeywordToken* ELSE_KEYWORD = new AbstractKeywordToken("else");
-    AbstractKeywordToken* ELIF_KEYWORD = new AbstractKeywordToken("elif");
+    std::shared_ptr<AbstractKeywordToken> WHILE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("while"));
+    std::shared_ptr<AbstractKeywordToken> FOR_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("for"));
+    std::shared_ptr<AbstractKeywordToken> BREAK_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("break"));
+    std::shared_ptr<AbstractKeywordToken> CONTINUE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("continue"));
 
-    AbstractKeywordToken* WHILE_KEYWORD = new AbstractKeywordToken("while");
-    AbstractKeywordToken* FOR_KEYWORD = new AbstractKeywordToken("for");
-    AbstractKeywordToken* BREAK_KEYWORD = new AbstractKeywordToken("break");
-    AbstractKeywordToken* CONTINUE_KEYWORD = new AbstractKeywordToken("continue");
+    std::shared_ptr<AbstractKeywordToken> LOGICAL_TRUE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("true"));
+    std::shared_ptr<AbstractKeywordToken> LOGICAL_FALSE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("false"));
 
-    AbstractKeywordToken* LOGICAL_TRUE_KEYWORD = new AbstractKeywordToken("true");
-    AbstractKeywordToken* LOGICAL_FALSE_KEYWORD = new AbstractKeywordToken("false");
+    std::shared_ptr<AbstractKeywordToken> RETURN_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("return"));
+    std::shared_ptr<AbstractKeywordToken> VOID_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("void"));
 
-    AbstractKeywordToken* RETURN_KEYWORD = new AbstractKeywordToken("return");
-    AbstractKeywordToken* VOID_KEYWORD = new AbstractKeywordToken("void");
-
-    AbstractKeywordToken* CLASS_KEYWORD = new AbstractKeywordToken("class");
-    AbstractKeywordToken* PUBLIC_KEYWORD = new AbstractKeywordToken("public");
-    AbstractKeywordToken* PRIVATE_KEYWORD = new AbstractKeywordToken("private");
-    AbstractKeywordToken* PROTECTED_KEYWORD = new AbstractKeywordToken("protected");
-    AbstractKeywordToken* STATIC_KEYWORD = new AbstractKeywordToken("static");
-    AbstractKeywordToken* CONST_KEYWORD = new AbstractKeywordToken("const");
-    AbstractKeywordToken* READ_ONLY_KEYWORD = new AbstractKeywordToken("readonly");
+    std::shared_ptr<AbstractKeywordToken> CLASS_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("class"));
+    std::shared_ptr<AbstractKeywordToken> PUBLIC_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("public"));
+    std::shared_ptr<AbstractKeywordToken> PRIVATE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("private"));
+    std::shared_ptr<AbstractKeywordToken> PROTECTED_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("protected"));
+    std::shared_ptr<AbstractKeywordToken> STATIC_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("static"));
+    std::shared_ptr<AbstractKeywordToken> CONST_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("const"));
+    std::shared_ptr<AbstractKeywordToken> READ_ONLY_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("readonly"));
 
 
     /// @brief Returns the token for the given keyword. If the keyword is not a keyword, returns nullptr.
-    AbstractKeywordToken* GetKeywordToken(std::string keyword);
+    std::shared_ptr<AbstractKeywordToken> GetKeywordToken(std::string keyword);
 }Keywords;
 
-AbstractKeywordToken* Keywords::GetKeywordToken(std::string keyword) {
+std::shared_ptr<AbstractKeywordToken> Keywords::GetKeywordToken(std::string keyword) {
     if (IF_KEYWORD->IsThisKeyword(keyword)) {
         return IF_KEYWORD;
     }

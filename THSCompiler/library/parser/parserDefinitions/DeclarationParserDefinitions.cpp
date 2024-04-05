@@ -273,13 +273,11 @@ ELookAheadCertainties PredictiveParser::LookAhead_ScopeAttribute(TokenList* toke
 }
 EScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens )
 {
-    AbstractToken* nextToken = tokens->Next(); // Consume scope keyword
+    std::shared_ptr<AbstractToken> nextToken = tokens->Next(); // Consume scope keyword
 
     if (nextToken->IsThisToken(Keywords.PUBLIC_KEYWORD)) return EScopes::PUBLIC;
 
     if (nextToken->IsThisToken(Keywords.PRIVATE_KEYWORD)) return EScopes::PRIVATE;
-
-    delete nextToken;
 
     return EScopes::PROTECTED;
 }

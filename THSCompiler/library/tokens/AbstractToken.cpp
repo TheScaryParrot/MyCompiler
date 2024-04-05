@@ -10,7 +10,7 @@ public:
     AbstractToken(std::string tokenName, CharacterGroup& characterGroup);
     virtual ~AbstractToken();
 
-    virtual bool IsThisToken(AbstractToken* other);
+    virtual bool IsThisToken(std::shared_ptr<AbstractToken> other);
     virtual bool IsInCharacterGroup(std::string character);
 
     virtual std::string ToString();
@@ -35,7 +35,7 @@ AbstractToken::AbstractToken(std::string tokenName, CharacterGroup& characterGro
 AbstractToken::~AbstractToken() {
 }
 
-bool AbstractToken::IsThisToken(AbstractToken* other)
+bool AbstractToken::IsThisToken(std::shared_ptr<AbstractToken> other)
 {
     return this->tokenName == other->tokenName;
 }

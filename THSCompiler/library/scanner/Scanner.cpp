@@ -103,7 +103,7 @@ TokenList* Scanner::Scan(InputFile* file) {
                 number += file->ReadNext();
             }
 
-            tokens->AddToken(new NumberConstToken(number));
+            tokens->AddToken(std::shared_ptr<NumberConstToken>(new NumberConstToken(number)));
 
             continue;
         }
@@ -122,7 +122,7 @@ TokenList* Scanner::Scan(InputFile* file) {
                 i++;
             }
 
-            tokens->AddToken(new StringConstToken(string));
+            tokens->AddToken(std::shared_ptr<StringConstToken>(new StringConstToken(string)));
 
             continue;
         }
@@ -135,7 +135,7 @@ TokenList* Scanner::Scan(InputFile* file) {
             }
 
             // Check whether the identifier is a keyword
-            AbstractKeywordToken* keywordToken = Keywords.GetKeywordToken(identifierString);
+            std::shared_ptr<AbstractKeywordToken> keywordToken = Keywords.GetKeywordToken(identifierString);
 
             if (keywordToken != nullptr)
             {
@@ -143,7 +143,7 @@ TokenList* Scanner::Scan(InputFile* file) {
             }
             else 
             {
-                tokens->AddToken(new IdentifierToken(identifierString));
+                tokens->AddToken(std::shared_ptr<IdentifierToken>(new IdentifierToken(identifierString)));
             }
 
             continue;
