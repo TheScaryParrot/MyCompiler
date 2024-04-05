@@ -25,7 +25,7 @@ private:
 };
 
 FuncDeclarationNode::FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name, 
-                                    std::vector<ParameterDeclarationNode*>* parameters, BodyNode* body) : AbstractVarFuncDeclarationNode()
+                                    std::vector<ParameterDeclarationNode*>* parameters, BodyNode* bodyNode) : AbstractVarFuncDeclarationNode()
 {
     this->attributes = attributes;
     this->returnType = returnType;

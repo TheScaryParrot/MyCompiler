@@ -70,7 +70,6 @@ AbstractExpressionNode* PredictiveParser::Parse_EqualExpression(TokenList* token
 
     while (LookAhead_EqualOperator(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
-        tokens->Next(); // Consume EqualOperator
         operatorValuePairs->push_back(new OperatorExpressionPair(Parse_EqualOperator(tokens), Parse_SumExpression(tokens)));
     }
 
@@ -115,8 +114,8 @@ AbstractExpressionNode* PredictiveParser::Parse_SumExpression(TokenList* tokens)
 
     while (LookAhead_SumOperator(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
-        tokens->Next(); // Consume SumOperator
-        operatorValuePairs->push_back(new OperatorExpressionPair(Parse_SumOperator(tokens), Parse_MulExpression(tokens)));
+        EOperators op = Parse_SumOperator(tokens); // Ensure SumOperator is parsed ahead of MulExpression. Complier sometimes does weird stuff: https://en.cppreference.com/w/c/language/eval_order
+        operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_MulExpression(tokens)));
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -152,8 +151,8 @@ AbstractExpressionNode* PredictiveParser::Parse_MulExpression(TokenList* tokens)
 
     while (LookAhead_MulOperator(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
-        tokens->Next(); // Consume MulOperator
-        operatorValuePairs->push_back(new OperatorExpressionPair(Parse_MulOperator(tokens), Parse_UnaryExpression(tokens)));
+        EOperators op = Parse_MulOperator(tokens); // Ensure MulOperator is parsed ahead of UnaryExpression. Complier sometimes does weird stuff: https://en.cppreference.com/w/c/language/eval_order
+        operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_UnaryExpression(tokens)));
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -217,9 +216,9 @@ ELookAheadCertainties PredictiveParser::LookAhead_Value(TokenList* tokens)
 }
 AbstractExpressionNode* PredictiveParser::Parse_Value(TokenList* tokens)
 {
-    if (LookAhead_Mutable(tokens) == ELookAheadCertainties::CertainlyPresent) return Parse_Mutable(tokens);
+    if (LookAhead_Immutable(tokens) == ELookAheadCertainties::CertainlyPresent) return Parse_Immutable(tokens);
 
-    return Parse_Immutable(tokens);
+    return Parse_Mutable(tokens);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_Mutable(TokenList* tokens)
@@ -237,7 +236,6 @@ IDValueNode* PredictiveParser::Parse_Mutable(TokenList* tokens)
 
 ELookAheadCertainties PredictiveParser::LookAhead_Immutable(TokenList* tokens)
 {
-    // INT | FLOAT | STRING | BOOL
     if (tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
     if (LookAhead_Call(tokens) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
     return LookAhead_Constant(tokens);

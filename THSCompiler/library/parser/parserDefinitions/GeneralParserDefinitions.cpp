@@ -15,6 +15,5 @@ AbstractLineNode* PredictiveParser::Parse_Line(TokenList* tokens)
         return Parse_Declaration(tokens);
     }
     
-    tokens->Next(); // Consume the token
-    return nullptr; // TODO: Implement Statement Node
+    return Parse_Statement(tokens);
 }

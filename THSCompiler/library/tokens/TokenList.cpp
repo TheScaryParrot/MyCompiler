@@ -22,7 +22,7 @@ public:
     AbstractToken* Next();
 
     AbstractToken* Peek(int offset = 0);
-    bool IsPeekOfTokenType(AbstractToken& other, int offset = 0);
+    bool IsPeekOfTokenType(AbstractToken* other, int offset = 0);
 
     bool HasNext(int offset = 0);
 
@@ -37,8 +37,13 @@ TokenList::TokenList() {
 }
 
 TokenList::~TokenList() {
-    for (AbstractToken* token : tokens) {
-        delete token;
+    for (int i = 0; i < tokens.size(); i++) {
+        if (tokens[i] == nullptr) {
+            continue;
+        }
+
+        delete tokens[i];
+        tokens[i] = nullptr;
     }
 }
 
@@ -66,7 +71,7 @@ AbstractToken* TokenList::Peek(int offset) {
     return tokens[readIndex + offset];
 }
 
-bool TokenList::IsPeekOfTokenType(AbstractToken& other, int offset) {
+bool TokenList::IsPeekOfTokenType(AbstractToken* other, int offset) {
     if (!HasNext(offset)) {
         return false;
     }

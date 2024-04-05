@@ -9,7 +9,6 @@
 class CallNode : public AbstractValueNode
 {
 public:
-    //TODO add arguments
     CallNode(std::string functionName, std::vector<CallArgument*> arguments);
     ~CallNode();
 
@@ -43,5 +42,5 @@ std::string CallNode::ToString()
         result += argument->ToString() + ", ";
     }
 
-    return result + ")";
+    return result + ");";
 }

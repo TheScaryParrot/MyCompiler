@@ -32,5 +32,5 @@ std::string StringConstValueNode::GetValue()
 
 std::string StringConstValueNode::ToString()
 {
-    return GetValue();
+    return '"' + GetValue() + '"';
 }

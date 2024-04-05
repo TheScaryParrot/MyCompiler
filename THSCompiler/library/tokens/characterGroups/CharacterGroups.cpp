@@ -54,8 +54,8 @@ public:
     CharacterGroup NEGATE_OPERATOR = CharacterGroup(std::vector<std::string>{"-"});
 
     CharacterGroup NOT_OPERATOR = CharacterGroup(std::vector<std::string>{"!"});
-    CharacterGroup AND_OPERATOR = CharacterGroup(std::vector<std::string>{"&&"});
-    CharacterGroup OR_OPERATOR = CharacterGroup(std::vector<std::string>{"||"});
+    CharacterGroup AND_OPERATOR = CharacterGroup(std::vector<std::string>{"&"});
+    CharacterGroup OR_OPERATOR = CharacterGroup(std::vector<std::string>{"|"});
 
 }CharacterGroups;
 

@@ -10,7 +10,9 @@ static class Base
 
 class Derived //: Base
 {
-    Derived(int amount) //: Base(amount)
+    moin = Hello();
+
+    void Derived(int amount) //: Base(amount)
     {
         print("Derived: " + amount);
     }
@@ -18,11 +20,11 @@ class Derived //: Base
 
 hei moin() {}
 
-void main(int argc, string[] argv)
+void main(int argc, string argv)
 {
-    Derived d = new Derived(10);
+    Derived d = Derived(10);
 
-    if (true && false)
+    if (true + false)
     {
         print("This should not be printed");
     }
