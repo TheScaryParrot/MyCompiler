@@ -24,6 +24,7 @@ AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 
     if (LookAhead_Body(tokens) == ELookAheadCertainties::CertainlyPresent) return Parse_Body(tokens);
     if (tokens->Peek()->IsKeyword()) return Parse_KeywordStatement(tokens);
+
     if (LookAhead_Assignment(tokens) == ELookAheadCertainties::CertainlyPresent) return Parse_Assignment(tokens);
 
     AbstractExpressionNode* expressionNode = Parse_Expression(tokens);
@@ -35,27 +36,35 @@ ELookAheadCertainties PredictiveParser::LookAhead_Assignment(TokenList* tokens)
 {
     if (LookAhead_Mutable(tokens) != ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyNotPresent;
 
-    return LookAhead_AssignOperator(tokens);
+    // Offset 1 because we need to check the next token
+    return LookAhead_AssignOperator(tokens, 1);
 }
 AssignmentNode* PredictiveParser::Parse_Assignment(TokenList* tokens)
 {
     std::string variableName = tokens->Next<IdentifierToken>()->GetValue();
 
     // If it's not a value assignment, it's a simple assignment
-    if (LookAhead_ValueAssignOperator(tokens) == ELookAheadCertainties::CertainlyNotPresent) return new AssignmentNode(variableName, Parse_AssignOperator(tokens));
+    if (LookAhead_ValueAssignOperator(tokens) == ELookAheadCertainties::CertainlyNotPresent) 
+    {
+        EAssignOperators assignOperator = Parse_AssignOperator(tokens);
+        tokens->Next(); // Consume STATEMENT_END_TOKEN
+        return new AssignmentNode(variableName, assignOperator);
+    }
 
     EAssignOperators assignOperator = Parse_AssignOperator(tokens);
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
+    tokens->Next(); // Consume STATEMENT_END_TOKEN
+
     return new ValueAssignmentNode(variableName, assignOperator, expression);
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_AssignOperator(TokenList* tokens)
+ELookAheadCertainties PredictiveParser::LookAhead_AssignOperator(TokenList* tokens, unsigned int offset)
 {
-    if (tokens->IsPeekOfTokenType(ConstTokens.INCREMENT_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-    if (tokens->IsPeekOfTokenType(ConstTokens.DECREMENT_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.INCREMENT_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.DECREMENT_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
 
-    return LookAhead_ValueAssignOperator(tokens);
+    return LookAhead_ValueAssignOperator(tokens, offset);
 }
 EAssignOperators PredictiveParser::Parse_AssignOperator(TokenList* tokens)
 {
@@ -65,14 +74,14 @@ EAssignOperators PredictiveParser::Parse_AssignOperator(TokenList* tokens)
     return Parse_ValueAssignOperator(tokens);
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_ValueAssignOperator(TokenList* tokens)
+ELookAheadCertainties PredictiveParser::LookAhead_ValueAssignOperator(TokenList* tokens, unsigned int offset)
 {
-    if (tokens->IsPeekOfTokenType(ConstTokens.ASSIGN_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-    if (tokens->IsPeekOfTokenType(ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-    if (tokens->IsPeekOfTokenType(ConstTokens.SUB_ASSIGN_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-    if (tokens->IsPeekOfTokenType(ConstTokens.MUL_ASSIGN_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-    if (tokens->IsPeekOfTokenType(ConstTokens.DIV_ASSIGN_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-    if (tokens->IsPeekOfTokenType(ConstTokens.MOD_ASSIGN_OPERATOR_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.ASSIGN_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.SUB_ASSIGN_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.MUL_ASSIGN_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.DIV_ASSIGN_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(ConstTokens.MOD_ASSIGN_OPERATOR_TOKEN, offset)) return ELookAheadCertainties::CertainlyPresent;
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }

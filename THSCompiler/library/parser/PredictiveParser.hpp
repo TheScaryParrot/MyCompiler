@@ -169,10 +169,10 @@ private:
     ELookAheadCertainties LookAhead_Assignment(TokenList* tokens);
     AssignmentNode* Parse_Assignment(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_AssignOperator(TokenList* tokens);
+    ELookAheadCertainties LookAhead_AssignOperator(TokenList* tokens, unsigned int offset = 0);
     EAssignOperators Parse_AssignOperator(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_ValueAssignOperator(TokenList* tokens);
+    ELookAheadCertainties LookAhead_ValueAssignOperator(TokenList* tokens, unsigned int offset = 0);
     EAssignOperators Parse_ValueAssignOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_KeywordStatement(TokenList* tokens);

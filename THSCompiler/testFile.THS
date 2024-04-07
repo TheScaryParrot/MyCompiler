@@ -4,7 +4,7 @@ static class Base
 {
     void Base(int amount)
     {
-        print("Base" + amount);
+        print("Base" - amount);
     }
 }
 
@@ -14,17 +14,17 @@ class Derived //: Base
 
     void Derived(int amount) //: Base(amount)
     {
-        print("Derived: " + amount);
+        print("Derived: " + amount & test * 5);
     }
 }
 
-hei moin() {}
+static readonly hei moin() {}
 
 void main(int argc, string argv)
 {
     Derived d = Derived(10);
 
-    if (true + false)
+    if (true & false)
     {
         print("This should not be printed");
     }
