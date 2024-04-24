@@ -29,7 +29,7 @@ AbstractExpressionNode* PredictiveParser::Parse_OrExpression(TokenList* tokens)
     while (tokens->IsPeekOfTokenType(ConstTokens.OR_OPERATOR_TOKEN))
     {
         tokens->Next(); // Consume OR_OPERATOR
-        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::ADD_OPERATOR, Parse_AndExpression(tokens)));
+        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::OR_OPERATOR, Parse_AndExpression(tokens)));
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -50,7 +50,7 @@ AbstractExpressionNode* PredictiveParser::Parse_AndExpression(TokenList* tokens)
     while (tokens->IsPeekOfTokenType(ConstTokens.AND_OPERATOR_TOKEN))
     {
         tokens->Next(); // Consume AND_OPERATOR
-        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::ADD_OPERATOR, Parse_EqualExpression(tokens)));
+        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::AND_OPERATOR, Parse_EqualExpression(tokens)));
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -70,7 +70,8 @@ AbstractExpressionNode* PredictiveParser::Parse_EqualExpression(TokenList* token
 
     while (LookAhead_EqualOperator(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
-        operatorValuePairs->push_back(new OperatorExpressionPair(Parse_EqualOperator(tokens), Parse_SumExpression(tokens)));
+        EOperators op = Parse_EqualOperator(tokens); // Ensure EqualOperator is parsed ahead of Parse_SumExpression. Complier sometimes does weird stuff: https://en.cppreference.com/w/c/language/eval_order
+        operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_SumExpression(tokens)));
     }
 
     return new OperatorExpressionNode(firstExpression, operatorValuePairs);

@@ -4,17 +4,18 @@ static class Base
 {
     void Base(int amount)
     {
+        amount--;
         print("Base" - amount);
     }
 }
 
-class Derived //: Base
+class Derived
 {
     moin = Hello();
 
-    void Derived(int amount) //: Base(amount)
+    void Derived(int amount)
     {
-        print("Derived: " + amount & test * 5);
+        print("Derived: " + amount && test * 5);
     }
 }
 
@@ -24,7 +25,9 @@ void main(int argc, string argv)
 {
     Derived d = Derived(10);
 
-    if (true & false)
+    print("aaaa");
+
+    if (true != false)
     {
         print("This should not be printed");
     }

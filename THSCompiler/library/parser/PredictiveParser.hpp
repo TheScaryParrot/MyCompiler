@@ -218,11 +218,12 @@ SyntaxTree* PredictiveParser::Parse(TokenList* tokens)
     {
         if (LookAhead_Line(tokens) == ELookAheadCertainties::CertainlyPresent)
         {
-            syntaxTree->AddCodeLineNode(Parse_Line(tokens));
+            AbstractLineNode* line = Parse_Line(tokens);
+            syntaxTree->AddCodeLineNode(line);
         }
         else
         {
-            std::cout << "Unexpected token during parsing: " + tokens->Next()->ToString() + "\n";
+            std::cout << "Unexpected token during parsing: " << tokens->Next()->ToString() << "\n";
         }
     }
 
