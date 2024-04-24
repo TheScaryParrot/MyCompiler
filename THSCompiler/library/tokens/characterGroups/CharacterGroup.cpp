@@ -1,48 +1,50 @@
 #pragma once
 
-#include <vector>
-#include <string>
+#include "TwoChar.cpp"
 
+#include <vector>
 class CharacterGroup {
 public:
     CharacterGroup();
-    CharacterGroup(std::vector<std::string> strings);
+    CharacterGroup(std::vector<TwoChar> twoChars);
     CharacterGroup(std::vector<CharacterGroup> characterGroups);
-    CharacterGroup(std::vector<std::string> strings, std::vector<CharacterGroup> characterGroups);
+    CharacterGroup(std::vector<TwoChar> twoChars, std::vector<CharacterGroup> characterGroups);
     ~CharacterGroup();
 
-    bool Contains(std::string character);
+    /// @brief Returns how many characters match the given characterGroup. First not 0 is returned.
+    /// @return 0 = no match, 1 = first character matches, 2 = both characters match
+    unsigned int Match(char first, char second);
 
     static CharacterGroup Empty() {
         return CharacterGroup();
     }
 
 private:
-    std::vector<std::string> strings;
+    std::vector<TwoChar> twoChars;
 };
 
 CharacterGroup::CharacterGroup() {
-    strings = std::vector<std::string>();
+    twoChars = std::vector<TwoChar>();
 }
 
-CharacterGroup::CharacterGroup(std::vector<std::string> strings) {
-    this->strings = strings;
+CharacterGroup::CharacterGroup(std::vector<TwoChar> twoChars) {
+    this->twoChars = twoChars;
 }
 
 CharacterGroup::CharacterGroup(std::vector<CharacterGroup> characterGroups) {
     for (CharacterGroup group : characterGroups) {
-        for (std::string character : group.strings) {
-            this->strings.push_back(character);
+        for (TwoChar twoChar : group.twoChars) {
+            this->twoChars.push_back(twoChar);
         }
     }
 }
 
-CharacterGroup::CharacterGroup(std::vector<std::string> strings, std::vector<CharacterGroup> characterGroups) {
-    this->strings = strings;
+CharacterGroup::CharacterGroup(std::vector<TwoChar> twoChars, std::vector<CharacterGroup> characterGroups) {
+    this->twoChars = twoChars;
 
     for (CharacterGroup group : characterGroups) {
-        for (std::string character : group.strings) {
-            this->strings.push_back(character);
+        for (TwoChar twoChar : group.twoChars) {
+            this->twoChars.push_back(twoChar);
         }
     }
 }
@@ -50,12 +52,15 @@ CharacterGroup::CharacterGroup(std::vector<std::string> strings, std::vector<Cha
 CharacterGroup::~CharacterGroup() {
 }
 
-bool CharacterGroup::Contains(std::string otherString) {
-    for (std::string containedString : strings) {
-        if (containedString == otherString) {
-            return true;
-        }
+unsigned int CharacterGroup::Match(char first, char second)
+{
+    unsigned int match = 0;
+
+    for (TwoChar twoChar : twoChars) {
+        match = twoChar.Match(first, second);
+
+        if (match > 0) return match;
     }
 
-    return false;
+    return 0;
 }

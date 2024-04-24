@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <fstream>
 
 class InputFile {
@@ -9,10 +8,10 @@ public:
     ~InputFile();
 
     /// @brief Reads the next character from the file. And advances the file pointer.
-    std::string ReadNext();
+    char ReadNext();
 
     /// @brief Peeks the next character from the file. Doesnt advance the file pointer.
-    std::string PeekNext();
+    char PeekNext();
 
     bool IsEndOfFile();
     bool IsGood();
@@ -29,12 +28,12 @@ InputFile::~InputFile() {
     file.close();
 }
 
-std::string InputFile::ReadNext() {
-    return std::string(1, file.get());
+char InputFile::ReadNext() {
+    return file.get();
 }
 
-std::string InputFile::PeekNext() {
-    return std::string(1, file.peek());
+char InputFile::PeekNext() {
+    return file.peek();
 }
 
 bool InputFile::IsEndOfFile() {
