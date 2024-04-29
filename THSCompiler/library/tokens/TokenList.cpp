@@ -38,6 +38,7 @@ TokenList::TokenList() {
 }
 
 TokenList::~TokenList() {
+    // Not needed due to shared_ptr
     /*for (int i = 0; i < tokens.size(); i++) {
         if (tokens[i] == nullptr) {
             continue;
