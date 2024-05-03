@@ -21,6 +21,8 @@ MY_CLASS* OBJECT_HEAP = new MY_CLASS();
 
 int main(int argc, char const *argv[])
 {
+    INT = 15;
+
     int LOCAL = 20;
 
     MY_CLASS LOCAL_OBJECT_NONE = OBJECT_NONE;

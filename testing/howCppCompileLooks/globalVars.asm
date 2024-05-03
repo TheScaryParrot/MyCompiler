@@ -60,6 +60,7 @@ main:
 	subq	$64, %rsp
 	movl	%edi, -52(%rbp)
 	movq	%rsi, -64(%rbp)
+	movl	$15, INT(%rip)
 	movl	$20, -4(%rbp)
 	movq	OBJECT_NONE(%rip), %rax
 	movq	%rax, -28(%rbp)
