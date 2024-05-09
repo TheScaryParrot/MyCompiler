@@ -48,7 +48,12 @@ int main(int argc, char const *argv[])
     */
     if (counter2 * 5 - (counter2 * 2) == 20)
     {
-        std::cout << "IF-counter: " << counter2 << std::endl;
+        std::cout << "IF-counter: " << counter2 << "\n";
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        std::cout << i << "\n";
     }
 
 
