@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "EnvironmentElement.cpp"
 
@@ -17,11 +18,26 @@ public:
 
     std::shared_ptr<T> GetElement(std::string identifier)
     {
-        for (std::shared_ptr<T> element : elements)
+        return FindElement([identifier](std::shared_ptr<EnvironmentElement<T>> element) -> bool{return element->IsThisElement(identifier);});
+
+        /*for (std::shared_ptr<T> element : elements)
         {
             if (element->IsThisElement(identifier))
             {
                 return element->GetElement();
+            }
+        }
+
+        return nullptr;*/
+    }
+
+    std::shared_ptr<T> FindElement(std::function<bool(std::shared_ptr<EnvironmentElement<T>>)> predicate)
+    {
+        for (std::shared_ptr<EnvironmentElement<T>> element : elements)
+        {
+            if (predicate(element))
+            {
+                return element;
             }
         }
 

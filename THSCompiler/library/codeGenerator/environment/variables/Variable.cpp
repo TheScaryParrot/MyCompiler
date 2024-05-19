@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Type.cpp"
+#include "../types/Type.cpp"
 #include "variableLocationGetters/IVariableLocationGetter.cpp"
 
 class Variable

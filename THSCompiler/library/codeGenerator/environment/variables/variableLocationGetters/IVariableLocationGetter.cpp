@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VariableLocation.cpp"
+#include "../VariableLocation.cpp"
 
 class IVariableLocationGetter
 {
