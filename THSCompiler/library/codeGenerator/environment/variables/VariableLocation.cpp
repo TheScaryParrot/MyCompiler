@@ -13,7 +13,6 @@ public:
     void AddToOffset(int offset);
 
     std::string ToString();
-    std::string ToAssemblyString();
 
 private:
     /// @brief String referring to the memory location of the variable
@@ -51,11 +50,6 @@ void VariableLocation::AddToOffset(int offset)
 }
 
 std::string VariableLocation::ToString()
-{
-    return originMemoryLocation + " + " + std::to_string(offset);
-}
-
-std::string VariableLocation::ToAssemblyString()
 {
     //TODO: Check if this is the correct format
     return "[" + originMemoryLocation + " + " + std::to_string(offset) + "]";
