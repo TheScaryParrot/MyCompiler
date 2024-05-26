@@ -26,8 +26,10 @@ public:
     std::shared_ptr<AbstractKeywordToken> PRIVATE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("private"));
     std::shared_ptr<AbstractKeywordToken> PROTECTED_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("protected"));
     std::shared_ptr<AbstractKeywordToken> STATIC_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("static"));
-    std::shared_ptr<AbstractKeywordToken> CONST_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("const"));
-    std::shared_ptr<AbstractKeywordToken> READ_ONLY_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("readonly"));
+    //std::shared_ptr<AbstractKeywordToken> CONST_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("const")); deprecated replaced by inline and final
+    //std::shared_ptr<AbstractKeywordToken> READ_ONLY_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("readonly")); deprecated replaced by final
+    std::shared_ptr<AbstractKeywordToken> FINAL_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("final"));
+    std::shared_ptr<AbstractKeywordToken> INLINE_KEYWORD = std::shared_ptr<AbstractKeywordToken>(new AbstractKeywordToken("inline"));
 
 
     /// @brief Returns the token for the given keyword. If the keyword is not a keyword, returns nullptr.
@@ -99,12 +101,12 @@ std::shared_ptr<AbstractKeywordToken> Keywords::GetKeywordToken(std::string keyw
         return STATIC_KEYWORD;
     }
 
-    if (CONST_KEYWORD->IsThisKeyword(keyword)) {
-        return CONST_KEYWORD;
+    if (FINAL_KEYWORD->IsThisKeyword(keyword)) {
+        return FINAL_KEYWORD;
     }
 
-    if (READ_ONLY_KEYWORD->IsThisKeyword(keyword)) {
-        return READ_ONLY_KEYWORD;
+    if (INLINE_KEYWORD->IsThisKeyword(keyword)) {
+        return INLINE_KEYWORD;
     }
 
     return nullptr;

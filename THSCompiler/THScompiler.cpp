@@ -21,6 +21,8 @@ void CompileFile(std::string filename) {
     delete tokens;
     std::cout << syntaxTree->ToString() << std::endl;
 
+    return;
+
     // Code generation
     std::auto_ptr<AssemblyCode> assemblyCode = CodeGenerator.GenerateCode(syntaxTree);
     delete syntaxTree;

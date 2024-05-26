@@ -1,4 +1,4 @@
-public static int yomamam = 5;
+public static final int yomamam = 5;
 
 static class Base
 {
@@ -13,7 +13,7 @@ class Derived
 {
     moin = Hello(5);
 
-    void Derived(int amount1)
+    inline void Derived(int amount1)
     {
         print("Derived: " + amount && test * 54 * (3 + 4) 1); // not causing error !#1
     }

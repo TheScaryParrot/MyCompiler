@@ -96,8 +96,15 @@ private:
     ELookAheadCertainties LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset = 0);
     bool Parse_StaticAttribute(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_ReadWriteAttribute(TokenList* tokens, unsigned int offset = 0);
-    EReadWrites Parse_ReadWriteAttribute(TokenList* tokens);
+    // deprecated, replaced by inline and final
+    //ELookAheadCertainties LookAhead_ReadWriteAttribute(TokenList* tokens, unsigned int offset = 0);
+    //EReadWrites Parse_ReadWriteAttribute(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset = 0);
+    bool Parse_FinalAttribute(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_InlineAttribute(TokenList* tokens, unsigned int offset = 0);
+    bool Parse_InlineAttribute(TokenList* tokens);
 
     #pragma endregion
 

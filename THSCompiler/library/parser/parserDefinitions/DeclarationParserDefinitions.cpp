@@ -149,7 +149,8 @@ ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclarationAttributes(T
     // <scope> | <static> | <readWrite>
     if (LookAhead_ScopeAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
     if (LookAhead_StaticAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
-    if (LookAhead_ReadWriteAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
+    if (LookAhead_FinalAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
+    if (LookAhead_InlineAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
 
     // no attributes case
     return ELookAheadCertainties::Unknown;
@@ -170,24 +171,24 @@ DeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttributes(Token
 {
     DeclarationAttributes attributes;
 
-    unsigned int i = 0;
-
     if (LookAhead_ScopeAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
         attributes.scope = Parse_ScopeAttribute(tokens);
-        i++;
     }
 
     if (LookAhead_StaticAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
         attributes.isStatic = Parse_StaticAttribute(tokens);
-        i++;
     }
 
-    if (LookAhead_ReadWriteAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_FinalAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
-        attributes.readWrite = Parse_ReadWriteAttribute(tokens);
-        i++;
+        attributes.isFinal = Parse_FinalAttribute(tokens);
+    }
+
+    if (LookAhead_InlineAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    {
+        attributes.isInline = Parse_InlineAttribute(tokens);
     }
 
     return attributes;
@@ -287,17 +288,28 @@ bool PredictiveParser::Parse_StaticAttribute(TokenList* tokens )
     return true; // As LookAhead_StaticAttribute() has returned CertainlyPresent, we know that static must be present
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_ReadWriteAttribute(TokenList* tokens, unsigned int offset)
+ELookAheadCertainties PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset)
 {
-    // READ | WRITE
-    if (tokens->IsPeekOfTokenType(Keywords.READ_ONLY_KEYWORD, offset) || tokens->IsPeekOfTokenType(Keywords.CONST_KEYWORD, offset)) return ELookAheadCertainties::CertainlyPresent;
+    // FINAL
+    if (tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD, offset)) return ELookAheadCertainties::CertainlyPresent;
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-EReadWrites PredictiveParser::Parse_ReadWriteAttribute(TokenList* tokens )
+bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens )
 {
-    if (tokens->Next()->IsThisToken(Keywords.READ_ONLY_KEYWORD)) return EReadWrites::READONLY;
+    tokens->Next(); // Consume FINAL
+    return true; // As LookAhead_FinalAttribute() has returned CertainlyPresent, we know that final must be present
+}
 
-    // LookAhead returned CertainlyPresent. Therefore it's either Readonly or Const
-    return EReadWrites::CONST;
+ELookAheadCertainties PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens, unsigned int offset)
+{
+    // INLINE
+    if (tokens->IsPeekOfTokenType(Keywords.INLINE_KEYWORD, offset)) return ELookAheadCertainties::CertainlyPresent;
+
+    return ELookAheadCertainties::CertainlyNotPresent;
+}
+bool PredictiveParser::Parse_InlineAttribute(TokenList* tokens )
+{
+    tokens->Next(); // Consume INLINE
+    return true; // As LookAhead_InlineAttribute() has returned CertainlyPresent, we know that inline must be present
 }
