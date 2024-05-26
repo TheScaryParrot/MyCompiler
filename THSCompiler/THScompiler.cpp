@@ -24,7 +24,7 @@ void CompileFile(std::string filename) {
     return;
 
     // Code generation
-    std::auto_ptr<AssemblyCode> assemblyCode = CodeGenerator.GenerateCode(syntaxTree);
+    std::unique_ptr<AssemblyCode> assemblyCode = CodeGenerator.GenerateCode(syntaxTree);
     delete syntaxTree;
 
     std::cout << assemblyCode->ToString() << std::endl;

@@ -16,7 +16,7 @@
 static class CodeGenerator
 {
 public:
-    std::auto_ptr<AssemblyCode> GenerateCode(SyntaxTree* syntaxTree);
+    std::unique_ptr<AssemblyCode> GenerateCode(SyntaxTree* syntaxTree);
 
 private:
     AssemblyCode* GenerateLine(AbstractLineNode* line);
@@ -30,7 +30,7 @@ private:
 
 }CodeGenerator;
 
-std::auto_ptr<AssemblyCode> CodeGenerator::GenerateCode(SyntaxTree* syntaxTree)
+std::unique_ptr<AssemblyCode> CodeGenerator::GenerateCode(SyntaxTree* syntaxTree)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
@@ -39,7 +39,7 @@ std::auto_ptr<AssemblyCode> CodeGenerator::GenerateCode(SyntaxTree* syntaxTree)
         assemblyCode->AddLines(GenerateLine(syntaxTree->GetLine(i)));
     }
 
-    return std::auto_ptr<AssemblyCode>(assemblyCode);
+    return std::unique_ptr<AssemblyCode>(assemblyCode);
 }
 
 AssemblyCode* CodeGenerator::GenerateLine(AbstractLineNode* line)
@@ -89,5 +89,11 @@ AssemblyCode* CodeGenerator::GenerateClassDeclaration(ClassDeclarationNode* decl
     // TODO: New environment for class
     //TODO: Add to current environment as type
     // TODO: Generate class code
+    return nullptr;
+}
+
+AssemblyCode* CodeGenerator::GenerateStatement(AbstractStatementNode* statement)
+{
+    // TODO: Generate statement
     return nullptr;
 }

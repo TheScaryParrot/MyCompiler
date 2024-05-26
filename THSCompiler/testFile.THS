@@ -19,7 +19,7 @@ class Derived
     }
 }
 
-static readonly hei moin() lol2; // not causing error !#2
+static final hei moin() lol2; // not causing error !#2
 
 void main(int argc, string argv)
 {
