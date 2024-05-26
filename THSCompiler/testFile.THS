@@ -5,6 +5,8 @@ static class Base
     void Base(int amount)
     {
         amount--;
+        amount = amount++;
+        amount = ++amount * 5 - amount--;
         print("Base" - amount);
     }
 }

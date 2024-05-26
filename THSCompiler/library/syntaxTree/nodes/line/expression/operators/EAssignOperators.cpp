@@ -3,8 +3,6 @@
 #include <string>
 
 enum class EAssignOperators {
-    INCREMENT,
-    DECREMENT,
     ASSIGN,
     ADD_ASSIGN,
     SUB_ASSIGN,
@@ -15,8 +13,6 @@ enum class EAssignOperators {
 
 std::string EAssignOperatorsToString(EAssignOperators assignOperator) {
     switch (assignOperator) {
-        case EAssignOperators::INCREMENT:  return "++";
-        case EAssignOperators::DECREMENT:  return "--";
         case EAssignOperators::ASSIGN:  return "=";
         case EAssignOperators::ADD_ASSIGN:  return "+=";
         case EAssignOperators::SUB_ASSIGN:  return "-=";

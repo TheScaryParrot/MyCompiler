@@ -7,20 +7,22 @@
 class UnaryExpressionNode : public AbstractExpressionNode
 {
 public:
-    UnaryExpressionNode(EUnaryOperators unaryOperator, AbstractExpressionNode* value);
+    UnaryExpressionNode(EPreUnaryOperators preUnaryOperator, AbstractExpressionNode* value, EPostUnaryOperators postUnaryOperator);
     ~UnaryExpressionNode();
 
     virtual std::string ToString() override;
 
 private:
-    EUnaryOperators unaryOperator;
+    EPreUnaryOperators preUnaryOperator;
     AbstractExpressionNode* value;
+    EPostUnaryOperators postUnaryOperator;
 };
 
-UnaryExpressionNode::UnaryExpressionNode(EUnaryOperators unaryOperator, AbstractExpressionNode* value) : AbstractExpressionNode()
+UnaryExpressionNode::UnaryExpressionNode(EPreUnaryOperators preUnaryOperator, AbstractExpressionNode* value, EPostUnaryOperators postUnaryOperator) : AbstractExpressionNode()
 {
-    this->unaryOperator = unaryOperator;
+    this->preUnaryOperator = preUnaryOperator;
     this->value = value;
+    this->postUnaryOperator = postUnaryOperator;
 }
 
 UnaryExpressionNode::~UnaryExpressionNode()
@@ -30,5 +32,5 @@ UnaryExpressionNode::~UnaryExpressionNode()
 
 std::string UnaryExpressionNode::ToString()
 {
-    return EUnaryOperatorsToString(unaryOperator) + value->ToString();
+    return EPreUnaryOperatorsToString(preUnaryOperator) + value->ToString() + EPostUnaryOperatorsToString(postUnaryOperator);
 }

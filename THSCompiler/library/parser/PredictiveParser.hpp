@@ -27,17 +27,17 @@
 #include "../syntaxTree/nodes/line/expression/values/StringConstValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/LogicalConstValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/functionCall/CallNode.cpp"
+#include "../syntaxTree/nodes/line/expression/AssignmentNode.cpp"
 #include "../syntaxTree/nodes/line/expression/OperatorExpressionNode.cpp"
 #include "../syntaxTree/nodes/line/expression/UnaryExpressionNode.cpp"
 #include "../syntaxTree/nodes/line/expression/operators/EUnaryOperators.cpp"
 #include "../syntaxTree/nodes/line/expression/operators/EOperators.cpp"
+#include "../syntaxTree/nodes/line/expression/operators/EAssignOperators.cpp"
 
 #pragma endregion
 
 #pragma region Statements
 #include "../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
-#include "../syntaxTree/nodes/line/statement/ValueAssignmentNode.cpp"
-#include "../syntaxTree/nodes/line/statement/assignOperators/EAssignOperators.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ElifStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
@@ -114,6 +114,15 @@ private:
     ELookAheadCertainties LookAhead_Expression(TokenList* tokens);
     AbstractExpressionNode* Parse_Expression(TokenList* tokens);
 
+    ELookAheadCertainties LookAhead_AssignmentExpression(TokenList* tokens);
+    AbstractExpressionNode* Parse_AssignmentExpression(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_Assignment(TokenList* tokens);
+    Assignment* Parse_Assignment(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_AssignOperator(TokenList* tokens, unsigned int offset = 0);
+    EAssignOperators Parse_AssignOperator(TokenList* tokens);
+
     ELookAheadCertainties LookAhead_OrExpression(TokenList* tokens);
     AbstractExpressionNode* Parse_OrExpression(TokenList* tokens);
 
@@ -141,8 +150,11 @@ private:
     ELookAheadCertainties LookAhead_UnaryExpression(TokenList* tokens);
     AbstractExpressionNode* Parse_UnaryExpression(TokenList* tokens);
 
-    ELookAheadCertainties LookAhead_UnaryOperator(TokenList* tokens);
-    EUnaryOperators Parse_UnaryOperator(TokenList* tokens);
+    ELookAheadCertainties LookAhead_PreUnaryOperator(TokenList* tokens);
+    EPreUnaryOperators Parse_PreUnaryOperator(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_PostUnaryOperator(TokenList* tokens);
+    EPostUnaryOperators Parse_PostUnaryOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Value(TokenList* tokens);
     AbstractExpressionNode* Parse_Value(TokenList* tokens);
@@ -172,15 +184,6 @@ private:
 
     ELookAheadCertainties LookAhead_Statement(TokenList* tokens);
     AbstractStatementNode* Parse_Statement(TokenList* tokens);
-
-    ELookAheadCertainties LookAhead_Assignment(TokenList* tokens);
-    AssignmentNode* Parse_Assignment(TokenList* tokens);
-
-    ELookAheadCertainties LookAhead_AssignOperator(TokenList* tokens, unsigned int offset = 0);
-    EAssignOperators Parse_AssignOperator(TokenList* tokens);
-
-    ELookAheadCertainties LookAhead_ValueAssignOperator(TokenList* tokens, unsigned int offset = 0);
-    EAssignOperators Parse_ValueAssignOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_KeywordStatement(TokenList* tokens);
     AbstractKeywordStatementNode* Parse_KeywordStatement(TokenList* tokens);
