@@ -20,5 +20,5 @@ ConstVariableLocationGetter::ConstVariableLocationGetter(std::string originMemor
 
 VariableLocation ConstVariableLocationGetter::GetLocation(VariableLocation parentLocation)
 {
-    return location;
+    return this->location;
 }

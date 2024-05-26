@@ -8,21 +8,24 @@
 class Variable
 {
 public:
-    Variable(std::shared_ptr<Type> type, std::auto_ptr<IVariableLocationGetter> locationGetter);
+    Variable(std::shared_ptr<Type> type, std::auto_ptr<IVariableLocationGetter> locationGetter, std::auto_ptr<IVariableLocationGetter> setLocation);
 
     std::shared_ptr<Type> GetType();
 
     VariableLocation GetLocation(VariableLocation parentLocation);
+    VariableLocation SetLocation(VariableLocation parentLocation);
 
 private:
     std::shared_ptr<Type> type;
-    std::auto_ptr<IVariableLocationGetter> locationGetter;
+    std::auto_ptr<IVariableLocationGetter> getLocation;
+    std::auto_ptr<IVariableLocationGetter> setLocation;
 };
 
-Variable::Variable(std::shared_ptr<Type> type, std::auto_ptr<IVariableLocationGetter> locationGetter)
+Variable::Variable(std::shared_ptr<Type> type, std::auto_ptr<IVariableLocationGetter> getLocation, std::auto_ptr<IVariableLocationGetter> setLocation)
 {
     this->type = type;
-    this->locationGetter = locationGetter;
+    this->getLocation = getLocation;
+    this->setLocation = setLocation;
 }
 
 std::shared_ptr<Type> Variable::GetType()
@@ -32,5 +35,10 @@ std::shared_ptr<Type> Variable::GetType()
 
 VariableLocation Variable::GetLocation(VariableLocation parentLocation)
 {
-    return locationGetter->GetLocation(parentLocation);
+    return this->getLocation->GetLocation(parentLocation);
+}
+
+VariableLocation Variable::SetLocation(VariableLocation parentLocation)
+{
+    return this->setLocation->GetLocation(parentLocation);
 }

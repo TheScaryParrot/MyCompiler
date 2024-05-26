@@ -4,7 +4,6 @@
 #include <memory>
 
 /// @brief Combines an identifier with an element of type T; used in AbstractEnvironment
-/// @tparam T 
 template <class T>
 class EnvironmentElement
 {

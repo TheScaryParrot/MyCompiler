@@ -6,7 +6,6 @@
 #include "EnvironmentElement.cpp"
 
 /// @brief Basic Environment that holds EnvironmentElements and provides methods to add and get elements, based on their identifier
-/// @tparam T 
 template <class T>
 class AbstractEnvironment
 {
@@ -18,17 +17,8 @@ public:
 
     std::shared_ptr<T> GetElement(std::string identifier)
     {
+        // Find element where element->IsThisElement(identifier) == true
         return FindElement([identifier](std::shared_ptr<EnvironmentElement<T>> element) -> bool{return element->IsThisElement(identifier);});
-
-        /*for (std::shared_ptr<T> element : elements)
-        {
-            if (element->IsThisElement(identifier))
-            {
-                return element->GetElement();
-            }
-        }
-
-        return nullptr;*/
     }
 
     std::shared_ptr<T> FindElement(std::function<bool(std::shared_ptr<EnvironmentElement<T>>)> predicate)
