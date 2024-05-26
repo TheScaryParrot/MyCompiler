@@ -7,6 +7,8 @@
 #include "library/parser/parserDefinitions/ExpressionParserDefinitions.cpp"
 #include "library/parser/parserDefinitions/DeclarationParserDefinitions.cpp"
 
+#include "library/codeGenerator/generator/CodeGenerator.cpp"
+
 void CompileFile(std::string filename) {
     InputFile* file = new InputFile(filename);
 
@@ -16,10 +18,14 @@ void CompileFile(std::string filename) {
 
     // Parsing
     SyntaxTree* syntaxTree = PredictiveParser.Parse(tokens);
+    delete tokens;
     std::cout << syntaxTree->ToString() << std::endl;
+
+    // Code generation
+    std::auto_ptr<AssemblyCode> assemblyCode = CodeGenerator.GenerateCode(syntaxTree);
     delete syntaxTree;
 
-    delete tokens;
+    std::cout << assemblyCode->ToString() << std::endl;
 }
 
 int main(int argc, char const *argv[])

@@ -10,7 +10,7 @@ class AssemblyCode
 {
 public:
     AssemblyCode* AddLine(std::shared_ptr<IAssemblyLine> line);
-    AssemblyCode* AddLines(std::shared_ptr<AssemblyCode> code);
+    AssemblyCode* AddLines(AssemblyCode* code);
 
     std::vector<std::shared_ptr<IAssemblyLine>> GetLines();
     std::string ToString();
@@ -25,8 +25,10 @@ AssemblyCode* AssemblyCode::AddLine(std::shared_ptr<IAssemblyLine> line)
     return this;
 }
 
-AssemblyCode* AssemblyCode::AddLines(std::shared_ptr<AssemblyCode> code)
+AssemblyCode* AssemblyCode::AddLines(AssemblyCode* code)
 {
+    if (code == nullptr) return this;
+
     for (std::shared_ptr<IAssemblyLine>& line : code->GetLines())
     {
         lines.push_back(line);

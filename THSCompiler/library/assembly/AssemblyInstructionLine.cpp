@@ -5,7 +5,7 @@
 
 #include "IAssemblyLine.cpp"
 #include "instructions/AssemblyInstruction.cpp"
-#include "../environment/variables/VariableLocation.cpp"
+#include "../codeGenerator/environment/variables/VariableLocation.cpp"
 
 class AssemblyInstructionLine : public IAssemblyLine
 {

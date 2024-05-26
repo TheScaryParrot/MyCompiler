@@ -138,18 +138,10 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens )
 
     tokens->Next(); // Consume PARENTHESIS_CLOSE
 
-    BodyNode* body = nullptr;
+    AbstractStatementNode* statement = nullptr;
+    statement = Parse_Statement(tokens);
 
-    if (LookAhead_Body(tokens) == ELookAheadCertainties::CertainlyPresent)
-    {
-        body = Parse_Body(tokens);
-    }
-    else
-    {
-        tokens->Next(); // Consume STATEMENT_END
-    }
-
-    return new FuncDeclarationNode(attributes, returnType, name, parameters, body);
+    return new FuncDeclarationNode(attributes, returnType, name, parameters, statement);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclarationAttributes(TokenList* tokens, unsigned int offset)

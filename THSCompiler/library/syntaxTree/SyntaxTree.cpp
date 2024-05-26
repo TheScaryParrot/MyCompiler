@@ -11,6 +11,8 @@ public:
     ~SyntaxTree();
 
     void AddCodeLineNode(AbstractLineNode* codeLine);
+    AbstractLineNode* GetLine(int index);
+    unsigned int GetLineCount();
 
     std::string ToString();
 
@@ -30,6 +32,16 @@ SyntaxTree::~SyntaxTree()
 void SyntaxTree::AddCodeLineNode(AbstractLineNode* codeLine)
 {
     codeBlock->AddCodeline(codeLine);
+}
+
+AbstractLineNode* SyntaxTree::GetLine(int index)
+{
+    return codeBlock->GetLine(index);
+}
+
+unsigned int SyntaxTree::GetLineCount()
+{
+    return codeBlock->GetLineCount();
 }
 
 std::string SyntaxTree::ToString()

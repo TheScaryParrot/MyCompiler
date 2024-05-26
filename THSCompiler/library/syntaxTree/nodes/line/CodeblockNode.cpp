@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "AbstractLineNode.cpp"
 
@@ -12,35 +13,39 @@ public:
     ~CodeblockNode();
 
     void AddCodeline(AbstractLineNode* line);
+    AbstractLineNode* GetLine(int index);
+    unsigned int GetLineCount();
 
     std::string ToString();
 
 private:
-    std::vector<AbstractLineNode*> lines;
+    std::vector<std::auto_ptr<AbstractLineNode>> lines;
 };
 
 CodeblockNode::CodeblockNode()
 {
 }
 
-CodeblockNode::~CodeblockNode()
-{
-    for (AbstractLineNode* line : lines)
-    {
-        delete line;
-    }
-}
-
 void CodeblockNode::AddCodeline(AbstractLineNode* codeLine)
 {
-    lines.push_back(codeLine);
+    lines.push_back(std::auto_ptr<AbstractLineNode>(codeLine));
+}
+
+AbstractLineNode* CodeblockNode::GetLine(int index)
+{
+    return lines[index].get();
+}
+
+unsigned int CodeblockNode::GetLineCount()
+{
+    return lines.size();
 }
 
 std::string CodeblockNode::ToString()
 {
     std::string result = "{\n";
 
-    for (AbstractLineNode* line : lines)
+    for (std::auto_ptr<AbstractLineNode> line : lines)
     {
         result += "\t" + line->ToString() + "\n";
     }
