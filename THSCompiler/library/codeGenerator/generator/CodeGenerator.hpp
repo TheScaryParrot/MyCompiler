@@ -12,6 +12,13 @@
 
 
 #include "../../syntaxTree/nodes/line/statement/AbstractStatementNode.cpp"
+#include "../../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
+#include "../../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
+#include "../../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
+#include "../../syntaxTree/nodes/line/statement/keywordStatement/WhileStatementNode.cpp"
+#include "../../syntaxTree/nodes/line/statement/keywordStatement/ForStatementNode.cpp"
+#include "../../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
+#include "../../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
 
 static class CodeGenerator
 {
@@ -21,12 +28,24 @@ public:
 private:
     AssemblyCode* GenerateLine(AbstractLineNode* line);
 
-    AssemblyCode* GenerateDeclaration(AbstractDeclarationNode* declaration);
+
+    AssemblyCode* GenerateDeclaration(const AbstractDeclarationNode* declaration);
     AssemblyCode* GenerateVarDeclaration(VarDeclarationNode* declaration);
     AssemblyCode* GenerateFuncDeclaration(FuncDeclarationNode* declaration);
     AssemblyCode* GenerateClassDeclaration(ClassDeclarationNode* declaration);
 
+
     AssemblyCode* GenerateStatement(AbstractStatementNode* statement);
+    AssemblyCode* GenerateBody(BodyNode* body);
+
+    AssemblyCode* GenerateKeywordStatement(AbstractKeywordStatementNode* statement);
+    AssemblyCode* GenerateIfStatement(IfStatementNode* statement);
+    AssemblyCode* GenerateIfStatement(IfStatementNode* statement, std::string finalLabel);
+    AssemblyCode* GenerateReturnStatement(ReturnStatementNode* statement);
+    AssemblyCode* GenerateWhileStatement(WhileStatementNode* statement);
+    AssemblyCode* GenerateForStatement(ForStatementNode* statement);
+    AssemblyCode* GenerateContinueStatement(ContinueStatementNode* statement);
+    AssemblyCode* GenerateBreakStatement(BreakStatementNode* statement);
 
 }CodeGenerator;
 
@@ -53,47 +72,3 @@ AssemblyCode* CodeGenerator::GenerateLine(AbstractLineNode* line)
     // Generate statement
     return GenerateStatement(dynamic_cast<AbstractStatementNode*>(line));
 };
-
-AssemblyCode* CodeGenerator::GenerateDeclaration(AbstractDeclarationNode* declaration)
-{
-    if (typeid(*declaration) == typeid(VarDeclarationNode))
-    {
-        return GenerateVarDeclaration(dynamic_cast<VarDeclarationNode*>(declaration));
-    }
-    
-    if (typeid(*declaration) == typeid(FuncDeclarationNode))
-    {
-        return GenerateFuncDeclaration(dynamic_cast<FuncDeclarationNode*>(declaration));
-    }
-
-    return GenerateClassDeclaration(dynamic_cast<ClassDeclarationNode*>(declaration));
-}
-
-AssemblyCode* CodeGenerator::GenerateVarDeclaration(VarDeclarationNode* declaration)
-{
-    // TODO: Add to current environment
-    // TODO: Set variable value
-    return nullptr;
-}
-
-AssemblyCode* CodeGenerator::GenerateFuncDeclaration(FuncDeclarationNode* declaration)
-{
-    //TODO: Add to current environment
-    // TODO: New environment for function
-    // TODO: Generate function code
-    return nullptr;
-}
-
-AssemblyCode* CodeGenerator::GenerateClassDeclaration(ClassDeclarationNode* declaration)
-{
-    // TODO: New environment for class
-    //TODO: Add to current environment as type
-    // TODO: Generate class code
-    return nullptr;
-}
-
-AssemblyCode* CodeGenerator::GenerateStatement(AbstractStatementNode* statement)
-{
-    // TODO: Generate statement
-    return nullptr;
-}
