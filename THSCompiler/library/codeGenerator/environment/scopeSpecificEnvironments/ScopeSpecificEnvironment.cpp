@@ -20,6 +20,9 @@ public:
 
     virtual AssemblyCode* GenerateFunctionCall(CallNode* call) override;
 
+    /// @brief Gets the identifier of the function; depends on function name and parameters (function name mangling)
+    virtual std::string GetFunctionIdentifier(std::string functionName, std::vector<std::shared_ptr<Type>> parameterTypes);
+
     bool HasVariable(std::string identifier);
 
     bool HasFunction(std::string identifier);
@@ -59,6 +62,18 @@ AssemblyCode* ScopeSpecificEnvironment::GenerateFunctionCall(CallNode* call)
 {
     //TODO: Add basic behaviour
     return nullptr;
+}
+
+std::string ScopeSpecificEnvironment::GetFunctionIdentifier(std::string functionName, std::vector<std::shared_ptr<Type>> parameterTypes)
+{
+    std::string result = functionName + "_";
+
+    for (std::shared_ptr<Type> type : parameterTypes)
+    {
+        result += type->ToString() + "_";
+    }
+
+    return result;
 }
 
 bool ScopeSpecificEnvironment::HasVariable(std::string identifier)

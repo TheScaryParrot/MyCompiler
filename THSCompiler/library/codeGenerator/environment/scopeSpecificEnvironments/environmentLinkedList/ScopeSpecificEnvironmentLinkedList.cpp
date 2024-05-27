@@ -58,63 +58,22 @@ void ScopeSpecificEnvironmentLinkedList::PopEnvironment()
 
 AssemblyCode* ScopeSpecificEnvironmentLinkedList::GenerateVariableDeclaration(VarDeclarationNode* declaration)
 {
-    return head->GetEnvironment()->GenerateVariableDeclaration(declaration);
+    return head->GenerateVariableDeclaration(declaration);
 };
 
 VariableLocation ScopeSpecificEnvironmentLinkedList::GetVariableLocation(std::string identifier)
 {
-    std::shared_ptr<ScopeSpecificEnvironment> environment = FindEnvironment([identifier](std::shared_ptr<ScopeSpecificEnvironment> environment) -> bool
-    {
-        return environment->HasVariable(identifier);
-    });
-
-    if (environment == nullptr)
-    {
-        //TODO: Error handling
-        std::cout << "Error: Variable " << identifier << " not found\n";
-        return VariableLocation();
-    }
-
-    return environment->GetVariableLocation(identifier);
+    return head->GetVariableLocation(identifier);
 };
 
 AssemblyCode* ScopeSpecificEnvironmentLinkedList::GenerateFunctionDeclaration(FuncDeclarationNode* declaration)
 {
-    return head->GetEnvironment()->GenerateFunctionDeclaration(declaration);
+    return head->GenerateFunctionDeclaration(declaration);
 };
 
 AssemblyCode* ScopeSpecificEnvironmentLinkedList::GenerateFunctionCall(CallNode* call)
 {
-    std::shared_ptr<ScopeSpecificEnvironment> environment = FindEnvironment([call](std::shared_ptr<ScopeSpecificEnvironment> environment) -> bool
-    {
-        return environment->HasFunction(call->functionName);
-    });
-
-    if (environment == nullptr)
-    {
-        //TODO: Error handling
-        std::cout << "Error: Function " << call->functionName << " not found\n";
-        return nullptr;
-    }
-
-    return environment->GenerateFunctionCall(call);
+    return head->GenerateFunctionCall(call);
 };
 
 # pragma endregion
-
-std::shared_ptr<ScopeSpecificEnvironment> ScopeSpecificEnvironmentLinkedList::FindEnvironment(std::function<bool(std::shared_ptr<ScopeSpecificEnvironment>)> predicate)
-{
-    std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> currentElement = head;
-
-    while (currentElement != nullptr)
-    {
-        if (predicate(currentElement->GetEnvironment()))
-        {
-            return currentElement->GetEnvironment();
-        }
-
-        currentElement = currentElement->GetParent();
-    }
-
-    return nullptr;
-}
