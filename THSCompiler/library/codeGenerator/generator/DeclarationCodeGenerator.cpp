@@ -2,12 +2,12 @@
 
 AssemblyCode* CodeGenerator::GenerateDeclaration(AbstractDeclarationNode* declaration)
 {
-    if (typeid(*declaration) == typeid(VarDeclarationNode))
+    if (dynamic_cast<VarDeclarationNode*>(declaration) != nullptr)
     {
         return GenerateVarDeclaration(dynamic_cast<VarDeclarationNode*>(declaration));
     }
     
-    if (typeid(*declaration) == typeid(FuncDeclarationNode))
+    if (dynamic_cast<FuncDeclarationNode*>(declaration) != nullptr)
     {
         return GenerateFuncDeclaration(dynamic_cast<FuncDeclarationNode*>(declaration));
     }
@@ -17,17 +17,17 @@ AssemblyCode* CodeGenerator::GenerateDeclaration(AbstractDeclarationNode* declar
 
 AssemblyCode* CodeGenerator::GenerateVarDeclaration(VarDeclarationNode* declaration)
 {
-    // TODO: Add to current environment
+    AssemblyCode* assemblyCode = this->environmentLinkedList.GenerateVariableDeclaration(declaration);
     // TODO: Set variable value
-    return nullptr;
+    return assemblyCode;
 }
 
 AssemblyCode* CodeGenerator::GenerateFuncDeclaration(FuncDeclarationNode* declaration)
 {
-    //TODO: Add to current environment
+    AssemblyCode* assemblyCode = this->environmentLinkedList.GenerateFunctionDeclaration(declaration);
     // TODO: New environment for function
     // TODO: Generate function code
-    return nullptr;
+    return assemblyCode;
 }
 
 AssemblyCode* CodeGenerator::GenerateClassDeclaration(ClassDeclarationNode* declaration)

@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include "../environment/scopeSpecificEnvironments/environmentLinkedList/ScopeSpecificEnvironmentLinkedList.cpp"
+#include "../environment/scopeSpecificEnvironments/GlobalScopeEnvironment.cpp"
+
 #include "../../syntaxTree/SyntaxTree.cpp"
 #include "../../assembly/AssemblyCode.cpp"
 
@@ -23,13 +26,15 @@
 static class CodeGenerator
 {
 public:
-    std::unique_ptr<AssemblyCode> GenerateCode(SyntaxTree* syntaxTree);
+    std::shared_ptr<AssemblyCode> GenerateCode(SyntaxTree* syntaxTree);
 
 private:
+    ScopeSpecificEnvironmentLinkedList environmentLinkedList;
+
     AssemblyCode* GenerateLine(AbstractLineNode* line);
 
 
-    AssemblyCode* GenerateDeclaration(const AbstractDeclarationNode* declaration);
+    AssemblyCode* GenerateDeclaration(AbstractDeclarationNode* declaration);
     AssemblyCode* GenerateVarDeclaration(VarDeclarationNode* declaration);
     AssemblyCode* GenerateFuncDeclaration(FuncDeclarationNode* declaration);
     AssemblyCode* GenerateClassDeclaration(ClassDeclarationNode* declaration);
@@ -49,26 +54,37 @@ private:
 
 }CodeGenerator;
 
-std::unique_ptr<AssemblyCode> CodeGenerator::GenerateCode(SyntaxTree* syntaxTree)
+std::shared_ptr<AssemblyCode> CodeGenerator::GenerateCode(SyntaxTree* syntaxTree)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
+
+    std::shared_ptr<Environment> environment = std::shared_ptr<Environment>(new Environment());
+    std::shared_ptr<GlobalScopeEnvironment> globalScopeEnvironment = std::shared_ptr<GlobalScopeEnvironment>(new GlobalScopeEnvironment(environment));
+    this->environmentLinkedList.PushEnvironment(std::shared_ptr<GlobalScopeEnvironment>(globalScopeEnvironment));
 
     for (size_t i = 0; i < syntaxTree->GetLineCount(); i++)
     {
         assemblyCode->AddLines(GenerateLine(syntaxTree->GetLine(i)));
     }
 
-    return std::unique_ptr<AssemblyCode>(assemblyCode);
+    return std::shared_ptr<AssemblyCode>(assemblyCode);
 }
 
 AssemblyCode* CodeGenerator::GenerateLine(AbstractLineNode* line)
 {
-    //FIXME: Solve this without typeid and dynamic_cast; visitor pattern with ICodeGenerator?
-    if (typeid(*line) == typeid(AbstractDeclarationNode))
+    if (line == nullptr)
+    {
+        std::cout << "Line is null\n";
+        return nullptr;
+    }
+
+    //FIXME: Solve this without dynamic_cast; visitor pattern with ICodeGenerator?
+    if (dynamic_cast<AbstractDeclarationNode*>(line) != nullptr)
     {
         return GenerateDeclaration(dynamic_cast<AbstractDeclarationNode*>(line));
     }
-    
+
+
     // Generate statement
     return GenerateStatement(dynamic_cast<AbstractStatementNode*>(line));
 };

@@ -7,7 +7,9 @@
 #include "library/parser/parserDefinitions/ExpressionParserDefinitions.cpp"
 #include "library/parser/parserDefinitions/DeclarationParserDefinitions.cpp"
 
-#include "library/codeGenerator/generator/CodeGenerator.cpp"
+#include "library/codeGenerator/generator/CodeGenerator.hpp"
+#include "library/codeGenerator/generator/DeclarationCodeGenerator.cpp"
+#include "library/codeGenerator/generator/StatementCodeGenerator.cpp"
 
 void CompileFile(std::string filename) {
     InputFile* file = new InputFile(filename);
@@ -21,10 +23,8 @@ void CompileFile(std::string filename) {
     delete tokens;
     std::cout << syntaxTree->ToString() << std::endl;
 
-    return;
-
     // Code generation
-    std::unique_ptr<AssemblyCode> assemblyCode = CodeGenerator.GenerateCode(syntaxTree);
+    std::shared_ptr<AssemblyCode> assemblyCode = CodeGenerator.GenerateCode(syntaxTree);
     delete syntaxTree;
 
     std::cout << assemblyCode->ToString() << std::endl;

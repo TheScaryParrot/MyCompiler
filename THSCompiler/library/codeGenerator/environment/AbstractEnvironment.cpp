@@ -27,7 +27,7 @@ public:
         {
             if (predicate(element))
             {
-                return element;
+                return element->GetElement();
             }
         }
 

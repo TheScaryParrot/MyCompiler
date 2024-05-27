@@ -14,7 +14,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     std::string functionName;
     std::vector<CallArgument*> arguments;
 };
