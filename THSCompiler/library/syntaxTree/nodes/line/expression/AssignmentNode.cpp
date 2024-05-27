@@ -20,7 +20,6 @@ public:
 };
 
 
-/// @brief This node is used for assign statements without a value (++ and --). See ValueAssignmentNode.cpp for assign statements with a value.
 class AssignmentNode : public AbstractExpressionNode
 {
 public:
