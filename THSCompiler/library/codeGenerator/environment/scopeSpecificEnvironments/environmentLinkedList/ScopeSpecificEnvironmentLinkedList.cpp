@@ -4,8 +4,7 @@
 
 #include "ScopeSpecificEnvironmentLinkedListElement.cpp"
 
-// Inherits IScopeSpecificEnvironment so that it can be used in the same way as ScopeSpecificEnvironment
-class ScopeSpecificEnvironmentLinkedList : IScopeSpecificEnvironment
+class ScopeSpecificEnvironmentLinkedList
 {
 public:
     ScopeSpecificEnvironmentLinkedList();
@@ -16,20 +15,7 @@ public:
     /// @brief Removes the current head of the linked list
     void PopEnvironment();
 
-
-    #pragma region IScopeSpecificEnvironment implementation
-
-    /// @brief Generates the assembly code for the given variable declaration and adds it to the environment. Does not assign a value to the variable!
-    virtual AssemblyCode* GenerateVariableDeclaration(VarDeclarationNode* declaration) override;
-
-    //TODO: identifier not past in as string, but as IdentifierNode or something
-    virtual VariableLocation GetVariableLocation(std::string identifier) override;
-
-    virtual AssemblyCode* GenerateFunctionDeclaration(FuncDeclarationNode* declaration) override;
-
-    virtual AssemblyCode* GenerateFunctionCall(CallNode* call) override;
-
-    #pragma endregion
+    ScopeSpecificEnvironmentLinkedListElement* GetHead();
 
 private:
     std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> head;
@@ -54,26 +40,7 @@ void ScopeSpecificEnvironmentLinkedList::PopEnvironment()
     head = head->GetParent();
 }
 
-#pragma region IScopeSpecificEnvironment implementation
-
-AssemblyCode* ScopeSpecificEnvironmentLinkedList::GenerateVariableDeclaration(VarDeclarationNode* declaration)
+ScopeSpecificEnvironmentLinkedListElement* ScopeSpecificEnvironmentLinkedList::GetHead()
 {
-    return head->GenerateVariableDeclaration(declaration);
-};
-
-VariableLocation ScopeSpecificEnvironmentLinkedList::GetVariableLocation(std::string identifier)
-{
-    return head->GetVariableLocation(identifier);
-};
-
-AssemblyCode* ScopeSpecificEnvironmentLinkedList::GenerateFunctionDeclaration(FuncDeclarationNode* declaration)
-{
-    return head->GenerateFunctionDeclaration(declaration);
-};
-
-AssemblyCode* ScopeSpecificEnvironmentLinkedList::GenerateFunctionCall(CallNode* call)
-{
-    return head->GenerateFunctionCall(call);
-};
-
-# pragma endregion
+    return head.get();
+}

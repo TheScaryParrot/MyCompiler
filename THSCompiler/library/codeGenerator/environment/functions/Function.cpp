@@ -10,17 +10,17 @@
 class Function
 {
 public:
-    Function(std::shared_ptr<Type> returnType);
+    Function(Type* returnType);
 
-    std::shared_ptr<Type> GetReturnType();
+    Type* GetReturnType();
 
     //TODO: Implement Call
 
 private:
-    std::shared_ptr<Type> returnType;
+    Type* returnType;
 
-    std::shared_ptr<Variable> returnVariable;
+    Variable* returnVariable;
 
-    std::vector<std::shared_ptr<Variable>> parameters;
+    std::vector<Variable*> parameters;
 };
 

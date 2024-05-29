@@ -7,9 +7,7 @@
 #include "library/parser/parserDefinitions/ExpressionParserDefinitions.cpp"
 #include "library/parser/parserDefinitions/DeclarationParserDefinitions.cpp"
 
-#include "library/codeGenerator/generator/CodeGenerator.hpp"
-#include "library/codeGenerator/generator/DeclarationCodeGenerator.cpp"
-#include "library/codeGenerator/generator/StatementCodeGenerator.cpp"
+#include "library/codeGenerator/SyntaxTreeTraverser.cpp"
 
 void CompileFile(std::string filename) {
     InputFile* file = new InputFile(filename);
@@ -24,7 +22,7 @@ void CompileFile(std::string filename) {
     std::cout << syntaxTree->ToString() << std::endl;
 
     // Code generation
-    std::shared_ptr<AssemblyCode> assemblyCode = CodeGenerator.GenerateCode(syntaxTree);
+    std::shared_ptr<AssemblyCode> assemblyCode = SyntaxTreeTraverser.GenerateCode(syntaxTree);
     delete syntaxTree;
 
     std::cout << assemblyCode->ToString() << std::endl;

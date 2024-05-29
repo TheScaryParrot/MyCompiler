@@ -12,22 +12,27 @@ class ScopeSpecificEnvironment : IScopeSpecificEnvironment
 public:
     ScopeSpecificEnvironment(std::shared_ptr<Environment> environment);
 
-    virtual AssemblyCode* GenerateVariableDeclaration(VarDeclarationNode* declaration) override;
+    virtual void AddVariable(std::string identifer, Variable* variable) override;
 
     virtual VariableLocation GetVariableLocation(std::string identifier) override;
 
-    virtual AssemblyCode* GenerateFunctionDeclaration(FuncDeclarationNode* declaration) override;
+    virtual void AddFunction(std::string identifier, Function* function) override;
+    virtual AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body) override;
 
-    virtual AssemblyCode* GenerateFunctionCall(CallNode* call) override;
+    virtual AssemblyCode* GenerateFunctionCall(Function* function, std::vector<Variable*> arguments) override;
 
     /// @brief Gets the identifier of the function; depends on function name and parameters (function name mangling)
     virtual std::string GetFunctionIdentifier(std::string functionName, std::vector<std::shared_ptr<Type>> parameterTypes);
 
-    bool HasVariable(std::string identifier);
+    virtual Type* GetType(std::string identifier) override;
 
-    bool HasFunction(std::string identifier);
+    virtual bool HasVariable(std::string identifier) override;
+    virtual bool HasVariable(Variable* variable) override;
 
-    bool HasTypeEnvironment(std::shared_ptr<Type> type);
+    virtual bool HasFunction(std::string identifier) override;
+    virtual bool HasFunction(Function* function) override;
+
+    virtual bool HasTypeEnvironment(std::shared_ptr<Type> type) override;
     
 
 private:
@@ -40,10 +45,9 @@ ScopeSpecificEnvironment::ScopeSpecificEnvironment(std::shared_ptr<Environment> 
     this->environment = environment;
 }
 
-AssemblyCode* ScopeSpecificEnvironment::GenerateVariableDeclaration(VarDeclarationNode* declaration)
+void ScopeSpecificEnvironment::AddVariable(std::string identifer, Variable* variable)
 {
-    //TODO: Add basic behaviour
-    return nullptr;
+    this->environment->AddVariable(identifer, variable);
 }
 
 VariableLocation ScopeSpecificEnvironment::GetVariableLocation(std::string identifier)
@@ -52,13 +56,18 @@ VariableLocation ScopeSpecificEnvironment::GetVariableLocation(std::string ident
     return VariableLocation();
 }
 
-AssemblyCode* ScopeSpecificEnvironment::GenerateFunctionDeclaration(FuncDeclarationNode* declaration)
+void ScopeSpecificEnvironment::AddFunction(std::string identifier, Function* function)
+{
+    this->environment->AddFunction(identifier, function);
+}
+
+AssemblyCode* ScopeSpecificEnvironment::SetFunctionBody(Function* function, AssemblyCode* body)
 {
     //TODO: Add basic behaviour
     return nullptr;
 }
 
-AssemblyCode* ScopeSpecificEnvironment::GenerateFunctionCall(CallNode* call)
+AssemblyCode* ScopeSpecificEnvironment::GenerateFunctionCall(Function* function, std::vector<Variable*> arguments)
 {
     //TODO: Add basic behaviour
     return nullptr;
@@ -66,6 +75,7 @@ AssemblyCode* ScopeSpecificEnvironment::GenerateFunctionCall(CallNode* call)
 
 std::string ScopeSpecificEnvironment::GetFunctionIdentifier(std::string functionName, std::vector<std::shared_ptr<Type>> parameterTypes)
 {
+    //TODO: Do proper function name mangling
     std::string result = functionName + "_";
 
     for (std::shared_ptr<Type> type : parameterTypes)
@@ -76,14 +86,24 @@ std::string ScopeSpecificEnvironment::GetFunctionIdentifier(std::string function
     return result;
 }
 
+Type* ScopeSpecificEnvironment::GetType(std::string identifier)
+{
+    return environment->GetType(identifier);
+}
+
 bool ScopeSpecificEnvironment::HasVariable(std::string identifier)
 {
-    return environment->GetVariable(identifier) != nullptr;
+    return environment->HasVariable(identifier);
 }
 
 bool ScopeSpecificEnvironment::HasFunction(std::string identifier)
 {
-    return environment->GetFunction(identifier) != nullptr;
+    return environment->HasFunction(identifier);
+}
+
+bool ScopeSpecificEnvironment::HasFunction(Function* function)
+{
+    return environment->HasFunction(function);
 }
 
 bool ScopeSpecificEnvironment::HasTypeEnvironment(std::shared_ptr<Type> type)

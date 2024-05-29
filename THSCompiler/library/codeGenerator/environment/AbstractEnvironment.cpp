@@ -34,6 +34,16 @@ public:
         return nullptr;
     }
 
+    bool HasElement(std::string identifier)
+    {
+        return GetElement(identifier) != nullptr;
+    }
+
+    bool HasElement(T* element)
+    {
+        return FindElement([element](std::shared_ptr<EnvironmentElement<T>> environmentElement) -> bool{return environmentElement->GetElement() == element;}) != nullptr;
+    }
+
 private:
     std::vector<std::shared_ptr<EnvironmentElement<T>>> elements;
 };

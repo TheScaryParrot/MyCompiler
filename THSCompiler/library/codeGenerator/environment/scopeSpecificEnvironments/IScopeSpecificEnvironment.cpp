@@ -15,8 +15,7 @@ class IScopeSpecificEnvironment
 public:
     // Variables:
     
-    /// @brief Generates the assembly code for the given variable declaration and adds it to the environment. Does not assign a value to the variable!
-    virtual AssemblyCode* GenerateVariableDeclaration(VarDeclarationNode* declaration) = 0;
+    virtual void AddVariable(std::string identifier, Variable* variable) = 0;
 
     //TODO: identifier not past in as string, but as IdentifierNode or something
     virtual VariableLocation GetVariableLocation(std::string identifier) = 0;
@@ -24,7 +23,23 @@ public:
 
     // Functions:
 
-    virtual AssemblyCode* GenerateFunctionDeclaration(FuncDeclarationNode* declaration) = 0;
+    virtual void AddFunction(std::string identifier, Function* function) = 0;
 
-    virtual AssemblyCode* GenerateFunctionCall(CallNode* call) = 0;
+    virtual AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body) = 0;
+
+    virtual AssemblyCode* GenerateFunctionCall(Function* function, std::vector<Variable*> arguments) = 0;
+
+    // Types:
+
+    virtual Type* GetType(std::string identifier) = 0;
+
+    
+
+    virtual bool HasVariable(std::string identifier) = 0;
+    virtual bool HasVariable(Variable* variable) = 0;
+
+    virtual bool HasFunction(std::string identifier) = 0;
+    virtual bool HasFunction(Function* function) = 0;
+
+    virtual bool HasTypeEnvironment(std::shared_ptr<Type> type) = 0;
 };

@@ -13,7 +13,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     std::string name;
     TypeNode type;
     AbstractExpressionNode* value;

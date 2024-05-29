@@ -12,14 +12,14 @@ class GlobalScopeEnvironment : public ScopeSpecificEnvironment
 public:
     GlobalScopeEnvironment(std::shared_ptr<Environment> environment);
 
-    virtual AssemblyCode* GenerateVariableDeclaration(VarDeclarationNode* declaration) override;
+    virtual AssemblyCode* AddVariable(VarDeclarationNode* declaration) override;
 };
 
 GlobalScopeEnvironment::GlobalScopeEnvironment(std::shared_ptr<Environment> environment) : ScopeSpecificEnvironment(environment)
 {
 }
 
-AssemblyCode* GlobalScopeEnvironment::GenerateVariableDeclaration(VarDeclarationNode* declaration)
+AssemblyCode* GlobalScopeEnvironment::AddVariable(VarDeclarationNode* declaration)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 

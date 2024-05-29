@@ -16,7 +16,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     std::string name;
     FunctionReturnTypeNode returnType;
     std::vector<ParameterDeclarationNode*>* parameters;

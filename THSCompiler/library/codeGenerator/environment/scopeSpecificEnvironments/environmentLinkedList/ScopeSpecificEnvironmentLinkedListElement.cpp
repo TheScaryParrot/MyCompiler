@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <iostream>
 
 #include "../ScopeSpecificEnvironment.cpp"
 
@@ -14,15 +15,16 @@ public:
 
     #pragma region IScopeSpecificEnvironment implementation
 
-    /// @brief Generates the assembly code for the given variable declaration and adds it to the environment. Does not assign a value to the variable!
-    virtual AssemblyCode* GenerateVariableDeclaration(VarDeclarationNode* declaration) override;
+    virtual void AddVariable(std::string identifier, Variable* variable) override;
 
     //TODO: identifier not past in as string, but as IdentifierNode or something ?
     virtual VariableLocation GetVariableLocation(std::string identifier) override;
 
-    virtual AssemblyCode* GenerateFunctionDeclaration(FuncDeclarationNode* declaration) override;
+    virtual void AddFunction(std::string identifier, Function* function) override;
+    virtual AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body) override;
+    virtual AssemblyCode* GenerateFunctionCall(Function* function, std::vector<Variable*> arguments) override;
 
-    virtual AssemblyCode* GenerateFunctionCall(CallNode* call) override;
+    virtual Type* GetType(std::string identifier) override;
 
     #pragma endregion
 
@@ -44,9 +46,9 @@ std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> ScopeSpecificEnvironm
 
 #pragma region IScopeSpecificEnvironment implementation
 
-AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateVariableDeclaration(VarDeclarationNode* declaration)
+void ScopeSpecificEnvironmentLinkedListElement::AddVariable(std::string identifier, Variable* variable)
 {
-    return environment->GenerateVariableDeclaration(declaration);
+    return environment->AddVariable(identifier, variable);
 }
 
 VariableLocation ScopeSpecificEnvironmentLinkedListElement::GetVariableLocation(std::string identifier)
@@ -58,32 +60,37 @@ VariableLocation ScopeSpecificEnvironmentLinkedListElement::GetVariableLocation(
 
     if (parent == nullptr)
     {
-        std::cout << "Variable " << identifier << " not found in environment\n";
+        std::cerr << "Variable " << identifier << " not found in environment\n";
         return VariableLocation();
     }
     
     return parent->GetVariableLocation(identifier);
 }
 
-AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateFunctionDeclaration(FuncDeclarationNode* declaration)
+void ScopeSpecificEnvironmentLinkedListElement::AddFunction(std::string identifier, Function* function)
 {
-    return environment->GenerateFunctionDeclaration(declaration);
+    environment->AddFunction(identifier, function);
 }
 
-AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateFunctionCall(CallNode* call)
+AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::SetFunctionBody(Function* function, AssemblyCode* body)
 {
-    if (environment->HasFunction(call->functionName))
+    return environment->SetFunctionBody(function, body);
+}
+
+AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateFunctionCall(Function* function, std::vector<Variable*> arguments)
+{
+    if (environment->HasFunction(function))
     {
-        return environment->GenerateFunctionCall(call);
+        return environment->GenerateFunctionCall(function, arguments);
     }
 
     if (parent == nullptr)
     {
-        std::cout << "Function " << call->functionName << " not found in environment\n";
+        std::cerr << "Function " << function << " not found in environment\n";
         return nullptr;
     }
 
-    return parent->GenerateFunctionCall(call);
+    return parent->GenerateFunctionCall(function, arguments);
 }
 
 #pragma endregion

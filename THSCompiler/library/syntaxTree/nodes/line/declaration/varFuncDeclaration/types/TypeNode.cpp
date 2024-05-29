@@ -9,6 +9,8 @@ public:
     TypeNode() = default;
     ~TypeNode();
 
+    std::string GetIdentfier();
+
     virtual std::string ToString() override;
 
 protected:
@@ -22,6 +24,11 @@ TypeNode::TypeNode(std::string name) : AbstractTreeNode()
 
 TypeNode::~TypeNode()
 {
+}
+
+std::string TypeNode::GetIdentfier()
+{
+    return name;
 }
 
 std::string TypeNode::ToString()
