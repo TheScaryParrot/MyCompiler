@@ -167,6 +167,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateBody(BodyNode* body)
     return nullptr;
 }
 
+
 #pragma region Keyword statements
 
 AssemblyCode* SyntaxTreeTraverser::GenerateKeywordStatement(AbstractKeywordStatementNode* statement)
@@ -196,6 +197,11 @@ AssemblyCode* SyntaxTreeTraverser::GenerateReturnStatement(ReturnStatementNode* 
 
 AssemblyCode* SyntaxTreeTraverser::GenerateWhileStatement(WhileStatementNode* statement)
 {
+    codeGenerator.InitWhileEnvironment();
+    //TODO: assembly code and variablegetter for expression
+    AssemblyCode* body = GenerateStatement(statement->statement);
+    codeGenerator.GenerateWhile(nullptr, body);
+
     return nullptr;
 }
 

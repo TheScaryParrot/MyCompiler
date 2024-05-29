@@ -14,7 +14,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     AbstractExpressionNode* expression;
     AbstractStatementNode* statement;
 };

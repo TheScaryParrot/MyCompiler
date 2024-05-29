@@ -1,32 +1,20 @@
 #pragma once
 
-#include <iostream>
 
 #include "ScopeSpecificEnvironment.cpp"
 
-#include "../../../assembly/AssemblyInstructionLine.cpp"
-#include "../../../assembly/instructions/AssemblyInstructions.cpp"
 
 class GlobalScopeEnvironment : public ScopeSpecificEnvironment
 {
 public:
+    GlobalScopeEnvironment();
     GlobalScopeEnvironment(std::shared_ptr<Environment> environment);
-
-    virtual AssemblyCode* AddVariable(VarDeclarationNode* declaration) override;
 };
 
-GlobalScopeEnvironment::GlobalScopeEnvironment(std::shared_ptr<Environment> environment) : ScopeSpecificEnvironment(environment)
+GlobalScopeEnvironment::GlobalScopeEnvironment() : ScopeSpecificEnvironment()
 {
 }
 
-AssemblyCode* GlobalScopeEnvironment::AddVariable(VarDeclarationNode* declaration)
+GlobalScopeEnvironment::GlobalScopeEnvironment(std::shared_ptr<Environment> environment) : ScopeSpecificEnvironment(environment)
 {
-    AssemblyCode* assemblyCode = new AssemblyCode();
-
-    AssemblyInstructionLine* instruction = new AssemblyInstructionLine(AssemblyInstructions::MOV);
-    instruction->AddArgument("rax");
-
-    assemblyCode->AddLine(std::shared_ptr<AssemblyInstructionLine>(instruction));
-
-    return assemblyCode;
 }

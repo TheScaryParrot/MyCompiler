@@ -7,6 +7,7 @@
 #include "types/Type.cpp"
 #include "variables/Variable.cpp"
 #include "functions/Function.cpp"
+#include "jumpLabels/JumpLabel.cpp"
 
 class Environment
 {
@@ -62,6 +63,16 @@ public:
         }) != nullptr;
     }
 
+    /// @brief Adds the given label to the current environment with the given identifier
+    void AddLabel(std::string identifier, JumpLabel* jumpLabel)
+    {
+        jumpLabels.AddElement(identifier, std::unique_ptr<JumpLabel>(jumpLabel));
+    }
+    /// @brief Returns a label that is defined in the current environment
+    JumpLabel* GetLabel(std::string identifier)
+    {
+        return jumpLabels.GetElement(identifier).get();
+    }
 
     /// @brief Returns the environment of the given type identifier
     std::shared_ptr<Environment> GetEnvironment(std::string typeIdentifier);
@@ -75,6 +86,7 @@ private:
     AbstractEnvironment<Variable> variables;
     AbstractEnvironment<Function> functions;
     AbstractEnvironment<TypeEnvironment> typeEnvironments;
+    AbstractEnvironment<JumpLabel> jumpLabels;
 
     /// @brief Returns the typeEnvironment of the given type identifier
     std::shared_ptr<TypeEnvironment> GetTypeEnvironment(std::string typeIdentifier);

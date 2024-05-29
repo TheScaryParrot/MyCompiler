@@ -17,14 +17,13 @@ public:
 
     virtual void AddVariable(std::string identifier, Variable* variable) override;
 
-    //TODO: identifier not past in as string, but as IdentifierNode or something ?
-    virtual VariableLocation GetVariableLocation(std::string identifier) override;
-
     virtual void AddFunction(std::string identifier, Function* function) override;
     virtual AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body) override;
-    virtual AssemblyCode* GenerateFunctionCall(Function* function, std::vector<Variable*> arguments) override;
 
     virtual Type* GetType(std::string identifier) override;
+
+    virtual void AddJumpLabel(std::string identifier, JumpLabel* jumpLabel) override;
+    virtual JumpLabel* GetJumpLabel(std::string identifier) override;
 
     #pragma endregion
 
@@ -51,22 +50,6 @@ void ScopeSpecificEnvironmentLinkedListElement::AddVariable(std::string identifi
     return environment->AddVariable(identifier, variable);
 }
 
-VariableLocation ScopeSpecificEnvironmentLinkedListElement::GetVariableLocation(std::string identifier)
-{
-    if (environment->HasVariable(identifier))
-    {
-        return environment->GetVariableLocation(identifier);
-    }
-
-    if (parent == nullptr)
-    {
-        std::cerr << "Variable " << identifier << " not found in environment\n";
-        return VariableLocation();
-    }
-    
-    return parent->GetVariableLocation(identifier);
-}
-
 void ScopeSpecificEnvironmentLinkedListElement::AddFunction(std::string identifier, Function* function)
 {
     environment->AddFunction(identifier, function);
@@ -77,7 +60,7 @@ AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::SetFunctionBody(Functio
     return environment->SetFunctionBody(function, body);
 }
 
-AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateFunctionCall(Function* function, std::vector<Variable*> arguments)
+/*AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateFunctionCall(Function* function, std::vector<Variable*> arguments)
 {
     if (environment->HasFunction(function))
     {
@@ -91,6 +74,27 @@ AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateFunctionCall(Fu
     }
 
     return parent->GenerateFunctionCall(function, arguments);
+}*/
+
+void ScopeSpecificEnvironmentLinkedListElement::AddJumpLabel(std::string identifier, JumpLabel* jumpLabel)
+{
+    environment->AddJumpLabel(identifier, jumpLabel);
+}
+
+JumpLabel* ScopeSpecificEnvironmentLinkedListElement::GetJumpLabel(std::string identifier)
+{
+    if (environment->HasJumpLabel(identifier))
+    {
+        return environment->GetJumpLabel(identifier);
+    }
+
+    if (parent == nullptr)
+    {
+        std::cerr << "Jump label " << identifier << " not found in environment\n";
+        return nullptr;
+    }
+
+    return parent->GetJumpLabel(identifier);
 }
 
 #pragma endregion
