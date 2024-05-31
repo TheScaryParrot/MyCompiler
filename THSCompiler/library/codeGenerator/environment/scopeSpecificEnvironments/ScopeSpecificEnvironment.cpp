@@ -123,4 +123,9 @@ JumpLabel* ScopeSpecificEnvironment::GetJumpLabel(std::string identifier)
     return environment->GetLabel(identifier);
 }
 
+bool ScopeSpecificEnvironment::HasJumpLabel(std::string identifier)
+{
+    return environment->HasLabel(identifier);
+}
+
 #pragma endregion

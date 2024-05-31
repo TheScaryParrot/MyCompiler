@@ -4,24 +4,24 @@
 
 #include "generator/CodeGenerator.cpp"
 
-#include "../../syntaxTree/SyntaxTree.cpp"
-#include "../../assembly/AssemblyCode.cpp"
+#include "../syntaxTree/SyntaxTree.cpp"
+#include "../assembly/AssemblyCode.cpp"
 
-#include "../../syntaxTree/nodes/line/declaration/AbstractDeclarationNode.cpp"
-#include "../../syntaxTree/nodes/line/declaration/varFuncDeclaration/VarDeclarationNode.cpp"
-#include "../../syntaxTree/nodes/line/declaration/varFuncDeclaration/FuncDeclarationNode.cpp"
-#include "../../syntaxTree/nodes/line/declaration/ClassDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/AbstractDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/VarDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/FuncDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/ClassDeclarationNode.cpp"
 
 
-#include "../../syntaxTree/nodes/line/statement/AbstractStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/keywordStatement/WhileStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/keywordStatement/ForStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
-#include "../../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/AbstractStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/WhileStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/ForStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
 
 static class SyntaxTreeTraverser
 {
@@ -46,8 +46,8 @@ private:
     AssemblyCode* GenerateIfStatement(IfStatementNode* statement);
     AssemblyCode* GenerateIfStatement(IfStatementNode* statement, std::string finalLabel);
     AssemblyCode* GenerateReturnStatement(ReturnStatementNode* statement);
-    AssemblyCode* GenerateWhileStatement(WhileStatementNode* statement);
-    AssemblyCode* GenerateForStatement(ForStatementNode* statement);
+    AssemblyCode* GenerateWhileStatement(WhileStatementNode* whileStatement);
+    AssemblyCode* GenerateForStatement(ForStatementNode* forStatement);
     AssemblyCode* GenerateContinueStatement(ContinueStatementNode* statement);
     AssemblyCode* GenerateBreakStatement(BreakStatementNode* statement);
 
@@ -107,6 +107,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateDeclaration(AbstractDeclarationNode* 
 
 AssemblyCode* SyntaxTreeTraverser::GenerateVarDeclaration(VarDeclarationNode* declaration)
 {
+    //FIXME: AddVariable should also return assembly code
     Variable* variable = codeGenerator.AddVariable(declaration->name, declaration->type.GetIdentfier());
 
     //TODO: Evaluate value
@@ -189,35 +190,41 @@ AssemblyCode* SyntaxTreeTraverser::GenerateIfStatement(IfStatementNode* statemen
 
 AssemblyCode* SyntaxTreeTraverser::GenerateReturnStatement(ReturnStatementNode* statement)
 {
-    //TODO: Get return Variable from Environment
-    //TODO: Assign return Variable to return value
-    //TODO: Write RET instruction
-    return nullptr;
+    //TODO: Generate expression code
+    AssemblyCode* returnCode = codeGenerator.GenerateReturnStatement(nullptr);
+    return returnCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateWhileStatement(WhileStatementNode* statement)
+AssemblyCode* SyntaxTreeTraverser::GenerateWhileStatement(WhileStatementNode* whileStatement)
 {
-    codeGenerator.InitWhileEnvironment();
     //TODO: assembly code and variablegetter for expression
-    AssemblyCode* body = GenerateStatement(statement->statement);
-    codeGenerator.GenerateWhile(nullptr, body);
-
-    return nullptr;
+    // Condition evaluated before InitWhile as InitWhile creates the while scope
+    codeGenerator.InitLoopEnvironment();
+    
+    AssemblyCode* body = GenerateStatement(whileStatement->statement);
+    return codeGenerator.GenerateWhile(nullptr, body);
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateForStatement(ForStatementNode* statement)
+AssemblyCode* SyntaxTreeTraverser::GenerateForStatement(ForStatementNode* forStatement)
 {
-    return nullptr;
+    codeGenerator.InitLoopEnvironment();
+
+    AssemblyCode* declaration = GenerateVarDeclaration(forStatement->initialization);
+    //TODO: assembly code and variablegetter for condition
+    AssemblyCode* increment = GenerateStatement(forStatement->increment);
+    AssemblyCode* body = GenerateStatement(forStatement->statement);
+
+    return codeGenerator.GenrateFor(declaration, nullptr, increment, body);
 }
 
 AssemblyCode* SyntaxTreeTraverser::GenerateContinueStatement(ContinueStatementNode* statement)
 {
-    return nullptr;
+    return codeGenerator.GenerateContinueStatement();
 }
 
 AssemblyCode* SyntaxTreeTraverser::GenerateBreakStatement(BreakStatementNode* statement)
 {
-    return nullptr;
+    return codeGenerator.GenerateBreakStatement();
 }
 
 #pragma endregion

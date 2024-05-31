@@ -13,7 +13,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     VarDeclarationNode* initialization;
     AbstractExpressionNode* condition;
     AbstractStatementNode* increment;

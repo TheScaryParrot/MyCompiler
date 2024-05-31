@@ -73,6 +73,11 @@ public:
     {
         return jumpLabels.GetElement(identifier).get();
     }
+    /// @brief Returns true if the given label is in the current environment
+    bool HasLabel(std::string identifier)
+    {
+        return jumpLabels.HasElement(identifier);
+    }
 
     /// @brief Returns the environment of the given type identifier
     std::shared_ptr<Environment> GetEnvironment(std::string typeIdentifier);
