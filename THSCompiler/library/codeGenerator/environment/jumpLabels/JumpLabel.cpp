@@ -13,3 +13,13 @@ public:
 private:
     std::string name;
 };
+
+JumpLabel::JumpLabel(std::string name)
+{
+    this->name = name;
+}
+
+std::string JumpLabel::GetName()
+{
+    return name;
+}

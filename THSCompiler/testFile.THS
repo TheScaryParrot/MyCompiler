@@ -1,3 +1,8 @@
+class int
+{
+
+}
+
 public static final int yomamam = 5;
 
 static class Base
@@ -21,7 +26,7 @@ class Derived
     }
 }
 
-static final hei moin() lol2; // not causing error !#2
+static final Derived moin() lol2; // not causing error !#2
 
 void main(int argc, string argv)
 {

@@ -2,13 +2,10 @@
 
 #include "../../../assembly/AssemblyCode.cpp"
 
-#include "../variables/VariableLocation.cpp"
-
-#include "../../../syntaxTree/nodes/line/declaration/varFuncDeclaration/VarDeclarationNode.cpp"
-#include "../../../syntaxTree/nodes/line/declaration/varFuncDeclaration/FuncDeclarationNode.cpp"
-#include "../../../syntaxTree/nodes/line/declaration/ClassDeclarationNode.cpp"
-
-#include "../../../syntaxTree/nodes/line/expression/functionCall/CallNode.cpp"
+#include "../variables/Variable.cpp"
+#include "../functions/Function.cpp"
+#include "../types/Type.cpp"
+#include "../jumpLabels/JumpLabel.cpp"
 
 class IScopeSpecificEnvironment
 {
@@ -37,9 +34,13 @@ public:
 
     #pragma region Types
     
+    virtual void AddType(std::string identifier, Type* type) = 0;
     virtual Type* GetType(std::string identifier) = 0;
+    virtual bool HasType(std::string identifier) = 0;
+    virtual bool HasType(Type* type) = 0;
 
-    virtual bool HasTypeEnvironment(std::shared_ptr<Type> type) = 0;
+    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment) = 0;
+    virtual bool HasTypeEnvironment(Type* type) = 0;
 
     #pragma endregion
 

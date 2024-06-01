@@ -7,7 +7,7 @@
 #include "IScopeSpecificEnvironment.cpp"
 
 
-class ScopeSpecificEnvironment : IScopeSpecificEnvironment
+class ScopeSpecificEnvironment : public IScopeSpecificEnvironment
 {
 public:
     ScopeSpecificEnvironment();
@@ -23,8 +23,13 @@ public:
     virtual bool HasFunction(std::string identifier) override;
     virtual bool HasFunction(Function* function) override;
 
+    virtual void AddType(std::string identifier, Type* type) override;
     virtual Type* GetType(std::string identifier) override;
-    virtual bool HasTypeEnvironment(std::shared_ptr<Type> type) override;
+    virtual bool HasType(std::string identifier) override;
+    virtual bool HasType(Type* type) override;
+
+    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment) override;
+    virtual bool HasTypeEnvironment(Type* type) override;
 
     virtual void AddJumpLabel(std::string identifier, JumpLabel* jumpLabel) override;
     virtual JumpLabel* GetJumpLabel(std::string identifier) override;
@@ -99,12 +104,32 @@ bool ScopeSpecificEnvironment::HasFunction(Function* function)
 
 #pragma region Types
 
+void ScopeSpecificEnvironment::AddType(std::string identifier, Type* type)
+{
+    environment->AddType(identifier, std::shared_ptr<Type>(type));
+}
+
 Type* ScopeSpecificEnvironment::GetType(std::string identifier)
 {
     return environment->GetType(identifier);
 }
 
-bool ScopeSpecificEnvironment::HasTypeEnvironment(std::shared_ptr<Type> type)
+bool ScopeSpecificEnvironment::HasType(std::string identifier)
+{
+    return environment->HasType(identifier);
+}
+
+bool ScopeSpecificEnvironment::HasType(Type* type)
+{
+    return environment->HasType(type);
+}
+
+void ScopeSpecificEnvironment::SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment)
+{
+    this->environment->SetEnvironment(type, std::shared_ptr<IScopeSpecificEnvironment>(environment));
+}
+
+bool ScopeSpecificEnvironment::HasTypeEnvironment(Type* type)
 {
     return environment->GetEnvironment(type) != nullptr;
 }

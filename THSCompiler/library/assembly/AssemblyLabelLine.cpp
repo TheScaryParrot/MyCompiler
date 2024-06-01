@@ -17,3 +17,8 @@ AssemblyLabelLine::AssemblyLabelLine(std::string label)
 {
     this->label = label;
 }
+
+std::string AssemblyLabelLine::ToString()
+{
+    return label + ":";
+}

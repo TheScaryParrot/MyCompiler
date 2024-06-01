@@ -12,7 +12,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     std::string name;
     bool isStatic;
     BodyNode* body;

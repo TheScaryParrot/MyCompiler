@@ -128,9 +128,10 @@ AssemblyCode* SyntaxTreeTraverser::GenerateFuncDeclaration(FuncDeclarationNode* 
 
 AssemblyCode* SyntaxTreeTraverser::GenerateClassDeclaration(ClassDeclarationNode* declaration)
 {
-    // TODO: New environment for class
-    //TODO: Add to current environment as type
-    // TODO: Generate class code
+    Type* type = codeGenerator.AddType(declaration->name);
+    ClassScopeEnvironment* classScopeEnvironment = codeGenerator.AddClassScopeEnvironmentToType(type);
+    //TODO: Change environment to classScopeEnvironment
+    //TODO: Generate Body
     return nullptr;
 }
 

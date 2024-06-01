@@ -41,7 +41,7 @@ public:
 
     bool HasElement(T* element)
     {
-        return FindElement([element](std::shared_ptr<EnvironmentElement<T>> environmentElement) -> bool{return environmentElement->GetElement() == element;}) != nullptr;
+        return FindElement([element](std::shared_ptr<EnvironmentElement<T>> environmentElement) -> bool{return environmentElement->GetElement().get() ==element;}) != nullptr;
     }
 
 private:

@@ -5,6 +5,7 @@
 #include "../environment/scopeSpecificEnvironments/environmentLinkedList/ScopeSpecificEnvironmentLinkedList.cpp"
 #include "../environment/scopeSpecificEnvironments/GlobalScopeEnvironment.cpp"
 #include "../environment/scopeSpecificEnvironments/FunctionScopeEnvironment.cpp"
+#include "../environment/scopeSpecificEnvironments/ClassScopeEnvironment.cpp"
 
 #include "../../assembly/AssemblyCode.cpp"
 #include "../../assembly/AssemblyLabelLine.cpp"
@@ -21,6 +22,9 @@ public:
 
     Function* AddFunction(std::string name, std::string returnTypeIdentifier /*TODO: Add parameters*/);
     AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body);
+
+    Type* AddType(std::string name);
+    ClassScopeEnvironment* AddClassScopeEnvironmentToType(Type* type);
 
     AssemblyCode* GenerateReturnStatement(AssemblyCode* expression);
     AssemblyCode* GenerateContinueStatement();
@@ -80,11 +84,27 @@ Function* CodeGenerator::AddFunction(std::string name, std::string returnTypeIde
     Function* function = new Function(returnType); // TODO: Add parameters
 
     GetCurrentEnvironment()->AddFunction(name, function);
+
+    return function;
 }
 
 AssemblyCode* CodeGenerator::SetFunctionBody(Function* function, AssemblyCode* body)
 {
     return GetCurrentEnvironment()->SetFunctionBody(function, body);
+}
+
+Type* CodeGenerator::AddType(std::string name)
+{
+    Type* type = new Type(name);
+    GetCurrentEnvironment()->AddType(name, type);
+    return type;
+}
+
+ClassScopeEnvironment* CodeGenerator::AddClassScopeEnvironmentToType(Type* type)
+{
+    ClassScopeEnvironment* classScopeEnvironment = new ClassScopeEnvironment();
+    GetCurrentEnvironment()->SetTypeEnvironment(type, classScopeEnvironment);
+    return classScopeEnvironment;
 }
 
 AssemblyCode* CodeGenerator::GenerateReturnStatement(AssemblyCode* expression)
@@ -137,7 +157,8 @@ AssemblyCode* CodeGenerator::GenerateWhile(AssemblyCode* condition, AssemblyCode
 
 AssemblyCode* CodeGenerator::GenrateFor(AssemblyCode* declaration, AssemblyCode* condition, AssemblyCode* increment, AssemblyCode* body)
 {
-
+    //TODO: Generate FOR loop
+    return nullptr;
 } 
 
 std::string CodeGenerator::GetNewJumpLabel()
