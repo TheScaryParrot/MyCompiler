@@ -28,7 +28,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     std::vector<Assignment*> assignments;
     AbstractExpressionNode* value;
 };

@@ -3,6 +3,32 @@ class int
 
 }
 
+while (amount > 0)
+{
+    if (amount == 5)
+    {
+        break;
+    }
+
+    while (amount > 0)
+    {
+        amount--;
+    }
+
+    amount--;
+}
+
+for (int i = 0; i < amount; i++;)
+{
+    if (i == 5)
+    {
+        continue;
+    }
+
+    amount++;
+}
+
+
 public static final int yomamam = 5;
 
 static class Base

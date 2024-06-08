@@ -14,6 +14,8 @@ public:
     AbstractLineNode* GetLine(int index);
     unsigned int GetLineCount();
 
+    CodeblockNode* GetCodeBlock();
+
     std::string ToString();
 
 private:
@@ -42,6 +44,11 @@ AbstractLineNode* SyntaxTree::GetLine(int index)
 unsigned int SyntaxTree::GetLineCount()
 {
     return codeBlock->GetLineCount();
+}
+
+CodeblockNode* SyntaxTree::GetCodeBlock()
+{
+    return codeBlock;
 }
 
 std::string SyntaxTree::ToString()

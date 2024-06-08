@@ -13,6 +13,8 @@ public:
 
     void AddCodeLine(AbstractLineNode* codeLine);
 
+    CodeblockNode* GetCodeBlock();
+
     virtual std::string ToString() override;
 
 private:
@@ -37,6 +39,11 @@ BodyNode::~BodyNode()
 void BodyNode::AddCodeLine(AbstractLineNode* codeLine)
 {
     codeblockNode->AddCodeline(codeLine);
+}
+
+CodeblockNode* BodyNode::GetCodeBlock()
+{
+    return codeblockNode;
 }
 
 std::string BodyNode::ToString()

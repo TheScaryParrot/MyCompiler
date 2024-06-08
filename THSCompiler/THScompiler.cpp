@@ -9,7 +9,8 @@
 
 #include "library/codeGenerator/SyntaxTreeTraverser.cpp"
 
-void CompileFile(std::string filename) {
+void CompileFile(std::string filename)
+{
     InputFile* file = new InputFile(filename);
 
     // Scanning

@@ -37,5 +37,5 @@ ForStatementNode::~ForStatementNode()
 
 std::string ForStatementNode::ToString()
 {
-    return "for (" + initialization->ToString() + "; " + condition->ToString() + "; " + increment->ToString() + ")\n" + statement->ToString();
+    return "for (" + initialization->ToString() + " " + condition->ToString() + "; " + increment->ToString() + ")\n" + statement->ToString();
 }

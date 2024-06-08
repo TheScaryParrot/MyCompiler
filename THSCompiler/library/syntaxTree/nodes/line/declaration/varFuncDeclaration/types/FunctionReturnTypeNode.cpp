@@ -11,7 +11,6 @@ public:
 
     virtual std::string ToString() override;
 
-private:
     bool IsVoid();
 };
 

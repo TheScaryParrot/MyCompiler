@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "ECodeGeneratorExpressionOperators.cpp"
+
 #include "../environment/scopeSpecificEnvironments/environmentLinkedList/ScopeSpecificEnvironmentLinkedList.cpp"
 #include "../environment/scopeSpecificEnvironments/GlobalScopeEnvironment.cpp"
 #include "../environment/scopeSpecificEnvironments/FunctionScopeEnvironment.cpp"
@@ -17,9 +19,13 @@ class CodeGenerator
 public:
     CodeGenerator();
 
-    Variable* AddVariable(std::string name, std::string typeIdentifier);
-    AssemblyCode* SetVariable(std::string variableName, IVariableLocationGetter* assignValueLocation);
+    void PushEnvironment(std::shared_ptr<ScopeSpecificEnvironment> environment);
+    void PopEnvironment();
 
+    Variable* AddVariable(std::string name, std::string typeIdentifier);
+    //AssemblyCode* SetVariable(std::string variableName, IVariableLocationGetter* assignValueLocation);
+
+    Function* AddVoidFunction(std::string name /*TODO: Add parameters*/);
     Function* AddFunction(std::string name, std::string returnTypeIdentifier /*TODO: Add parameters*/);
     AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body);
 
@@ -32,12 +38,22 @@ public:
 
     void InitLoopEnvironment();
     AssemblyCode* GenerateWhile(AssemblyCode* condition, AssemblyCode* body);
-    AssemblyCode* GenrateFor(AssemblyCode* declaration, AssemblyCode* condition, AssemblyCode* increment, AssemblyCode* body);
+    AssemblyCode* GenerateFor(AssemblyCode* declaration, AssemblyCode* condition, AssemblyCode* increment, AssemblyCode* body);
+
+    AssemblyCode* AssignExpressionOutToVariable(std::string variableName);
+
+    /// @brief Generates code for an expression with variable on the left and ExpressionOut on the right. Output is stored in expression output variable.
+    AssemblyCode* PerformOperation_LVariable_RExpressionOut(std::string variableName, ECodeGeneratorExpressionOperators operation);
+
+    /// @brief Generates code for an expression with ExpressionOut on the left and a VariableLocationGetter on the right.
+    AssemblyCode* PerformOperation_LExpressionOut_RVariableLocation(IVariableLocationGetter* locationGetter, ECodeGeneratorExpressionOperators operation);
 
 private:
     ScopeSpecificEnvironmentLinkedList environmentLinkedList;
 
     ScopeSpecificEnvironmentLinkedListElement* GetCurrentEnvironment();
+
+    Function* AddFunction(std::string name, Type* returnType /*TODO: Add parameters*/);
 
     unsigned int jumpLabelCounter = 0;
 
@@ -45,12 +61,25 @@ private:
     JumpLabel* AddJumpLabel(std::string name);
     AssemblyCode* GenerateLabel(JumpLabel* jumpLabel);
     AssemblyCode* GenerateJumpToLabel(JumpLabel* jumpLabel);
+
+    /// @brief Variable currently used for the output of an expression
+    Variable* ExpressionOutputVariable = nullptr;
 };
 
 CodeGenerator::CodeGenerator()
 {
     environmentLinkedList = ScopeSpecificEnvironmentLinkedList();
     environmentLinkedList.PushEnvironment(std::make_shared<GlobalScopeEnvironment>());
+}
+
+void CodeGenerator::PushEnvironment(std::shared_ptr<ScopeSpecificEnvironment> environment)
+{
+    environmentLinkedList.PushEnvironment(environment);
+}
+
+void CodeGenerator::PopEnvironment()
+{
+    return environmentLinkedList.PopEnvironment();
 }
 
 
@@ -70,17 +99,27 @@ Variable* CodeGenerator::AddVariable(std::string name, std::string typeIdentifie
     return variable;
 }
 
-AssemblyCode* CodeGenerator::SetVariable(std::string variableName, IVariableLocationGetter* assignValueLocation)
+/*AssemblyCode* CodeGenerator::SetVariable(std::string variableName, IVariableLocationGetter* assignValueLocation)
 {
     //TODO: Assign variable
     return nullptr;
+}*/
+
+Function* CodeGenerator::AddVoidFunction(std::string name /*TODO: Add parameters*/)
+{
+    return AddFunction(name, nullptr);
 }
 
 Function* CodeGenerator::AddFunction(std::string name, std::string returnTypeIdentifier)
 {
     Type* returnType = GetCurrentEnvironment()->GetType(returnTypeIdentifier);
 
-    // TODO: Construct parameters from type and name; requires locationGetter and locationSetter
+    return AddFunction(name, returnType);
+}
+
+Function* CodeGenerator::AddFunction(std::string name, Type* returnType /*TODO: Add parameters*/)
+{
+     // TODO: Construct parameters from type and name; requires locationGetter and locationSetter
     Function* function = new Function(returnType); // TODO: Add parameters
 
     GetCurrentEnvironment()->AddFunction(name, function);
@@ -110,8 +149,8 @@ ClassScopeEnvironment* CodeGenerator::AddClassScopeEnvironmentToType(Type* type)
 AssemblyCode* CodeGenerator::GenerateReturnStatement(AssemblyCode* expression)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
-    // TODO: Get return variable
-    assemblyCode->AddLines(this->SetVariable("return", nullptr));
+    // TODO: Assign return
+    //assemblyCode->AddLines(this->SetVariable("return", nullptr));
     assemblyCode->AddLine(std::make_shared<AssemblyInstructionLine>(AssemblyInstructions::RET));
     return assemblyCode;
 }
@@ -155,11 +194,29 @@ AssemblyCode* CodeGenerator::GenerateWhile(AssemblyCode* condition, AssemblyCode
     return assemblyCode;
 }
 
-AssemblyCode* CodeGenerator::GenrateFor(AssemblyCode* declaration, AssemblyCode* condition, AssemblyCode* increment, AssemblyCode* body)
+AssemblyCode* CodeGenerator::GenerateFor(AssemblyCode* declaration, AssemblyCode* condition, AssemblyCode* increment, AssemblyCode* body)
 {
     //TODO: Generate FOR loop
     return nullptr;
 } 
+
+AssemblyCode* CodeGenerator::AssignExpressionOutToVariable(std::string variableName)
+{
+    //TODO: Assign expression output to variable
+    return nullptr;
+}
+
+AssemblyCode* CodeGenerator::PerformOperation_LVariable_RExpressionOut(std::string variableName, ECodeGeneratorExpressionOperators operation)
+{
+    //TODO: Perform operation
+    return nullptr;
+}
+
+AssemblyCode* CodeGenerator::PerformOperation_LExpressionOut_RVariableLocation(IVariableLocationGetter* locationGetter, ECodeGeneratorExpressionOperators operation)
+{
+    //TODO: Perform operation
+    return nullptr;
+}
 
 std::string CodeGenerator::GetNewJumpLabel()
 {
