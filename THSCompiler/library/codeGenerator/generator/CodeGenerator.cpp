@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <stack>
 
 #include "ECodeGeneratorExpressionOperators.cpp"
 
@@ -9,10 +10,7 @@
 #include "../environment/scopeSpecificEnvironments/FunctionScopeEnvironment.cpp"
 #include "../environment/scopeSpecificEnvironments/ClassScopeEnvironment.cpp"
 
-#include "../../assembly/AssemblyCode.cpp"
-#include "../../assembly/AssemblyLabelLine.cpp"
-#include "../../assembly/AssemblyInstructionLine.cpp"
-#include "../../assembly/instructions/AssemblyInstructions.cpp"
+#include "../../assembly/AssemblyGenerator.cpp"
 
 class CodeGenerator
 {
@@ -59,11 +57,9 @@ private:
 
     std::string GetNewJumpLabel();
     JumpLabel* AddJumpLabel(std::string name);
-    AssemblyCode* GenerateLabel(JumpLabel* jumpLabel);
-    AssemblyCode* GenerateJumpToLabel(JumpLabel* jumpLabel);
 
-    /// @brief Variable currently used for the output of an expression
-    Variable* ExpressionOutputVariable = nullptr;
+    /// @brief Stack of currently used temporary variables (used for: expression output, function return)
+    std::stack<Variable*> TempVariableStack;
 };
 
 CodeGenerator::CodeGenerator()
@@ -151,18 +147,17 @@ AssemblyCode* CodeGenerator::GenerateReturnStatement(AssemblyCode* expression)
     AssemblyCode* assemblyCode = new AssemblyCode();
     // TODO: Assign return
     //assemblyCode->AddLines(this->SetVariable("return", nullptr));
-    assemblyCode->AddLine(std::make_shared<AssemblyInstructionLine>(AssemblyInstructions::RET));
-    return assemblyCode;
+    return AssemblyGenerator.GenerateReturnInstruction();
 }
 
 AssemblyCode* CodeGenerator::GenerateContinueStatement()
 {
-    return GenerateJumpToLabel(GetCurrentEnvironment()->GetJumpLabel("continue"));
+    return AssemblyGenerator.GenerateJumpToLabel(GetCurrentEnvironment()->GetJumpLabel("continue"));
 }
 
 AssemblyCode* CodeGenerator::GenerateBreakStatement()
 {
-    return GenerateJumpToLabel(GetCurrentEnvironment()->GetJumpLabel("break"));
+    return AssemblyGenerator.GenerateJumpToLabel(GetCurrentEnvironment()->GetJumpLabel("break"));
 }
 
 void CodeGenerator::InitLoopEnvironment()
@@ -179,15 +174,15 @@ AssemblyCode* CodeGenerator::GenerateWhile(AssemblyCode* condition, AssemblyCode
     JumpLabel* continueLabel = GetCurrentEnvironment()->GetJumpLabel("continue");
     JumpLabel* breakLabel = GetCurrentEnvironment()->GetJumpLabel("break");
 
-    assemblyCode->AddLines(GenerateLabel(continueLabel)); // eval label
+    assemblyCode->AddLines(AssemblyGenerator.GenerateLabel(continueLabel)); // eval label
     assemblyCode->AddLines(condition); // condition
     
     //TODO: Add jump to break label if condition is false
     assemblyCode->AddLines(body); // body
 
-    assemblyCode->AddLines(GenerateJumpToLabel(continueLabel));
+    assemblyCode->AddLines(AssemblyGenerator.GenerateJumpToLabel(continueLabel));
 
-    assemblyCode->AddLines(GenerateLabel(breakLabel));
+    assemblyCode->AddLines(AssemblyGenerator.GenerateLabel(breakLabel));
 
     environmentLinkedList.PopEnvironment();
 
@@ -208,7 +203,11 @@ AssemblyCode* CodeGenerator::AssignExpressionOutToVariable(std::string variableN
 
 AssemblyCode* CodeGenerator::PerformOperation_LVariable_RExpressionOut(std::string variableName, ECodeGeneratorExpressionOperators operation)
 {
+    Variable* tempVariable = TempVariableStack.top();
+    TempVariableStack.pop();
+
     //TODO: Perform operation
+
     return nullptr;
 }
 
@@ -231,18 +230,3 @@ JumpLabel* CodeGenerator::AddJumpLabel(std::string name)
 
     return jumpLabel;
 }
-
-AssemblyCode* CodeGenerator::GenerateLabel(JumpLabel* jumpLabel)
-{
-    AssemblyCode* assemblyCode = new AssemblyCode();
-    assemblyCode->AddLine(std::make_shared<AssemblyLabelLine>(jumpLabel->GetName()));
-    return assemblyCode;
-};
-
-AssemblyCode* CodeGenerator::GenerateJumpToLabel(JumpLabel* jumpLabel)
-{
-    AssemblyCode* assemblyCode = new AssemblyCode();
-    AssemblyInstructionLine* jumpLine = (new AssemblyInstructionLine(AssemblyInstructions::JMP))->AddArgument(jumpLabel->GetName());
-    assemblyCode->AddLine(std::shared_ptr<AssemblyInstructionLine>(jumpLine));
-    return assemblyCode;
-};
