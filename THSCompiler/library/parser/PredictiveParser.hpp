@@ -156,14 +156,11 @@ private:
     ELookAheadCertainties LookAhead_PostUnaryOperator(TokenList* tokens);
     EPostUnaryOperators Parse_PostUnaryOperator(TokenList* tokens);
 
+    ELookAheadCertainties LookAhead_ValueChain(TokenList* tokens);
+    AbstractExpressionNode* Parse_ValueChain(TokenList* tokens);
+
     ELookAheadCertainties LookAhead_Value(TokenList* tokens);
     AbstractExpressionNode* Parse_Value(TokenList* tokens);
-
-    ELookAheadCertainties LookAhead_Mutable(TokenList* tokens);
-    IDValueNode* Parse_Mutable(TokenList* tokens);
-
-    ELookAheadCertainties LookAhead_Immutable(TokenList* tokens);
-    AbstractExpressionNode* Parse_Immutable(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Call(TokenList* tokens);
     CallNode* Parse_Call(TokenList* tokens);
@@ -173,6 +170,17 @@ private:
 
     ELookAheadCertainties LookAhead_LogicalConstant(TokenList* tokens);
     LogicalConstValueNode* Parse_LogicalConstant(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_PropertyAccessor(TokenList* tokens); 
+    /// @brief Parses a property accessor, which can be a normal accessor or a static accessor
+    /// @return true if property accessor was static, false if it was normal
+    bool Parse_PropertyAccessor(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_NormalAccessor(TokenList* tokens);
+    void Parse_NormalAccessor(TokenList* tokens);
+
+    ELookAheadCertainties LookAhead_StaticAccessor(TokenList* tokens);
+    void Parse_StaticAccessor(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Arguments(TokenList* tokens);
     std::vector<CallArgument*> Parse_Arguments(TokenList* tokens);

@@ -162,6 +162,9 @@ TokenList* Scanner::Scan(InputFile* file)
             continue;
         }
 
+        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.DOT_TOKEN, character, peekCharacter)) continue;
+        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.COLON_TOKEN, character, peekCharacter)) continue;
+
         // --- Equal Operators ---
         if (TryAddCharacterGroupToken(file, tokens, ConstTokens.EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
         if (TryAddCharacterGroupToken(file, tokens, ConstTokens.NOT_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;

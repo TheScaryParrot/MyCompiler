@@ -44,6 +44,9 @@ public:
     std::shared_ptr<CharacterGroupToken> AND_OPERATOR_TOKEN = std::shared_ptr<CharacterGroupToken>(new CharacterGroupToken("andOperator", CharacterGroups.AND_OPERATOR));
     std::shared_ptr<CharacterGroupToken> OR_OPERATOR_TOKEN = std::shared_ptr<CharacterGroupToken>(new CharacterGroupToken("orOperator", CharacterGroups.OR_OPERATOR));
 
+    std::shared_ptr<CharacterGroupToken> DOT_TOKEN = std::shared_ptr<CharacterGroupToken>(new CharacterGroupToken("dot", CharacterGroups.DOT));
+    std::shared_ptr<CharacterGroupToken> COLON_TOKEN = std::shared_ptr<CharacterGroupToken>(new CharacterGroupToken("colon", CharacterGroups.COLON));
+
     /* ----- Const version of Not Constant Tokens (IdentifierToken, NumberToken, StringToken...) -----
         Their main usage is for their IsThisToken method. Which cannot be used static*/
     std::shared_ptr<IdentifierToken> CONST_IDENTIFIER_TOKEN = std::shared_ptr<IdentifierToken>(new IdentifierToken(""));

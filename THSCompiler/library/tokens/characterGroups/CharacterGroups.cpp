@@ -63,6 +63,9 @@ public:
     CharacterGroup MULTI_LINE_COMMENT_START = CharacterGroup(std::vector<TwoChar>{TwoChar('/', '*')});
     CharacterGroup MULTI_LINE_COMMENT_END = CharacterGroup(std::vector<TwoChar>{TwoChar('*', '/')});
 
+    CharacterGroup DOT = CharacterGroup(std::vector<TwoChar>{'.'});
+    CharacterGroup COLON = CharacterGroup(std::vector<TwoChar>{':'});
+
 }CharacterGroups;
 
 CharacterGroups::CharacterGroups() {
