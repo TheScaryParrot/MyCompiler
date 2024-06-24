@@ -15,7 +15,7 @@
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/FuncDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/ParameterDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/VarDeclarationNode.cpp"
-#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/declarationAttributes/DeclarationAttributes.cpp"
+#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/declarationAttributes/SyntaxTreeDeclarationAttributes.cpp"
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/types/FunctionReturnTypeNode.cpp"
 
 #pragma endregion
@@ -82,7 +82,7 @@ static class PredictiveParser
     unsigned int Skip_VarFuncDeclarationAttributes(
         TokenList* tokens);  // Returns the number of tokens that belong to VarFuncDeclarationAttributes. Allows
                              // skipping the tokens
-    DeclarationAttributes Parse_VarFuncDeclarationAttributes(TokenList* tokens);
+    SyntaxTreeDeclarationAttributes Parse_VarFuncDeclarationAttributes(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Params(TokenList* tokens);
     std::vector<ParameterDeclarationNode*>* Parse_Params(TokenList* tokens);
@@ -94,7 +94,7 @@ static class PredictiveParser
     BodyNode* Parse_Body(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ScopeAttribute(TokenList* tokens, unsigned int offset = 0);
-    EScopes Parse_ScopeAttribute(TokenList* tokens);
+    ESyntaxTreeScopes Parse_ScopeAttribute(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset = 0);
     bool Parse_StaticAttribute(TokenList* tokens);

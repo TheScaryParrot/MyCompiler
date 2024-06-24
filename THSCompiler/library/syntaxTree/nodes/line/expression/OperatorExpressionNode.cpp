@@ -14,7 +14,6 @@ class OperatorExpressionNode : public AbstractExpressionNode
 
     virtual std::string ToString() override;
 
-   private:
     AbstractExpressionNode* firstExpression;
     std::vector<OperatorExpressionPair*>* operatorExpressionPairs;
 };

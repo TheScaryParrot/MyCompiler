@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../../../assembly/AssemblyInstructionLine.cpp"
-#include "../../../assembly/instructions/AssemblyInstructions.cpp"
+#include "../../../../assembly/AssemblyGenerator.cpp"
 #include "IFunctionCallCode.cpp"
 
 class CallInstructionFunctionCallCode : public IFunctionCallCode
@@ -22,12 +21,5 @@ CallInstructionFunctionCallCode::CallInstructionFunctionCallCode(std::string fun
 
 AssemblyCode* CallInstructionFunctionCallCode::GenerateFunctionCallCode()
 {
-    AssemblyCode* code = new AssemblyCode();
-
-    AssemblyInstructionLine* callInstruction =
-        (new AssemblyInstructionLine(AssemblyInstructions::CALL))->AddArgument(functionName);
-
-    code->AddLine(std::shared_ptr<AssemblyInstructionLine>(callInstruction));
-
-    return code;
+    return AssemblyGenerator.GenerateCallInstruction(functionName);
 }

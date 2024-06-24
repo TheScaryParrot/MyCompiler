@@ -1,10 +1,10 @@
 #pragma once
 
-#include "EScopes.cpp"
+#include "ESyntaxTreeScopes.cpp"
 
-struct DeclarationAttributes
+struct SyntaxTreeDeclarationAttributes
 {
-    EScopes scope = EScopes::PRIVATE;
+    ESyntaxTreeScopes scope = ESyntaxTreeScopes::PRIVATE;
     bool isStatic = false;
     // EReadWrites readWrite = EReadWrites::FULL; deprecated replaced by final and inline
     bool isFinal = false;
@@ -14,7 +14,7 @@ struct DeclarationAttributes
     std::string ToString();
 };
 
-std::string DeclarationAttributes::ToString()
+std::string SyntaxTreeDeclarationAttributes::ToString()
 {
     std::string result = EScopesToString(scope) + " ";
 

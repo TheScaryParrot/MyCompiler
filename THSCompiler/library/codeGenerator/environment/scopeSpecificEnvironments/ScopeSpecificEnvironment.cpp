@@ -3,6 +3,8 @@
 #include <memory>
 
 #include "../Environment.cpp"
+#include "../funcVars/functions/CallInstructionFunctionCallCode.cpp"
+#include "../funcVars/functions/InlineFunctionCallCode.cpp"
 #include "IScopeSpecificEnvironment.cpp"
 
 class ScopeSpecificEnvironment : public IScopeSpecificEnvironment
@@ -74,7 +76,29 @@ void ScopeSpecificEnvironment::AddFunction(std::string identifier, Function* fun
 AssemblyCode* ScopeSpecificEnvironment::SetFunctionBody(Function* function, AssemblyCode* body)
 {
     // TODO: Add basic behaviour
-    return nullptr;
+
+    // If no body is set yet the function can be set even if it is final
+    if (function->IsFinal() && function->HasFunctionCallCode())
+    {
+        std::cerr << "Cannot set body of final function\n";
+        return nullptr;
+    }
+
+    if (function->IsInline())
+    {
+        function->SetCallCode(std::unique_ptr<InlineFunctionCallCode>(new InlineFunctionCallCode(body)));
+        return nullptr;  // Inline functions do not have any assembly code
+    }
+
+    AssemblyCode* functionBody = AssemblyGenerator.GenerateLabel(function->label);
+    functionBody->AddLines(body);
+
+    // Set the call code to the function label
+    // FIXME: Might be good practice to add a number to the label to make it unique
+    function->SetCallCode(
+        std::unique_ptr<CallInstructionFunctionCallCode>(new CallInstructionFunctionCallCode(function->label)));
+
+    return functionBody;
 }
 
 bool ScopeSpecificEnvironment::HasFunction(std::string identifier) { return environment->HasFunction(identifier); }

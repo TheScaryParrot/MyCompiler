@@ -11,7 +11,6 @@ class OperatorExpressionPair
 
     std::string ToString();
 
-   private:
     EOperators op;  // operator
     AbstractExpressionNode* expression;
 };

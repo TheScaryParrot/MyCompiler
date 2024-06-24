@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../../../assembly/AssemblyCode.cpp"
-#include "../functions/Function.cpp"
+#include "../funcVars/functions/Function.cpp"
+#include "../funcVars/variables/Variable.cpp"
 #include "../jumpLabels/JumpLabel.cpp"
 #include "../types/Type.cpp"
-#include "../variables/Variable.cpp"
 
 class IScopeSpecificEnvironment
 {
@@ -24,6 +24,9 @@ class IScopeSpecificEnvironment
 
     virtual void AddFunction(std::string identifier, Function* function) = 0;
 
+    /// @brief Generates body of a function and updates the functions FunctionCallCode
+    /// @param function Function to set the body
+    /// @param body The AssemblyCode that represents the body of the function
     virtual AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body) = 0;
 
     virtual bool HasFunction(std::string identifier) = 0;

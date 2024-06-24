@@ -92,7 +92,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_VarDeclaration(TokenList* toke
 }
 VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens)
 {
-    DeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
+    SyntaxTreeDeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
     TypeNode type = TypeNode(tokens->Next<IdentifierToken>()->GetValue());
     std::string name = tokens->Next<IdentifierToken>()->GetValue();
     AbstractExpressionNode* value = nullptr;
@@ -127,7 +127,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_FuncDeclaration(TokenList* tok
 }
 FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 {
-    DeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
+    SyntaxTreeDeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
     FunctionReturnTypeNode returnType;
 
     if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD))
@@ -182,9 +182,9 @@ unsigned int PredictiveParser::Skip_VarFuncDeclarationAttributes(TokenList* toke
 
     return skippedTokens;
 }
-DeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttributes(TokenList* tokens)
+SyntaxTreeDeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttributes(TokenList* tokens)
 {
-    DeclarationAttributes attributes;
+    SyntaxTreeDeclarationAttributes attributes;
 
     if (LookAhead_ScopeAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
@@ -283,15 +283,15 @@ ELookAheadCertainties PredictiveParser::LookAhead_ScopeAttribute(TokenList* toke
 
     return ELookAheadCertainties::CertainlyNotPresent;
 }
-EScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens)
+ESyntaxTreeScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens)
 {
     std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume scope keyword
 
-    if (nextToken->IsThisToken(Keywords.PUBLIC_KEYWORD)) return EScopes::PUBLIC;
+    if (nextToken->IsThisToken(Keywords.PUBLIC_KEYWORD)) return ESyntaxTreeScopes::PUBLIC;
 
-    if (nextToken->IsThisToken(Keywords.PRIVATE_KEYWORD)) return EScopes::PRIVATE;
+    if (nextToken->IsThisToken(Keywords.PRIVATE_KEYWORD)) return ESyntaxTreeScopes::PRIVATE;
 
-    return EScopes::PROTECTED;
+    return ESyntaxTreeScopes::PROTECTED;
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset)

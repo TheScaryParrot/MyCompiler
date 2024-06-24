@@ -8,7 +8,7 @@
 #include "../environment/scopeSpecificEnvironments/FunctionScopeEnvironment.cpp"
 #include "../environment/scopeSpecificEnvironments/GlobalScopeEnvironment.cpp"
 #include "../environment/scopeSpecificEnvironments/environmentLinkedList/ScopeSpecificEnvironmentLinkedList.cpp"
-#include "ECodeGeneratorExpressionOperators.cpp"
+#include "ECodeGeneratorBinaryOperators.cpp"
 
 class CodeGenerator
 {
@@ -18,10 +18,11 @@ class CodeGenerator
     void PushEnvironment(std::shared_ptr<ScopeSpecificEnvironment> environment);
     void PopEnvironment();
 
-    Variable* AddVariable(std::string name, std::string typeIdentifier);
+    Variable* AddVariable(std::string name, std::string typeIdentifier, DeclarationAttributes attributes);
 
-    Function* AddVoidFunction(std::string name /*TODO: Add parameters*/);
-    Function* AddFunction(std::string name, std::string returnTypeIdentifier /*TODO: Add parameters*/);
+    Function* AddVoidFunction(std::string name /*TODO: Add parameters*/, DeclarationAttributes attributes);
+    Function* AddFunction(std::string name, std::string returnTypeIdentifier /*TODO: Add parameters*/,
+                          DeclarationAttributes attributes);
     AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body);
 
     /// @brief Generates a call to a function. Arguments are poped from TempVariableStack
@@ -42,7 +43,7 @@ class CodeGenerator
                               AssemblyCode* body);
 
     /// @brief Pops temporary varibales from TempVariableStack, performs operations on them and pushes the result back
-    AssemblyCode* PerformOperationOnTempVariables(ECodeGeneratorExpressionOperators operation);
+    AssemblyCode* PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators operation);
 
     /// @brief Pushes the environment of the top TempVariable to the environment stack
     void ActivateTempVariableEnvironment();
@@ -61,7 +62,8 @@ class CodeGenerator
 
     ScopeSpecificEnvironmentLinkedListElement* GetCurrentEnvironment();
 
-    Function* AddFunction(std::string name, Type* returnType /*TODO: Add parameters*/);
+    Function* AddFunction(std::string name, Type* returnType /*TODO: Add parameters*/,
+                          DeclarationAttributes attributes);
 
     unsigned int jumpLabelCounter = 0;
 
@@ -93,34 +95,38 @@ ScopeSpecificEnvironmentLinkedListElement* CodeGenerator::GetCurrentEnvironment(
     return environmentLinkedList.GetHead();
 }
 
-Variable* CodeGenerator::AddVariable(std::string name, std::string typeIdentifier)
+Variable* CodeGenerator::AddVariable(std::string name, std::string typeIdentifier, DeclarationAttributes attributes)
 {
     Type* type = GetCurrentEnvironment()->GetType(typeIdentifier);
 
-    Variable* variable = new Variable(type);
+    Variable* variable = new Variable(type, attributes);
 
     GetCurrentEnvironment()->AddVariable(name, variable);
 
     return variable;
 }
 
-Function* CodeGenerator::AddVoidFunction(std::string name /*TODO: Add parameters*/)
+Function* CodeGenerator::AddVoidFunction(std::string name /*TODO: Add parameters*/, DeclarationAttributes attributes)
 {
-    return AddFunction(name, nullptr);
+    return AddFunction(name, nullptr, attributes);
 }
 
-Function* CodeGenerator::AddFunction(std::string name, std::string returnTypeIdentifier)
+Function* CodeGenerator::AddFunction(std::string name, std::string returnTypeIdentifier,
+                                     DeclarationAttributes attributes)
 {
     Type* returnType = GetCurrentEnvironment()->GetType(returnTypeIdentifier);
 
-    return AddFunction(name, returnType);
+    return AddFunction(name, returnType, attributes);
 }
 
-Function* CodeGenerator::AddFunction(std::string name, Type* returnType /*TODO: Add parameters*/)
+Function* CodeGenerator::AddFunction(std::string name, Type* returnType /*TODO: Add parameters*/,
+                                     DeclarationAttributes attributes)
 {
-    // TODO: Construct parameters from type and name; requires locationGetter and locationSetter
-    Function* function = new Function(returnType);  // TODO: Add parameters
+    // TODO: Construct parameters from type and name
+    // TODO: Get return Variable from type
+    Function* function = new Function(name, nullptr, attributes);  // TODO: Add parameters
 
+    // TODO: Function name mangling using parameters
     GetCurrentEnvironment()->AddFunction(name, function);
 
     return function;
@@ -162,12 +168,12 @@ AssemblyCode* CodeGenerator::GenerateReturnStatement(AssemblyCode* expression)
 
 AssemblyCode* CodeGenerator::GenerateContinueStatement()
 {
-    return AssemblyGenerator.GenerateJumpToLabel(GetCurrentEnvironment()->GetJumpLabel("continue"));
+    return AssemblyGenerator.GenerateJumpToJumpLabel(GetCurrentEnvironment()->GetJumpLabel("continue"));
 }
 
 AssemblyCode* CodeGenerator::GenerateBreakStatement()
 {
-    return AssemblyGenerator.GenerateJumpToLabel(GetCurrentEnvironment()->GetJumpLabel("break"));
+    return AssemblyGenerator.GenerateJumpToJumpLabel(GetCurrentEnvironment()->GetJumpLabel("break"));
 }
 
 void CodeGenerator::InitLoopEnvironment()
@@ -184,15 +190,15 @@ AssemblyCode* CodeGenerator::GenerateWhile(AssemblyCode* condition, AssemblyCode
     JumpLabel* continueLabel = GetCurrentEnvironment()->GetJumpLabel("continue");
     JumpLabel* breakLabel = GetCurrentEnvironment()->GetJumpLabel("break");
 
-    assemblyCode->AddLines(AssemblyGenerator.GenerateLabel(continueLabel));  // eval label
-    assemblyCode->AddLines(condition);                                       // condition
+    assemblyCode->AddLines(AssemblyGenerator.GenerateLabel(continueLabel->GetName()));  // eval label
+    assemblyCode->AddLines(condition);                                                  // condition
 
     // TODO: Add jump to break label if condition is false
     assemblyCode->AddLines(body);  // body
 
-    assemblyCode->AddLines(AssemblyGenerator.GenerateJumpToLabel(continueLabel));
+    assemblyCode->AddLines(AssemblyGenerator.GenerateJumpToJumpLabel(continueLabel));
 
-    assemblyCode->AddLines(AssemblyGenerator.GenerateLabel(breakLabel));
+    assemblyCode->AddLines(AssemblyGenerator.GenerateLabel(breakLabel->GetName()));
 
     environmentLinkedList.PopEnvironment();
 
@@ -206,16 +212,46 @@ AssemblyCode* CodeGenerator::GenerateFor(AssemblyCode* declaration, AssemblyCode
     return nullptr;
 }
 
-AssemblyCode* CodeGenerator::PerformOperationOnTempVariables(ECodeGeneratorExpressionOperators operation)
+AssemblyCode* CodeGenerator::PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators operation)
 {
-    // TODO: Call operation function
-    return nullptr;
+    AssemblyCode* assemblyCode = new AssemblyCode();
+
+    // TODO: Generate function name
+    std::string operatorFunctionName = "";
+
+    // only 1 argument as the l_value is seen as the method caller and
+    // added because TempVariableEnvironment was activated
+    assemblyCode->AddLines(CallFunction(operatorFunctionName, 1));
+
+    return assemblyCode;
 }
 
 void CodeGenerator::ActivateTempVariableEnvironment()
 {
+    if (tempVariableStack.empty())
+    {
+        std::cerr << "Error: TempVariableStack is empty\n";
+        return;
+    }
+
+    Variable* tempVariable = tempVariableStack.top();
+
+    if (tempVariable == nullptr)
+    {
+        std::cerr << "Error: TempVariable is nullptr\n";
+        return;
+    }
+
+    Type* tempVariableType = tempVariable->GetType();
+
+    if (tempVariableType == nullptr)
+    {
+        std::cerr << "Error: TempVariable is nullptr\n";
+        return;
+    }
+
     // Sets tempVariableEnvironment to the environment of the top TempVariables type
-    tempVariableEnvironment = GetCurrentEnvironment()->GetTypeEnvironment(tempVariableStack.top()->GetType());
+    tempVariableEnvironment = GetCurrentEnvironment()->GetTypeEnvironment(tempVariableType);
 }
 
 void CodeGenerator::ClearTempVariableEnvironment() { tempVariableEnvironment = nullptr; }
@@ -223,6 +259,21 @@ void CodeGenerator::ClearTempVariableEnvironment() { tempVariableEnvironment = n
 void CodeGenerator::PushVariableToTempVariable(std::string variableName)
 {
     tempVariableStack.push(GetCurrentEnvironment()->GetVariable(variableName));
+}
+
+void CodeGenerator::PushNumberConstToTempVariable(std::string number)
+{
+    // TODO: Do this
+}
+
+void CodeGenerator::PushStringConstToTempVariable(std::string string)
+{
+    // TODO: Do this
+}
+
+void CodeGenerator::PushLogicalConstToTempVariable(bool isTrue)
+{
+    // TODO: Do this
 }
 
 std::string CodeGenerator::GetNewJumpLabel() { return "JL" + std::to_string(jumpLabelCounter++); }

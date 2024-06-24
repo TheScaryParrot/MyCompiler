@@ -9,12 +9,10 @@
 class ScopeSpecificEnvironmentLinkedListElement : IScopeSpecificEnvironment
 {
    public:
-    ScopeSpecificEnvironmentLinkedListElement(std::shared_ptr<ScopeSpecificEnvironment> environment,
+    ScopeSpecificEnvironmentLinkedListElement(std::shared_ptr<ScopeSpecificEnvironment> scopeEnvironment,
                                               std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> parent);
 
     std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> GetParent();
-
-#pragma region IScopeSpecificEnvironment implementation
 
     virtual void AddVariable(std::string identifier, Variable* variable) override;
     virtual Variable* GetVariable(std::string identifier) override;
@@ -39,18 +37,16 @@ class ScopeSpecificEnvironmentLinkedListElement : IScopeSpecificEnvironment
     virtual JumpLabel* GetJumpLabel(std::string identifier) override;
     virtual bool HasJumpLabel(std::string identifier) override;
 
-#pragma endregion
-
    private:
     std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> parent;
-    std::shared_ptr<ScopeSpecificEnvironment> environment;
+    std::shared_ptr<ScopeSpecificEnvironment> scopeEnvironment;
 };
 
 ScopeSpecificEnvironmentLinkedListElement::ScopeSpecificEnvironmentLinkedListElement(
-    std::shared_ptr<ScopeSpecificEnvironment> environment,
+    std::shared_ptr<ScopeSpecificEnvironment> scopeEnvironment,
     std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> parent)
 {
-    this->environment = environment;
+    this->scopeEnvironment = scopeEnvironment;
     this->parent = parent;
 }
 
@@ -63,14 +59,14 @@ std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> ScopeSpecificEnvironm
 
 void ScopeSpecificEnvironmentLinkedListElement::AddVariable(std::string identifier, Variable* variable)
 {
-    return environment->AddVariable(identifier, variable);
+    return scopeEnvironment->AddVariable(identifier, variable);
 }
 
 Variable* ScopeSpecificEnvironmentLinkedListElement::GetVariable(std::string identifier)
 {
-    if (environment->HasVariable(identifier))
+    if (scopeEnvironment->HasVariable(identifier))
     {
-        return environment->GetVariable(identifier);
+        return scopeEnvironment->GetVariable(identifier);
     }
 
     if (parent == nullptr)
@@ -84,7 +80,7 @@ Variable* ScopeSpecificEnvironmentLinkedListElement::GetVariable(std::string ide
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(std::string identifier)
 {
-    if (environment->HasVariable(identifier))
+    if (scopeEnvironment->HasVariable(identifier))
     {
         return true;
     }
@@ -99,7 +95,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(std::string identifi
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(Variable* variable)
 {
-    if (environment->HasVariable(variable))
+    if (scopeEnvironment->HasVariable(variable))
     {
         return true;
     }
@@ -114,17 +110,17 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(Variable* variable)
 
 void ScopeSpecificEnvironmentLinkedListElement::AddFunction(std::string identifier, Function* function)
 {
-    environment->AddFunction(identifier, function);
+    scopeEnvironment->AddFunction(identifier, function);
 }
 
 AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::SetFunctionBody(Function* function, AssemblyCode* body)
 {
-    return environment->SetFunctionBody(function, body);
+    return scopeEnvironment->SetFunctionBody(function, body);
 }
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(std::string identifier)
 {
-    if (environment->HasFunction(identifier))
+    if (scopeEnvironment->HasFunction(identifier))
     {
         return true;
     }
@@ -139,7 +135,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(std::string identifi
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(Function* function)
 {
-    if (environment->HasFunction(function))
+    if (scopeEnvironment->HasFunction(function))
     {
         return true;
     }
@@ -171,14 +167,14 @@ std::vector<Variable*> arguments)
 
 void ScopeSpecificEnvironmentLinkedListElement::AddType(std::string identifier, Type* type)
 {
-    environment->AddType(identifier, type);
+    scopeEnvironment->AddType(identifier, type);
 }
 
 Type* ScopeSpecificEnvironmentLinkedListElement::GetType(std::string identifier)
 {
-    if (environment->HasType(identifier))
+    if (scopeEnvironment->HasType(identifier))
     {
-        return environment->GetType(identifier);
+        return scopeEnvironment->GetType(identifier);
     }
 
     if (parent == nullptr)
@@ -192,7 +188,7 @@ Type* ScopeSpecificEnvironmentLinkedListElement::GetType(std::string identifier)
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasType(std::string identifier)
 {
-    if (environment->HasType(identifier))
+    if (scopeEnvironment->HasType(identifier))
     {
         return true;
     }
@@ -207,7 +203,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasType(std::string identifier)
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasType(Type* type)
 {
-    if (environment->HasType(type))
+    if (scopeEnvironment->HasType(type))
     {
         return true;
     }
@@ -223,9 +219,9 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasType(Type* type)
 void ScopeSpecificEnvironmentLinkedListElement::SetTypeEnvironment(Type* type,
                                                                    IScopeSpecificEnvironment* typeEnvironment)
 {
-    if (this->environment->HasType(type))
+    if (this->scopeEnvironment->HasType(type))
     {
-        this->environment->SetTypeEnvironment(type, typeEnvironment);
+        this->scopeEnvironment->SetTypeEnvironment(type, typeEnvironment);
         return;
     }
 
@@ -240,9 +236,9 @@ void ScopeSpecificEnvironmentLinkedListElement::SetTypeEnvironment(Type* type,
 
 IScopeSpecificEnvironment* ScopeSpecificEnvironmentLinkedListElement::GetTypeEnvironment(Type* type)
 {
-    if (environment->HasType(type))
+    if (scopeEnvironment->HasType(type))
     {
-        return environment->GetTypeEnvironment(type);
+        return scopeEnvironment->GetTypeEnvironment(type);
     }
 
     if (parent == nullptr)
@@ -256,7 +252,7 @@ IScopeSpecificEnvironment* ScopeSpecificEnvironmentLinkedListElement::GetTypeEnv
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type)
 {
-    if (environment->HasType(type))
+    if (scopeEnvironment->HasType(type))
     {
         return true;
     }
@@ -271,14 +267,14 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type)
 
 void ScopeSpecificEnvironmentLinkedListElement::AddJumpLabel(std::string identifier, JumpLabel* jumpLabel)
 {
-    environment->AddJumpLabel(identifier, jumpLabel);
+    scopeEnvironment->AddJumpLabel(identifier, jumpLabel);
 }
 
 JumpLabel* ScopeSpecificEnvironmentLinkedListElement::GetJumpLabel(std::string identifier)
 {
-    if (environment->HasJumpLabel(identifier))
+    if (scopeEnvironment->HasJumpLabel(identifier))
     {
-        return environment->GetJumpLabel(identifier);
+        return scopeEnvironment->GetJumpLabel(identifier);
     }
 
     if (parent == nullptr)
@@ -292,58 +288,7 @@ JumpLabel* ScopeSpecificEnvironmentLinkedListElement::GetJumpLabel(std::string i
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasJumpLabel(std::string identifier)
 {
-    if (environment->HasJumpLabel(identifier))
-    {
-        return true;
-    }
-
-    if (parent == nullptr)
-    {
-        return false;
-    }
-
-    return parent->HasJumpLabel(identifier);
-}
-
-bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type)
-{
-    if (environment->HasType(type))
-    {
-        return true;
-    }
-
-    if (parent == nullptr)
-    {
-        return false;
-    }
-
-    return parent->HasTypeEnvironment(type);
-}
-
-void ScopeSpecificEnvironmentLinkedListElement::AddJumpLabel(std::string identifier, JumpLabel* jumpLabel)
-{
-    environment->AddJumpLabel(identifier, jumpLabel);
-}
-
-JumpLabel* ScopeSpecificEnvironmentLinkedListElement::GetJumpLabel(std::string identifier)
-{
-    if (environment->HasJumpLabel(identifier))
-    {
-        return environment->GetJumpLabel(identifier);
-    }
-
-    if (parent == nullptr)
-    {
-        std::cerr << "Jump label " << identifier << " not found in environment\n";
-        return nullptr;
-    }
-
-    return parent->GetJumpLabel(identifier);
-}
-
-bool ScopeSpecificEnvironmentLinkedListElement::HasJumpLabel(std::string identifier)
-{
-    if (environment->HasJumpLabel(identifier))
+    if (scopeEnvironment->HasJumpLabel(identifier))
     {
         return true;
     }

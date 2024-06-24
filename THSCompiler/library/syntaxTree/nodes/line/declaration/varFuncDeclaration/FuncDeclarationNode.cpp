@@ -3,13 +3,13 @@
 #include "../BodyNode.cpp"
 #include "AbstractVarFuncDeclarationNode.cpp"
 #include "ParameterDeclarationNode.cpp"
-#include "declarationAttributes/DeclarationAttributes.cpp"
+#include "declarationAttributes/SyntaxTreeDeclarationAttributes.cpp"
 #include "types/FunctionReturnTypeNode.cpp"
 
 class FuncDeclarationNode : public AbstractVarFuncDeclarationNode
 {
    public:
-    FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name,
+    FuncDeclarationNode(SyntaxTreeDeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name,
                         std::vector<ParameterDeclarationNode*>* parameters, AbstractStatementNode* statement);
     ~FuncDeclarationNode();
 
@@ -18,11 +18,11 @@ class FuncDeclarationNode : public AbstractVarFuncDeclarationNode
     std::string name;
     FunctionReturnTypeNode returnType;
     std::vector<ParameterDeclarationNode*>* parameters;
-    DeclarationAttributes attributes;
+    SyntaxTreeDeclarationAttributes attributes;
     AbstractStatementNode* statement;
 };
 
-FuncDeclarationNode::FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType,
+FuncDeclarationNode::FuncDeclarationNode(SyntaxTreeDeclarationAttributes attributes, FunctionReturnTypeNode returnType,
                                          std::string name, std::vector<ParameterDeclarationNode*>* parameters,
                                          AbstractStatementNode* statement)
     : AbstractVarFuncDeclarationNode()

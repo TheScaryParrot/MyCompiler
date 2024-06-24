@@ -1,6 +1,6 @@
 #pragma once
 
-enum ECodeGeneratorExpressionOperators
+enum ECodeGeneratorBinaryOperators
 {
     ADD,
     SUB,

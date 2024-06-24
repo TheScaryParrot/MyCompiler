@@ -4,11 +4,11 @@
 #include <memory>
 
 #include "AbstractEnvironment.cpp"
-#include "functions/Function.cpp"
+#include "funcVars/functions/Function.cpp"
+#include "funcVars/variables/Variable.cpp"
 #include "jumpLabels/JumpLabel.cpp"
 #include "scopeSpecificEnvironments/IScopeSpecificEnvironment.cpp"  // FIXME: Not circular dependency but there might be a better way to do this
 #include "types/Type.cpp"
-#include "variables/Variable.cpp"
 
 class Environment
 {

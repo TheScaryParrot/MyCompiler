@@ -9,10 +9,13 @@
 static class AssemblyGenerator
 {
    public:
+    AssemblyCode* GenerateCallInstruction(std::string functionName);
     AssemblyCode* GenerateReturnInstruction();
 
-    AssemblyCode* GenerateLabel(JumpLabel* jumpLabel);
-    AssemblyCode* GenerateJumpToLabel(JumpLabel* jumpLabel);
+    /// @brief Code to generate a label; label can be JumpLabel, functionLabel or any other label
+    AssemblyCode* GenerateLabel(std::string label);
+
+    AssemblyCode* GenerateJumpToJumpLabel(JumpLabel* jumpLabel);
 
 } AssemblyGenerator;
 
@@ -22,13 +25,22 @@ AssemblyCode* AssemblyGenerator::GenerateReturnInstruction()
     return assemblyCode->AddLine(std::make_shared<AssemblyInstructionLine>(AssemblyInstructions::RET));
 }
 
-AssemblyCode* AssemblyGenerator::GenerateLabel(JumpLabel* jumpLabel)
+AssemblyCode* AssemblyGenerator::GenerateCallInstruction(std::string functionName)
 {
-    AssemblyCode* assemblyCode = new AssemblyCode();
-    return assemblyCode->AddLine(std::make_shared<AssemblyLabelLine>(jumpLabel->GetName()));
+    AssemblyInstructionLine* callInstruction = new AssemblyInstructionLine(AssemblyInstructions::CALL);
+    callInstruction->AddArgument(functionName);
+
+    AssemblyCode* code = new AssemblyCode();
+    return code->AddLine(std::shared_ptr<AssemblyInstructionLine>(callInstruction));
 }
 
-AssemblyCode* AssemblyGenerator::GenerateJumpToLabel(JumpLabel* jumpLabel)
+AssemblyCode* AssemblyGenerator::GenerateLabel(std::string label)
+{
+    AssemblyCode* assemblyCode = new AssemblyCode();
+    return assemblyCode->AddLine(std::make_shared<AssemblyLabelLine>(label));
+}
+
+AssemblyCode* AssemblyGenerator::GenerateJumpToJumpLabel(JumpLabel* jumpLabel)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
     AssemblyInstructionLine* jumpLine =

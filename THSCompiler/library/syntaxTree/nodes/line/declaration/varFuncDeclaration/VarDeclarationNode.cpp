@@ -2,13 +2,13 @@
 
 #include "../../expression/AbstractExpressionNode.cpp"
 #include "AbstractVarFuncDeclarationNode.cpp"
-#include "declarationAttributes/DeclarationAttributes.cpp"
+#include "declarationAttributes/SyntaxTreeDeclarationAttributes.cpp"
 #include "types/TypeNode.cpp"
 
 class VarDeclarationNode : public AbstractVarFuncDeclarationNode
 {
    public:
-    VarDeclarationNode(DeclarationAttributes attributes, TypeNode type, std::string name,
+    VarDeclarationNode(SyntaxTreeDeclarationAttributes attributes, TypeNode type, std::string name,
                        AbstractExpressionNode* value = nullptr);
     ~VarDeclarationNode();
 
@@ -17,10 +17,10 @@ class VarDeclarationNode : public AbstractVarFuncDeclarationNode
     std::string name;
     TypeNode type;
     AbstractExpressionNode* value;
-    DeclarationAttributes attributes;
+    SyntaxTreeDeclarationAttributes attributes;
 };
 
-VarDeclarationNode::VarDeclarationNode(DeclarationAttributes attributes, TypeNode type, std::string name,
+VarDeclarationNode::VarDeclarationNode(SyntaxTreeDeclarationAttributes attributes, TypeNode type, std::string name,
                                        AbstractExpressionNode* value)
     : AbstractVarFuncDeclarationNode()
 {

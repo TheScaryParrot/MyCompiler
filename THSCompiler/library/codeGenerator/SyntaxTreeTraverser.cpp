@@ -8,6 +8,7 @@
 #include "../syntaxTree/nodes/line/declaration/ClassDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/FuncDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/VarDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/declarationAttributes/ESyntaxTreeScopes.cpp"
 #include "../syntaxTree/nodes/line/expression/AbstractValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/AssignmentNode.cpp"
 #include "../syntaxTree/nodes/line/expression/OperatorExpressionNode.cpp"
@@ -17,6 +18,7 @@
 #include "../syntaxTree/nodes/line/expression/values/IDValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/LogicalConstValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/NumberConstValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/StaticValueChainNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/StringConstValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/ValueChainNode.cpp"
 #include "../syntaxTree/nodes/line/statement/AbstractStatementNode.cpp"
@@ -67,6 +69,7 @@ static class SyntaxTreeTraverser
 
     AssemblyCode* GenerateValue(AbstractValueNode* value);
     AssemblyCode* GenerateValueChain(ValueChainNode* valueChain);
+    AssemblyCode* GenerateStaticValueChain(StaticValueChainNode* valueChain);
     AssemblyCode* GenerateConstValue(AbstractConstValueNode* value);
     AssemblyCode* GenerateIDValue(IDValueNode* value);
     AssemblyCode* GenerateCall(CallNode* call);
@@ -129,8 +132,26 @@ AssemblyCode* SyntaxTreeTraverser::GenerateDeclaration(AbstractDeclarationNode* 
 
 AssemblyCode* SyntaxTreeTraverser::GenerateVarDeclaration(VarDeclarationNode* declaration)
 {
-    // FIXME: AddVariable should also return assembly code
-    Variable* variable = codeGenerator.AddVariable(declaration->name, declaration->type.GetIdentfier());
+    DeclarationAttributes attributes = DeclarationAttributes();
+    attributes.isFinal = declaration->attributes.isFinal;
+    attributes.isInline = declaration->attributes.isInline;
+
+    switch (declaration->attributes.scope)
+    {
+        case ESyntaxTreeScopes::PUBLIC:
+            attributes.scope = EScopes::PUBLIC;
+            break;
+        case ESyntaxTreeScopes::PROTECTED:
+            attributes.scope = EScopes::PROTECTED;
+            break;
+        case ESyntaxTreeScopes::PRIVATE:
+            attributes.scope = EScopes::PRIVATE;
+            break;
+    }
+
+    // TODO: Use static
+    //  FIXME: AddVariable should also return assembly code
+    Variable* variable = codeGenerator.AddVariable(declaration->name, declaration->type.GetIdentfier(), attributes);
 
     // TODO: Assign value
     return nullptr;
@@ -138,15 +159,32 @@ AssemblyCode* SyntaxTreeTraverser::GenerateVarDeclaration(VarDeclarationNode* de
 
 AssemblyCode* SyntaxTreeTraverser::GenerateFuncDeclaration(FuncDeclarationNode* declaration)
 {
+    DeclarationAttributes attributes = DeclarationAttributes();
+    attributes.isFinal = declaration->attributes.isFinal;
+    attributes.isInline = declaration->attributes.isInline;
+
+    switch (declaration->attributes.scope)
+    {
+        case ESyntaxTreeScopes::PUBLIC:
+            attributes.scope = EScopes::PUBLIC;
+            break;
+        case ESyntaxTreeScopes::PROTECTED:
+            attributes.scope = EScopes::PROTECTED;
+            break;
+        case ESyntaxTreeScopes::PRIVATE:
+            attributes.scope = EScopes::PRIVATE;
+            break;
+    }
+
     Function* function;
 
     if (declaration->returnType.IsVoid())
     {
-        function = codeGenerator.AddVoidFunction(declaration->name);
+        function = codeGenerator.AddVoidFunction(declaration->name, attributes);
     }
     else
     {
-        function = codeGenerator.AddFunction(declaration->name, declaration->returnType.GetIdentfier());
+        function = codeGenerator.AddFunction(declaration->name, declaration->returnType.GetIdentfier(), attributes);
     }
 
     codeGenerator.PushEnvironment(std::make_shared<FunctionScopeEnvironment>());
@@ -154,8 +192,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateFuncDeclaration(FuncDeclarationNode* 
                                            true);  // Lock environment as function environment was already created
     codeGenerator.PopEnvironment();
 
-    AssemblyCode* assemblyCode = codeGenerator.SetFunctionBody(function, body);
-    return assemblyCode;
+    return codeGenerator.SetFunctionBody(function, body);
 }
 
 AssemblyCode* SyntaxTreeTraverser::GenerateClassDeclaration(ClassDeclarationNode* declaration)
@@ -345,40 +382,71 @@ AssemblyCode* SyntaxTreeTraverser::GenerateAssignment(AssignmentNode* assignment
             assemblyCode->AddLines(
                 GenerateExpression(assignmentNode->value));  // Evaluate value & store to Temp variables
             assemblyCode->AddLines(
-                codeGenerator.PerformOperationOnTempVariables(ECodeGeneratorExpressionOperators::ASSIGN));
+                codeGenerator.PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators::ASSIGN));
             continue;
         }
 
-        ECodeGeneratorExpressionOperators codeGeneratorOperator;
+        ECodeGeneratorBinaryOperators codeGeneratorOperator;
 
         switch (assignOperator)
         {
             case EAssignOperators::ADD_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorExpressionOperators::ADD;
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::ADD;
             case EAssignOperators::SUB_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorExpressionOperators::SUB;
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::SUB;
             case EAssignOperators::MUL_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorExpressionOperators::MUL;
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::MUL;
             case EAssignOperators::DIV_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorExpressionOperators::DIV;
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::DIV;
             case EAssignOperators::MOD_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorExpressionOperators::MOD;
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::MOD;
         }
 
-        assemblyCode->AddLines(GenerateExpression(assignment->L_value));    // (for assign) Evaluate L_value & store to
-                                                                            // Temp variables
+        assemblyCode->AddLines(GenerateExpression(assignment->L_value));    // (for assign) Evaluate L_value &
+                                                                            // store to Temp variables
         assemblyCode->AddLines(GenerateExpression(assignment->L_value));    // (for operation ahead of assign) Evaluate
                                                                             // L_value & store to Temp variables
         assemblyCode->AddLines(GenerateExpression(assignmentNode->value));  // Evaluate value & store to Temp variables
-        assemblyCode->AddLines(codeGenerator.PerformOperationOnTempVariables(codeGeneratorOperator));
+        assemblyCode->AddLines(codeGenerator.PerformBinaryOperationOnTempVariables(codeGeneratorOperator));
         assemblyCode->AddLines(
-            codeGenerator.PerformOperationOnTempVariables(ECodeGeneratorExpressionOperators::ASSIGN));
+            codeGenerator.PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators::ASSIGN));
     }
 
     return assemblyCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateBinaryOperation(OperatorExpressionNode* binaryOperation) { return nullptr; }
+AssemblyCode* SyntaxTreeTraverser::GenerateBinaryOperation(OperatorExpressionNode* binaryOperationNode)
+{
+    AssemblyCode* assemblyCode = new AssemblyCode();
+
+    assemblyCode->AddLines(GenerateExpression(binaryOperationNode->firstExpression));
+
+    for (OperatorExpressionPair* operatorExpressionPair : *binaryOperationNode->operatorExpressionPairs)
+    {
+        codeGenerator.ActivateTempVariableEnvironment();
+        assemblyCode->AddLines(GenerateExpression(operatorExpressionPair->expression));
+
+        ECodeGeneratorBinaryOperators codeGeneratorOperator;
+
+        switch (operatorExpressionPair->op)
+        {
+            case EOperators::ADD_OPERATOR:
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::ADD;
+            case EOperators::SUB_OPERATOR:
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::SUB;
+            case EOperators::MUL_OPERATOR:
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::MUL;
+            case EOperators::DIV_OPERATOR:
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::DIV;
+            case EOperators::MOD_OPERATOR:
+                codeGeneratorOperator = ECodeGeneratorBinaryOperators::MOD;
+        }
+
+        assemblyCode->AddLines(codeGenerator.PerformBinaryOperationOnTempVariables(codeGeneratorOperator));
+    }
+
+    return assemblyCode;
+}
 
 AssemblyCode* SyntaxTreeTraverser::GenerateUnaryOperation(UnaryExpressionNode* unaryOperation) { return nullptr; }
 
@@ -387,6 +455,11 @@ AssemblyCode* SyntaxTreeTraverser::GenerateValue(AbstractValueNode* value)
     if (dynamic_cast<ValueChainNode*>(value) != nullptr)
     {
         return GenerateValueChain(dynamic_cast<ValueChainNode*>(value));
+    }
+
+    if (dynamic_cast<StaticValueChainNode*>(value) != nullptr)
+    {
+        return GenerateStaticValueChain(dynamic_cast<StaticValueChainNode*>(value));
     }
 
     if (dynamic_cast<AbstractConstValueNode*>(value) != nullptr)
@@ -407,7 +480,38 @@ AssemblyCode* SyntaxTreeTraverser::GenerateValue(AbstractValueNode* value)
     return nullptr;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateValueChain(ValueChainNode* valueChain) { return nullptr; }
+AssemblyCode* SyntaxTreeTraverser::GenerateValueChain(ValueChainNode* valueChain)
+{
+    AssemblyCode* assemblyCode = new AssemblyCode();
+
+    for (AbstractExpressionNode* value : valueChain->propertyAccesses)
+    {
+        assemblyCode->AddLines(GenerateExpression(value));
+        codeGenerator.ActivateTempVariableEnvironment();  // Activate environment of temp variable
+                                                          // (which is the result of generateExpression)
+    }
+
+    codeGenerator.ClearTempVariableEnvironment();  // Clear the temp variable environment as the value chain is done
+
+    return assemblyCode;
+}
+
+AssemblyCode* SyntaxTreeTraverser::GenerateStaticValueChain(StaticValueChainNode* valueChain)
+{
+    AssemblyCode* assemblyCode = new AssemblyCode();
+
+    for (AbstractExpressionNode* value : valueChain->propertyAccesses)
+    {
+        assemblyCode->AddLines(GenerateExpression(value));
+        // TODO: Activate static environment of type
+        codeGenerator.ActivateTempVariableEnvironment();  // Activate environment of temp variable
+                                                          // (which is the result of generateExpression)
+    }
+
+    // TODO: Temp variable environment should be cleared but only the static part. Probably will need a different
+    // TempVariableEnvironment for static and normal ValueChains
+    return assemblyCode;
+}
 
 AssemblyCode* SyntaxTreeTraverser::GenerateConstValue(AbstractConstValueNode* value)
 {

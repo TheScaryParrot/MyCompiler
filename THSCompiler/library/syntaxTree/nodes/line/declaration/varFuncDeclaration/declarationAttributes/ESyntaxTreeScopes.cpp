@@ -2,14 +2,14 @@
 
 #include <string>
 
-enum EScopes
+enum ESyntaxTreeScopes
 {
     PUBLIC,
     PROTECTED,
     PRIVATE
 };
 
-std::string EScopesToString(EScopes scope)
+std::string EScopesToString(ESyntaxTreeScopes scope)
 {
     switch (scope)
     {
@@ -21,5 +21,5 @@ std::string EScopesToString(EScopes scope)
             return "private";
     }
 
-    throw "Couldn't convert EScopes to String. Did you forget to update EScopesToString()";
+    throw "Couldn't convert ESyntaxTreeScopes to String. Did you forget to update EScopesToString()";
 }

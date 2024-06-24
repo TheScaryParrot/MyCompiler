@@ -14,7 +14,6 @@ class StaticValueChainNode : public AbstractValueNode
 
     virtual std::string ToString() override;
 
-   private:
     std::vector<AbstractExpressionNode*> propertyAccesses;
 };
 
