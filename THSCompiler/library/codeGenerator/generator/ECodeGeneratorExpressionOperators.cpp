@@ -6,5 +6,6 @@ enum ECodeGeneratorExpressionOperators
     SUB,
     MUL,
     DIV,
-    MOD
+    MOD,
+    ASSIGN
 };

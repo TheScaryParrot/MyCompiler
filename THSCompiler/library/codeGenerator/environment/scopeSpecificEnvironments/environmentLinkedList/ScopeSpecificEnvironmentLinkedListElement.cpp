@@ -13,31 +13,32 @@ public:
 
     std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> GetParent();
 
-    #pragma region IScopeSpecificEnvironment implementation
+#pragma region IScopeSpecificEnvironment implementation
 
-    virtual void AddVariable(std::string identifier, Variable* variable) override;
+    virtual void AddVariable(std::string identifier, Variable *variable) override;
+    virtual Variable *GetVariable(std::string identifier) override;
     virtual bool HasVariable(std::string identifier) override;
-    virtual bool HasVariable(Variable* variable) override;
+    virtual bool HasVariable(Variable *variable) override;
 
-    virtual void AddFunction(std::string identifier, Function* function) override;
-    virtual AssemblyCode* SetFunctionBody(Function* function, AssemblyCode* body) override;
-    virtual AssemblyCode* GenerateFunctionCall(Function* function, std::vector<Variable*> arguments) override;
-    virtual bool HasFunction(std::string identifier)  override;
-    virtual bool HasFunction(Function* function) override;
+    virtual void AddFunction(std::string identifier, Function *function) override;
+    virtual AssemblyCode *SetFunctionBody(Function *function, AssemblyCode *body) override;
+    virtual bool HasFunction(std::string identifier) override;
+    virtual bool HasFunction(Function *function) override;
 
-    virtual void AddType(std::string identifier, Type* type) override;
-    virtual Type* GetType(std::string identifier) override;
+    virtual void AddType(std::string identifier, Type *type) override;
+    virtual Type *GetType(std::string identifier) override;
     virtual bool HasType(std::string identifier) override;
-    virtual bool HasType(Type* type) override;
+    virtual bool HasType(Type *type) override;
 
-    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* typeEnvironment) override;
-    virtual bool HasTypeEnvironment(Type* type) override;
+    virtual void SetTypeEnvironment(Type *type, IScopeSpecificEnvironment *typeEnvironment) override;
+    virtual IScopeSpecificEnvironment *GetTypeEnvironment(Type *type) override;
+    virtual bool HasTypeEnvironment(Type *type) override;
 
-    virtual void AddJumpLabel(std::string identifier, JumpLabel* jumpLabel) override;
-    virtual JumpLabel* GetJumpLabel(std::string identifier) override;
+    virtual void AddJumpLabel(std::string identifier, JumpLabel *jumpLabel) override;
+    virtual JumpLabel *GetJumpLabel(std::string identifier) override;
     virtual bool HasJumpLabel(std::string identifier) override;
 
-    #pragma endregion
+#pragma endregion
 
 private:
     std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> parent;
@@ -57,9 +58,25 @@ std::shared_ptr<ScopeSpecificEnvironmentLinkedListElement> ScopeSpecificEnvironm
 
 #pragma region IScopeSpecificEnvironment implementation
 
-void ScopeSpecificEnvironmentLinkedListElement::AddVariable(std::string identifier, Variable* variable)
+void ScopeSpecificEnvironmentLinkedListElement::AddVariable(std::string identifier, Variable *variable)
 {
     return environment->AddVariable(identifier, variable);
+}
+
+Variable *ScopeSpecificEnvironmentLinkedListElement::GetVariable(std::string identifier)
+{
+    if (environment->HasVariable(identifier))
+    {
+        return environment->GetVariable(identifier);
+    }
+
+    if (parent == nullptr)
+    {
+        std::cerr << "Variable " << identifier << " not found in environment\n";
+        return nullptr;
+    }
+
+    return parent->GetVariable(identifier);
 }
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(std::string identifier)
@@ -77,7 +94,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(std::string identifi
     return parent->HasVariable(identifier);
 }
 
-bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(Variable* variable)
+bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(Variable *variable)
 {
     if (environment->HasVariable(variable))
     {
@@ -92,30 +109,14 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasVariable(Variable* variable)
     return parent->HasVariable(variable);
 }
 
-void ScopeSpecificEnvironmentLinkedListElement::AddFunction(std::string identifier, Function* function)
+void ScopeSpecificEnvironmentLinkedListElement::AddFunction(std::string identifier, Function *function)
 {
     environment->AddFunction(identifier, function);
 }
 
-AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::SetFunctionBody(Function* function, AssemblyCode* body)
+AssemblyCode *ScopeSpecificEnvironmentLinkedListElement::SetFunctionBody(Function *function, AssemblyCode *body)
 {
     return environment->SetFunctionBody(function, body);
-}
-
-AssemblyCode* ScopeSpecificEnvironmentLinkedListElement::GenerateFunctionCall(Function* function, std::vector<Variable*> arguments)
-{
-    if (environment->HasFunction(function))
-    {
-        return environment->GenerateFunctionCall(function, arguments);
-    }
-
-    if (parent == nullptr)
-    {
-        std::cerr << "Function " << function << " not found in environment\n";
-        return nullptr;
-    }
-
-    return parent->GenerateFunctionCall(function, arguments);
 }
 
 bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(std::string identifier)
@@ -133,7 +134,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(std::string identifi
     return parent->HasFunction(identifier);
 }
 
-bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(Function* function)
+bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(Function *function)
 {
     if (environment->HasFunction(function))
     {
@@ -164,12 +165,12 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasFunction(Function* function)
     return parent->GenerateFunctionCall(function, arguments);
 }*/
 
-void ScopeSpecificEnvironmentLinkedListElement::AddType(std::string identifier, Type* type)
+void ScopeSpecificEnvironmentLinkedListElement::AddType(std::string identifier, Type *type)
 {
     environment->AddType(identifier, type);
 }
 
-Type* ScopeSpecificEnvironmentLinkedListElement::GetType(std::string identifier)
+Type *ScopeSpecificEnvironmentLinkedListElement::GetType(std::string identifier)
 {
     if (environment->HasType(identifier))
     {
@@ -200,7 +201,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasType(std::string identifier)
     return parent->HasType(identifier);
 }
 
-bool ScopeSpecificEnvironmentLinkedListElement::HasType(Type* type)
+bool ScopeSpecificEnvironmentLinkedListElement::HasType(Type *type)
 {
     if (environment->HasType(type))
     {
@@ -215,7 +216,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasType(Type* type)
     return parent->HasType(type);
 }
 
-void ScopeSpecificEnvironmentLinkedListElement::SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* typeEnvironment)
+void ScopeSpecificEnvironmentLinkedListElement::SetTypeEnvironment(Type *type, IScopeSpecificEnvironment *typeEnvironment)
 {
     if (this->environment->HasType(type))
     {
@@ -232,7 +233,23 @@ void ScopeSpecificEnvironmentLinkedListElement::SetTypeEnvironment(Type* type, I
     parent->SetTypeEnvironment(type, typeEnvironment);
 }
 
-bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type)
+IScopeSpecificEnvironment *ScopeSpecificEnvironmentLinkedListElement::GetTypeEnvironment(Type *type)
+{
+    if (environment->HasType(type))
+    {
+        return environment->GetTypeEnvironment(type);
+    }
+
+    if (parent == nullptr)
+    {
+        std::cerr << "Type " << type->ToString() << " not found in environment\n";
+        return nullptr;
+    }
+
+    return parent->GetTypeEnvironment(type);
+}
+
+bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type *type)
 {
     if (environment->HasType(type))
     {
@@ -247,12 +264,63 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type)
     return parent->HasTypeEnvironment(type);
 }
 
-void ScopeSpecificEnvironmentLinkedListElement::AddJumpLabel(std::string identifier, JumpLabel* jumpLabel)
+void ScopeSpecificEnvironmentLinkedListElement::AddJumpLabel(std::string identifier, JumpLabel *jumpLabel)
 {
     environment->AddJumpLabel(identifier, jumpLabel);
 }
 
-JumpLabel* ScopeSpecificEnvironmentLinkedListElement::GetJumpLabel(std::string identifier)
+JumpLabel *ScopeSpecificEnvironmentLinkedListElement::GetJumpLabel(std::string identifier)
+{
+    if (environment->HasJumpLabel(identifier))
+    {
+        return environment->GetJumpLabel(identifier);
+    }
+
+    if (parent == nullptr)
+    {
+        std::cerr << "Jump label " << identifier << " not found in environment\n";
+        return nullptr;
+    }
+
+    return parent->GetJumpLabel(identifier);
+}
+
+bool ScopeSpecificEnvironmentLinkedListElement::HasJumpLabel(std::string identifier)
+{
+    if (environment->HasJumpLabel(identifier))
+    {
+        return true;
+    }
+
+    if (parent == nullptr)
+    {
+        return false;
+    }
+
+    return parent->HasJumpLabel(identifier);
+}
+
+bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type *type)
+{
+    if (environment->HasType(type))
+    {
+        return true;
+    }
+
+    if (parent == nullptr)
+    {
+        return false;
+    }
+
+    return parent->HasTypeEnvironment(type);
+}
+
+void ScopeSpecificEnvironmentLinkedListElement::AddJumpLabel(std::string identifier, JumpLabel *jumpLabel)
+{
+    environment->AddJumpLabel(identifier, jumpLabel);
+}
+
+JumpLabel *ScopeSpecificEnvironmentLinkedListElement::GetJumpLabel(std::string identifier)
 {
     if (environment->HasJumpLabel(identifier))
     {

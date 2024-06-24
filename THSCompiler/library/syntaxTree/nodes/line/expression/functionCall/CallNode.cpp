@@ -4,21 +4,19 @@
 
 #include "../AbstractValueNode.cpp"
 
-#include "CallArgument.cpp"
-
 class CallNode : public AbstractValueNode
 {
 public:
-    CallNode(std::string functionName, std::vector<CallArgument*> arguments);
+    CallNode(std::string functionName, std::vector<AbstractExpressionNode *> arguments);
     ~CallNode();
 
     virtual std::string ToString() override;
 
     std::string functionName;
-    std::vector<CallArgument*> arguments;
+    std::vector<AbstractExpressionNode *> arguments;
 };
 
-CallNode::CallNode(std::string functionName, std::vector<CallArgument*> arguments) : AbstractValueNode()
+CallNode::CallNode(std::string functionName, std::vector<AbstractExpressionNode *> arguments) : AbstractValueNode()
 {
     this->functionName = functionName;
     this->arguments = arguments;
@@ -26,7 +24,7 @@ CallNode::CallNode(std::string functionName, std::vector<CallArgument*> argument
 
 CallNode::~CallNode()
 {
-    for (CallArgument* argument : arguments)
+    for (AbstractExpressionNode *argument : arguments)
     {
         delete argument;
     }
@@ -36,7 +34,7 @@ std::string CallNode::ToString()
 {
     std::string result = functionName + "(";
 
-    for (CallArgument* argument : arguments)
+    for (AbstractExpressionNode *argument : arguments)
     {
         result += argument->ToString() + ", ";
     }

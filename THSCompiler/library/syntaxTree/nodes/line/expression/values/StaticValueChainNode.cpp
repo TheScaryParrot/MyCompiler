@@ -5,12 +5,12 @@
 
 #include "../AbstractValueNode.cpp"
 
-class ValueChainNode : public AbstractValueNode
+class StaticValueChainNode : public AbstractValueNode
 {
 public:
-    virtual ~ValueChainNode();
+    virtual ~StaticValueChainNode();
 
-    ValueChainNode *AddPropertyAccess(AbstractExpressionNode *value);
+    StaticValueChainNode *AddPropertyAccess(AbstractExpressionNode *value);
 
     virtual std::string ToString() override;
 
@@ -18,7 +18,7 @@ private:
     std::vector<AbstractExpressionNode *> propertyAccesses;
 };
 
-ValueChainNode::~ValueChainNode()
+StaticValueChainNode::~StaticValueChainNode()
 {
     for (AbstractExpressionNode *property : propertyAccesses)
     {
@@ -26,14 +26,14 @@ ValueChainNode::~ValueChainNode()
     }
 }
 
-ValueChainNode *ValueChainNode::AddPropertyAccess(AbstractExpressionNode *value)
+StaticValueChainNode *StaticValueChainNode::AddPropertyAccess(AbstractExpressionNode *value)
 {
     propertyAccesses.push_back(value);
 
     return this;
 }
 
-std::string ValueChainNode::ToString()
+std::string StaticValueChainNode::ToString()
 {
     std::string result = propertyAccesses[0]->ToString();
 

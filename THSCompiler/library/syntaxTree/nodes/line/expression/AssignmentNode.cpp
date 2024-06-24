@@ -9,30 +9,29 @@
 class Assignment
 {
 public:
-    Assignment(std::string variableName, EAssignOperators assignOperator)
+    Assignment(AbstractExpressionNode *L_value, EAssignOperators assignOperator)
     {
-        this->variableName = variableName;
+        this->L_value = L_value;
         this->assignOperator = assignOperator;
     }
 
-    std::string variableName;
+    AbstractExpressionNode *L_value;
     EAssignOperators assignOperator;
 };
-
 
 class AssignmentNode : public AbstractExpressionNode
 {
 public:
-    AssignmentNode(std::vector<Assignment*> assignments, AbstractExpressionNode* value);
+    AssignmentNode(std::vector<Assignment *> assignments, AbstractExpressionNode *value);
     virtual ~AssignmentNode();
 
     virtual std::string ToString() override;
 
-    std::vector<Assignment*> assignments;
-    AbstractExpressionNode* value;
+    std::vector<Assignment *> assignments;
+    AbstractExpressionNode *value;
 };
 
-AssignmentNode::AssignmentNode(std::vector<Assignment*> assignments, AbstractExpressionNode* value) : AbstractExpressionNode()
+AssignmentNode::AssignmentNode(std::vector<Assignment *> assignments, AbstractExpressionNode *value) : AbstractExpressionNode()
 {
     this->assignments = assignments;
     this->value = value;
@@ -47,10 +46,10 @@ std::string AssignmentNode::ToString()
 {
     std::string result = "";
 
-    for (Assignment* assignment : assignments)
+    for (Assignment *assignment : assignments)
     {
-        result += assignment->variableName + " " + EAssignOperatorsToString(assignment->assignOperator) + " ";
+        result += assignment->L_value->ToString() + " " + EAssignOperatorsToString(assignment->assignOperator) + " ";
     }
 
-    return result + value->ToString(); 
+    return result + value->ToString();
 }
