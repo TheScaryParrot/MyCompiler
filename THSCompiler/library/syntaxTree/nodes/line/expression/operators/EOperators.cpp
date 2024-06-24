@@ -25,22 +25,36 @@ std::string EOperatorsToString(EOperators operatorValue)
 {
     switch (operatorValue)
     {
-        case OR_OPERATOR: return "||";
-        case AND_OPERATOR: return "&&";
+        case OR_OPERATOR:
+            return "||";
+        case AND_OPERATOR:
+            return "&&";
 
-        case EQUAL_OPERATOR: return "==";
-        case NOT_EQUAL_OPERATOR: return "!=";
-        case LESS_THAN_OPERATOR: return "<";
-        case GREATER_THAN_OPERATOR: return ">";
-        case LESS_THAN_OR_EQUAL_OPERATOR: return "<=";
-        case GREATER_THAN_OR_EQUAL_OPERATOR: return ">=";
+        case EQUAL_OPERATOR:
+            return "==";
+        case NOT_EQUAL_OPERATOR:
+            return "!=";
+        case LESS_THAN_OPERATOR:
+            return "<";
+        case GREATER_THAN_OPERATOR:
+            return ">";
+        case LESS_THAN_OR_EQUAL_OPERATOR:
+            return "<=";
+        case GREATER_THAN_OR_EQUAL_OPERATOR:
+            return ">=";
 
-        case ADD_OPERATOR: return "+";
-        case SUB_OPERATOR: return "-";
-        case MUL_OPERATOR: return "*";
-        case DIV_OPERATOR: return "/";
-        case MOD_OPERATOR: return "%";
+        case ADD_OPERATOR:
+            return "+";
+        case SUB_OPERATOR:
+            return "-";
+        case MUL_OPERATOR:
+            return "*";
+        case DIV_OPERATOR:
+            return "/";
+        case MOD_OPERATOR:
+            return "%";
     }
 
-    throw "Couldn't convert EOperators to String in EOperatorsToString(). Did you forget to update EOperatorsToString()";
+    throw "Couldn't convert EOperators to String in EOperatorsToString(). Did you forget to update "
+          "EOperatorsToString()";
 }

@@ -4,22 +4,15 @@
 
 class BreakStatementNode : public AbstractKeywordStatementNode
 {
-public:
+   public:
     BreakStatementNode();
     ~BreakStatementNode();
 
     virtual std::string ToString() override;
 };
 
-BreakStatementNode::BreakStatementNode() : AbstractKeywordStatementNode()
-{
-}
+BreakStatementNode::BreakStatementNode() : AbstractKeywordStatementNode() {}
 
-BreakStatementNode::~BreakStatementNode()
-{
-}
+BreakStatementNode::~BreakStatementNode() {}
 
-std::string BreakStatementNode::ToString()
-{
-    return "continue";
-}
+std::string BreakStatementNode::ToString() { return "continue"; }

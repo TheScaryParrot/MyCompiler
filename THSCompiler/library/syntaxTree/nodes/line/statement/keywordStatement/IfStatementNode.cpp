@@ -2,20 +2,19 @@
 
 #include <vector>
 
-#include "AbstractKeywordStatementNode.cpp"
-
-#include "ElifStatementNode.cpp"
 #include "../../expression/AbstractExpressionNode.cpp"
+#include "AbstractKeywordStatementNode.cpp"
+#include "ElifStatementNode.cpp"
 
 class IfStatementNode : public AbstractKeywordStatementNode
 {
-public:
-    IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement, std::vector<ElifStatementNode*>* elifStatements, AbstractStatementNode* elseStatement);
+   public:
+    IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement,
+                    std::vector<ElifStatementNode*>* elifStatements, AbstractStatementNode* elseStatement);
     ~IfStatementNode();
 
     virtual std::string ToString() override;
 
- 
     AbstractExpressionNode* expression;
     AbstractStatementNode* statement;
 
@@ -24,7 +23,9 @@ public:
     AbstractStatementNode* elseStatement;
 };
 
-IfStatementNode::IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement, std::vector<ElifStatementNode*>* elifStatements, AbstractStatementNode* elseStatement) : AbstractKeywordStatementNode()
+IfStatementNode::IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement,
+                                 std::vector<ElifStatementNode*>* elifStatements, AbstractStatementNode* elseStatement)
+    : AbstractKeywordStatementNode()
 {
     this->expression = expression;
     this->statement = statement;

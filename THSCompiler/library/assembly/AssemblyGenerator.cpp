@@ -1,21 +1,20 @@
 #pragma once
 
 #include "../codeGenerator/environment/jumpLabels/JumpLabel.cpp"
-
 #include "AssemblyCode.cpp"
-#include "AssemblyLabelLine.cpp"
 #include "AssemblyInstructionLine.cpp"
+#include "AssemblyLabelLine.cpp"
 #include "instructions/AssemblyInstructions.cpp"
 
 static class AssemblyGenerator
 {
-public:
+   public:
     AssemblyCode* GenerateReturnInstruction();
 
     AssemblyCode* GenerateLabel(JumpLabel* jumpLabel);
     AssemblyCode* GenerateJumpToLabel(JumpLabel* jumpLabel);
 
-}AssemblyGenerator;
+} AssemblyGenerator;
 
 AssemblyCode* AssemblyGenerator::GenerateReturnInstruction()
 {
@@ -32,6 +31,7 @@ AssemblyCode* AssemblyGenerator::GenerateLabel(JumpLabel* jumpLabel)
 AssemblyCode* AssemblyGenerator::GenerateJumpToLabel(JumpLabel* jumpLabel)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
-    AssemblyInstructionLine* jumpLine = (new AssemblyInstructionLine(AssemblyInstructions::JMP))->AddArgument(jumpLabel->GetName());
+    AssemblyInstructionLine* jumpLine =
+        (new AssemblyInstructionLine(AssemblyInstructions::JMP))->AddArgument(jumpLabel->GetName());
     return assemblyCode->AddLine(std::shared_ptr<AssemblyInstructionLine>(jumpLine));
 }

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
+#include "../codeGenerator/environment/variables/VariableLocation.cpp"
 #include "IAssemblyLine.cpp"
 #include "instructions/AssemblyInstruction.cpp"
-#include "../codeGenerator/environment/variables/VariableLocation.cpp"
 
 class AssemblyInstructionLine : public IAssemblyLine
 {
-public:
+   public:
     AssemblyInstructionLine(AssemblyInstruction instruction);
 
     AssemblyInstructionLine* AddArgument(std::string argument);
@@ -17,15 +17,12 @@ public:
 
     virtual std::string ToString() override;
 
-private:
+   private:
     AssemblyInstruction instruction;
     std::vector<std::string> arguments;
 };
 
-AssemblyInstructionLine::AssemblyInstructionLine(AssemblyInstruction instruction)
-{
-    this->instruction = instruction;
-}
+AssemblyInstructionLine::AssemblyInstructionLine(AssemblyInstruction instruction) { this->instruction = instruction; }
 
 AssemblyInstructionLine* AssemblyInstructionLine::AddArgument(std::string argument)
 {
@@ -50,7 +47,7 @@ std::string AssemblyInstructionLine::ToString()
     for (size_t i = 1; i < arguments.size(); i++)
     {
         result += ", " + arguments[i];
-    } 
+    }
 
     return result;
 }

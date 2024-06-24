@@ -4,22 +4,15 @@
 
 class ContinueStatementNode : public AbstractKeywordStatementNode
 {
-public:
+   public:
     ContinueStatementNode();
     ~ContinueStatementNode();
 
     virtual std::string ToString() override;
 };
 
-ContinueStatementNode::ContinueStatementNode() : AbstractKeywordStatementNode()
-{
-}
+ContinueStatementNode::ContinueStatementNode() : AbstractKeywordStatementNode() {}
 
-ContinueStatementNode::~ContinueStatementNode()
-{
-}
+ContinueStatementNode::~ContinueStatementNode() {}
 
-std::string ContinueStatementNode::ToString()
-{
-    return "continue";
-}
+std::string ContinueStatementNode::ToString() { return "continue"; }

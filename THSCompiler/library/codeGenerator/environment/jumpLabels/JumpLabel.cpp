@@ -5,21 +5,15 @@
 /// @brief Represents a jump label in the code
 class JumpLabel
 {
-public:
+   public:
     JumpLabel(std::string name);
 
     std::string GetName();
 
-private:
+   private:
     std::string name;
 };
 
-JumpLabel::JumpLabel(std::string name)
-{
-    this->name = name;
-}
+JumpLabel::JumpLabel(std::string name) { this->name = name; }
 
-std::string JumpLabel::GetName()
-{
-    return name;
-}
+std::string JumpLabel::GetName() { return name; }

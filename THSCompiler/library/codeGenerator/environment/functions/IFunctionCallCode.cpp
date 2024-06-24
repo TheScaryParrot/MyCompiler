@@ -5,6 +5,6 @@
 /// @brief Interface for generating function call code
 class IFunctionCallCode
 {
-public:
+   public:
     virtual AssemblyCode* GenerateFunctionCallCode() = 0;
 };

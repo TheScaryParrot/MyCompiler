@@ -4,19 +4,16 @@
 
 class OffsetVariableLocationGetter : public IVariableLocationGetter
 {
-public:
+   public:
     OffsetVariableLocationGetter(int offset);
 
     VariableLocation GetLocation(VariableLocation parentLocation) override;
 
-private:
+   private:
     int offset;
 };
 
-OffsetVariableLocationGetter::OffsetVariableLocationGetter(int offset)
-{
-    this->offset = offset;
-}
+OffsetVariableLocationGetter::OffsetVariableLocationGetter(int offset) { this->offset = offset; }
 
 VariableLocation OffsetVariableLocationGetter::GetLocation(VariableLocation parentLocation)
 {

@@ -4,13 +4,13 @@
 
 class ParameterDeclarationNode : public AbstractTreeNode
 {
-public:
+   public:
     ParameterDeclarationNode(std::string type, std::string name);
     ~ParameterDeclarationNode();
 
     virtual std::string ToString() override;
 
-private:
+   private:
     std::string name;
     std::string type;
 };
@@ -21,11 +21,6 @@ ParameterDeclarationNode::ParameterDeclarationNode(std::string type, std::string
     this->name = name;
 }
 
-ParameterDeclarationNode::~ParameterDeclarationNode()
-{
-}
+ParameterDeclarationNode::~ParameterDeclarationNode() {}
 
-std::string ParameterDeclarationNode::ToString()
-{
-    return "param: " + type + " " + name;
-}
+std::string ParameterDeclarationNode::ToString() { return "param: " + type + " " + name; }

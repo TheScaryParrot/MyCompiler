@@ -6,7 +6,7 @@
 
 static class AssemblyInstructions
 {
-public:
+   public:
     static const AssemblyInstruction MOV;
     static const AssemblyInstruction ADD;
     static const AssemblyInstruction SUB;
@@ -18,7 +18,7 @@ public:
 
     static const AssemblyInstruction JMP;
 
-}AssemblyInstructions;
+} AssemblyInstructions;
 
 const AssemblyInstruction AssemblyInstructions::MOV = AssemblyInstruction("MOV");
 const AssemblyInstruction AssemblyInstructions::ADD = AssemblyInstruction("ADD");

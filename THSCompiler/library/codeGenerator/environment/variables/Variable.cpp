@@ -7,7 +7,7 @@
 
 class Variable
 {
-public:
+   public:
     Variable(Type* type);
     Variable(Type* type, IVariableLocationGetter* locationGetter, IVariableLocationGetter* setLocation);
 
@@ -16,16 +16,13 @@ public:
     VariableLocation GetLocation(VariableLocation parentLocation);
     VariableLocation SetLocation(VariableLocation parentLocation);
 
-private:
+   private:
     Type* type;
     std::unique_ptr<IVariableLocationGetter> getLocation;
     std::unique_ptr<IVariableLocationGetter> setLocation;
 };
 
-Variable::Variable(Type* type)
-{
-    this->type = type;
-}
+Variable::Variable(Type* type) { this->type = type; }
 
 Variable::Variable(Type* type, IVariableLocationGetter* locationGetter, IVariableLocationGetter* setLocation)
 {
@@ -34,10 +31,7 @@ Variable::Variable(Type* type, IVariableLocationGetter* locationGetter, IVariabl
     this->setLocation = std::unique_ptr<IVariableLocationGetter>(setLocation);
 }
 
-Type* Variable::GetType()
-{
-    return type;
-}
+Type* Variable::GetType() { return type; }
 
 VariableLocation Variable::GetLocation(VariableLocation parentLocation)
 {

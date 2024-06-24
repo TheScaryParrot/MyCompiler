@@ -1,32 +1,32 @@
 #pragma once
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include "../AbstractValueNode.cpp"
 
 class StaticValueChainNode : public AbstractValueNode
 {
-public:
+   public:
     virtual ~StaticValueChainNode();
 
-    StaticValueChainNode *AddPropertyAccess(AbstractExpressionNode *value);
+    StaticValueChainNode* AddPropertyAccess(AbstractExpressionNode* value);
 
     virtual std::string ToString() override;
 
-private:
-    std::vector<AbstractExpressionNode *> propertyAccesses;
+   private:
+    std::vector<AbstractExpressionNode*> propertyAccesses;
 };
 
 StaticValueChainNode::~StaticValueChainNode()
 {
-    for (AbstractExpressionNode *property : propertyAccesses)
+    for (AbstractExpressionNode* property : propertyAccesses)
     {
         delete property;
     }
 }
 
-StaticValueChainNode *StaticValueChainNode::AddPropertyAccess(AbstractExpressionNode *value)
+StaticValueChainNode* StaticValueChainNode::AddPropertyAccess(AbstractExpressionNode* value)
 {
     propertyAccesses.push_back(value);
 

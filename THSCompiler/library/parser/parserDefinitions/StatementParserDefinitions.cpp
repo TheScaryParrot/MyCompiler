@@ -1,15 +1,16 @@
 #pragma once
 
-#include "../PredictiveParser.hpp"
-
 #include "../../tokens/ConstTokens.cpp"
 #include "../../tokens/Keywords.cpp"
+#include "../PredictiveParser.hpp"
 
 ELookAheadCertainties PredictiveParser::LookAhead_Statement(TokenList* tokens)
 {
     if (tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-    if (LookAhead_Body(tokens) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
-    if (LookAhead_KeywordStatement(tokens) == ELookAheadCertainties::CertainlyPresent) return ELookAheadCertainties::CertainlyPresent;
+    if (LookAhead_Body(tokens) == ELookAheadCertainties::CertainlyPresent)
+        return ELookAheadCertainties::CertainlyPresent;
+    if (LookAhead_KeywordStatement(tokens) == ELookAheadCertainties::CertainlyPresent)
+        return ELookAheadCertainties::CertainlyPresent;
 
     return LookAhead_Call(tokens);
 }
@@ -17,7 +18,7 @@ AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 {
     if (tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN))
     {
-        tokens->Next(); // Consume STATEMENT_END_TOKEN
+        tokens->Next();  // Consume STATEMENT_END_TOKEN
         return new EmptyStatementNode();
     }
 
@@ -25,7 +26,7 @@ AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
     if (tokens->Peek()->IsKeyword()) return Parse_KeywordStatement(tokens);
 
     AbstractExpressionNode* expressionNode = Parse_Expression(tokens);
-    tokens->Next(); // Consume STATEMENT_END_TOKEN
+    tokens->Next();  // Consume STATEMENT_END_TOKEN
     return expressionNode;
 }
 
@@ -61,11 +62,11 @@ ELookAheadCertainties PredictiveParser::LookAhead_IfStatement(TokenList* tokens)
 }
 IfStatementNode* PredictiveParser::Parse_IfStatement(TokenList* tokens)
 {
-    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
 
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
 
     AbstractStatementNode* statement = Parse_Statement(tokens);
 
@@ -96,12 +97,12 @@ ELookAheadCertainties PredictiveParser::LookAhead_ElifStatement(TokenList* token
 }
 ElifStatementNode* PredictiveParser::Parse_ElifStatement(TokenList* tokens)
 {
-    tokens->Next(); // Consume ELIF_KEYWORD
-    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume ELIF_KEYWORD
+    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
 
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
 
     AbstractStatementNode* statement = Parse_Statement(tokens);
 
@@ -116,7 +117,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_ElseStatement(TokenList* token
 }
 AbstractStatementNode* PredictiveParser::Parse_ElseStatement(TokenList* tokens)
 {
-    tokens->Next(); // Consume ELSE_KEYWORD
+    tokens->Next();  // Consume ELSE_KEYWORD
 
     return Parse_Statement(tokens);
 }
@@ -131,7 +132,7 @@ ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
 {
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next(); // Consume STATEMENT_END_TOKEN
+    tokens->Next();  // Consume STATEMENT_END_TOKEN
 
     return new ReturnStatementNode(expression);
 }
@@ -144,11 +145,11 @@ ELookAheadCertainties PredictiveParser::LookAhead_WhileStatement(TokenList* toke
 }
 WhileStatementNode* PredictiveParser::Parse_WhileStatement(TokenList* tokens)
 {
-    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
 
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
 
     return new WhileStatementNode(expression, Parse_Statement(tokens));
 }
@@ -161,16 +162,16 @@ ELookAheadCertainties PredictiveParser::LookAhead_ForStatement(TokenList* tokens
 }
 ForStatementNode* PredictiveParser::Parse_ForStatement(TokenList* tokens)
 {
-    tokens->Next(); // Consume OPEN_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
 
     VarDeclarationNode* initialization = Parse_VarDeclaration(tokens);
 
     AbstractExpressionNode* condition = Parse_Expression(tokens);
-    tokens->Next(); // Consume STATEMENT_END_TOKEN (Parse_Expression does not consume STATEMENT_END_TOKEN)
+    tokens->Next();  // Consume STATEMENT_END_TOKEN (Parse_Expression does not consume STATEMENT_END_TOKEN)
 
     AbstractStatementNode* increment = Parse_Statement(tokens);
-    
-    tokens->Next(); // Consume CLOSE_PARENTHESIS_TOKEN
+
+    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
 
     return new ForStatementNode(initialization, condition, increment, Parse_Statement(tokens));
 }
@@ -183,7 +184,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_BreakStatement(TokenList* toke
 }
 BreakStatementNode* PredictiveParser::Parse_BreakStatement(TokenList* tokens)
 {
-    tokens->Next(); // Consume STATEMENT_END_TOKEN
+    tokens->Next();  // Consume STATEMENT_END_TOKEN
     return new BreakStatementNode();
 }
 
@@ -195,7 +196,6 @@ ELookAheadCertainties PredictiveParser::LookAhead_ContinueStatement(TokenList* t
 }
 ContinueStatementNode* PredictiveParser::Parse_ContinueStatement(TokenList* tokens)
 {
-    tokens->Next(); // Consume STATEMENT_END_TOKEN
+    tokens->Next();  // Consume STATEMENT_END_TOKEN
     return new ContinueStatementNode();
 }
-

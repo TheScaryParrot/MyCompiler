@@ -5,17 +5,11 @@
 /// @brief Node used for everything that is an expression. So also sumExp or unaryExp
 class AbstractExpressionNode : public AbstractStatementNode
 {
-public:
+   public:
     AbstractExpressionNode();
     virtual ~AbstractExpressionNode();
 };
 
-AbstractExpressionNode::AbstractExpressionNode() : AbstractStatementNode()
-{
+AbstractExpressionNode::AbstractExpressionNode() : AbstractStatementNode() {}
 
-}
-
-AbstractExpressionNode::~AbstractExpressionNode()
-{
-    
-}
+AbstractExpressionNode::~AbstractExpressionNode() {}

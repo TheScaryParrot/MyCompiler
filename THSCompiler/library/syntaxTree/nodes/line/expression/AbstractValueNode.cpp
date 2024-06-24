@@ -4,16 +4,11 @@
 
 class AbstractValueNode : public AbstractExpressionNode
 {
-public:
+   public:
     AbstractValueNode();
     virtual ~AbstractValueNode();
 };
 
-AbstractValueNode::AbstractValueNode() : AbstractExpressionNode()
-{
-}
+AbstractValueNode::AbstractValueNode() : AbstractExpressionNode() {}
 
-AbstractValueNode::~AbstractValueNode()
-{
-}
-
+AbstractValueNode::~AbstractValueNode() {}

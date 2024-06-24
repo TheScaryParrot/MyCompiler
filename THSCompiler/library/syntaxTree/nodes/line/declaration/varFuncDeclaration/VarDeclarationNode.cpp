@@ -1,14 +1,15 @@
 #pragma once
 
-#include "AbstractVarFuncDeclarationNode.cpp"
-
-#include "declarationAttributes/DeclarationAttributes.cpp"
 #include "../../expression/AbstractExpressionNode.cpp"
+#include "AbstractVarFuncDeclarationNode.cpp"
+#include "declarationAttributes/DeclarationAttributes.cpp"
+#include "types/TypeNode.cpp"
 
 class VarDeclarationNode : public AbstractVarFuncDeclarationNode
 {
-public:
-    VarDeclarationNode(DeclarationAttributes attributes, TypeNode type, std::string name, AbstractExpressionNode* value = nullptr);
+   public:
+    VarDeclarationNode(DeclarationAttributes attributes, TypeNode type, std::string name,
+                       AbstractExpressionNode* value = nullptr);
     ~VarDeclarationNode();
 
     virtual std::string ToString() override;
@@ -19,7 +20,9 @@ public:
     DeclarationAttributes attributes;
 };
 
-VarDeclarationNode::VarDeclarationNode(DeclarationAttributes attributes, TypeNode type, std::string name, AbstractExpressionNode* value) : AbstractVarFuncDeclarationNode()
+VarDeclarationNode::VarDeclarationNode(DeclarationAttributes attributes, TypeNode type, std::string name,
+                                       AbstractExpressionNode* value)
+    : AbstractVarFuncDeclarationNode()
 {
     this->attributes = attributes;
     this->type = type;
@@ -27,10 +30,7 @@ VarDeclarationNode::VarDeclarationNode(DeclarationAttributes attributes, TypeNod
     this->value = value;
 }
 
-VarDeclarationNode::~VarDeclarationNode()
-{
-    delete value;
-}
+VarDeclarationNode::~VarDeclarationNode() { delete value; }
 
 std::string VarDeclarationNode::ToString()
 {

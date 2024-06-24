@@ -1,12 +1,11 @@
 #pragma once
 
 #include "AbstractDeclarationNode.cpp"
-
 #include "BodyNode.cpp"
 
 class ClassDeclarationNode : public AbstractDeclarationNode
 {
-public:
+   public:
     ClassDeclarationNode(bool isStatic, std::string name, BodyNode* body);
     ~ClassDeclarationNode();
 
@@ -24,10 +23,7 @@ ClassDeclarationNode::ClassDeclarationNode(bool isStatic, std::string name, Body
     this->body = body;
 }
 
-ClassDeclarationNode::~ClassDeclarationNode()
-{
-    delete body;
-}
+ClassDeclarationNode::~ClassDeclarationNode() { delete body; }
 
 std::string ClassDeclarationNode::ToString()
 {

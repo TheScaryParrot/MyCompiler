@@ -1,21 +1,21 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "IAssemblyLine.cpp"
 
 class AssemblyCode
 {
-public:
+   public:
     AssemblyCode* AddLine(std::shared_ptr<IAssemblyLine> line);
     AssemblyCode* AddLines(AssemblyCode* code);
 
     std::vector<std::shared_ptr<IAssemblyLine>> GetLines();
     std::string ToString();
 
-private:
+   private:
     std::vector<std::shared_ptr<IAssemblyLine>> lines;
 };
 
@@ -37,15 +37,12 @@ AssemblyCode* AssemblyCode::AddLines(AssemblyCode* code)
     return this;
 }
 
-std::vector<std::shared_ptr<IAssemblyLine>> AssemblyCode::GetLines()
-{
-    return lines;
-}
+std::vector<std::shared_ptr<IAssemblyLine>> AssemblyCode::GetLines() { return lines; }
 
 std::string AssemblyCode::ToString()
 {
     std::string result;
-    
+
     for (std::shared_ptr<IAssemblyLine>& line : lines)
     {
         result += line->ToString() + "\n";

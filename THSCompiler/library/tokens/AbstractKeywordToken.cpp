@@ -4,8 +4,9 @@
 
 #include "AbstractToken.cpp"
 
-class AbstractKeywordToken : public AbstractToken {
-public:
+class AbstractKeywordToken : public AbstractToken
+{
+   public:
     AbstractKeywordToken(std::string keyword);
     ~AbstractKeywordToken();
 
@@ -14,31 +15,24 @@ public:
 
     bool IsThisKeyword(std::string keyword);
 
-    virtual bool IsKeyword() override; // returns true
+    virtual bool IsKeyword() override;  // returns true
 
-private: 
+   private:
     std::string keyword;
 };
 
-AbstractKeywordToken::AbstractKeywordToken(std::string keyword) : AbstractToken("keyword"){
-    this->keyword = keyword;
+AbstractKeywordToken::AbstractKeywordToken(std::string keyword) : AbstractToken("keyword") { this->keyword = keyword; }
+
+AbstractKeywordToken::~AbstractKeywordToken() {}
+
+bool AbstractKeywordToken::IsThisToken(std::shared_ptr<AbstractToken> other)
+{
+    return AbstractToken::IsThisToken(other) &&
+           this->IsThisKeyword(std::dynamic_pointer_cast<AbstractKeywordToken>(other)->keyword);
 }
 
-AbstractKeywordToken::~AbstractKeywordToken() {
-}
+std::string AbstractKeywordToken::ToString() { return AbstractToken::ToString() + ":" + this->keyword; }
 
-bool AbstractKeywordToken::IsThisToken(std::shared_ptr<AbstractToken> other) {
-    return AbstractToken::IsThisToken(other) && this->IsThisKeyword(std::dynamic_pointer_cast<AbstractKeywordToken>(other)->keyword);
-}
+bool AbstractKeywordToken::IsThisKeyword(std::string keyword) { return this->keyword == keyword; }
 
-std::string AbstractKeywordToken::ToString() {
-    return AbstractToken::ToString() + ":" + this->keyword;
-}
-
-bool AbstractKeywordToken::IsThisKeyword(std::string keyword) {
-    return this->keyword == keyword;
-}
-
-bool AbstractKeywordToken::IsKeyword() {
-    return true;
-}
+bool AbstractKeywordToken::IsKeyword() { return true; }

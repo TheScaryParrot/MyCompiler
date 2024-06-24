@@ -2,13 +2,12 @@
 
 #include <vector>
 
-#include "AbstractKeywordStatementNode.cpp"
-
 #include "../../expression/AbstractExpressionNode.cpp"
+#include "AbstractKeywordStatementNode.cpp"
 
 class WhileStatementNode : public AbstractKeywordStatementNode
 {
-public:
+   public:
     WhileStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement);
     ~WhileStatementNode();
 
@@ -18,7 +17,8 @@ public:
     AbstractStatementNode* statement;
 };
 
-WhileStatementNode::WhileStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement) : AbstractKeywordStatementNode()
+WhileStatementNode::WhileStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement)
+    : AbstractKeywordStatementNode()
 {
     this->expression = expression;
     this->statement = statement;

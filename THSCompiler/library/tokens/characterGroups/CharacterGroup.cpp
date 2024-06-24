@@ -1,10 +1,11 @@
 #pragma once
 
-#include "TwoChar.cpp"
-
 #include <vector>
-class CharacterGroup {
-public:
+
+#include "TwoChar.cpp"
+class CharacterGroup
+{
+   public:
     CharacterGroup();
     CharacterGroup(std::vector<TwoChar> twoChars);
     CharacterGroup(std::vector<CharacterGroup> characterGroups);
@@ -15,48 +16,48 @@ public:
     /// @return 0 = no match, 1 = first character matches, 2 = both characters match
     unsigned int Match(char first, char second);
 
-    static CharacterGroup Empty() {
-        return CharacterGroup();
-    }
+    static CharacterGroup Empty() { return CharacterGroup(); }
 
-private:
+   private:
     std::vector<TwoChar> twoChars;
 };
 
-CharacterGroup::CharacterGroup() {
-    twoChars = std::vector<TwoChar>();
-}
+CharacterGroup::CharacterGroup() { twoChars = std::vector<TwoChar>(); }
 
-CharacterGroup::CharacterGroup(std::vector<TwoChar> twoChars) {
-    this->twoChars = twoChars;
-}
+CharacterGroup::CharacterGroup(std::vector<TwoChar> twoChars) { this->twoChars = twoChars; }
 
-CharacterGroup::CharacterGroup(std::vector<CharacterGroup> characterGroups) {
-    for (CharacterGroup group : characterGroups) {
-        for (TwoChar twoChar : group.twoChars) {
+CharacterGroup::CharacterGroup(std::vector<CharacterGroup> characterGroups)
+{
+    for (CharacterGroup group : characterGroups)
+    {
+        for (TwoChar twoChar : group.twoChars)
+        {
             this->twoChars.push_back(twoChar);
         }
     }
 }
 
-CharacterGroup::CharacterGroup(std::vector<TwoChar> twoChars, std::vector<CharacterGroup> characterGroups) {
+CharacterGroup::CharacterGroup(std::vector<TwoChar> twoChars, std::vector<CharacterGroup> characterGroups)
+{
     this->twoChars = twoChars;
 
-    for (CharacterGroup group : characterGroups) {
-        for (TwoChar twoChar : group.twoChars) {
+    for (CharacterGroup group : characterGroups)
+    {
+        for (TwoChar twoChar : group.twoChars)
+        {
             this->twoChars.push_back(twoChar);
         }
     }
 }
 
-CharacterGroup::~CharacterGroup() {
-}
+CharacterGroup::~CharacterGroup() {}
 
 unsigned int CharacterGroup::Match(char first, char second)
 {
     unsigned int match = 0;
 
-    for (TwoChar twoChar : twoChars) {
+    for (TwoChar twoChar : twoChars)
+    {
         match = twoChar.Match(first, second);
 
         if (match > 0) return match;

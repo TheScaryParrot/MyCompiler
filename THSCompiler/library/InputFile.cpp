@@ -2,8 +2,9 @@
 
 #include <fstream>
 
-class InputFile {
-public:
+class InputFile
+{
+   public:
     InputFile(std::string filename);
     ~InputFile();
 
@@ -16,30 +17,18 @@ public:
     bool IsEndOfFile();
     bool IsGood();
 
-private:
+   private:
     std::ifstream file;
 };
 
-InputFile::InputFile(std::string filename) {
-    file.open(filename);
-}
+InputFile::InputFile(std::string filename) { file.open(filename); }
 
-InputFile::~InputFile() {
-    file.close();
-}
+InputFile::~InputFile() { file.close(); }
 
-char InputFile::ReadNext() {
-    return file.get();
-}
+char InputFile::ReadNext() { return file.get(); }
 
-char InputFile::PeekNext() {
-    return file.peek();
-}
+char InputFile::PeekNext() { return file.peek(); }
 
-bool InputFile::IsEndOfFile() {
-    return file.eof();
-}
+bool InputFile::IsEndOfFile() { return file.eof(); }
 
-bool InputFile::IsGood() {
-    return file.good();
-}
+bool InputFile::IsGood() { return file.good(); }

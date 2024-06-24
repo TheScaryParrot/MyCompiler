@@ -4,15 +4,11 @@
 
 class AbstractKeywordStatementNode : public AbstractStatementNode
 {
-public:
+   public:
     AbstractKeywordStatementNode();
     virtual ~AbstractKeywordStatementNode();
 };
 
-AbstractKeywordStatementNode::AbstractKeywordStatementNode() : AbstractStatementNode()
-{
-}
+AbstractKeywordStatementNode::AbstractKeywordStatementNode() : AbstractStatementNode() {}
 
-AbstractKeywordStatementNode::~AbstractKeywordStatementNode()
-{
-}
+AbstractKeywordStatementNode::~AbstractKeywordStatementNode() {}

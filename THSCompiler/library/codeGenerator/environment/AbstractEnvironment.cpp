@@ -1,15 +1,16 @@
 #pragma once
 
-#include <vector>
 #include <functional>
+#include <vector>
 
 #include "EnvironmentElement.cpp"
 
-/// @brief Basic Environment that holds EnvironmentElements and provides methods to add and get elements, based on their identifier
+/// @brief Basic Environment that holds EnvironmentElements and provides methods to add and get elements, based on their
+/// identifier
 template <class T>
 class AbstractEnvironment
 {
-public:
+   public:
     void AddElement(std::string identifier, std::shared_ptr<T> element)
     {
         elements.push_back(std::make_shared<EnvironmentElement<T>>(identifier, element));
@@ -18,7 +19,8 @@ public:
     std::shared_ptr<T> GetElement(std::string identifier)
     {
         // Find element where element->IsThisElement(identifier) == true
-        return FindElement([identifier](std::shared_ptr<EnvironmentElement<T>> element) -> bool{return element->IsThisElement(identifier);});
+        return FindElement([identifier](std::shared_ptr<EnvironmentElement<T>> element) -> bool
+                           { return element->IsThisElement(identifier); });
     }
 
     std::shared_ptr<T> FindElement(std::function<bool(std::shared_ptr<EnvironmentElement<T>>)> predicate)
@@ -34,16 +36,14 @@ public:
         return nullptr;
     }
 
-    bool HasElement(std::string identifier)
-    {
-        return GetElement(identifier) != nullptr;
-    }
+    bool HasElement(std::string identifier) { return GetElement(identifier) != nullptr; }
 
     bool HasElement(T* element)
     {
-        return FindElement([element](std::shared_ptr<EnvironmentElement<T>> environmentElement) -> bool{return environmentElement->GetElement().get() ==element;}) != nullptr;
+        return FindElement([element](std::shared_ptr<EnvironmentElement<T>> environmentElement) -> bool
+                           { return environmentElement->GetElement().get() == element; }) != nullptr;
     }
 
-private:
+   private:
     std::vector<std::shared_ptr<EnvironmentElement<T>>> elements;
 };

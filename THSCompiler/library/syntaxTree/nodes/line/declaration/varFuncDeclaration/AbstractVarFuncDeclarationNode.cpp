@@ -4,15 +4,11 @@
 
 class AbstractVarFuncDeclarationNode : public AbstractDeclarationNode
 {
-public:
+   public:
     AbstractVarFuncDeclarationNode();
     virtual ~AbstractVarFuncDeclarationNode();
 };
 
-AbstractVarFuncDeclarationNode::AbstractVarFuncDeclarationNode() : AbstractDeclarationNode()
-{
-}
+AbstractVarFuncDeclarationNode::AbstractVarFuncDeclarationNode() : AbstractDeclarationNode() {}
 
-AbstractVarFuncDeclarationNode::~AbstractVarFuncDeclarationNode()
-{
-}
+AbstractVarFuncDeclarationNode::~AbstractVarFuncDeclarationNode() {}

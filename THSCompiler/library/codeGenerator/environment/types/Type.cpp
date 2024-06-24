@@ -1,22 +1,18 @@
 #pragma once
 
+#include <string>
+
 class Type
 {
-public:
+   public:
     Type(std::string name);
 
     std::string ToString();
 
-private:
+   private:
     std::string name;
 };
 
-Type::Type(std::string name)
-{
-    this->name = name;
-}
+Type::Type(std::string name) { this->name = name; }
 
-std::string Type::ToString()
-{
-    return name;
-}
+std::string Type::ToString() { return name; }

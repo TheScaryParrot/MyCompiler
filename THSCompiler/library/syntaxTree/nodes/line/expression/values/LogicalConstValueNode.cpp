@@ -4,7 +4,7 @@
 
 class LogicalConstValueNode : public AbstractConstValueNode
 {
-public:
+   public:
     LogicalConstValueNode(bool value);
     ~LogicalConstValueNode();
 
@@ -12,25 +12,14 @@ public:
 
     virtual std::string ToString() override;
 
-private:
+   private:
     bool value;
 };
 
-LogicalConstValueNode::LogicalConstValueNode(bool value) : AbstractConstValueNode()
-{
-    this->value = value;
-}
+LogicalConstValueNode::LogicalConstValueNode(bool value) : AbstractConstValueNode() { this->value = value; }
 
-LogicalConstValueNode::~LogicalConstValueNode()
-{
-}
+LogicalConstValueNode::~LogicalConstValueNode() {}
 
-bool LogicalConstValueNode::GetValue()
-{
-    return value;
-}
+bool LogicalConstValueNode::GetValue() { return value; }
 
-std::string LogicalConstValueNode::ToString()
-{
-    return value ? "true" : "false";
-}
+std::string LogicalConstValueNode::ToString() { return value ? "true" : "false"; }

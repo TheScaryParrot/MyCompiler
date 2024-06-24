@@ -1,18 +1,14 @@
-#pragma once 
+#pragma once
 
 #include "../AbstractValueNode.cpp"
 
 class AbstractConstValueNode : public AbstractValueNode
 {
-public:
+   public:
     AbstractConstValueNode();
     virtual ~AbstractConstValueNode();
 };
 
-AbstractConstValueNode::AbstractConstValueNode() : AbstractValueNode()
-{
-}
+AbstractConstValueNode::AbstractConstValueNode() : AbstractValueNode() {}
 
-AbstractConstValueNode::~AbstractConstValueNode()
-{
-}
+AbstractConstValueNode::~AbstractConstValueNode() {}

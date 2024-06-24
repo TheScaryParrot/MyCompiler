@@ -4,12 +4,12 @@
 
 class ConstVariableLocationGetter : public IVariableLocationGetter
 {
-public:
+   public:
     ConstVariableLocationGetter(std::string originMemoryLocation, int offset);
 
     VariableLocation GetLocation(VariableLocation parentLocation) override;
 
-private:
+   private:
     VariableLocation location;
 };
 
@@ -18,7 +18,4 @@ ConstVariableLocationGetter::ConstVariableLocationGetter(std::string originMemor
     this->location = VariableLocation(originMemoryLocation, offset);
 }
 
-VariableLocation ConstVariableLocationGetter::GetLocation(VariableLocation parentLocation)
-{
-    return this->location;
-}
+VariableLocation ConstVariableLocationGetter::GetLocation(VariableLocation parentLocation) { return this->location; }

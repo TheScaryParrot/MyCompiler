@@ -4,15 +4,11 @@
 
 class AbstractLineNode : public AbstractTreeNode
 {
-public:
+   public:
     AbstractLineNode();
     virtual ~AbstractLineNode();
 };
 
-AbstractLineNode::AbstractLineNode() : AbstractTreeNode()
-{
-}
+AbstractLineNode::AbstractLineNode() : AbstractTreeNode() {}
 
-AbstractLineNode::~AbstractLineNode()
-{
-}
+AbstractLineNode::~AbstractLineNode() {}

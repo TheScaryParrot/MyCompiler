@@ -4,7 +4,7 @@
 
 class NumberConstValueNode : public AbstractConstValueNode
 {
-public:
+   public:
     NumberConstValueNode(std::string value);
     ~NumberConstValueNode();
 
@@ -12,18 +12,13 @@ public:
 
     virtual std::string ToString() override;
 
-private:
+   private:
     std::string value;
 };
 
-NumberConstValueNode::NumberConstValueNode(std::string value) : AbstractConstValueNode()
-{
-    this->value = value;
-}
+NumberConstValueNode::NumberConstValueNode(std::string value) : AbstractConstValueNode() { this->value = value; }
 
-NumberConstValueNode::~NumberConstValueNode()
-{
-}
+NumberConstValueNode::~NumberConstValueNode() {}
 
 std::string NumberConstValueNode::GetValue()
 {

@@ -1,41 +1,31 @@
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "characterGroups/CharacterGroup.cpp"
 
-class AbstractToken {
-public:
+class AbstractToken
+{
+   public:
     AbstractToken(std::string tokenName);
     virtual ~AbstractToken();
 
     virtual bool IsThisToken(std::shared_ptr<AbstractToken> other);
-    virtual bool IsKeyword(); // returns false
+    virtual bool IsKeyword();  // returns false
 
     virtual std::string ToString();
 
-private:
+   private:
     std::string tokenName;
 };
 
-AbstractToken::AbstractToken(std::string tokenName) {
-    this->tokenName = tokenName;
-}
+AbstractToken::AbstractToken(std::string tokenName) { this->tokenName = tokenName; }
 
-AbstractToken::~AbstractToken() {
-}
+AbstractToken::~AbstractToken() {}
 
-bool AbstractToken::IsThisToken(std::shared_ptr<AbstractToken> other)
-{
-    return this->tokenName == other->tokenName;
-}
+bool AbstractToken::IsThisToken(std::shared_ptr<AbstractToken> other) { return this->tokenName == other->tokenName; }
 
-bool AbstractToken::IsKeyword() {
-    return false;
-}
+bool AbstractToken::IsKeyword() { return false; }
 
-
-std::string AbstractToken::ToString() {
-    return tokenName;
-}
+std::string AbstractToken::ToString() { return tokenName; }

@@ -1,16 +1,15 @@
 #pragma once
 
-#include "AbstractVarFuncDeclarationNode.cpp"
-
-#include "declarationAttributes/DeclarationAttributes.cpp"
-#include "ParameterDeclarationNode.cpp"
-#include "types/FunctionReturnTypeNode.cpp"
 #include "../BodyNode.cpp"
+#include "AbstractVarFuncDeclarationNode.cpp"
+#include "ParameterDeclarationNode.cpp"
+#include "declarationAttributes/DeclarationAttributes.cpp"
+#include "types/FunctionReturnTypeNode.cpp"
 
 class FuncDeclarationNode : public AbstractVarFuncDeclarationNode
 {
-public:
-    FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name, 
+   public:
+    FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name,
                         std::vector<ParameterDeclarationNode*>* parameters, AbstractStatementNode* statement);
     ~FuncDeclarationNode();
 
@@ -23,8 +22,10 @@ public:
     AbstractStatementNode* statement;
 };
 
-FuncDeclarationNode::FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name, 
-                                    std::vector<ParameterDeclarationNode*>* parameters, AbstractStatementNode* statement) : AbstractVarFuncDeclarationNode()
+FuncDeclarationNode::FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType,
+                                         std::string name, std::vector<ParameterDeclarationNode*>* parameters,
+                                         AbstractStatementNode* statement)
+    : AbstractVarFuncDeclarationNode()
 {
     this->attributes = attributes;
     this->returnType = returnType;

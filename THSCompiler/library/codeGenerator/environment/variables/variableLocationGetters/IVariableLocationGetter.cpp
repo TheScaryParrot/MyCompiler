@@ -4,6 +4,6 @@
 
 class IVariableLocationGetter
 {
-public:
+   public:
     virtual VariableLocation GetLocation(VariableLocation parentLocation) = 0;
 };

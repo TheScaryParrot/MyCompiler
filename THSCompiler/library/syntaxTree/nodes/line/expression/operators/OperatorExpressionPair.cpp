@@ -1,18 +1,18 @@
 #pragma once
 
-#include "EOperators.cpp"
 #include "../AbstractExpressionNode.cpp"
+#include "EOperators.cpp"
 
 class OperatorExpressionPair
 {
-public:
+   public:
     OperatorExpressionPair(EOperators op, AbstractExpressionNode* expression);
     ~OperatorExpressionPair();
 
     std::string ToString();
 
-private:
-    EOperators op; // operator
+   private:
+    EOperators op;  // operator
     AbstractExpressionNode* expression;
 };
 
@@ -22,12 +22,6 @@ OperatorExpressionPair::OperatorExpressionPair(EOperators op, AbstractExpression
     this->expression = expression;
 }
 
-OperatorExpressionPair::~OperatorExpressionPair()
-{
-    delete expression;
-}
+OperatorExpressionPair::~OperatorExpressionPair() { delete expression; }
 
-std::string OperatorExpressionPair::ToString()
-{
-    return EOperatorsToString(op) + expression->ToString();
-}
+std::string OperatorExpressionPair::ToString() { return EOperatorsToString(op) + expression->ToString(); }

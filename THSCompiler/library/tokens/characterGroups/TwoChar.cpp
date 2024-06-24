@@ -1,16 +1,16 @@
 #pragma once
 
 /// @brief Holds two characters. Used by characterGroups with a consumed and a peek character.
-class TwoChar 
+class TwoChar
 {
-public:
+   public:
     TwoChar(char first)
     {
         this->first = first;
         this->second = '\0';
     }
 
-    TwoChar(char first, char second) 
+    TwoChar(char first, char second)
     {
         this->first = first;
         this->second = second;
@@ -26,7 +26,7 @@ public:
         return this->second == '\0';
     }
 
-private:
+   private:
     char first;
     char second;
 };

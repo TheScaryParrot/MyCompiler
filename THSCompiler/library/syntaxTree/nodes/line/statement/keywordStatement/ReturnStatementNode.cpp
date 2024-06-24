@@ -1,12 +1,11 @@
 #pragma once
 
-#include "AbstractKeywordStatementNode.cpp"
-
 #include "../../expression/AbstractExpressionNode.cpp"
+#include "AbstractKeywordStatementNode.cpp"
 
 class ReturnStatementNode : public AbstractKeywordStatementNode
 {
-public:
+   public:
     ReturnStatementNode(AbstractExpressionNode* expression);
     ~ReturnStatementNode();
 
@@ -20,12 +19,6 @@ ReturnStatementNode::ReturnStatementNode(AbstractExpressionNode* expression) : A
     this->expression = expression;
 }
 
-ReturnStatementNode::~ReturnStatementNode()
-{
-    delete expression;
-}
+ReturnStatementNode::~ReturnStatementNode() { delete expression; }
 
-std::string ReturnStatementNode::ToString()
-{
-    return "return " + expression->ToString();
-}
+std::string ReturnStatementNode::ToString() { return "return " + expression->ToString(); }

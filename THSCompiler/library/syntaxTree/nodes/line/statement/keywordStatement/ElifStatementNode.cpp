@@ -1,23 +1,23 @@
 #pragma once
 
-#include "AbstractKeywordStatementNode.cpp"
-
 #include "../../expression/AbstractExpressionNode.cpp"
+#include "AbstractKeywordStatementNode.cpp"
 
 class ElifStatementNode : public AbstractKeywordStatementNode
 {
-public:
+   public:
     ElifStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement);
     ~ElifStatementNode();
 
     virtual std::string ToString() override;
 
-private:
+   private:
     AbstractExpressionNode* expression;
     AbstractStatementNode* statement;
 };
 
-ElifStatementNode::ElifStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement) : AbstractKeywordStatementNode()
+ElifStatementNode::ElifStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement)
+    : AbstractKeywordStatementNode()
 {
     this->expression = expression;
     this->statement = statement;
@@ -29,7 +29,4 @@ ElifStatementNode::~ElifStatementNode()
     delete statement;
 }
 
-std::string ElifStatementNode::ToString()
-{
-    return "elif (" + expression->ToString() + ")\n" + statement->ToString();
-}
+std::string ElifStatementNode::ToString() { return "elif (" + expression->ToString() + ")\n" + statement->ToString(); }

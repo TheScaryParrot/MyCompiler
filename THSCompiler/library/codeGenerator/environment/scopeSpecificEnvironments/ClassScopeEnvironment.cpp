@@ -4,15 +4,14 @@
 
 class ClassScopeEnvironment : public ScopeSpecificEnvironment
 {
-public:
+   public:
     ClassScopeEnvironment();
     ClassScopeEnvironment(std::shared_ptr<Environment> environment);
 };
 
-ClassScopeEnvironment::ClassScopeEnvironment() : ScopeSpecificEnvironment()
-{
-}
+ClassScopeEnvironment::ClassScopeEnvironment() : ScopeSpecificEnvironment() {}
 
-ClassScopeEnvironment::ClassScopeEnvironment(std::shared_ptr<Environment> environment) : ScopeSpecificEnvironment(environment)
+ClassScopeEnvironment::ClassScopeEnvironment(std::shared_ptr<Environment> environment)
+    : ScopeSpecificEnvironment(environment)
 {
 }

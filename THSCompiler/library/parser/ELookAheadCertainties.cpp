@@ -9,7 +9,8 @@ enum class ELookAheadCertainties
     Unknown
 };
 
-// Short circuit evaluation is not guaranteed for overloaded operators. Therefore the following operators would be inefficient to use
+// Short circuit evaluation is not guaranteed for overloaded operators. Therefore the following operators would be
+// inefficient to use
 
 /*constexpr ELookAheadCertainties operator||(ELookAheadCertainties a, ELookAheadCertainties b)
 {
@@ -22,7 +23,7 @@ enum class ELookAheadCertainties
     {
         return ELookAheadCertainties::Unknown;
     }
-    
+
     return ELookAheadCertainties::CertainlyNotPresent;
 }
 
@@ -37,7 +38,7 @@ constexpr ELookAheadCertainties operator&&(ELookAheadCertainties a, ELookAheadCe
     {
         return ELookAheadCertainties::CertainlyNotPresent;
     }
-    
+
     return ELookAheadCertainties::CertainlyPresent;
 }
 

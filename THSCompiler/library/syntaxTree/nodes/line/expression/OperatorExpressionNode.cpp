@@ -3,23 +3,25 @@
 #include <vector>
 
 #include "AbstractExpressionNode.cpp"
-
 #include "operators/OperatorExpressionPair.cpp"
 
 class OperatorExpressionNode : public AbstractExpressionNode
 {
-public:
-    OperatorExpressionNode(AbstractExpressionNode* firstExpression, std::vector<OperatorExpressionPair*>* OperatorValuePairs = nullptr);
+   public:
+    OperatorExpressionNode(AbstractExpressionNode* firstExpression,
+                           std::vector<OperatorExpressionPair*>* OperatorValuePairs = nullptr);
     ~OperatorExpressionNode();
 
     virtual std::string ToString() override;
 
-private:
+   private:
     AbstractExpressionNode* firstExpression;
     std::vector<OperatorExpressionPair*>* operatorExpressionPairs;
 };
 
-OperatorExpressionNode::OperatorExpressionNode(AbstractExpressionNode* firstExpression, std::vector<OperatorExpressionPair*>* operatorExpressionPairs) : AbstractExpressionNode()
+OperatorExpressionNode::OperatorExpressionNode(AbstractExpressionNode* firstExpression,
+                                               std::vector<OperatorExpressionPair*>* operatorExpressionPairs)
+    : AbstractExpressionNode()
 {
     this->firstExpression = firstExpression;
     this->operatorExpressionPairs = operatorExpressionPairs;
@@ -52,4 +54,3 @@ std::string OperatorExpressionNode::ToString()
 
     return result;
 }
-

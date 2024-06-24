@@ -4,24 +4,32 @@
 
 #include "CharacterGroup.cpp"
 
-static class CharacterGroups {
-public:
+static class CharacterGroups
+{
+   public:
     CharacterGroups();
     ~CharacterGroups();
 
     CharacterGroup WHITESPACES = CharacterGroup(std::vector<TwoChar>{' ', '\n', '\t', '\r'});
     CharacterGroup STATEMENT_END = CharacterGroup(std::vector<TwoChar>{';'});
 
-    CharacterGroup LOWER_ALPHABET = CharacterGroup(std::vector<TwoChar>{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'});
-    CharacterGroup UPPER_ALPHABET = CharacterGroup(std::vector<TwoChar>{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'});
-    CharacterGroup ALPHABET = CharacterGroup(std::vector<TwoChar>(), std::vector<CharacterGroup>{LOWER_ALPHABET, UPPER_ALPHABET});
+    CharacterGroup LOWER_ALPHABET =
+        CharacterGroup(std::vector<TwoChar>{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                                            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'});
+    CharacterGroup UPPER_ALPHABET =
+        CharacterGroup(std::vector<TwoChar>{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                                            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'});
+    CharacterGroup ALPHABET =
+        CharacterGroup(std::vector<TwoChar>(), std::vector<CharacterGroup>{LOWER_ALPHABET, UPPER_ALPHABET});
     CharacterGroup NUMBERS = CharacterGroup(std::vector<TwoChar>{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'});
     CharacterGroup ALPHANUMERIC = CharacterGroup(std::vector<CharacterGroup>{ALPHABET, NUMBERS});
 
     CharacterGroup STRING_DELIMITOR = CharacterGroup(std::vector<TwoChar>{'"'});
 
-    CharacterGroup IDENTIFIER_START_CHAR = CharacterGroup(std::vector<TwoChar>{'_'}, std::vector<CharacterGroup>{ALPHABET});
-    CharacterGroup IDENTIFIER_CHAR = CharacterGroup(std::vector<TwoChar>{'_'}, std::vector<CharacterGroup>{ALPHABET, NUMBERS});
+    CharacterGroup IDENTIFIER_START_CHAR =
+        CharacterGroup(std::vector<TwoChar>{'_'}, std::vector<CharacterGroup>{ALPHABET});
+    CharacterGroup IDENTIFIER_CHAR =
+        CharacterGroup(std::vector<TwoChar>{'_'}, std::vector<CharacterGroup>{ALPHABET, NUMBERS});
 
     CharacterGroup BODY_OPEN = CharacterGroup(std::vector<TwoChar>{'{'});
     CharacterGroup BODY_CLOSE = CharacterGroup(std::vector<TwoChar>{'}'});
@@ -66,10 +74,8 @@ public:
     CharacterGroup DOT = CharacterGroup(std::vector<TwoChar>{'.'});
     CharacterGroup COLON = CharacterGroup(std::vector<TwoChar>{':'});
 
-}CharacterGroups;
+} CharacterGroups;
 
-CharacterGroups::CharacterGroups() {
-}
+CharacterGroups::CharacterGroups() {}
 
-CharacterGroups::~CharacterGroups() {
-}
+CharacterGroups::~CharacterGroups() {}

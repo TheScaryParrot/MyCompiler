@@ -4,15 +4,11 @@
 
 class AbstractDeclarationNode : public AbstractLineNode
 {
-public:
+   public:
     AbstractDeclarationNode();
     virtual ~AbstractDeclarationNode();
 };
 
-AbstractDeclarationNode::AbstractDeclarationNode() : AbstractLineNode()
-{
-}
+AbstractDeclarationNode::AbstractDeclarationNode() : AbstractLineNode() {}
 
-AbstractDeclarationNode::~AbstractDeclarationNode()
-{
-}
+AbstractDeclarationNode::~AbstractDeclarationNode() {}

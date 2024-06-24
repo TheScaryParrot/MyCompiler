@@ -1,39 +1,31 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "AbstractLineNode.cpp"
 
-
 class CodeblockNode : AbstractTreeNode
 {
-public:
+   public:
     void AddCodeline(AbstractLineNode* line);
     AbstractLineNode* GetLine(int index);
     unsigned int GetLineCount();
 
     std::string ToString();
 
-private:
+   private:
     std::vector<std::unique_ptr<AbstractLineNode>> lines;
 };
-
 
 void CodeblockNode::AddCodeline(AbstractLineNode* codeLine)
 {
     lines.push_back(std::unique_ptr<AbstractLineNode>(codeLine));
 }
 
-AbstractLineNode* CodeblockNode::GetLine(int index)
-{
-    return lines[index].get();
-}
+AbstractLineNode* CodeblockNode::GetLine(int index) { return lines[index].get(); }
 
-unsigned int CodeblockNode::GetLineCount()
-{
-    return lines.size();
-}
+unsigned int CodeblockNode::GetLineCount() { return lines.size(); }
 
 std::string CodeblockNode::ToString()
 {

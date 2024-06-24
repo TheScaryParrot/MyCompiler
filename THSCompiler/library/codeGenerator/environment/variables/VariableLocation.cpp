@@ -4,7 +4,7 @@
 
 class VariableLocation
 {
-public:
+   public:
     VariableLocation();
     VariableLocation(std::string originMemoryLocation, int offset);
 
@@ -14,7 +14,7 @@ public:
 
     std::string ToString();
 
-private:
+   private:
     /// @brief String referring to the memory location of the variable
     std::string originMemoryLocation;
 
@@ -39,18 +39,12 @@ void VariableLocation::SetOriginMemoryLocation(std::string originMemoryLocation)
     this->originMemoryLocation = originMemoryLocation;
 }
 
-void VariableLocation::SetOffset(int offset)
-{
-    this->offset = offset;
-}
+void VariableLocation::SetOffset(int offset) { this->offset = offset; }
 
-void VariableLocation::AddToOffset(int offset)
-{
-    this->offset += offset;
-}
+void VariableLocation::AddToOffset(int offset) { this->offset += offset; }
 
 std::string VariableLocation::ToString()
 {
-    //TODO: Check if this is the correct format
+    // TODO: Check if this is the correct format
     return "[" + originMemoryLocation + " + " + std::to_string(offset) + "]";
 }

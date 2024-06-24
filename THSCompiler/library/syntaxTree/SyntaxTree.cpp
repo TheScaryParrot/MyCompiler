@@ -1,12 +1,12 @@
 #pragma once
 
-#include "nodes/line/CodeblockNode.cpp"
-
 #include <iostream>
+
+#include "nodes/line/CodeblockNode.cpp"
 
 class SyntaxTree
 {
-public: 
+   public:
     SyntaxTree();
     ~SyntaxTree();
 
@@ -18,40 +18,20 @@ public:
 
     std::string ToString();
 
-private:
+   private:
     CodeblockNode* codeBlock = new CodeblockNode();
 };
 
-SyntaxTree::SyntaxTree()
-{
-}
+SyntaxTree::SyntaxTree() {}
 
-SyntaxTree::~SyntaxTree()
-{
-    delete codeBlock;
-}
+SyntaxTree::~SyntaxTree() { delete codeBlock; }
 
-void SyntaxTree::AddCodeLineNode(AbstractLineNode* codeLine)
-{
-    codeBlock->AddCodeline(codeLine);
-}
+void SyntaxTree::AddCodeLineNode(AbstractLineNode* codeLine) { codeBlock->AddCodeline(codeLine); }
 
-AbstractLineNode* SyntaxTree::GetLine(int index)
-{
-    return codeBlock->GetLine(index);
-}
+AbstractLineNode* SyntaxTree::GetLine(int index) { return codeBlock->GetLine(index); }
 
-unsigned int SyntaxTree::GetLineCount()
-{
-    return codeBlock->GetLineCount();
-}
+unsigned int SyntaxTree::GetLineCount() { return codeBlock->GetLineCount(); }
 
-CodeblockNode* SyntaxTree::GetCodeBlock()
-{
-    return codeBlock;
-}
+CodeblockNode* SyntaxTree::GetCodeBlock() { return codeBlock; }
 
-std::string SyntaxTree::ToString()
-{
-    return "SyntaxTree: " + codeBlock->ToString();
-}
+std::string SyntaxTree::ToString() { return "SyntaxTree: " + codeBlock->ToString(); }

@@ -4,6 +4,6 @@
 
 class IAssemblyLine
 {
-public:
+   public:
     virtual std::string ToString() = 0;
 };

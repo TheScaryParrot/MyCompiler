@@ -4,22 +4,15 @@
 
 class EmptyStatementNode : public AbstractStatementNode
 {
-public:
+   public:
     EmptyStatementNode();
     ~EmptyStatementNode();
 
     virtual std::string ToString() override;
 };
 
-EmptyStatementNode::EmptyStatementNode() : AbstractStatementNode()
-{
-}
+EmptyStatementNode::EmptyStatementNode() : AbstractStatementNode() {}
 
-EmptyStatementNode::~EmptyStatementNode()
-{
-}
+EmptyStatementNode::~EmptyStatementNode() {}
 
-std::string EmptyStatementNode::ToString()
-{
-    return ";";
-}
+std::string EmptyStatementNode::ToString() { return ";"; }

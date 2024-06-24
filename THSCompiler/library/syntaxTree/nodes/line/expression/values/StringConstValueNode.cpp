@@ -4,33 +4,22 @@
 
 class StringConstValueNode : public AbstractConstValueNode
 {
-public:
+   public:
     StringConstValueNode(std::string value);
     ~StringConstValueNode();
 
     std::string GetValue();
 
-    virtual std::string ToString() override; 
+    virtual std::string ToString() override;
 
-private:
+   private:
     std::string value;
 };
 
-StringConstValueNode::StringConstValueNode(std::string value) : AbstractConstValueNode()
-{
-    this->value = value;
-}
+StringConstValueNode::StringConstValueNode(std::string value) : AbstractConstValueNode() { this->value = value; }
 
-StringConstValueNode::~StringConstValueNode()
-{
-}
+StringConstValueNode::~StringConstValueNode() {}
 
-std::string StringConstValueNode::GetValue()
-{
-    return value;
-}
+std::string StringConstValueNode::GetValue() { return value; }
 
-std::string StringConstValueNode::ToString()
-{
-    return '"' + GetValue() + '"';
-}
+std::string StringConstValueNode::ToString() { return '"' + GetValue() + '"'; }

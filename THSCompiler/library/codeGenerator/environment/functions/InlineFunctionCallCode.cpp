@@ -4,21 +4,15 @@
 
 class InlineFunctionCallCode : public IFunctionCallCode
 {
-public:
+   public:
     InlineFunctionCallCode(AssemblyCode* functionCode);
 
     virtual AssemblyCode* GenerateFunctionCallCode() override;
 
-private:
+   private:
     AssemblyCode* functionCode;
 };
 
-InlineFunctionCallCode::InlineFunctionCallCode(AssemblyCode* functionCode)
-{
-    this->functionCode = functionCode;
-}
+InlineFunctionCallCode::InlineFunctionCallCode(AssemblyCode* functionCode) { this->functionCode = functionCode; }
 
-AssemblyCode* InlineFunctionCallCode::GenerateFunctionCallCode()
-{
-    return functionCode;
-}
+AssemblyCode* InlineFunctionCallCode::GenerateFunctionCallCode() { return functionCode; }

@@ -10,7 +10,7 @@
 
 class Function
 {
-public:
+   public:
     Function(Type* returnType);
 
     /// @brief Sets this function's call code
@@ -24,22 +24,15 @@ public:
 
     std::vector<Variable*> parameters;
 
-private:
+   private:
     std::unique_ptr<IFunctionCallCode> callCode;
 };
 
-Function::Function(Type* returnType)
-{
-    this->returnType = returnType;
-}
+Function::Function(Type* returnType) { this->returnType = returnType; }
 
 void Function::SetCallCode(std::unique_ptr<IFunctionCallCode> callCode)
 {
-    this->callCode = std::unique_ptr<IFunctionCallCode>(callCode.release()); // Take ownership of the pointer
+    this->callCode = std::unique_ptr<IFunctionCallCode>(callCode.release());  // Take ownership of the pointer
 }
 
-AssemblyCode* Function::GetFunctionCallCode()
-{
-    return callCode->GenerateFunctionCallCode();
-}
-
+AssemblyCode* Function::GetFunctionCallCode() { return callCode->GenerateFunctionCallCode(); }

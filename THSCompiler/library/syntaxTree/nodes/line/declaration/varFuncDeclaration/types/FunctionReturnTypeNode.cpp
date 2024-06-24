@@ -4,7 +4,7 @@
 
 class FunctionReturnTypeNode : public TypeNode
 {
-public:
+   public:
     FunctionReturnTypeNode(std::string name);
     FunctionReturnTypeNode() = default;
     ~FunctionReturnTypeNode();
@@ -14,20 +14,10 @@ public:
     bool IsVoid();
 };
 
-FunctionReturnTypeNode::FunctionReturnTypeNode(std::string name) : TypeNode(name)
-{
-}
+FunctionReturnTypeNode::FunctionReturnTypeNode(std::string name) : TypeNode(name) {}
 
-FunctionReturnTypeNode::~FunctionReturnTypeNode()
-{
-}
+FunctionReturnTypeNode::~FunctionReturnTypeNode() {}
 
-bool FunctionReturnTypeNode::IsVoid()
-{
-    return name == "void";
-}
+bool FunctionReturnTypeNode::IsVoid() { return name == "void"; }
 
-std::string FunctionReturnTypeNode::ToString()
-{
-    return name;
-}
+std::string FunctionReturnTypeNode::ToString() { return name; }
