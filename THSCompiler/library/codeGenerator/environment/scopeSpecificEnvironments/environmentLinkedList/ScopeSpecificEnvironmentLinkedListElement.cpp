@@ -29,9 +29,10 @@ class ScopeSpecificEnvironmentLinkedListElement : IScopeSpecificEnvironment
     virtual bool HasType(std::string identifier) override;
     virtual bool HasType(Type* type) override;
 
-    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* typeEnvironment) override;
-    virtual IScopeSpecificEnvironment* GetTypeEnvironment(Type* type) override;
-    virtual bool HasTypeEnvironment(Type* type) override;
+    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* typeEnvironment,
+                                    bool staticEnvironment) override;
+    virtual IScopeSpecificEnvironment* GetTypeEnvironment(Type* type, bool staticEnvironment) override;
+    virtual bool HasTypeEnvironment(Type* type, bool staticEnvironment) override;
 
     virtual void AddJumpLabel(std::string identifier, JumpLabel* jumpLabel) override;
     virtual JumpLabel* GetJumpLabel(std::string identifier) override;
@@ -217,11 +218,12 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasType(Type* type)
 }
 
 void ScopeSpecificEnvironmentLinkedListElement::SetTypeEnvironment(Type* type,
-                                                                   IScopeSpecificEnvironment* typeEnvironment)
+                                                                   IScopeSpecificEnvironment* typeEnvironment,
+                                                                   bool staticEnvironment)
 {
     if (this->scopeEnvironment->HasType(type))
     {
-        this->scopeEnvironment->SetTypeEnvironment(type, typeEnvironment);
+        this->scopeEnvironment->SetTypeEnvironment(type, typeEnvironment, staticEnvironment);
         return;
     }
 
@@ -231,14 +233,15 @@ void ScopeSpecificEnvironmentLinkedListElement::SetTypeEnvironment(Type* type,
         return;
     }
 
-    parent->SetTypeEnvironment(type, typeEnvironment);
+    parent->SetTypeEnvironment(type, typeEnvironment, staticEnvironment);
 }
 
-IScopeSpecificEnvironment* ScopeSpecificEnvironmentLinkedListElement::GetTypeEnvironment(Type* type)
+IScopeSpecificEnvironment* ScopeSpecificEnvironmentLinkedListElement::GetTypeEnvironment(Type* type,
+                                                                                         bool staticEnvironment)
 {
     if (scopeEnvironment->HasType(type))
     {
-        return scopeEnvironment->GetTypeEnvironment(type);
+        return scopeEnvironment->GetTypeEnvironment(type, staticEnvironment);
     }
 
     if (parent == nullptr)
@@ -247,10 +250,10 @@ IScopeSpecificEnvironment* ScopeSpecificEnvironmentLinkedListElement::GetTypeEnv
         return nullptr;
     }
 
-    return parent->GetTypeEnvironment(type);
+    return parent->GetTypeEnvironment(type, staticEnvironment);
 }
 
-bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type)
+bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type, bool staticEnvironment)
 {
     if (scopeEnvironment->HasType(type))
     {
@@ -262,7 +265,7 @@ bool ScopeSpecificEnvironmentLinkedListElement::HasTypeEnvironment(Type* type)
         return false;
     }
 
-    return parent->HasTypeEnvironment(type);
+    return parent->HasTypeEnvironment(type, staticEnvironment);
 }
 
 void ScopeSpecificEnvironmentLinkedListElement::AddJumpLabel(std::string identifier, JumpLabel* jumpLabel)

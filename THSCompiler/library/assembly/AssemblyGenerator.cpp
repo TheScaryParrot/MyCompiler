@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../codeGenerator/environment/funcVars/variables/Variable.cpp"
 #include "../codeGenerator/environment/jumpLabels/JumpLabel.cpp"
 #include "AssemblyCode.cpp"
 #include "AssemblyInstructionLine.cpp"
@@ -9,13 +10,15 @@
 static class AssemblyGenerator
 {
    public:
-    AssemblyCode* GenerateCallInstruction(std::string functionName);
     AssemblyCode* GenerateReturnInstruction();
+    AssemblyCode* GenerateCallInstruction(std::string functionName);
 
     /// @brief Code to generate a label; label can be JumpLabel, functionLabel or any other label
     AssemblyCode* GenerateLabel(std::string label);
 
     AssemblyCode* GenerateJumpToJumpLabel(JumpLabel* jumpLabel);
+
+    const std::string LABEL_MANGLING_TOKEN = "-";
 
 } AssemblyGenerator;
 

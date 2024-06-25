@@ -1,7 +1,25 @@
 class int
 {
+    public int Add(int other)
+    {
+        return 0;
+    }
 
+    public int Mul(int other)
+    {
+        return 0;
+    }
+
+    public void Assign(int other)
+    {
+        return 0;
+    }
 }
+
+public int num1 = 0;
+public final int num2 = 1;
+
+num1 += num2 * 5;
 
 while (amount.hello:lol().(5 + vdiniMom.size) > 0)
 {

@@ -12,7 +12,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_Statement(TokenList* tokens)
     if (LookAhead_KeywordStatement(tokens) == ELookAheadCertainties::CertainlyPresent)
         return ELookAheadCertainties::CertainlyPresent;
 
-    return LookAhead_Call(tokens);
+    return LookAhead_Expression(tokens);
 }
 AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 {

@@ -28,9 +28,10 @@ class ScopeSpecificEnvironment : public IScopeSpecificEnvironment
     virtual bool HasType(std::string identifier) override;
     virtual bool HasType(Type* type) override;
 
-    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment) override;
-    virtual IScopeSpecificEnvironment* GetTypeEnvironment(Type* type) override;
-    virtual bool HasTypeEnvironment(Type* type) override;
+    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment,
+                                    bool staticEnvironment) override;
+    virtual IScopeSpecificEnvironment* GetTypeEnvironment(Type* type, bool staticEnvironment) override;
+    virtual bool HasTypeEnvironment(Type* type, bool staticEnvironment) override;
 
     virtual void AddJumpLabel(std::string identifier, JumpLabel* jumpLabel) override;
     virtual JumpLabel* GetJumpLabel(std::string identifier) override;
@@ -75,8 +76,6 @@ void ScopeSpecificEnvironment::AddFunction(std::string identifier, Function* fun
 
 AssemblyCode* ScopeSpecificEnvironment::SetFunctionBody(Function* function, AssemblyCode* body)
 {
-    // TODO: Add basic behaviour
-
     // If no body is set yet the function can be set even if it is final
     if (function->IsFinal() && function->HasFunctionCallCode())
     {
@@ -120,17 +119,21 @@ bool ScopeSpecificEnvironment::HasType(std::string identifier) { return environm
 
 bool ScopeSpecificEnvironment::HasType(Type* type) { return environment->HasType(type); }
 
-void ScopeSpecificEnvironment::SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment)
+void ScopeSpecificEnvironment::SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment,
+                                                  bool staticEnvironment)
 {
-    this->environment->SetEnvironment(type, std::shared_ptr<IScopeSpecificEnvironment>(environment));
+    this->environment->SetEnvironment(type, std::shared_ptr<IScopeSpecificEnvironment>(environment), staticEnvironment);
 }
 
-IScopeSpecificEnvironment* ScopeSpecificEnvironment::GetTypeEnvironment(Type* type)
+IScopeSpecificEnvironment* ScopeSpecificEnvironment::GetTypeEnvironment(Type* type, bool staticEnvironment)
 {
-    return environment->GetEnvironment(type).get();
+    return environment->GetEnvironment(type, staticEnvironment).get();
 }
 
-bool ScopeSpecificEnvironment::HasTypeEnvironment(Type* type) { return environment->GetEnvironment(type) != nullptr; }
+bool ScopeSpecificEnvironment::HasTypeEnvironment(Type* type, bool staticEnvironment)
+{
+    return environment->GetEnvironment(type, staticEnvironment) != nullptr;
+}
 
 #pragma endregion
 

@@ -41,9 +41,9 @@ class IScopeSpecificEnvironment
     virtual bool HasType(std::string identifier) = 0;
     virtual bool HasType(Type* type) = 0;
 
-    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment) = 0;
-    virtual IScopeSpecificEnvironment* GetTypeEnvironment(Type* type) = 0;
-    virtual bool HasTypeEnvironment(Type* type) = 0;
+    virtual void SetTypeEnvironment(Type* type, IScopeSpecificEnvironment* environment, bool staticEnvironment) = 0;
+    virtual IScopeSpecificEnvironment* GetTypeEnvironment(Type* type, bool staticEnvironment) = 0;
+    virtual bool HasTypeEnvironment(Type* type, bool staticEnvironment) = 0;
 
 #pragma endregion
 

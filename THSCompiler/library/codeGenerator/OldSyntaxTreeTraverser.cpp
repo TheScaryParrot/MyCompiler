@@ -32,7 +32,7 @@
 #include "../syntaxTree/nodes/line/statement/keywordStatement/WhileStatementNode.cpp"
 #include "generator/CodeGenerator.cpp"
 
-static class SyntaxTreeTraverser
+static class OldSyntaxTreeTraverser
 {
    public:
     std::shared_ptr<AssemblyCode> GenerateCode(SyntaxTree* syntaxTree);
@@ -74,16 +74,16 @@ static class SyntaxTreeTraverser
     AssemblyCode* GenerateIDValue(IDValueNode* value);
     AssemblyCode* GenerateCall(CallNode* call);
 
-} SyntaxTreeTraverser;
+} OldSyntaxTreeTraverser;
 
-std::shared_ptr<AssemblyCode> SyntaxTreeTraverser::GenerateCode(SyntaxTree* syntaxTree)
+std::shared_ptr<AssemblyCode> OldSyntaxTreeTraverser::GenerateCode(SyntaxTree* syntaxTree)
 {
     codeGenerator = CodeGenerator();  // Initialize code generator
 
     return std::shared_ptr<AssemblyCode>(GenerateCodeBlock(syntaxTree->GetCodeBlock()));
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateCodeBlock(CodeblockNode* codeBlock)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateCodeBlock(CodeblockNode* codeBlock)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
@@ -95,7 +95,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateCodeBlock(CodeblockNode* codeBlock)
     return assemblyCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateLine(AbstractLineNode* line)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateLine(AbstractLineNode* line)
 {
     if (line == nullptr)
     {
@@ -104,7 +104,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateLine(AbstractLineNode* line)
     }
 
     // FIXME: Solve this without dynamic_cast; visitor pattern with
-    // ISyntaxTreeTraverser?
+    // IOldSyntaxTreeTraverser?
     if (dynamic_cast<AbstractDeclarationNode*>(line) != nullptr)
     {
         return GenerateDeclaration(dynamic_cast<AbstractDeclarationNode*>(line));
@@ -115,7 +115,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateLine(AbstractLineNode* line)
 };
 
 #pragma region Declarations
-AssemblyCode* SyntaxTreeTraverser::GenerateDeclaration(AbstractDeclarationNode* declaration)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateDeclaration(AbstractDeclarationNode* declaration)
 {
     if (dynamic_cast<VarDeclarationNode*>(declaration) != nullptr)
     {
@@ -130,7 +130,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateDeclaration(AbstractDeclarationNode* 
     return GenerateClassDeclaration(dynamic_cast<ClassDeclarationNode*>(declaration));
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateVarDeclaration(VarDeclarationNode* declaration)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateVarDeclaration(VarDeclarationNode* declaration)
 {
     DeclarationAttributes attributes = DeclarationAttributes();
     attributes.isFinal = declaration->attributes.isFinal;
@@ -157,7 +157,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateVarDeclaration(VarDeclarationNode* de
     return nullptr;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateFuncDeclaration(FuncDeclarationNode* declaration)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateFuncDeclaration(FuncDeclarationNode* declaration)
 {
     DeclarationAttributes attributes = DeclarationAttributes();
     attributes.isFinal = declaration->attributes.isFinal;
@@ -195,7 +195,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateFuncDeclaration(FuncDeclarationNode* 
     return codeGenerator.SetFunctionBody(function, body);
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateClassDeclaration(ClassDeclarationNode* declaration)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateClassDeclaration(ClassDeclarationNode* declaration)
 {
     Type* type = codeGenerator.AddType(declaration->name);
     ClassScopeEnvironment* classScopeEnvironment = codeGenerator.AddClassScopeEnvironmentToType(type);
@@ -208,7 +208,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateClassDeclaration(ClassDeclarationNode
 
 #pragma region Statements
 
-AssemblyCode* SyntaxTreeTraverser::GenerateStatement(AbstractStatementNode* statement, bool environmentLock)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateStatement(AbstractStatementNode* statement, bool environmentLock)
 {
     if (dynamic_cast<EmptyStatementNode*>(statement) != nullptr)
     {
@@ -245,7 +245,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateStatement(AbstractStatementNode* stat
     return nullptr;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateBody(BodyNode* body)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateBody(BodyNode* body)
 {
     // TODO: New environment; where does it know what type of environment to
     // create?
@@ -254,7 +254,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateBody(BodyNode* body)
 
 #pragma region Keyword statements
 
-AssemblyCode* SyntaxTreeTraverser::GenerateKeywordStatement(AbstractKeywordStatementNode* statement)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateKeywordStatement(AbstractKeywordStatementNode* statement)
 {
     if (dynamic_cast<IfStatementNode*>(statement) != nullptr)
     {
@@ -289,26 +289,26 @@ AssemblyCode* SyntaxTreeTraverser::GenerateKeywordStatement(AbstractKeywordState
     return nullptr;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateIfStatement(IfStatementNode* statement)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateIfStatement(IfStatementNode* statement)
 {
     // TODO: Get label for final
     return GenerateIfStatement(statement, "final");
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateIfStatement(IfStatementNode* statement, std::string finalLabel)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateIfStatement(IfStatementNode* statement, std::string finalLabel)
 {
     // TODO: Generate if statement
     return nullptr;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateReturnStatement(ReturnStatementNode* statement)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateReturnStatement(ReturnStatementNode* statement)
 {
     // TODO: Generate expression code
     AssemblyCode* returnCode = codeGenerator.GenerateReturnStatement(nullptr);
     return returnCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateWhileStatement(WhileStatementNode* whileStatement)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateWhileStatement(WhileStatementNode* whileStatement)
 {
     // TODO: assembly code and variablegetter for expression
     //  Condition evaluated before InitWhile as InitWhile creates the while scope
@@ -318,7 +318,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateWhileStatement(WhileStatementNode* wh
     return codeGenerator.GenerateWhile(nullptr, body);
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateForStatement(ForStatementNode* forStatement)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateForStatement(ForStatementNode* forStatement)
 {
     codeGenerator.InitLoopEnvironment();
 
@@ -330,12 +330,12 @@ AssemblyCode* SyntaxTreeTraverser::GenerateForStatement(ForStatementNode* forSta
     return codeGenerator.GenerateFor(declaration, nullptr, increment, body);
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateContinueStatement(ContinueStatementNode* statement)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateContinueStatement(ContinueStatementNode* statement)
 {
     return codeGenerator.GenerateContinueStatement();
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateBreakStatement(BreakStatementNode* statement)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateBreakStatement(BreakStatementNode* statement)
 {
     return codeGenerator.GenerateBreakStatement();
 }
@@ -346,7 +346,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateBreakStatement(BreakStatementNode* st
 
 #pragma region Expressions
 
-AssemblyCode* SyntaxTreeTraverser::GenerateExpression(AbstractExpressionNode* expression)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateExpression(AbstractExpressionNode* expression)
 {
     if (dynamic_cast<AssignmentNode*>(expression) != nullptr)
     {
@@ -367,7 +367,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateExpression(AbstractExpressionNode* ex
     return GenerateValue(dynamic_cast<AbstractValueNode*>(expression));
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateAssignment(AssignmentNode* assignmentNode)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateAssignment(AssignmentNode* assignmentNode)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
@@ -415,7 +415,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateAssignment(AssignmentNode* assignment
     return assemblyCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateBinaryOperation(OperatorExpressionNode* binaryOperationNode)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateBinaryOperation(OperatorExpressionNode* binaryOperationNode)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
@@ -448,9 +448,9 @@ AssemblyCode* SyntaxTreeTraverser::GenerateBinaryOperation(OperatorExpressionNod
     return assemblyCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateUnaryOperation(UnaryExpressionNode* unaryOperation) { return nullptr; }
+AssemblyCode* OldSyntaxTreeTraverser::GenerateUnaryOperation(UnaryExpressionNode* unaryOperation) { return nullptr; }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateValue(AbstractValueNode* value)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateValue(AbstractValueNode* value)
 {
     if (dynamic_cast<ValueChainNode*>(value) != nullptr)
     {
@@ -480,7 +480,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateValue(AbstractValueNode* value)
     return nullptr;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateValueChain(ValueChainNode* valueChain)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateValueChain(ValueChainNode* valueChain)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
@@ -496,7 +496,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateValueChain(ValueChainNode* valueChain
     return assemblyCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateStaticValueChain(StaticValueChainNode* valueChain)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateStaticValueChain(StaticValueChainNode* valueChain)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
@@ -513,7 +513,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateStaticValueChain(StaticValueChainNode
     return assemblyCode;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateConstValue(AbstractConstValueNode* value)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateConstValue(AbstractConstValueNode* value)
 {
     if (dynamic_cast<LogicalConstValueNode*>(value) != nullptr)
     {
@@ -536,13 +536,13 @@ AssemblyCode* SyntaxTreeTraverser::GenerateConstValue(AbstractConstValueNode* va
     return nullptr;
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateIDValue(IDValueNode* value)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateIDValue(IDValueNode* value)
 {
     codeGenerator.PushVariableToTempVariable(value->GetValue());
     return nullptr;  // No code generated by this
 }
 
-AssemblyCode* SyntaxTreeTraverser::GenerateCall(CallNode* call)
+AssemblyCode* OldSyntaxTreeTraverser::GenerateCall(CallNode* call)
 {
     for (AbstractExpressionNode* argument : call->arguments)
     {

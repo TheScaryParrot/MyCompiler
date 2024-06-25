@@ -12,7 +12,7 @@
 class Function
 {
    public:
-    Function(std::string label, Variable* returnVariable, DeclarationAttributes attributes);
+    Function(Variable* returnVariable, std::vector<Variable*> parameters, DeclarationAttributes attributes);
 
     /// @brief Sets this function's call code
     /// @param callCode unique pointer to the function call code; the function takes ownership of the pointer
@@ -20,7 +20,6 @@ class Function
     bool HasFunctionCallCode();
     AssemblyCode* GetFunctionCallCode();
 
-    std::string label;
     Variable* returnVariable;
 
     std::vector<Variable*> parameters;
@@ -34,10 +33,10 @@ class Function
     DeclarationAttributes attributes;
 };
 
-Function::Function(std::string label, Variable* returnVariable, DeclarationAttributes attributes)
+Function::Function(Variable* returnVariable, std::vector<Variable*> parameters, DeclarationAttributes attributes)
 {
-    this->label = label;
     this->returnVariable = returnVariable;
+    this->parameters = parameters;
     this->attributes = attributes;
 }
 
@@ -52,7 +51,7 @@ AssemblyCode* Function::GetFunctionCallCode()
 {
     if (!HasFunctionCallCode())
     {
-        std::cerr << "Function call code not set for function " << label << std::endl;
+        std::cerr << "Function call code not set\n";
     }
 
     return callCode->GenerateFunctionCallCode();

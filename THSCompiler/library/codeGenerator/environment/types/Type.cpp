@@ -5,14 +5,18 @@
 class Type
 {
    public:
-    Type(std::string name);
+    Type(std::string name, bool isStatic);
+
+    std::string name;
+    bool isStatic;
 
     std::string ToString();
-
-   private:
-    std::string name;
 };
 
-Type::Type(std::string name) { this->name = name; }
+Type::Type(std::string name, bool isStatic)
+{
+    this->name = name;
+    this->isStatic = isStatic;
+}
 
 std::string Type::ToString() { return name; }
