@@ -39,6 +39,19 @@ class IEnvironment
     /// @brief Returns true if the given type is in the current environment
     virtual bool HasType(Type* type) = 0;
 
+    /// @brief Sets the given type to number consts
+    virtual void SetNumberConstType(Type* type) = 0;
+    /// @brief Gets the given type of number consts
+    virtual Type* GetNumberConstType() = 0;
+    /// @brief Sets the given type to string consts
+    virtual void SetStringConstType(Type* type) = 0;
+    /// @brief Gets the given type of string consts
+    virtual Type* GetStringConstType() = 0;
+    /// @brief Sets the given type to logic consts
+    virtual void SetLogicConstType(Type* type) = 0;
+    /// @brief Gets the given type of logic consts
+    virtual Type* GetLogicConstType() = 0;
+
     /// @brief Adds the given label to the current environment with the given identifier
     virtual void AddLabel(std::string identifier, JumpLabel* jumpLabel) = 0;
     /// @brief Returns a label that is defined in the current environment

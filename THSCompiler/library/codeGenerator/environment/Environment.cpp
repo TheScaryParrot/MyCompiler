@@ -10,7 +10,7 @@
 #include "jumpLabels/JumpLabel.cpp"
 #include "types/Type.cpp"
 
-class Environment : IEnvironment
+class Environment : public IEnvironment
 {
    public:
     /// @brief Adds the given variable to the current environment with the given identifier
@@ -39,6 +39,19 @@ class Environment : IEnvironment
     virtual bool HasType(std::string identifier) override;
     /// @brief Returns true if the given type is in the current environment
     virtual bool HasType(Type* type) override;
+
+    /// @brief Sets the given type to number consts
+    virtual void SetNumberConstType(Type* type) override;
+    /// @brief Gets the given type of number consts
+    virtual Type* GetNumberConstType() override;
+    /// @brief Sets the given type to string consts
+    virtual void SetStringConstType(Type* type) override;
+    /// @brief Gets the given type of string consts
+    virtual Type* GetStringConstType() override;
+    /// @brief Sets the given type to logic consts
+    virtual void SetLogicConstType(Type* type) override;
+    /// @brief Gets the given type of logic consts
+    virtual Type* GetLogicConstType() override;
 
     /// @brief Adds the given label to the current environment with the given identifier
     virtual void AddLabel(std::string identifier, JumpLabel* jumpLabel) override;
@@ -71,6 +84,10 @@ class Environment : IEnvironment
     AbstractEnvironment<TypeEnvironment> typeEnvironments;
     AbstractEnvironment<JumpLabel> jumpLabels;
 
+    Type* numberConstType = nullptr;
+    Type* stringConstType = nullptr;
+    Type* logicConstType = nullptr;
+
     /// @brief Returns the typeEnvironment of the given type identifier
     TypeEnvironment* GetTypeEnvironment(std::string typeIdentifier);
 
@@ -82,22 +99,16 @@ void Environment::AddVariable(std::string identifier, Variable* variable)
 {
     variables.AddElement(identifier, std::unique_ptr<Variable>(variable));
 }
-
 Variable* Environment::GetVariable(std::string identifier) { return variables.GetElement(identifier).get(); }
-
 bool Environment::HasVariable(std::string identifier) { return variables.HasElement(identifier); }
-
 bool Environment::HasVariable(Variable* variable) { return variables.HasElement(variable); }
 
 void Environment::AddFunction(std::string identifier, Function* function)
 {
     functions.AddElement(identifier, std::unique_ptr<Function>(function));
 }
-
 Function* Environment::GetFunction(std::string identifier) { return functions.GetElement(identifier).get(); }
-
 bool Environment::HasFunction(std::string identifier) { return functions.HasElement(identifier); }
-
 bool Environment::HasFunction(Function* function) { return functions.HasElement(function); }
 
 void Environment::AddType(std::string identifier, std::shared_ptr<Type> type)
@@ -110,20 +121,24 @@ void Environment::AddType(std::string identifier, std::shared_ptr<Type> type)
 
     typeEnvironments.AddElement(identifier, std::shared_ptr<TypeEnvironment>(typeEnvironment));
 }
-
 Type* Environment::GetType(std::string identifier) { return GetTypeEnvironment(identifier)->type.get(); }
-
 bool Environment::HasType(std::string identifier) { return typeEnvironments.HasElement(identifier); }
-
 bool Environment::HasType(Type* type) { return GetTypeEnvironment(type)->type.get() == type; }
+
+void Environment::SetNumberConstType(Type* type) { numberConstType = type; }
+Type* Environment::GetNumberConstType() { return numberConstType; }
+
+void Environment::SetStringConstType(Type* type) { stringConstType = type; }
+Type* Environment::GetStringConstType() { return stringConstType; }
+
+void Environment::SetLogicConstType(Type* type) { logicConstType = type; }
+Type* Environment::GetLogicConstType() { return logicConstType; }
 
 void Environment::AddLabel(std::string identifier, JumpLabel* jumpLabel)
 {
     jumpLabels.AddElement(identifier, std::unique_ptr<JumpLabel>(jumpLabel));
 }
-
 JumpLabel* Environment::GetLabel(std::string identifier) { return jumpLabels.GetElement(identifier).get(); }
-
 bool Environment::HasLabel(std::string identifier) { return jumpLabels.HasElement(identifier); }
 
 void Environment::SetEnvironment(Type* type, std::shared_ptr<IEnvironment> environment, bool staticEnvironment)
@@ -133,14 +148,12 @@ void Environment::SetEnvironment(Type* type, std::shared_ptr<IEnvironment> envir
     else
         GetTypeEnvironment(type)->environment = environment;
 }
-
 IEnvironment* Environment::GetEnvironment(std::string typeIdentifier, bool staticEnvironment)
 {
     if (staticEnvironment) return GetTypeEnvironment(typeIdentifier)->staticEnvironment.get();
 
     return GetTypeEnvironment(typeIdentifier)->environment.get();
 }
-
 IEnvironment* Environment::GetEnvironment(Type* type, bool staticEnvironment)
 {
     if (staticEnvironment) return GetTypeEnvironment(type)->staticEnvironment.get();
@@ -153,7 +166,6 @@ Environment::TypeEnvironment* Environment::GetTypeEnvironment(std::string typeId
     // Finds the TypeEnvironment in the list of typeEnvironments that has the given type identifier
     return typeEnvironments.GetElement(typeIdentifier).get();
 }
-
 Environment::TypeEnvironment* Environment::GetTypeEnvironment(Type* type)
 {
     // Finds the TypeEnvironment in the list of typeEnvironments that has the given type

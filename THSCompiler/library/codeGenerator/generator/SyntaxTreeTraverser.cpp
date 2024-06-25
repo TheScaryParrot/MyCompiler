@@ -91,7 +91,7 @@ AssemblyCode* SyntaxTreeTraverser::GenerateStatement(ISyntaxTreeNodeIn* nodeIn, 
 
     if (dynamic_cast<BodyNode*>(statement) != nullptr)
     {
-        return nodeIn->GenerateBody(dynamic_cast<BodyNode*>(statement));
+        return nodeIn->GenerateBody(dynamic_cast<BodyNode*>(statement), true);
         /*
         if (!environmentLock)
         {

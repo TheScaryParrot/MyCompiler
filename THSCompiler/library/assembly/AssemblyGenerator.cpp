@@ -20,6 +20,10 @@ static class AssemblyGenerator
 
     const std::string LABEL_MANGLING_TOKEN = "-";
 
+    IVariableLocationGetter* GenerateNumberConst(std::string number);
+    IVariableLocationGetter* GenerateStringConst(std::string str);
+    IVariableLocationGetter* GenerateLogicConst(bool logic);
+
 } AssemblyGenerator;
 
 AssemblyCode* AssemblyGenerator::GenerateReturnInstruction()
@@ -49,4 +53,23 @@ AssemblyCode* AssemblyGenerator::GenerateJumpToJumpLabel(JumpLabel* jumpLabel)
     AssemblyInstructionLine* jumpLine =
         (new AssemblyInstructionLine(AssemblyInstructions::JMP))->AddArgument(jumpLabel->GetName());
     return assemblyCode->AddLine(std::shared_ptr<AssemblyInstructionLine>(jumpLine));
+}
+
+IVariableLocationGetter* AssemblyGenerator::GenerateNumberConst(std::string number)
+{
+    // TODO: Return inline variable location getter
+    return nullptr;
+}
+
+IVariableLocationGetter* AssemblyGenerator::GenerateStringConst(std::string str)
+{
+    // TODO: Return inline variable location getter
+    // This will probably need access to assemblyCode object as it will need to write the string into the data section
+    return nullptr;
+}
+
+IVariableLocationGetter* AssemblyGenerator::GenerateLogicConst(bool logic)
+{
+    // TODO: Return inline variable location getter
+    return nullptr;
 }

@@ -382,7 +382,7 @@ AssemblyCode* OldSyntaxTreeTraverser::GenerateAssignment(AssignmentNode* assignm
             assemblyCode->AddLines(
                 GenerateExpression(assignmentNode->value));  // Evaluate value & store to Temp variables
             assemblyCode->AddLines(
-                codeGenerator.PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators::ASSIGN));
+                codeGenerator.PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN));
             continue;
         }
 
@@ -407,9 +407,9 @@ AssemblyCode* OldSyntaxTreeTraverser::GenerateAssignment(AssignmentNode* assignm
         assemblyCode->AddLines(GenerateExpression(assignment->L_value));    // (for operation ahead of assign) Evaluate
                                                                             // L_value & store to Temp variables
         assemblyCode->AddLines(GenerateExpression(assignmentNode->value));  // Evaluate value & store to Temp variables
-        assemblyCode->AddLines(codeGenerator.PerformBinaryOperationOnTempVariables(codeGeneratorOperator));
+        assemblyCode->AddLines(codeGenerator.PerformBinaryOperationWithTempVariable(codeGeneratorOperator));
         assemblyCode->AddLines(
-            codeGenerator.PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators::ASSIGN));
+            codeGenerator.PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN));
     }
 
     return assemblyCode;
@@ -442,7 +442,7 @@ AssemblyCode* OldSyntaxTreeTraverser::GenerateBinaryOperation(OperatorExpression
                 codeGeneratorOperator = ECodeGeneratorBinaryOperators::MOD;
         }
 
-        assemblyCode->AddLines(codeGenerator.PerformBinaryOperationOnTempVariables(codeGeneratorOperator));
+        assemblyCode->AddLines(codeGenerator.PerformBinaryOperationWithTempVariable(codeGeneratorOperator));
     }
 
     return assemblyCode;

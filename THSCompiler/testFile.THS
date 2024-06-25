@@ -1,16 +1,16 @@
 class int
 {
-    public int Add(int other)
+    public int Add(int this, int other)
     {
         return 0;
     }
 
-    public int Mul(int other)
+    public int Mul(int this, int other)
     {
         return 0;
     }
 
-    public void Assign(int other)
+    public void Assign(int this, int other)
     {
         return 0;
     }

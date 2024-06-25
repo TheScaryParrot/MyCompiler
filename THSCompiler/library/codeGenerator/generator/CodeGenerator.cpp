@@ -23,7 +23,7 @@ class CodeGenerator : ISyntaxTreeNodeIn
     virtual AssemblyCode* GenerateFuncDeclaration(FuncDeclarationNode* declaration) override;
     virtual AssemblyCode* GenerateClassDeclaration(ClassDeclarationNode* declaration) override;
 
-    virtual AssemblyCode* GenerateBody(BodyNode* body) override;
+    virtual AssemblyCode* GenerateBody(BodyNode* body, bool newEnvironment) override;
 
     virtual AssemblyCode* GenerateIfStatement(IfStatementNode* statement) override;
     virtual AssemblyCode* GenerateReturnStatement(ReturnStatementNode* statement) override;
@@ -61,11 +61,17 @@ class CodeGenerator : ISyntaxTreeNodeIn
     EnvironmentLinkedList* environmentLinkedList;
 
     Stack<Variable*> tempVariableStack;
-    Environment* tempVariableEnvironment = nullptr;
-    Environment* tempVariableStaticEnvironment = nullptr;
 
-    /// @brief Pops temporary varibales from TempVariableStack, performs operations on them and pushes the result back
-    AssemblyCode* PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators operation);
+    /// @brief Variable that is currently used when accessing things in a relative way (properties, methods)
+    Variable* relativeAccessVariable = nullptr;
+
+    /// @brief Uses relativeAccessVariable as l_value and pops from tempVariableStack as r_value. Result is pushed to
+    /// tempVariableStack
+    AssemblyCode* PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators operation);
+
+    /// @brief Performs binary operation on two expressions and  pushes the result to tempVariableStack
+    AssemblyCode* PerformBinaryOperationOnExpressions(AbstractExpressionNode* l_value, AbstractExpressionNode* r_value,
+                                                      ECodeGeneratorBinaryOperators operation);
 
     AssemblyCode* AssignVariable(Variable* variable, AbstractExpressionNode* value);
 
@@ -75,23 +81,9 @@ class CodeGenerator : ISyntaxTreeNodeIn
 
     AssemblyCode* CallFunction(std::string name, unsigned int argumentsCount);
 
-    /// @brief Tries to get type from the tempStaticEnvironment, then tempEnvironment, then the current environment
-    Type* GetType(std::string identifier);
-
-    /// @brief Tries to get variable from the tempStaticEnvironment, then tempEnvironment, then the current environment
-    Variable* GetVariable(std::string identifier);
-
-    /// @brief Tries to get function from the tempStaticEnvironment, then tempEnvironment, then the current environment
-    Function* GetFunction(std::string identifier);
-
-    void PushEnvironment();
-    void PopEnvironment();
-
-    void PushGeneratorType(EGeneratorType generatorType);
-    void PopGeneratorType();
-
-    void ActivateTempVariableEnvironment(bool staticEnvironment);
-    void ClearTempVariableEnvironment(bool staticEnvironment);
+    /// @brief Sets the environmentLinkedList to the environment of the relativeAccessVariable. Old linked list is lost.
+    /// Don't forget to backup and restore
+    void ActivateRelativeAccessVariableEnvironment(bool isStatic);
 };
 
 CodeGenerator::CodeGenerator()
@@ -122,7 +114,7 @@ AssemblyCode* CodeGenerator::GenerateVarDeclaration(VarDeclarationNode* declarat
     // TODO: Use static
     // FIXME: AddVariable should also return assembly code
 
-    Variable* variable = new Variable(GetType(declaration->type.GetIdentfier()), attributes);
+    Variable* variable = new Variable(environmentLinkedList->GetType(declaration->type.GetIdentfier()), attributes);
     environmentLinkedList->AddVariable(declaration->name, variable);
 
     return AssignVariable(variable, declaration->value);
@@ -130,27 +122,40 @@ AssemblyCode* CodeGenerator::GenerateVarDeclaration(VarDeclarationNode* declarat
 
 AssemblyCode* CodeGenerator::GenerateFuncDeclaration(FuncDeclarationNode* declaration)
 {
+    std::cout << "GenerateFuncDeclaration: " << declaration->name << std::endl;
+
     DeclarationAttributes attributes = DeclarationAttributes(
         declaration->attributes.scope, declaration->attributes.isFinal, declaration->attributes.isInline);
 
-    Type* returnType = nullptr;
+    Variable* returnVariable = nullptr;
 
     if (!declaration->returnType.IsVoid())
     {
-        returnType = GetType(declaration->returnType.GetIdentfier());
+        Type* returnType = environmentLinkedList->GetType(declaration->returnType.GetIdentfier());
+
+        returnVariable = new Variable(returnType, DeclarationAttributes(EScopes::PRIVATE, false, false));
     }
 
-    // TODO: Add return variable
-    // TODO: Add arguments
-    Function* function = new Function(nullptr, std::vector<Variable*>(), attributes);
+    std::vector<Variable*> arguments;
+
+    for (ParameterDeclarationNode* argument : *declaration->parameters)
+    {
+        Variable* variable = new Variable(environmentLinkedList->GetType(argument->type),
+                                          DeclarationAttributes(EScopes::PRIVATE, false, false));
+        environmentLinkedList->AddVariable(argument->name, variable);
+        arguments.push_back(variable);
+    }
+
+    Function* function = new Function(returnVariable, arguments, attributes);
+
     std::string mangledName = MangleFunctionName(declaration->name, function->parameters);
     environmentLinkedList->AddFunction(mangledName, function);
 
-    PushGeneratorType(EGeneratorType::Function);
+    generatorTypeStack.Push(EGeneratorType::Function);
 
     AssemblyCode* body = traverser->GenerateStatement(this, declaration->statement);
 
-    PopGeneratorType();
+    generatorTypeStack.Pop();
 
     return AssignFunction(function, body);
 }
@@ -160,18 +165,36 @@ AssemblyCode* CodeGenerator::GenerateClassDeclaration(ClassDeclarationNode* decl
     Type* type = new Type(declaration->name, declaration->isStatic);
     environmentLinkedList->AddType(declaration->name, std::shared_ptr<Type>(type));
 
-    PushGeneratorType(EGeneratorType::Class);
+    Environment* environment = new Environment();
+    // TODO: Make static and non-static environments; will need to look how I do this
+    environmentLinkedList->SetEnvironment(type, std::shared_ptr<Environment>(environment), false);
 
-    AssemblyCode* body = GenerateBody(declaration->body);
+    generatorTypeStack.Push(EGeneratorType::Class);
+    environmentLinkedList->Push(environment);
 
-    PopGeneratorType();
+    AssemblyCode* body = GenerateBody(declaration->body, false);
+
+    generatorTypeStack.Pop();
+    environmentLinkedList->Pop();
 
     return body;
 }
 
-AssemblyCode* CodeGenerator::GenerateBody(BodyNode* body)
+AssemblyCode* CodeGenerator::GenerateBody(BodyNode* body, bool newEnvironment)
 {
-    return traverser->GenerateCodeBlock(this, body->GetCodeBlock());
+    if (newEnvironment)
+    {
+        environmentLinkedList->Push(new Environment());
+    }
+
+    AssemblyCode* assemblyCode = traverser->GenerateCodeBlock(this, body->GetCodeBlock());
+
+    if (newEnvironment)
+    {
+        environmentLinkedList->Pop();
+    }
+
+    return assemblyCode;
 }
 
 AssemblyCode* CodeGenerator::GenerateIfStatement(IfStatementNode* statement)
@@ -187,7 +210,7 @@ AssemblyCode* CodeGenerator::GenerateReturnStatement(ReturnStatementNode* statem
     // TODO: Fix this
 
     // return is defined in function environment
-    Variable* returnVariable = GetVariable(RETURN_VARIABLE_NAME);
+    Variable* returnVariable = environmentLinkedList->GetVariable(RETURN_VARIABLE_NAME);
 
     AssemblyCode* assemblyCode = AssignVariable(returnVariable, statement->expression);
 
@@ -226,51 +249,49 @@ AssemblyCode* CodeGenerator::GenerateAssignment(AssignmentNode* assignmentNode)
 
     AssemblyCode* assemblyCode = new AssemblyCode();
 
+    // Evauate first r_value
+    assemblyCode->AddLines(traverser->GenerateExpression(this, assignmentNode->value));
+
     for (Assignment* assignment : assignmentNode->assignments)
     {
+        // Get l_value variable
+        assemblyCode->AddLines(traverser->GenerateExpression(this, assignment->L_value));
+        Variable* l_value = tempVariableStack.Pop();
+        relativeAccessVariable = l_value;
+
         EAssignOperators assignOperator = assignment->assignOperator;
 
-        if (assignOperator == EAssignOperators::ASSIGN)
+        if (assignOperator != EAssignOperators::ASSIGN)
         {
-            assemblyCode->AddLines(traverser->GenerateExpression(
-                this, assignment->L_value));  // Evaluate L_value & store to Temp variables
-            assemblyCode->AddLines(traverser->GenerateExpression(
-                this, assignmentNode->value));  // Evaluate value & store to Temp variables
-            assemblyCode->AddLines(PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators::ASSIGN));
-            continue;
+            ECodeGeneratorBinaryOperators binaryOperator;
+
+            switch (assignOperator)
+            {
+                case EAssignOperators::ADD_ASSIGN:
+                    binaryOperator = ECodeGeneratorBinaryOperators::ADD;
+                    break;
+                case EAssignOperators::SUB_ASSIGN:
+                    binaryOperator = ECodeGeneratorBinaryOperators::SUB;
+                    break;
+                case EAssignOperators::MUL_ASSIGN:
+                    binaryOperator = ECodeGeneratorBinaryOperators::MUL;
+                    break;
+                case EAssignOperators::DIV_ASSIGN:
+                    binaryOperator = ECodeGeneratorBinaryOperators::DIV;
+                    break;
+                case EAssignOperators::MOD_ASSIGN:
+                    binaryOperator = ECodeGeneratorBinaryOperators::MOD;
+                    break;
+            }
+
+            // Old r_value is top of stack
+            // l_value is relativeAccessVariable
+            assemblyCode->AddLines(PerformBinaryOperationWithTempVariable(binaryOperator));
         }
 
-        ECodeGeneratorBinaryOperators codeGeneratorOperator;
-
-        switch (assignOperator)
-        {
-            case EAssignOperators::ADD_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorBinaryOperators::ADD;
-                break;
-            case EAssignOperators::SUB_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorBinaryOperators::SUB;
-                break;
-            case EAssignOperators::MUL_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorBinaryOperators::MUL;
-                break;
-            case EAssignOperators::DIV_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorBinaryOperators::DIV;
-                break;
-            case EAssignOperators::MOD_ASSIGN:
-                codeGeneratorOperator = ECodeGeneratorBinaryOperators::MOD;
-                break;
-        }
-
-        assemblyCode->AddLines(
-            traverser->GenerateExpression(this, assignment->L_value));  // (for assign) Evaluate L_value &
-                                                                        // store to Temp variables
-        assemblyCode->AddLines(
-            traverser->GenerateExpression(this, assignment->L_value));  // (for operation ahead of assign) Evaluate
-                                                                        // L_value & store to Temp variables
-        assemblyCode->AddLines(
-            traverser->GenerateExpression(this, assignmentNode->value));  // Evaluate value & store to Temp variables
-        assemblyCode->AddLines(PerformBinaryOperationOnTempVariables(codeGeneratorOperator));
-        assemblyCode->AddLines(PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators::ASSIGN));
+        // Old r_value is top of stack (might also be the result of the preceding binary operation)
+        // l_value is relativeAccessVariable
+        assemblyCode->AddLines(PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN));
     }
 
     return assemblyCode;
@@ -307,7 +328,7 @@ AssemblyCode* CodeGenerator::GenerateBinaryOperation(OperatorExpressionNode* bin
                 break;
         }
 
-        assemblyCode->AddLines(PerformBinaryOperationOnTempVariables(codeGeneratorOperator));
+        assemblyCode->AddLines(PerformBinaryOperationWithTempVariable(codeGeneratorOperator));
     }
 
     return assemblyCode;
@@ -323,14 +344,22 @@ AssemblyCode* CodeGenerator::GenerateValueChain(ValueChainNode* valueChain)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
+    // backup old environment
+    EnvironmentLinkedList* oldEnvironment = environmentLinkedList;
+
     for (AbstractExpressionNode* value : valueChain->propertyAccesses)
     {
         assemblyCode->AddLines(traverser->GenerateExpression(this, value));
-        ActivateTempVariableEnvironment(false);  // Activate environment of temp variable
-                                                 // (which is the result of generateExpression)
+
+        Variable* expressionOutVariable = tempVariableStack.Pop();
+        relativeAccessVariable = expressionOutVariable;
+
+        // FIXME: delete new environment from memory
+        ActivateRelativeAccessVariableEnvironment(false);
     }
 
-    ClearTempVariableEnvironment(false);  // Clear the temp variable environment as the value chain is done
+    relativeAccessVariable = nullptr;
+    environmentLinkedList = oldEnvironment;
 
     return assemblyCode;
 }
@@ -339,22 +368,29 @@ AssemblyCode* CodeGenerator::GenerateStaticValueChain(StaticValueChainNode* valu
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
+    // backup old environment
+    EnvironmentLinkedList* oldEnvironment = environmentLinkedList;
+
     for (AbstractExpressionNode* value : valueChain->propertyAccesses)
     {
         assemblyCode->AddLines(traverser->GenerateExpression(this, value));
-        // TODO: Activate static environment of type
-        ActivateTempVariableEnvironment(true);  // Activate environment of temp variable
-                                                // (which is the result of generateExpression)
+
+        Variable* expressionOutVariable = tempVariableStack.Pop();
+        relativeAccessVariable = expressionOutVariable;
+
+        // FIXME: delete new environment from memory
+        ActivateRelativeAccessVariableEnvironment(true);
     }
 
-    ClearTempVariableEnvironment(true);  // Clear the temp variable environment as the value chain is done
+    relativeAccessVariable = nullptr;
+    environmentLinkedList = oldEnvironment;
 
     return assemblyCode;
 }
 
 AssemblyCode* CodeGenerator::GenerateIDValue(IDValueNode* value)
 {
-    Variable* variable = GetVariable(value->GetValue());
+    Variable* variable = environmentLinkedList->GetVariable(value->GetValue());
     tempVariableStack.Push(variable);
     return nullptr;
 }
@@ -372,49 +408,85 @@ AssemblyCode* CodeGenerator::GenerateCall(CallNode* call)
 AssemblyCode* CodeGenerator::GenerateConstNumber(NumberConstValueNode* numberConst)
 {
     std::cout << "GenerateConstNumber" << std::endl;
-    tempVariableStack.Push(new Variable(GetType("int"), DeclarationAttributes()));
+
+    Variable* variable =
+        new Variable(environmentLinkedList->GetNumberConstType(), DeclarationAttributes(EScopes::PRIVATE, true, true));
+    variable->SetGetLocation(AssemblyGenerator.GenerateNumberConst(numberConst->GetValue()));
+
+    tempVariableStack.Push(variable);
+
     return nullptr;
 }
 
 AssemblyCode* CodeGenerator::GenerateConstString(StringConstValueNode* stringConst)
 {
     std::cout << "GenerateConstString" << std::endl;
-    tempVariableStack.Push(new Variable(GetType("string"), DeclarationAttributes()));
+
+    Variable* variable =
+        new Variable(environmentLinkedList->GetStringConstType(), DeclarationAttributes(EScopes::PRIVATE, true, true));
+    variable->SetGetLocation(AssemblyGenerator.GenerateStringConst(stringConst->GetValue()));
+
+    tempVariableStack.Push(variable);
+
     return nullptr;
 }
 
 AssemblyCode* CodeGenerator::GenerateConstLogical(LogicalConstValueNode* logicalConst)
 {
     std::cout << "GenerateConstLogical" << std::endl;
-    tempVariableStack.Push(new Variable(GetType("bool"), DeclarationAttributes()));
+    Variable* variable =
+        new Variable(environmentLinkedList->GetLogicConstType(), DeclarationAttributes(EScopes::PRIVATE, true, true));
+    variable->SetGetLocation(AssemblyGenerator.GenerateLogicConst(logicalConst->GetValue()));
+
+    tempVariableStack.Push(variable);
+
     return nullptr;
 }
 
 #pragma endregion
 
-AssemblyCode* CodeGenerator::PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators operation)
+AssemblyCode* CodeGenerator::PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators operation)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
     // TODO: Generate function name
     std::string operatorFunctionName = GetOperationFunctionName(operation);
 
-    Variable* r_var = tempVariableStack.Pop();
-    ActivateTempVariableEnvironment(false);
-    tempVariableStack.Push(r_var);  // push the r_value back to the stack
+    // backup old environment
+    EnvironmentLinkedList* oldEnvironment = environmentLinkedList;
+
+    // activate l_value environment
+    ActivateRelativeAccessVariableEnvironment(false);
 
     // only 1 argument as the l_value is seen as the method caller
     assemblyCode->AddLines(CallFunction(operatorFunctionName, 1));
 
+    // restore old environment
+    environmentLinkedList = oldEnvironment;
+
     return assemblyCode;
+}
+
+AssemblyCode* CodeGenerator::PerformBinaryOperationOnExpressions(AbstractExpressionNode* l_value,
+                                                                 AbstractExpressionNode* r_value,
+                                                                 ECodeGeneratorBinaryOperators operation)
+{
+    AssemblyCode* assemblyCode = new AssemblyCode();
+
+    assemblyCode->AddLines(traverser->GenerateExpression(this, l_value));
+    relativeAccessVariable = tempVariableStack.Pop();  // Pop l_value to relativeAccessVariable
+
+    assemblyCode->AddLines(traverser->GenerateExpression(this, r_value));
+
+    return assemblyCode->AddLines(PerformBinaryOperationWithTempVariable(operation));
 }
 
 AssemblyCode* CodeGenerator::AssignVariable(Variable* variable, AbstractExpressionNode* value)
 {
-    tempVariableStack.Push(variable);
-
+    relativeAccessVariable = variable;
     AssemblyCode* assemblyCode = traverser->GenerateExpression(this, value);
-    return assemblyCode->AddLines(PerformBinaryOperationOnTempVariables(ECodeGeneratorBinaryOperators::ASSIGN));
+
+    return assemblyCode->AddLines(PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN));
 }
 
 AssemblyCode* CodeGenerator::AssignFunction(Function* function, AssemblyCode* body)
@@ -441,16 +513,15 @@ AssemblyCode* CodeGenerator::CallFunction(std::string name, unsigned int argumen
 
     AssemblyCode* assemblyCode = new AssemblyCode();
 
-    // If the function is accessed using a tempVariable environment add one argument (which is the method caller)
-    if (tempVariableEnvironment != nullptr)
-    {
-        std::cout << "TempVariableEnvironment is active\n";
-        argumentsCount++;
-    }
-
     std::cout << "Arguments count 1: " << argumentsCount << std::endl;
 
     std::vector<Variable*> arguments;
+
+    if (relativeAccessVariable != nullptr)
+    {
+        std::cout << "Relative access variable added to arguments" << std::endl;
+        arguments.push_back(relativeAccessVariable);
+    }
 
     for (unsigned int i = 0; i < argumentsCount; i++)
     {
@@ -461,7 +532,7 @@ AssemblyCode* CodeGenerator::CallFunction(std::string name, unsigned int argumen
 
     std::string mangledName = MangleFunctionName(name, arguments);
 
-    Function* function = GetFunction(mangledName);
+    Function* function = environmentLinkedList->GetFunction(mangledName);
 
     // TODO: Assign arguments
 
@@ -473,77 +544,21 @@ AssemblyCode* CodeGenerator::CallFunction(std::string name, unsigned int argumen
     return assemblyCode->AddLines(function->GetFunctionCallCode());
 }
 
-Type* CodeGenerator::GetType(std::string identifier)
+void CodeGenerator::ActivateRelativeAccessVariableEnvironment(bool isStatic)
 {
-    if (tempVariableStaticEnvironment != nullptr)
+    if (relativeAccessVariable == nullptr)
     {
-        return tempVariableStaticEnvironment->GetType(identifier);
-    }
-
-    if (tempVariableEnvironment != nullptr)
-    {
-        return tempVariableEnvironment->GetType(identifier);
-    }
-
-    return environmentLinkedList->GetType(identifier);
-}
-
-Variable* CodeGenerator::GetVariable(std::string identifier)
-{
-    if (tempVariableStaticEnvironment != nullptr)
-    {
-        return tempVariableStaticEnvironment->GetVariable(identifier);
-    }
-
-    if (tempVariableEnvironment != nullptr)
-    {
-        return tempVariableEnvironment->GetVariable(identifier);
-    }
-
-    return environmentLinkedList->GetVariable(identifier);
-}
-
-Function* CodeGenerator::GetFunction(std::string identifier)
-{
-    if (tempVariableStaticEnvironment != nullptr)
-    {
-        return tempVariableStaticEnvironment->GetFunction(identifier);
-    }
-
-    if (tempVariableEnvironment != nullptr)
-    {
-        return tempVariableEnvironment->GetFunction(identifier);
-    }
-
-    return environmentLinkedList->GetFunction(identifier);
-}
-
-void CodeGenerator::PushEnvironment() { environmentLinkedList->Push(new Environment()); }
-
-void CodeGenerator::PopEnvironment() { environmentLinkedList->Pop(); }
-
-void CodeGenerator::PushGeneratorType(EGeneratorType generatorType) { generatorTypeStack.Push(generatorType); }
-
-void CodeGenerator::PopGeneratorType() { generatorTypeStack.Pop(); }
-
-void CodeGenerator::ActivateTempVariableEnvironment(bool staticEnvironment)
-{
-    if (staticEnvironment)
-    {
-        tempVariableStaticEnvironment = new Environment();
+        std::cout << "Tried to activate relative access variable environment but it is null. Setting empty environment."
+                  << std::endl;
+        environmentLinkedList = new EnvironmentLinkedList();
         return;
     }
 
-    tempVariableEnvironment = new Environment();
-}
+    EnvironmentLinkedList* newEnvironment = new EnvironmentLinkedList();
 
-void CodeGenerator::ClearTempVariableEnvironment(bool staticEnvironment)
-{
-    if (staticEnvironment)
-    {
-        tempVariableStaticEnvironment = nullptr;
-        return;
-    }
+    IEnvironment* environment = environmentLinkedList->GetEnvironment(relativeAccessVariable->GetType(), isStatic);
 
-    tempVariableEnvironment = nullptr;
+    newEnvironment->Push(environment);
+
+    environmentLinkedList = newEnvironment;
 }

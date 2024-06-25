@@ -28,7 +28,7 @@ class ISyntaxTreeNodeIn
     virtual AssemblyCode* GenerateFuncDeclaration(FuncDeclarationNode* declaration) = 0;
     virtual AssemblyCode* GenerateClassDeclaration(ClassDeclarationNode* declaration) = 0;
 
-    virtual AssemblyCode* GenerateBody(BodyNode* body) = 0;
+    virtual AssemblyCode* GenerateBody(BodyNode* body, bool newEnvironment) = 0;
 
     virtual AssemblyCode* GenerateIfStatement(IfStatementNode* statement) = 0;
     virtual AssemblyCode* GenerateReturnStatement(ReturnStatementNode* statement) = 0;

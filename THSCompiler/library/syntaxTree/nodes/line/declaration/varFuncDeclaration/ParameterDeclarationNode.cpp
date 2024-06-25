@@ -10,7 +10,6 @@ class ParameterDeclarationNode : public AbstractTreeNode
 
     virtual std::string ToString() override;
 
-   private:
     std::string name;
     std::string type;
 };
