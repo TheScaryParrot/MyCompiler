@@ -123,7 +123,7 @@ void Environment::AddType(std::string identifier, std::shared_ptr<Type> type)
 }
 Type* Environment::GetType(std::string identifier) { return GetTypeEnvironment(identifier)->type.get(); }
 bool Environment::HasType(std::string identifier) { return typeEnvironments.HasElement(identifier); }
-bool Environment::HasType(Type* type) { return GetTypeEnvironment(type)->type.get() == type; }
+bool Environment::HasType(Type* type) { return GetTypeEnvironment(type) != nullptr; }
 
 void Environment::SetNumberConstType(Type* type) { numberConstType = type; }
 Type* Environment::GetNumberConstType() { return numberConstType; }

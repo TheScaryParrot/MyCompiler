@@ -1,5 +1,10 @@
 class int
 {
+    public void Assign(int this, int other)
+    {
+        return;
+    }
+
     public int Add(int this, int other)
     {
         return 0;
@@ -7,11 +12,7 @@ class int
 
     public int Mul(int this, int other)
     {
-        return 0;
-    }
-
-    public void Assign(int this, int other)
-    {
+        this += other;
         return 0;
     }
 }
@@ -21,67 +22,3 @@ public final int num2 = 1;
 
 num1 += num2 * 5;
 
-while (amount.hello:lol().(5 + vdiniMom.size) > 0)
-{
-    if (amount == 5)
-    {
-        break;
-    }
-
-    while (amount > 0)
-    {
-        amount--;
-    }
-
-    amount--;
-}
-
-for (int i = 0; i < amount; i++;)
-{
-    if (i == 5)
-    {
-        continue;
-    }
-
-    amount++;
-}
-
-
-public static final int yomamam = 5;
-
-static class Base
-{
-    void Base(int amount)
-    {
-        amount--;
-        amount = amount++;
-        amount = ++amount * 5 - amount--;
-        print("Base" - amount);
-    }
-}
-
-class Derived
-{
-    moin = Hello(5);
-
-    inline void Derived(int amount1)
-    {
-        print("Derived: " + amount && test * 54 * (3 + 4) 1); // not causing error !#1
-    }
-}
-
-static final Derived moin() lol2; // not causing error !#2
-
-void main(int argc, string argv)
-{
-    Derived d = Derived(10);
-
-    print("aaaa"3); // not causing error !#1
-
-    if (true != false && 5 == 5)
-    {
-        print("This should not be printed");
-    }
-
-    print("Done");
-}

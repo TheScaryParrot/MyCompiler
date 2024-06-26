@@ -188,7 +188,7 @@ AssemblyCode* OldSyntaxTreeTraverser::GenerateFuncDeclaration(FuncDeclarationNod
     }
 
     codeGenerator.PushEnvironment(std::make_shared<FunctionScopeEnvironment>());
-    AssemblyCode* body = GenerateStatement(declaration->statement,
+    AssemblyCode* body = GenerateStatement(declaration->body,
                                            true);  // Lock environment as function environment was already created
     codeGenerator.PopEnvironment();
 

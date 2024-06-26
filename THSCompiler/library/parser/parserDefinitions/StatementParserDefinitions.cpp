@@ -130,6 +130,12 @@ ELookAheadCertainties PredictiveParser::LookAhead_ReturnStatement(TokenList* tok
 }
 ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
 {
+    if (tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN))
+    {
+        tokens->Next();  // Consume STATEMENT_END_TOKEN
+        return new ReturnStatementNode(nullptr);
+    }
+
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
     tokens->Next();  // Consume STATEMENT_END_TOKEN

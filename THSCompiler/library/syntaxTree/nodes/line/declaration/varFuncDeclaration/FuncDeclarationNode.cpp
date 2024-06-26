@@ -10,7 +10,7 @@ class FuncDeclarationNode : public AbstractVarFuncDeclarationNode
 {
    public:
     FuncDeclarationNode(SyntaxTreeDeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name,
-                        std::vector<ParameterDeclarationNode*>* parameters, AbstractStatementNode* statement);
+                        std::vector<ParameterDeclarationNode*>* parameters, BodyNode* body);
     ~FuncDeclarationNode();
 
     virtual std::string ToString() override;
@@ -19,19 +19,19 @@ class FuncDeclarationNode : public AbstractVarFuncDeclarationNode
     FunctionReturnTypeNode returnType;
     std::vector<ParameterDeclarationNode*>* parameters;
     SyntaxTreeDeclarationAttributes attributes;
-    AbstractStatementNode* statement;
+    BodyNode* body;
 };
 
 FuncDeclarationNode::FuncDeclarationNode(SyntaxTreeDeclarationAttributes attributes, FunctionReturnTypeNode returnType,
                                          std::string name, std::vector<ParameterDeclarationNode*>* parameters,
-                                         AbstractStatementNode* statement)
+                                         BodyNode* body)
     : AbstractVarFuncDeclarationNode()
 {
     this->attributes = attributes;
     this->returnType = returnType;
     this->name = name;
     this->parameters = parameters;
-    this->statement = statement;
+    this->body = body;
 }
 
 FuncDeclarationNode::~FuncDeclarationNode()
@@ -43,7 +43,7 @@ FuncDeclarationNode::~FuncDeclarationNode()
 
     delete parameters;
 
-    delete statement;
+    delete body;
 }
 
 std::string FuncDeclarationNode::ToString()
@@ -55,5 +55,5 @@ std::string FuncDeclarationNode::ToString()
         result += parameter->ToString() + ", ";
     }
 
-    return result + ")" + statement->ToString();
+    return result + ")" + body->ToString();
 }

@@ -13,7 +13,6 @@ class AssemblyInstructionLine : public IAssemblyLine
     AssemblyInstructionLine(AssemblyInstruction instruction);
 
     AssemblyInstructionLine* AddArgument(std::string argument);
-    AssemblyInstructionLine* AddArgument(VariableLocation argument);
 
     virtual std::string ToString() override;
 
@@ -27,12 +26,6 @@ AssemblyInstructionLine::AssemblyInstructionLine(AssemblyInstruction instruction
 AssemblyInstructionLine* AssemblyInstructionLine::AddArgument(std::string argument)
 {
     arguments.push_back(argument);
-    return this;
-}
-
-AssemblyInstructionLine* AssemblyInstructionLine::AddArgument(VariableLocation argument)
-{
-    arguments.push_back(argument.ToString());
     return this;
 }
 

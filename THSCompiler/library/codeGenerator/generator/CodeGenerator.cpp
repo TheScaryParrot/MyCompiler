@@ -75,7 +75,7 @@ class CodeGenerator : ISyntaxTreeNodeIn
 
     AssemblyCode* AssignVariable(Variable* variable, AbstractExpressionNode* value);
 
-    AssemblyCode* AssignFunction(Function* function, AssemblyCode* body);
+    AssemblyCode* AssignFunction(std::string mangledName, Function* function, AssemblyCode* body);
 
     std::string MangleFunctionName(std::string functionName, std::vector<Variable*> arguments);
 
@@ -84,6 +84,14 @@ class CodeGenerator : ISyntaxTreeNodeIn
     /// @brief Sets the environmentLinkedList to the environment of the relativeAccessVariable. Old linked list is lost.
     /// Don't forget to backup and restore
     void ActivateRelativeAccessVariableEnvironment(bool isStatic);
+
+    unsigned int functionLabelCounter = 1;
+    /// @brief Generates a new function label based on the functions mangled name
+    std::string NewFunctionLabel(std::string mangledName)
+    {
+        // FL13-[mangledName]
+        return "FL" + std::to_string(functionLabelCounter++) + AssemblyGenerator.LABEL_MANGLING_TOKEN + mangledName;
+    }
 };
 
 CodeGenerator::CodeGenerator()
@@ -127,15 +135,21 @@ AssemblyCode* CodeGenerator::GenerateFuncDeclaration(FuncDeclarationNode* declar
     DeclarationAttributes attributes = DeclarationAttributes(
         declaration->attributes.scope, declaration->attributes.isFinal, declaration->attributes.isInline);
 
+    // new environment for function
+    environmentLinkedList->Push(new Environment());
+
+    // Add return variable to environment
     Variable* returnVariable = nullptr;
 
     if (!declaration->returnType.IsVoid())
     {
         Type* returnType = environmentLinkedList->GetType(declaration->returnType.GetIdentfier());
-
         returnVariable = new Variable(returnType, DeclarationAttributes(EScopes::PRIVATE, false, false));
+
+        environmentLinkedList->AddVariable(RETURN_VARIABLE_NAME, returnVariable);
     }
 
+    // Add arguments to environment
     std::vector<Variable*> arguments;
 
     for (ParameterDeclarationNode* argument : *declaration->parameters)
@@ -146,18 +160,23 @@ AssemblyCode* CodeGenerator::GenerateFuncDeclaration(FuncDeclarationNode* declar
         arguments.push_back(variable);
     }
 
+    // Make function
     Function* function = new Function(returnVariable, arguments, attributes);
 
     std::string mangledName = MangleFunctionName(declaration->name, function->parameters);
-    environmentLinkedList->AddFunction(mangledName, function);
 
     generatorTypeStack.Push(EGeneratorType::Function);
 
-    AssemblyCode* body = traverser->GenerateStatement(this, declaration->statement);
+    AssemblyCode* body = GenerateBody(declaration->body, false);
 
     generatorTypeStack.Pop();
+    // Leave function environment
+    environmentLinkedList->Pop();
 
-    return AssignFunction(function, body);
+    // Add function to environment
+    environmentLinkedList->AddFunction(mangledName, function);
+
+    return AssignFunction(mangledName, function, body);
 }
 
 AssemblyCode* CodeGenerator::GenerateClassDeclaration(ClassDeclarationNode* declaration)
@@ -206,13 +225,15 @@ AssemblyCode* CodeGenerator::GenerateIfStatement(IfStatementNode* statement)
 
 AssemblyCode* CodeGenerator::GenerateReturnStatement(ReturnStatementNode* statement)
 {
-    return nullptr;
-    // TODO: Fix this
+    AssemblyCode* assemblyCode = new AssemblyCode();
 
-    // return is defined in function environment
-    Variable* returnVariable = environmentLinkedList->GetVariable(RETURN_VARIABLE_NAME);
+    if (statement->expression != nullptr)
+    {
+        // return is defined in function environment
+        Variable* returnVariable = environmentLinkedList->GetVariable(RETURN_VARIABLE_NAME);
 
-    AssemblyCode* assemblyCode = AssignVariable(returnVariable, statement->expression);
+        assemblyCode->AddLines(AssignVariable(returnVariable, statement->expression));
+    }
 
     assemblyCode->AddLines(AssemblyGenerator.GenerateReturnInstruction());
 
@@ -249,7 +270,7 @@ AssemblyCode* CodeGenerator::GenerateAssignment(AssignmentNode* assignmentNode)
 
     AssemblyCode* assemblyCode = new AssemblyCode();
 
-    // Evauate first r_value
+    // Evaluate first r_value
     assemblyCode->AddLines(traverser->GenerateExpression(this, assignmentNode->value));
 
     for (Assignment* assignment : assignmentNode->assignments)
@@ -397,12 +418,15 @@ AssemblyCode* CodeGenerator::GenerateIDValue(IDValueNode* value)
 
 AssemblyCode* CodeGenerator::GenerateCall(CallNode* call)
 {
-    for (AbstractExpressionNode* argument : call->arguments)
+    AssemblyCode* assemblyCode = new AssemblyCode();
+
+    // Adding arguments in reverse order
+    for (unsigned int i = call->arguments.size() - 1; i >= 0; i--)
     {
-        traverser->GenerateExpression(this, argument);
+        assemblyCode->AddLines(traverser->GenerateExpression(this, call->arguments[i]));
     }
 
-    return CallFunction(call->functionName, call->arguments.size());
+    return assemblyCode->AddLines(CallFunction(call->functionName, call->arguments.size()));
 }
 
 AssemblyCode* CodeGenerator::GenerateConstNumber(NumberConstValueNode* numberConst)
@@ -484,15 +508,25 @@ AssemblyCode* CodeGenerator::PerformBinaryOperationOnExpressions(AbstractExpress
 AssemblyCode* CodeGenerator::AssignVariable(Variable* variable, AbstractExpressionNode* value)
 {
     relativeAccessVariable = variable;
-    AssemblyCode* assemblyCode = traverser->GenerateExpression(this, value);
+    AssemblyCode* assemblyCode = new AssemblyCode();
+    assemblyCode->AddLines(traverser->GenerateExpression(this, value));
 
     return assemblyCode->AddLines(PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN));
 }
 
-AssemblyCode* CodeGenerator::AssignFunction(Function* function, AssemblyCode* body)
+AssemblyCode* CodeGenerator::AssignFunction(std::string mangledName, Function* function, AssemblyCode* body)
 {
-    // TODO: Assign function
-    return nullptr;
+    if (function->IsInline())
+    {
+        function->SetCallCode(Function::GenerateInlineFunctionCallCode(body));
+        return nullptr;
+    }
+
+    std::string functionLabel = NewFunctionLabel(mangledName);
+    function->SetCallCode(Function::GenerateCallInstructionFunctionCallCode(functionLabel));
+
+    AssemblyCode* assemblyCode = AssemblyGenerator.GenerateLabel(functionLabel);
+    return assemblyCode->AddLines(body);
 }
 
 std::string CodeGenerator::MangleFunctionName(std::string functionName, std::vector<Variable*> arguments)
@@ -513,13 +547,10 @@ AssemblyCode* CodeGenerator::CallFunction(std::string name, unsigned int argumen
 
     AssemblyCode* assemblyCode = new AssemblyCode();
 
-    std::cout << "Arguments count 1: " << argumentsCount << std::endl;
-
     std::vector<Variable*> arguments;
 
     if (relativeAccessVariable != nullptr)
     {
-        std::cout << "Relative access variable added to arguments" << std::endl;
         arguments.push_back(relativeAccessVariable);
     }
 
@@ -528,17 +559,42 @@ AssemblyCode* CodeGenerator::CallFunction(std::string name, unsigned int argumen
         arguments.push_back(tempVariableStack.Pop());
     }
 
-    std::cout << "Arguments count 2: " << arguments.size() << std::endl;
-
     std::string mangledName = MangleFunctionName(name, arguments);
 
     Function* function = environmentLinkedList->GetFunction(mangledName);
 
-    // TODO: Assign arguments
-
     if (function == nullptr)
     {
         return nullptr;
+    }
+
+    // assign arguments to the function argument variables
+    for (unsigned int i = 0; i < arguments.size(); i++)
+    {
+        Variable* functionArgumentVar = function->parameters[i];
+        Variable* argumentVar = arguments[i];
+
+        if (functionArgumentVar == nullptr)
+        {
+            std::cout << "Function argument variable is null" << std::endl;
+            continue;
+        }
+
+        if (argumentVar == nullptr)
+        {
+            std::cout << "Argument variable is null" << std::endl;
+            continue;
+        }
+
+        relativeAccessVariable = functionArgumentVar;
+        tempVariableStack.Push(argumentVar);
+        PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN);
+    }
+
+    // Push return variable to tempVariableStack
+    if (function->returnVariable != nullptr)
+    {
+        tempVariableStack.Push(function->returnVariable);
     }
 
     return assemblyCode->AddLines(function->GetFunctionCallCode());
@@ -556,7 +612,15 @@ void CodeGenerator::ActivateRelativeAccessVariableEnvironment(bool isStatic)
 
     EnvironmentLinkedList* newEnvironment = new EnvironmentLinkedList();
 
-    IEnvironment* environment = environmentLinkedList->GetEnvironment(relativeAccessVariable->GetType(), isStatic);
+    Type* type = relativeAccessVariable->GetType();
+
+    if (type == nullptr)
+    {
+        std::cout << "Relative access variable type is null" << std::endl;
+        return;
+    }
+
+    IEnvironment* environment = environmentLinkedList->GetEnvironment(type, isStatic);
 
     newEnvironment->Push(environment);
 

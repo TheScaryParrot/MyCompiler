@@ -148,10 +148,9 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 
     tokens->Next();  // Consume PARENTHESIS_CLOSE
 
-    AbstractStatementNode* statement = nullptr;
-    statement = Parse_Statement(tokens);
+    BodyNode* body = Parse_Body(tokens);
 
-    return new FuncDeclarationNode(attributes, returnType, name, parameters, statement);
+    return new FuncDeclarationNode(attributes, returnType, name, parameters, body);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclarationAttributes(TokenList* tokens, unsigned int offset)

@@ -9,19 +9,21 @@
 class AssemblyCode
 {
    public:
-    AssemblyCode* AddLine(std::shared_ptr<IAssemblyLine> line);
+    AssemblyCode* AddLine(IAssemblyLine* line);
     AssemblyCode* AddLines(AssemblyCode* code);
 
-    std::vector<std::shared_ptr<IAssemblyLine>> GetLines();
+    std::vector<IAssemblyLine*>& GetLines();
     std::string ToString();
 
    private:
-    std::vector<std::shared_ptr<IAssemblyLine>> lines;
+    std::vector<IAssemblyLine*> lines = std::vector<IAssemblyLine*>();
 };
 
-AssemblyCode* AssemblyCode::AddLine(std::shared_ptr<IAssemblyLine> line)
+AssemblyCode* AssemblyCode::AddLine(IAssemblyLine* line)
 {
-    lines.push_back(line);
+    if (line == nullptr) return this;
+
+    this->lines.push_back(line);
     return this;
 }
 
@@ -29,21 +31,23 @@ AssemblyCode* AssemblyCode::AddLines(AssemblyCode* code)
 {
     if (code == nullptr) return this;
 
-    for (std::shared_ptr<IAssemblyLine>& line : code->GetLines())
+    for (auto& line : code->GetLines())
     {
-        lines.push_back(line);
+        if (line == nullptr) continue;
+
+        this->lines.push_back(line);
     }
 
     return this;
 }
 
-std::vector<std::shared_ptr<IAssemblyLine>> AssemblyCode::GetLines() { return lines; }
+std::vector<IAssemblyLine*>& AssemblyCode::GetLines() { return lines; }
 
 std::string AssemblyCode::ToString()
 {
     std::string result;
 
-    for (std::shared_ptr<IAssemblyLine>& line : lines)
+    for (auto& line : lines)
     {
         result += line->ToString() + "\n";
     }

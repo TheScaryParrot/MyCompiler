@@ -29,7 +29,7 @@ static class AssemblyGenerator
 AssemblyCode* AssemblyGenerator::GenerateReturnInstruction()
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
-    return assemblyCode->AddLine(std::make_shared<AssemblyInstructionLine>(AssemblyInstructions::RET));
+    return assemblyCode->AddLine(new AssemblyInstructionLine(AssemblyInstructions::RET));
 }
 
 AssemblyCode* AssemblyGenerator::GenerateCallInstruction(std::string functionName)
@@ -38,21 +38,21 @@ AssemblyCode* AssemblyGenerator::GenerateCallInstruction(std::string functionNam
     callInstruction->AddArgument(functionName);
 
     AssemblyCode* code = new AssemblyCode();
-    return code->AddLine(std::shared_ptr<AssemblyInstructionLine>(callInstruction));
+    return code->AddLine(callInstruction);
 }
 
 AssemblyCode* AssemblyGenerator::GenerateLabel(std::string label)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
-    return assemblyCode->AddLine(std::make_shared<AssemblyLabelLine>(label));
+    return assemblyCode->AddLine(new AssemblyLabelLine(label));
 }
 
 AssemblyCode* AssemblyGenerator::GenerateJumpToJumpLabel(JumpLabel* jumpLabel)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
-    AssemblyInstructionLine* jumpLine =
-        (new AssemblyInstructionLine(AssemblyInstructions::JMP))->AddArgument(jumpLabel->GetName());
-    return assemblyCode->AddLine(std::shared_ptr<AssemblyInstructionLine>(jumpLine));
+    AssemblyInstructionLine* jumpLine = new AssemblyInstructionLine(AssemblyInstructions::JMP);
+    jumpLine->AddArgument(jumpLabel->GetName());
+    return assemblyCode->AddLine(jumpLine);
 }
 
 IVariableLocationGetter* AssemblyGenerator::GenerateNumberConst(std::string number)

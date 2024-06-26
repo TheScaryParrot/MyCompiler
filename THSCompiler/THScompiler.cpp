@@ -18,14 +18,17 @@ void CompileFile(std::string filename)
     // Parsing
     SyntaxTree* syntaxTree = PredictiveParser.Parse(tokens);
     delete tokens;
-    std::cout << syntaxTree->ToString() << std::endl;
+    // std::cout << syntaxTree->ToString() << std::endl;
 
     // Code generation
     CodeGenerator* codeGenerator = new CodeGenerator();
     AssemblyCode* assemblyCode = codeGenerator->GenerateCode(syntaxTree);
     delete syntaxTree;
 
+    std::cout << "\n------Generated code------" << std::endl;
     std::cout << assemblyCode->ToString() << std::endl;
+
+    delete assemblyCode;
 }
 
 int main(int argc, char const* argv[])
