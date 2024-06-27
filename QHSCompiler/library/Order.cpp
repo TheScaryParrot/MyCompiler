@@ -9,6 +9,7 @@ class Order
     {
         Identifier,
         CompilerInstruction,
+        DirectCode
     };
 
     Order(std::string name, EOrderTypes type)
@@ -21,6 +22,8 @@ class Order
     EOrderTypes GetType();
 
     std::string ToString();
+
+    static Order Empty() { return Order("EMPTY", EOrderTypes::Identifier); }
 
    private:
     std::string name;

@@ -2,19 +2,20 @@
 
 #include <vector>
 
-#include "../OrderQueue.cpp"
+#include "../Order.cpp"
+#include "../utils/Queue.cpp"
 #include "Type.cpp"
 
 class Callable
 {
    public:
-    Callable(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, OrderQueue orders);
+    Callable(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, Queue<Order> orders);
 
     void SetPushTypes(std::vector<Type*> types);
     void SetPopTypes(std::vector<Type*> types);
 
-    void SetOrders(OrderQueue orders);
-    OrderQueue GetOrders();
+    void SetOrders(Queue<Order> orders);
+    Queue<Order> GetOrders();
 
     void MakeCodeStackProof();
     bool IsCodeStackProof();
@@ -25,13 +26,13 @@ class Callable
    private:
     std::vector<Type*> pushTypes;
     std::vector<Type*> popTypes;
-    OrderQueue orders;
+    Queue<Order> orders;
 
     bool isCodeStackProof = false;
     bool isCommentProof = false;
 };
 
-Callable::Callable(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, OrderQueue orders)
+Callable::Callable(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, Queue<Order> orders)
 {
     SetPushTypes(pushTypes);
     SetPopTypes(popTypes);
@@ -42,9 +43,9 @@ void Callable::SetPushTypes(std::vector<Type*> types) { pushTypes = types; }
 
 void Callable::SetPopTypes(std::vector<Type*> types) { popTypes = types; }
 
-void Callable::SetOrders(OrderQueue orders) { this->orders = orders; }
+void Callable::SetOrders(Queue<Order> orders) { this->orders = orders; }
 
-OrderQueue Callable::GetOrders() { return orders; }
+Queue<Order> Callable::GetOrders() { return orders; }
 
 void Callable::MakeCodeStackProof() { isCodeStackProof = true; }
 

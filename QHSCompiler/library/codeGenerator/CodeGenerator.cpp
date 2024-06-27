@@ -3,36 +3,38 @@
 #include <iostream>
 #include <string>
 
-#include "../OrderQueue.cpp"
 #include "../assembly/AssemblyCode.cpp"
+#include "../utils/Logger.cpp"
 #include "Callable.cpp"
 #include "Environment.cpp"
+#include "OrderHandler.cpp"
 #include "TypeStackHandler.cpp"
 
 class CodeGenerator
 {
    public:
-    CodeGenerator();
-    AssemblyCode* GenerateOrders(OrderQueue orders);
+    AssemblyCode* Generate(InputFile* file);
 
    private:
-    void HandleOrder(OrderQueue* orders, AssemblyCode* assemblyCode);
-    void HandleOrderInCallableStackMode(OrderQueue* orders, AssemblyCode* assemblyCode);
-    void HandleOrderInCodeStackMode(OrderQueue* orders, AssemblyCode* assemblyCode);
-    void HandleOrderInTypeStackMode(OrderQueue* orders, AssemblyCode* assemblyCode);
-    void HandleOrderInCommentMode(OrderQueue* orders, AssemblyCode* assemblyCode);
+    OrderHandler orderHandler;
 
-    void HandleIdentifier(OrderQueue* orders, AssemblyCode* assemblyCode);
-    void HandleCompilerInstruction(OrderQueue* orders);
+    void HandleOrder(Order order, AssemblyCode* assemblyCode);
+    void HandleOrderInCallableStackMode(Order order, AssemblyCode* assemblyCode);
+    void HandleOrderInCodeStackMode(Order order, AssemblyCode* assemblyCode);
+    void HandleOrderInTypeStackMode(Order order, AssemblyCode* assemblyCode);
+    void HandleOrderInCommentMode(Order order, AssemblyCode* assemblyCode);
 
-    void HandleCallable(Callable* callable, OrderQueue* orders, AssemblyCode* assemblyCode);
+    void HandleIdentifier(Order order, AssemblyCode* assemblyCode);
+    void HandleCompilerInstruction(Order order);
+    void HandleDirectCode(Order order, AssemblyCode* assemblyCode);
+
+    void HandleCallable(Callable* callable, AssemblyCode* assemblyCode);
 
     enum EModes
     {
         CallableStack,
         CodeStack,
         TypeStack,
-        DirectCode,
         Comment
     };
 
@@ -40,71 +42,73 @@ class CodeGenerator
 
     Stack<EModes> modeStack = Stack<EModes>();
 
-    Stack<OrderQueue*> codeStack = Stack<OrderQueue*>();
+    Stack<Queue<Order>*> codeStack = Stack<Queue<Order>*>();
 
     TypeStackHandler typeStack = TypeStackHandler();
 
     Environment environment = Environment();
 };
 
-CodeGenerator::CodeGenerator() { modeStack.Push(EModes::CallableStack); }
-
-AssemblyCode* CodeGenerator::GenerateOrders(OrderQueue orders)
+AssemblyCode* CodeGenerator::Generate(InputFile* file)
 {
+    this->orderHandler = OrderHandler(file);
+    this->modeStack.Push(EModes::CallableStack);
+
     AssemblyCode* assemblyCode = new AssemblyCode();
 
-    while (!orders.IsEmpty())
+    while (!orderHandler.IsDone())
     {
-        HandleOrder(&orders, assemblyCode);
+        HandleOrder(orderHandler.GetNextOrder(), assemblyCode);
     }
 
     return assemblyCode;
 }
 
-void CodeGenerator::HandleOrder(OrderQueue* orders, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleOrder(Order order, AssemblyCode* assemblyCode)
 {
     if (modeStack.Top() == EModes::CodeStack)
     {
-        HandleOrderInCodeStackMode(orders, assemblyCode);
+        HandleOrderInCodeStackMode(order, assemblyCode);
         return;
     }
 
     if (modeStack.Top() == EModes::TypeStack)
     {
-        HandleOrderInTypeStackMode(orders, assemblyCode);
+        HandleOrderInTypeStackMode(order, assemblyCode);
         return;
     }
 
     if (modeStack.Top() == EModes::CallableStack)
     {
-        HandleOrderInCallableStackMode(orders, assemblyCode);
+        HandleOrderInCallableStackMode(order, assemblyCode);
         return;
     }
 
     if (modeStack.Top() == EModes::Comment)
     {
-        HandleOrderInCommentMode(orders, assemblyCode);
+        HandleOrderInCommentMode(order, assemblyCode);
         return;
     }
 }
 
-void CodeGenerator::HandleOrderInCallableStackMode(OrderQueue* orders, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleOrderInCallableStackMode(Order order, AssemblyCode* assemblyCode)
 {
-    switch (orders->Front().GetType())
+    switch (order.GetType())
     {
         case Order::Identifier:
-            HandleIdentifier(orders, assemblyCode);
+            HandleIdentifier(order, assemblyCode);
             break;
         case Order::CompilerInstruction:
-            HandleCompilerInstruction(orders);
+            HandleCompilerInstruction(order);
+            break;
+        case Order::DirectCode:
+            HandleDirectCode(order, assemblyCode);
             break;
     }
 }
 
-void CodeGenerator::HandleOrderInCodeStackMode(OrderQueue* orders, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleOrderInCodeStackMode(Order order, AssemblyCode* assemblyCode)
 {
-    Order order = orders->Pop();
-
     if (order.GetType() == Order::EOrderTypes::CompilerInstruction)
     {
         std::string instruction = order.GetName();
@@ -121,14 +125,14 @@ void CodeGenerator::HandleOrderInCodeStackMode(OrderQueue* orders, AssemblyCode*
 
         if (instruction == "pushNextOrderToCodeStack")
         {
-            Order nextOrder = orders->Pop();
-            codeStack.Top()->Push(nextOrder);
+            Order nextOrder = orderHandler.GetNextOrder();
+            codeStack.Top()->Enqueue(nextOrder);
             return;
         }
 
         if (codeStackDepthCounter <= 0)
         {
-            std::cout << "Exiting code stack\n";
+            Logger.Log("Exiting code stack", Logger::DEBUG);
             modeStack.Pop();
             return;
         }
@@ -139,38 +143,39 @@ void CodeGenerator::HandleOrderInCodeStackMode(OrderQueue* orders, AssemblyCode*
 
         if (callable != nullptr && callable->IsCodeStackProof())
         {
-            HandleCallable(callable, orders, assemblyCode);
+            HandleCallable(callable, assemblyCode);
             return;
         }
     }
 
-    codeStack.Top()->Push(order);
+    codeStack.Top()->Enqueue(order);
 }
 
-void CodeGenerator::HandleOrderInTypeStackMode(OrderQueue* orders, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleOrderInTypeStackMode(Order order, AssemblyCode* assemblyCode)
 {
-    switch (orders->Front().GetType())
+    switch (order.GetType())
     {
         case Order::Identifier:
-            HandleIdentifier(orders, assemblyCode);
+            HandleIdentifier(order, assemblyCode);
             break;
         case Order::CompilerInstruction:
-            HandleCompilerInstruction(orders);
+            HandleCompilerInstruction(order);
+            break;
+        case Order::DirectCode:
+            HandleDirectCode(order, assemblyCode);
             break;
     }
 }
 
-void CodeGenerator::HandleOrderInCommentMode(OrderQueue* orders, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleOrderInCommentMode(Order order, AssemblyCode* assemblyCode)
 {
-    Order order = orders->Pop();
-
     if (order.GetType() == Order::EOrderTypes::CompilerInstruction)
     {
         std::string instruction = order.GetName();
 
         if (instruction == "exitComment")
         {
-            std::cout << "Exiting comment\n";
+            Logger.Log("Exiting comment", Logger::DEBUG);
             modeStack.Pop();
         }
     }
@@ -180,50 +185,48 @@ void CodeGenerator::HandleOrderInCommentMode(OrderQueue* orders, AssemblyCode* a
 
         if (callable != nullptr && callable->IsCommentProof())
         {
-            HandleCallable(callable, orders, assemblyCode);
+            HandleCallable(callable, assemblyCode);
         }
     }
 }
 
-void CodeGenerator::HandleIdentifier(OrderQueue* orders, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleIdentifier(Order order, AssemblyCode* assemblyCode)
 {
-    Order order = orders->Pop();
-
     Callable* callable = environment.GetCallable(order.GetName());
 
     if (callable == nullptr)
     {
-        std::cerr << "Unknown identifier '" << order.GetName() << "'\n";
+        Logger.Log("Unknown identifier '" + order.GetName() + "'", Logger::ERROR);
         return;
     }
 
-    HandleCallable(callable, orders, assemblyCode);
+    HandleCallable(callable, assemblyCode);
 }
 
-void CodeGenerator::HandleCompilerInstruction(OrderQueue* orders)
+void CodeGenerator::HandleCompilerInstruction(Order order)
 {
-    Order order = orders->Pop();
-
     std::string instruction = order.GetName();
 
     if (instruction == "enterComment")
     {
-        std::cout << "Entering comment\n";
+        Logger.Log("Entering Comment", Logger::DEBUG);
         modeStack.Push(EModes::Comment);
         return;
     }
 
     if (instruction == "exitComment")
     {
-        std::cerr << "Exiting comment called although not in CommentMode. Exiting comment should be handled by "
-                     "HandleOrderInCommentMode\n";
+        Logger.Log(
+            "Exiting comment called although not in CommentMode. Exiting comment should be handled by "
+            "HandleOrderInCommentMode",
+            Logger::WARNING);
         return;
     }
 
     if (instruction == "enterCodeStack")
     {
-        std::cout << "Entering code stack\n";
-        codeStack.Push(new OrderQueue());
+        Logger.Log("Entering CodeStack", Logger::DEBUG);
+        codeStack.Push(new Queue<Order>());
         modeStack.Push(EModes::CodeStack);
         codeStackDepthCounter = 1;
         return;
@@ -231,15 +234,17 @@ void CodeGenerator::HandleCompilerInstruction(OrderQueue* orders)
 
     if (instruction == "exitCodeStack")
     {
-        std::cout << "Exiting code stack called although not in CodeStackMode. Exiting code stack should be handled by "
-                     "HandleOrderInCodeStackMode\n";
+        Logger.Log(
+            "Exiting code stack called although not in CodeStackMode. Exiting code stack should be handled by "
+            "HandleOrderInCodeStackMode",
+            Logger::WARNING);
 
         return;
     }
 
     if (instruction == "enterTypeStack")
     {
-        std::cout << "Entering type stack\n";
+        Logger.Log("Entering TypeStack", Logger::DEBUG);
         typeStack.NewStack();
         modeStack.Push(EModes::TypeStack);
         return;
@@ -247,36 +252,40 @@ void CodeGenerator::HandleCompilerInstruction(OrderQueue* orders)
 
     if (instruction == "pushNextOrderToCodeStack")
     {
-        std::cout << "Trying to push next order to code stack. But not in codeStackMode. This instruction is only "
-                     "valid in code stack mode\n";
+        Logger.Log(
+            "Trying to push next order to code stack. But not in codeStackMode. This instruction is only "
+            "valid in code stack mode",
+            Logger::WARNING);
         return;
     }
 
     if (instruction == "exitTypeStack")
     {
-        std::cout << "Exiting type stack\n";
+        Logger.Log("Exiting TypeStack", Logger::DEBUG);
         modeStack.Pop();
         return;
     }
 
     if (instruction == "assignNextIdentifier")
     {
-        Order nextOrder = orders->Pop();
+        Order nextOrder = orderHandler.GetNextOrder();
 
         if (nextOrder.GetType() == Order::EOrderTypes::CompilerInstruction)
         {
-            std::cerr << "Tried assigning next identifier but identifier '" << nextOrder.ToString()
-                      << "' is compiler instruction\n";
+            Logger.Log("Tried assigning next identifier but identifier is compiler instruction. Skipping assign",
+                       Logger::ERROR);
+
             return;
         }
 
-        std::cout << "Assigning next order '" << nextOrder.ToString() << "'\n";
+        Logger.Log("Assigning next order '" + nextOrder.ToString() + "'", Logger::DEBUG);
 
         std::vector<Type*> popTypes = typeStack.PopStack();
         std::vector<Type*> pushTypes = typeStack.PopStack();
-        OrderQueue* code = codeStack.Pop();
+        Queue<Order>* code = codeStack.Pop();
 
         Callable* callable = new Callable(pushTypes, popTypes, *code);
+        delete code;
 
         environment.AddCallable(nextOrder.GetName(), callable);
 
@@ -285,16 +294,17 @@ void CodeGenerator::HandleCompilerInstruction(OrderQueue* orders)
 
     if (instruction == "makeNextIdentifierCodeStackProof")
     {
-        Order nextOrder = orders->Pop();
+        Order nextOrder = orderHandler.GetNextOrder();
 
         if (nextOrder.GetType() == Order::EOrderTypes::CompilerInstruction)
         {
-            std::cerr << "Tried making next identifier code stack proof but identifier '" << nextOrder.ToString()
-                      << "' is compiler instruction\n";
+            Logger.Log("Tried making next identifier code stack proof but identifier '" + nextOrder.ToString() +
+                           "' is compiler instruction",
+                       Logger::ERROR);
             return;
         }
 
-        std::cout << "Making next order '" << nextOrder.ToString() << "' code stack proof\n";
+        Logger.Log("Making next order '" + nextOrder.ToString() + "' code stack proof", Logger::DEBUG);
 
         Callable* callable = environment.GetCallable(nextOrder.GetName());
         callable->MakeCodeStackProof();
@@ -303,16 +313,17 @@ void CodeGenerator::HandleCompilerInstruction(OrderQueue* orders)
 
     if (instruction == "makeNextIdentifierCommentProof")
     {
-        Order nextOrder = orders->Pop();
+        Order nextOrder = orderHandler.GetNextOrder();
 
         if (nextOrder.GetType() == Order::EOrderTypes::CompilerInstruction)
         {
-            std::cerr << "Tried making next identifier comment proof but identifier '" << nextOrder.ToString()
-                      << "' is compiler instruction\n";
+            Logger.Log("Tried making next identifier comment proof but identifier '" + nextOrder.ToString() +
+                           "' is compiler instruction",
+                       Logger::ERROR);
             return;
         }
 
-        std::cout << "Making next order '" << nextOrder.ToString() << "' comment proof\n";
+        Logger.Log("Making next order '" + nextOrder.ToString() + "' comment proof", Logger::DEBUG);
 
         Callable* callable = environment.GetCallable(nextOrder.GetName());
         callable->MakeCommentProof();
@@ -321,23 +332,39 @@ void CodeGenerator::HandleCompilerInstruction(OrderQueue* orders)
 
     if (instruction == "debug")
     {
-        std::cout << "DEBUG PRINT\n";
+        Logger.Log("DEBUG PRINT", Logger::INFO);
         return;
     }
 
     if (instruction == "debugStatus")
     {
-        std::cout << "---DEBUG STATUS\n";
-        std::cout << "---Mode: " << modeStack.Top() << "\n";
-        std::cout << "---CodeStackDepthCounter: " << codeStackDepthCounter << "\n";
+        Logger.Log("---DEBUG STATUS", Logger::INFO);
+        Logger.Log("---Mode: " + std::to_string(modeStack.Top()), Logger::INFO);
+        Logger.Log("---CodeStackDepthCounter: " + std::to_string(codeStackDepthCounter), Logger::INFO);
+        return;
+    }
+
+    if (instruction == "activateDebugMode")
+    {
+        Logger.SetDebug(true);
+        return;
+    }
+
+    if (instruction == "deactivateDebugMode")
+    {
+        Logger.SetDebug(false);
         return;
     }
 
     std::cout << "Unknown compiler instruction '" << instruction << "'\n";
 }
 
-void CodeGenerator::HandleCallable(Callable* callable, OrderQueue* orders, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleDirectCode(Order order, AssemblyCode* assemblyCode)
 {
-    OrderQueue code = callable->GetOrders();
-    orders->PushFrontQueue(code);
+    assemblyCode->AddCode(order.GetName());
+}
+
+void CodeGenerator::HandleCallable(Callable* callable, AssemblyCode* assemblyCode)
+{
+    orderHandler.PutInFront(callable->GetOrders());
 }

@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "../InputFile.cpp"
-#include "../OrderQueue.cpp"
 
 class CharacterGroup
 {
@@ -38,66 +37,77 @@ class CharacterGroup
 class Scanner
 {
    public:
-    OrderQueue* ScanFile(InputFile* file);
+    Order ScanOrder(InputFile* file);
 
    private:
+    void ClearWhitespaces(InputFile* file);
+
     CharacterGroup whitespace = CharacterGroup(4, new char[4]{' ', '\n', '\t', '\r'});
     CharacterGroup compilerInstruction = CharacterGroup(1, new char[1]{'#'});
+    CharacterGroup directCode = CharacterGroup(1, new char[1]{'"'});
 };
 
-OrderQueue* Scanner::ScanFile(InputFile* file)
+Order Scanner::ScanOrder(InputFile* file)
 {
     if (file == nullptr)
     {
         std::cerr << "Error: file is null" << std::endl;
-        return nullptr;
+        return Order::Empty();
     }
 
     if (!file->IsGood())
     {
         std::cerr << "Error: file is not good" << std::endl;
-        return nullptr;
+        return Order::Empty();
     }
 
-    OrderQueue* orders = new OrderQueue();
+    ClearWhitespaces(file);
 
-    char peekChar;
+    char character = file->PeekNext();
     Order::EOrderTypes type = Order::Identifier;
     std::string name = "";
 
-    while (!file->IsEndOfFile())
+    if (directCode.IsCharacterInGroup(character))
     {
-        peekChar = file->PeekNext();
+        file->ReadNext();
+        character = file->PeekNext();
+        type = Order::DirectCode;
 
-        if (file->IsEndOfFile() || whitespace.IsCharacterInGroup(peekChar))
+        while (!file->IsEndOfFile() && !directCode.IsCharacterInGroup(character))
         {
-            if (name != "")
-            {
-                orders->Push(Order(name, type));
-                name = "";
-            }
-
-            type = Order::Identifier;
             file->ReadNext();
-            continue;
+            name += character;
+            character = file->PeekNext();
         }
 
-        if (compilerInstruction.IsCharacterInGroup(peekChar))
-        {
-            if (name != "")
-            {
-                orders->Push(Order(name, type));
-                name = "";
-            }
-
-            type = Order::CompilerInstruction;
-            file->ReadNext();
-
-            continue;
-        }
-
-        name += file->ReadNext();
+        file->ReadNext();
+        return Order(name, type);
     }
 
-    return orders;
+    if (compilerInstruction.IsCharacterInGroup(character))
+    {
+        file->ReadNext();
+        character = file->PeekNext();
+        type = Order::CompilerInstruction;
+    }
+
+    while (!file->IsEndOfFile() && !whitespace.IsCharacterInGroup(character) &&
+           !compilerInstruction.IsCharacterInGroup(character) && !directCode.IsCharacterInGroup(character))
+    {
+        file->ReadNext();
+        name += character;
+        character = file->PeekNext();
+    }
+
+    ClearWhitespaces(file);
+
+    return Order(name, type);
+}
+
+void Scanner::ClearWhitespaces(InputFile* file)
+{
+    while (!file->IsEndOfFile() && whitespace.IsCharacterInGroup(file->PeekNext()))
+    {
+        file->ReadNext();
+    }
 }
