@@ -67,7 +67,11 @@ TokenList* Scanner::Scan(InputFile* file)
         if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BRACES_OPEN_TOKEN, character, peekCharacter)) continue;
         if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BRACES_CLOSE_TOKEN, character, peekCharacter)) continue;
 
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.SEPARATOR_TOKEN, character, peekCharacter)) continue;
+        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BRACKETS_OPEN_TOKEN, character, peekCharacter))
+            continue;
+
+        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BRACKETS_CLOSE_TOKEN, character, peekCharacter))
+            continue;
 
         // --- Comments ---
         if (CharacterGroups.SINGLE_LINE_COMMENT.Match(character, peekCharacter))

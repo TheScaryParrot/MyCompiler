@@ -21,8 +21,6 @@ static class ConstTokens
         std::make_shared<CharacterGroupToken>("bracketsOpen", CharacterGroups.BRACKETS_OPEN);
     std::shared_ptr<CharacterGroupToken> BRACKETS_CLOSE_TOKEN =
         std::make_shared<CharacterGroupToken>("bracketsClose", CharacterGroups.BRACKETS_CLOSE);
-    std::shared_ptr<CharacterGroupToken> SEPARATOR_TOKEN =
-        std::make_shared<CharacterGroupToken>("separator", CharacterGroups.SEPARATOR);
 
     /* ----- Const version of Not Constant Tokens (IdentifierToken, NumberToken, StringToken...) -----
         Their main usage is for their IsThisToken method. Which cannot be used static*/

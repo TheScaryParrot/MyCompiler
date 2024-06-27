@@ -20,7 +20,6 @@ static class CharacterGroups
     CharacterGroup BRACES_CLOSE = CharacterGroup(std::vector<TwoChar>{'}'});
     CharacterGroup BRACKETS_OPEN = CharacterGroup(std::vector<TwoChar>{'['});
     CharacterGroup BRACKETS_CLOSE = CharacterGroup(std::vector<TwoChar>{']'});
-    CharacterGroup SEPARATOR = CharacterGroup(std::vector<TwoChar>{','});
 
     // ------ comments ------
 
@@ -38,8 +37,8 @@ static class CharacterGroups
                                             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'});
     CharacterGroup ALPHABET = CharacterGroup(std::vector<CharacterGroup>{LOWER_ALPHABET, UPPER_ALPHABET});
 
-    CharacterGroup SYMBOLS =
-        CharacterGroup(std::vector<TwoChar>{'.', ':', ';', '+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '!', '?'});
+    CharacterGroup SYMBOLS = CharacterGroup(
+        std::vector<TwoChar>{'.', ',', ':', ';', '+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '!', '?'});
 
     CharacterGroup IDENTIFIER = CharacterGroup(std::vector<CharacterGroup>{ALPHABET, NUMBERS, SYMBOLS});
 
