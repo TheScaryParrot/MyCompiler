@@ -1,0 +1,14 @@
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 120
+
+---
+Language: Cpp
+
+DerivePointerAlignment: false # Force pointer * to the left
+PointerAlignment: Left
+
+AlignConsecutiveShortCaseStatements: 
+  Enabled: true # Aligns case statements in switch statements
+
+BreakBeforeBraces: Allman # Allways break before braces

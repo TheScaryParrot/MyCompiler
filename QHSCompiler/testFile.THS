@@ -1,0 +1,77 @@
+#enterTypeStack
+#exitTypeStack
+
+#enterTypeStack
+#exitTypeStack
+
+#enterCodeStack
+#enterTypeStack
+#exitCodeStack
+
+#assignNextIdentifier
+[
+
+
+#enterTypeStack
+#exitTypeStack
+
+#enterTypeStack
+#exitTypeStack
+
+#enterCodeStack
+#exitTypeStack
+#exitCodeStack
+
+#assignNextIdentifier
+]
+
+
+
+[ ] [ ]
+
+#enterCodeStack
+#pushNextOrderToCodeStack
+#enterCodeStack
+#exitCodeStack
+
+#assignNextIdentifier
+{
+
+#makeNextIdentifierCodeStackProof {
+
+
+#enterTypeStack
+#exitTypeStack
+
+#enterTypeStack
+#exitTypeStack
+
+#enterCodeStack
+#pushNextOrderToCodeStack
+#exitCodeStack
+#exitCodeStack
+
+#assignNextIdentifier
+}
+
+#makeNextIdentifierCodeStackProof }
+
+
+[ ] [ ]  { #assignNextIdentifier } #assignNextIdentifier ->
+
+[ ] [ ] { #debug } -> hello
+
+hello
+
+[ ] [ ] { #enterComment } -> /*
+[ ] [ ] { #exitComment } -> */
+
+#makeNextIdentifierCommentProof */
+
+hello
+
+/*
+hello
+*/
+
+hello
