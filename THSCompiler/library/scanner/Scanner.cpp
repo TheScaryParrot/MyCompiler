@@ -5,7 +5,6 @@
 #include "../InputFile.cpp"
 #include "../tokens/CharacterGroupToken.cpp"
 #include "../tokens/ConstTokens.cpp"
-#include "../tokens/Keywords.cpp"
 #include "../tokens/TokenList.cpp"
 #include "../tokens/characterGroups/CharacterGroups.cpp"
 #include "../tokens/notConstTokens/IdentifierToken.cpp"
@@ -60,19 +59,15 @@ TokenList* Scanner::Scan(InputFile* file)
             continue;
         }
 
-        // --- Delimitors ---
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.STATEMENT_END_TOKEN, character, peekCharacter))
-            continue;
-
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BODY_OPEN_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BODY_CLOSE_TOKEN, character, peekCharacter)) continue;
-
         if (TryAddCharacterGroupToken(file, tokens, ConstTokens.PARENTHESIS_OPEN_TOKEN, character, peekCharacter))
             continue;
         if (TryAddCharacterGroupToken(file, tokens, ConstTokens.PARENTHESIS_CLOSE_TOKEN, character, peekCharacter))
             continue;
 
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.SEPERATOR_TOKEN, character, peekCharacter)) continue;
+        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BRACES_OPEN_TOKEN, character, peekCharacter)) continue;
+        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.BRACES_CLOSE_TOKEN, character, peekCharacter)) continue;
+
+        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.SEPARATOR_TOKEN, character, peekCharacter)) continue;
 
         // --- Comments ---
         if (CharacterGroups.SINGLE_LINE_COMMENT.Match(character, peekCharacter))
@@ -156,82 +151,19 @@ TokenList* Scanner::Scan(InputFile* file)
         }
 
         // --- Identifier ---
-        if (CharacterGroups.IDENTIFIER_START_CHAR.Match(character, peekCharacter))
+        if (CharacterGroups.IDENTIFIER.Match(character, peekCharacter))
         {
             std::string identifierString = std::string(1, character);
 
-            while (CharacterGroups.IDENTIFIER_CHAR.Match(file->PeekNext(), 0))
+            while (CharacterGroups.IDENTIFIER.Match(file->PeekNext(), 0))
             {
                 identifierString += file->ReadNext();
             }
 
-            // Check whether the identifier is a keyword
-            std::shared_ptr<AbstractKeywordToken> keywordToken = Keywords.GetKeywordToken(identifierString);
-
-            if (keywordToken != nullptr)
-            {
-                tokens->AddToken(keywordToken);
-            }
-            else
-            {
-                tokens->AddToken(std::shared_ptr<IdentifierToken>(new IdentifierToken(identifierString)));
-            }
+            tokens->AddToken(std::shared_ptr<IdentifierToken>(new IdentifierToken(identifierString)));
 
             continue;
         }
-
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.DOT_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.COLON_TOKEN, character, peekCharacter)) continue;
-
-        // --- Equal Operators ---
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.EQUAL_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.NOT_EQUAL_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.GREATER_THAN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.LESS_THAN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN, character,
-                                      peekCharacter))
-            continue;
-
-        // --- Assign Operators ---
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.ASSIGN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.SUB_ASSIGN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.MUL_ASSIGN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.DIV_ASSIGN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.MOD_ASSIGN_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-
-        // --- Increment and Decrement Operators ---
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.INCREMENT_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.DECREMENT_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-
-        // --- Arithmetic Operators ---
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.ADD_OPERATOR_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.SUB_OPERATOR_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.MUL_OPERATOR_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.DIV_OPERATOR_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.MOD_OPERATOR_TOKEN, character, peekCharacter)) continue;
-
-        // --- Negate Operator ---
-        // TODO: Issue here as this will be parsed as a sub operator
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.NEGATE_OPERATOR_TOKEN, character, peekCharacter))
-            continue;
-
-        // --- Logical Operators ---
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.AND_OPERATOR_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.OR_OPERATOR_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, ConstTokens.NOT_OPERATOR_TOKEN, character, peekCharacter)) continue;
 
         // --- Unknown Token ---
         std::cout << "Unknown token: " << character << "\n";
