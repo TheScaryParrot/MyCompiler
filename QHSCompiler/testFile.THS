@@ -1,5 +1,17 @@
-#activateDebugMode
 #debug
+
+#makeNextOrderCodeStackProof
+#enterCodeStack
+
+#makeNextOrderCodeStackProof
+#exitCodeStack
+
+#makeNextOrderCodeStackProof
+#pushNextOrderToCodeStack
+
+#makeNextOrderCommentProof
+#exitComment
+
 
 #enterTypeStack
 #exitTypeStack
@@ -38,14 +50,10 @@
 #assignNextIdentifier
 {
 
-#makeNextIdentifierCodeStackProof {
+#makeNextOrderCodeStackProof {
 
 
-#enterTypeStack
-#exitTypeStack
-
-#enterTypeStack
-#exitTypeStack
+[ ] [ ]
 
 #enterCodeStack
 #pushNextOrderToCodeStack
@@ -55,7 +63,7 @@
 #assignNextIdentifier
 }
 
-#makeNextIdentifierCodeStackProof }
+#makeNextOrderCodeStackProof }
 
 
 [ ] [ ]  { #assignNextIdentifier } #assignNextIdentifier ->
@@ -63,7 +71,7 @@
 [ ] [ ] { #enterComment } -> /*
 [ ] [ ] { #exitComment } -> */
 
-#makeNextIdentifierCommentProof */
+#makeNextOrderCommentProof */
 
 [ ] [ ] {"
 "}  -> ;
@@ -72,8 +80,9 @@
 
 { #debug } >> debug
 
+/*
 debug
-debug
+debug */
 
 
 {"rax"} >> rax

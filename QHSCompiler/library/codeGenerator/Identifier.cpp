@@ -3,19 +3,19 @@
 #include <vector>
 
 #include "../Order.cpp"
-#include "../utils/Queue.cpp"
 #include "Callable.cpp"
+#include "OrderQueue.cpp"
 #include "Type.cpp"
 
 class Identifier : public Callable
 {
    public:
-    Identifier(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, Queue<Order> orders);
+    Identifier(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, OrderQueue orders);
 
     void SetPushTypes(std::vector<Type*> types);
     void SetPopTypes(std::vector<Type*> types);
 
-    void SetOrders(Queue<Order> orders);
+    void SetOrders(OrderQueue orders);
 
     void MakeCodeStackProof();
     bool IsCodeStackProof();
@@ -31,7 +31,7 @@ class Identifier : public Callable
     bool isCommentProof = false;
 };
 
-Identifier::Identifier(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, Queue<Order> orders)
+Identifier::Identifier(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, OrderQueue orders)
     : Callable([orders](ICodeGenerator* codeGenerator) { codeGenerator->PutInFront(orders); })
 {
     SetPushTypes(pushTypes);

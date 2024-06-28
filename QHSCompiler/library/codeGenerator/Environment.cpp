@@ -11,6 +11,8 @@
 class Environment
 {
    public:
+    ~Environment();
+
     void AddCallable(std::string name, Callable* callable);
     Callable* GetCallable(std::string name);
     void ExecuteCallable(std::string name, ICodeGenerator* codeGenerator);
@@ -18,6 +20,14 @@ class Environment
    private:
     std::map<std::string, Callable*> callables;
 };
+
+Environment::~Environment()
+{
+    for (auto const& callable : callables)
+    {
+        delete callable.second;
+    }
+}
 
 void Environment::AddCallable(std::string name, Callable* callable) { callables[name] = callable; }
 

@@ -7,6 +7,7 @@
 #include "../scanner/Scanner.cpp"
 #include "../utils/Queue.cpp"
 #include "../utils/Stack.cpp"
+#include "OrderQueue.cpp"
 
 class OrderHandler
 {
@@ -14,17 +15,22 @@ class OrderHandler
     OrderHandler();
     OrderHandler(InputFile* file);
 
-    Order GetNextOrder();
+    Order GetCurrentOrder();
 
-    void PutInFront(Queue<Order> queue);
+    /// @brief Advances next order; order can be retrieved from GetCurrentOrder()
+    void NextOrder();
+
+    void PutInFront(OrderQueue queue);
 
     bool IsDone();
 
    private:
+    Order currentOrder = Order::Empty();
+
     Scanner scanner;
     InputFile* file;
 
-    Stack<Queue<Order>*> stackedOrderQueues = Stack<Queue<Order>*>();
+    Stack<OrderQueue*> stackedOrderQueues;
 };
 
 OrderHandler::OrderHandler() {}
@@ -33,16 +39,21 @@ OrderHandler::OrderHandler(InputFile* file)
 {
     this->file = file;
     this->scanner = Scanner();
+    this->stackedOrderQueues = Stack<OrderQueue*>();
+    this->NextOrder();  // Immediately get the first order
 }
 
-Order OrderHandler::GetNextOrder()
+Order OrderHandler::GetCurrentOrder() { return currentOrder; }
+
+void OrderHandler::NextOrder()
 {
     if (stackedOrderQueues.IsEmpty())
     {
-        return scanner.ScanOrder(file);
+        currentOrder = scanner.ScanOrder(file);
+        return;
     }
 
-    Queue<Order>* queue = stackedOrderQueues.Top();
+    OrderQueue* queue = stackedOrderQueues.Top();
     Order order = queue->Dequeue();
 
     if (queue->IsEmpty())
@@ -50,17 +61,17 @@ Order OrderHandler::GetNextOrder()
         stackedOrderQueues.Pop();
     }
 
-    return order;
+    currentOrder = order;
 }
 
-void OrderHandler::PutInFront(Queue<Order> queue)
+void OrderHandler::PutInFront(OrderQueue queue)
 {
     if (queue.IsEmpty())
     {
         return;
     }
 
-    Queue<Order>* newQueue = new Queue<Order>(queue);
+    OrderQueue* newQueue = new OrderQueue(queue);
 
     stackedOrderQueues.Push(newQueue);
 }

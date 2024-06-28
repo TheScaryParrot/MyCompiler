@@ -3,6 +3,11 @@
 #include "../Order.cpp"
 #include "../utils/Logger.cpp"
 #include "../utils/Queue.cpp"
+#include "OrderQueue.cpp"
+#include "Type.cpp"
+
+class Callable;
+class Identifier;
 
 class ICodeGenerator
 {
@@ -15,5 +20,24 @@ class ICodeGenerator
         Comment
     };
 
-    virtual void PutInFront(Queue<Order> orders) = 0;
+    virtual Order GetCurrentOrder() = 0;
+    virtual Order GetNextOrder() = 0;
+    virtual Callable* GetCallable(Order& order) = 0;
+
+    virtual void PushMode(EModes mode) = 0;
+    virtual void PopMode() = 0;
+    virtual EModes GetCurrentMode() = 0;
+    bool IsInMode(EModes mode) { return GetCurrentMode() == mode; }
+
+    virtual void PutInFront(OrderQueue orders) = 0;
+
+    virtual void IncrementCodeStackDepth() = 0;
+    virtual void DecrementCodeStackDepth() = 0;
+    virtual void PushToOrderStack(Order order) = 0;
+    virtual OrderQueue PopFromCodeStack() = 0;
+
+    virtual void NewTypeStack() = 0;
+    virtual std::vector<Type*> PopTypeStack() = 0;
+
+    virtual void AddIdentifier(std::string name, Identifier* identifier) = 0;
 };
