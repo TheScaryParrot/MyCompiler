@@ -1,56 +1,38 @@
 #pragma once
 
+#include <functional>
 #include <vector>
 
-#include "../Order.cpp"
 #include "../utils/Queue.cpp"
-#include "Type.cpp"
+#include "ICodeGenerator.cpp"
 
 class Callable
 {
    public:
-    Callable(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, Queue<Order> orders);
+    Callable(std::function<void(ICodeGenerator*)>);
 
-    void SetPushTypes(std::vector<Type*> types);
-    void SetPopTypes(std::vector<Type*> types);
+    void SetFunction(std::function<void(ICodeGenerator*)> call);
+    void Execute(ICodeGenerator* codeGenerator);
 
-    void SetOrders(Queue<Order> orders);
-    Queue<Order> GetOrders();
-
-    void MakeCodeStackProof();
+    void SetCodeStackProof(bool value);
     bool IsCodeStackProof();
 
-    void MakeCommentProof();
+    void SetCommentProof(bool value);
     bool IsCommentProof();
 
    private:
-    std::vector<Type*> pushTypes;
-    std::vector<Type*> popTypes;
-    Queue<Order> orders;
-
+    std::function<void(ICodeGenerator*)> call;
     bool isCodeStackProof = false;
     bool isCommentProof = false;
 };
 
-Callable::Callable(std::vector<Type*> pushTypes, std::vector<Type*> popTypes, Queue<Order> orders)
-{
-    SetPushTypes(pushTypes);
-    SetPopTypes(popTypes);
-    SetOrders(orders);
-}
+Callable::Callable(std::function<void(ICodeGenerator*)> call) { this->call = call; }
 
-void Callable::SetPushTypes(std::vector<Type*> types) { pushTypes = types; }
+void Callable::SetFunction(std::function<void(ICodeGenerator*)> call) { this->call = call; }
+void Callable::Execute(ICodeGenerator* codeGenerator) { call(codeGenerator); }
 
-void Callable::SetPopTypes(std::vector<Type*> types) { popTypes = types; }
-
-void Callable::SetOrders(Queue<Order> orders) { this->orders = orders; }
-
-Queue<Order> Callable::GetOrders() { return orders; }
-
-void Callable::MakeCodeStackProof() { isCodeStackProof = true; }
-
+void Callable::SetCodeStackProof(bool value) { isCodeStackProof = value; }
 bool Callable::IsCodeStackProof() { return isCodeStackProof; }
 
-void Callable::MakeCommentProof() { isCommentProof = true; }
-
+void Callable::SetCommentProof(bool value) { isCommentProof = value; }
 bool Callable::IsCommentProof() { return isCommentProof; }

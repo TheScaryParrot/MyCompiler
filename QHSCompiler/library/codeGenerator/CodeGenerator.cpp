@@ -7,10 +7,12 @@
 #include "../utils/Logger.cpp"
 #include "Callable.cpp"
 #include "Environment.cpp"
+#include "IdentifierEnvironment.cpp"
+#include "InstructionEnvironment.cpp"
 #include "OrderHandler.cpp"
 #include "TypeStackHandler.cpp"
 
-class CodeGenerator
+class CodeGenerator : public ICodeGenerator
 {
    public:
     AssemblyCode* Generate(InputFile* file);
@@ -19,24 +21,10 @@ class CodeGenerator
     OrderHandler orderHandler;
 
     void HandleOrder(Order order, AssemblyCode* assemblyCode);
-    void HandleOrderInCallableStackMode(Order order, AssemblyCode* assemblyCode);
-    void HandleOrderInCodeStackMode(Order order, AssemblyCode* assemblyCode);
-    void HandleOrderInTypeStackMode(Order order, AssemblyCode* assemblyCode);
-    void HandleOrderInCommentMode(Order order, AssemblyCode* assemblyCode);
 
-    void HandleIdentifier(Order order, AssemblyCode* assemblyCode);
+    void HandleIdentifier(Order order);
     void HandleCompilerInstruction(Order order);
     void HandleDirectCode(Order order, AssemblyCode* assemblyCode);
-
-    void HandleCallable(Callable* callable, AssemblyCode* assemblyCode);
-
-    enum EModes
-    {
-        CallableStack,
-        CodeStack,
-        TypeStack,
-        Comment
-    };
 
     unsigned int codeStackDepthCounter = 0;
 
@@ -46,7 +34,9 @@ class CodeGenerator
 
     TypeStackHandler typeStack = TypeStackHandler();
 
-    Environment environment = Environment();
+    IdentifierEnvironment identifierEnvironment = IdentifierEnvironment();
+
+    InstructionEnvironment instructionEnvironment = InstructionEnvironment();
 };
 
 AssemblyCode* CodeGenerator::Generate(InputFile* file)
@@ -66,37 +56,10 @@ AssemblyCode* CodeGenerator::Generate(InputFile* file)
 
 void CodeGenerator::HandleOrder(Order order, AssemblyCode* assemblyCode)
 {
-    if (modeStack.Top() == EModes::CodeStack)
-    {
-        HandleOrderInCodeStackMode(order, assemblyCode);
-        return;
-    }
-
-    if (modeStack.Top() == EModes::TypeStack)
-    {
-        HandleOrderInTypeStackMode(order, assemblyCode);
-        return;
-    }
-
-    if (modeStack.Top() == EModes::CallableStack)
-    {
-        HandleOrderInCallableStackMode(order, assemblyCode);
-        return;
-    }
-
-    if (modeStack.Top() == EModes::Comment)
-    {
-        HandleOrderInCommentMode(order, assemblyCode);
-        return;
-    }
-}
-
-void CodeGenerator::HandleOrderInCallableStackMode(Order order, AssemblyCode* assemblyCode)
-{
     switch (order.GetType())
     {
         case Order::Identifier:
-            HandleIdentifier(order, assemblyCode);
+            HandleIdentifier(order);
             break;
         case Order::CompilerInstruction:
             HandleCompilerInstruction(order);
@@ -139,37 +102,21 @@ void CodeGenerator::HandleOrderInCodeStackMode(Order order, AssemblyCode* assemb
     }
     else if (order.GetType() == Order::EOrderTypes::Identifier)
     {
-        Callable* callable = environment.GetCallable(order.GetName());
+        /*Callable* callable = environment.GetCallable(order.GetName());
 
         if (callable != nullptr && callable->IsCodeStackProof())
         {
             HandleCallable(callable, assemblyCode);
             return;
-        }
+        }*/
     }
 
     codeStack.Top()->Enqueue(order);
 }
 
-void CodeGenerator::HandleOrderInTypeStackMode(Order order, AssemblyCode* assemblyCode)
-{
-    switch (order.GetType())
-    {
-        case Order::Identifier:
-            HandleIdentifier(order, assemblyCode);
-            break;
-        case Order::CompilerInstruction:
-            HandleCompilerInstruction(order);
-            break;
-        case Order::DirectCode:
-            HandleDirectCode(order, assemblyCode);
-            break;
-    }
-}
-
 void CodeGenerator::HandleOrderInCommentMode(Order order, AssemblyCode* assemblyCode)
 {
-    if (order.GetType() == Order::EOrderTypes::CompilerInstruction)
+    /*if (order.GetType() == Order::EOrderTypes::CompilerInstruction)
     {
         std::string instruction = order.GetName();
 
@@ -187,27 +134,51 @@ void CodeGenerator::HandleOrderInCommentMode(Order order, AssemblyCode* assembly
         {
             HandleCallable(callable, assemblyCode);
         }
-    }
+    }*/
 }
 
-void CodeGenerator::HandleIdentifier(Order order, AssemblyCode* assemblyCode)
+void CodeGenerator::HandleIdentifier(Order order)
 {
-    Callable* callable = environment.GetCallable(order.GetName());
+    Identifier* identifier = identifierEnvironment.GetIdentifier(order.GetName());
 
-    if (callable == nullptr)
+    if (identifier == nullptr)
     {
-        Logger.Log("Unknown identifier '" + order.GetName() + "'", Logger::ERROR);
         return;
     }
 
-    HandleCallable(callable, assemblyCode);
+    if (modeStack.Top() == EModes::CodeStack && !identifier->IsCodeStackProof())
+    {
+        codeStack.Top()->Enqueue(order);
+        return;
+    }
+
+    if (modeStack.Top() == EModes::Comment && !identifier->IsCommentProof())
+    {
+        return;
+    }
+
+    identifier->Execute(this);
 }
 
 void CodeGenerator::HandleCompilerInstruction(Order order)
 {
-    std::string instruction = order.GetName();
+    Callable* instruction = instructionEnvironment.GetInstruction(order.GetName());
 
-    if (instruction == "enterComment")
+    if (modeStack.Top() == EModes::CodeStack && !instruction->IsCodeStackProof())
+    {
+        codeStack.Top()->Enqueue(order);
+        return;
+    }
+
+    if (modeStack.Top() == EModes::Comment && !instruction->IsCommentProof())
+    {
+        return;
+    }
+
+    instruction->Execute(this);
+    return;
+
+    /*if (instruction == "enterComment")
     {
         Logger.Log("Entering Comment", Logger::DEBUG);
         modeStack.Push(EModes::Comment);
@@ -354,7 +325,7 @@ void CodeGenerator::HandleCompilerInstruction(Order order)
     {
         Logger.SetDebug(false);
         return;
-    }
+    }*/
 
     std::cout << "Unknown compiler instruction '" << instruction << "'\n";
 }
@@ -362,9 +333,4 @@ void CodeGenerator::HandleCompilerInstruction(Order order)
 void CodeGenerator::HandleDirectCode(Order order, AssemblyCode* assemblyCode)
 {
     assemblyCode->AddCode(order.GetName());
-}
-
-void CodeGenerator::HandleCallable(Callable* callable, AssemblyCode* assemblyCode)
-{
-    orderHandler.PutInFront(callable->GetOrders());
 }
