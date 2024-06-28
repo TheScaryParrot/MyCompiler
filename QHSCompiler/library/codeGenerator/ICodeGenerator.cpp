@@ -14,14 +14,15 @@ class ICodeGenerator
    public:
     enum EModes
     {
-        CallableStack,
-        CodeStack,
-        TypeStack,
-        Comment
+        EXECUTE,
+        ORDER_QUEUE,
+        TYPE_STACK,
+        COMMENT
     };
 
     virtual Order GetCurrentOrder() = 0;
     virtual Order GetNextOrder() = 0;
+    virtual void ExecuteNextOrder() = 0;
     virtual Callable* GetCallable(Order& order) = 0;
 
     virtual void PushMode(EModes mode) = 0;
@@ -31,10 +32,15 @@ class ICodeGenerator
 
     virtual void PutInFront(OrderQueue orders) = 0;
 
-    virtual void IncrementCodeStackDepth() = 0;
-    virtual void DecrementCodeStackDepth() = 0;
-    virtual void PushToOrderStack(Order order) = 0;
-    virtual OrderQueue PopFromCodeStack() = 0;
+    virtual void IncrementOrderQueueDepth() = 0;
+    virtual void DecrementOrderQueueDepth() = 0;
+    virtual void EnqueueInOrderQueue(Order order) = 0;
+    virtual OrderQueue GetOrderQueue() = 0;
+    virtual void ClearOrderQueue() = 0;
+    virtual void ExecuteFromOrderQueue() = 0;
+
+    virtual void FromPrimaryToSecondaryOrderQueue() = 0;
+    virtual void FromSecondaryToPrimaryOrderQueue() = 0;
 
     virtual void NewTypeStack() = 0;
     virtual std::vector<Type*> PopTypeStack() = 0;

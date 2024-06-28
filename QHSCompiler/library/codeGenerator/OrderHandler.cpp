@@ -40,7 +40,6 @@ OrderHandler::OrderHandler(InputFile* file)
     this->file = file;
     this->scanner = Scanner();
     this->stackedOrderQueues = Stack<OrderQueue*>();
-    this->NextOrder();  // Immediately get the first order
 }
 
 Order OrderHandler::GetCurrentOrder() { return currentOrder; }
@@ -58,7 +57,7 @@ void OrderHandler::NextOrder()
 
     if (queue->IsEmpty())
     {
-        stackedOrderQueues.Pop();
+        delete stackedOrderQueues.Pop();
     }
 
     currentOrder = order;

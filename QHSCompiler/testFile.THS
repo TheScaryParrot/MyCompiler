@@ -1,5 +1,3 @@
-#debug
-
 #makeNextOrderCodeStackProof
 #enterCodeStack
 
@@ -8,6 +6,9 @@
 
 #makeNextOrderCodeStackProof
 #pushNextOrderToCodeStack
+
+#makeNextOrderCodeStackProof
+#escapeNextFromOrderQueue
 
 #makeNextOrderCommentProof
 #exitComment
@@ -74,20 +75,40 @@
 #makeNextOrderCommentProof */
 
 [ ] [ ] {"
-"}  -> ;
+" #clearOrderQueue }  -> ;
 
-[ ] [ ] { [ ] [ ] -> } -> >>
+[ ] [ ] { [ ] [ ] -> } -> >> ;
 
-{ #debug } >> debug
+{ #debug } >> debug ;
 
 /*
 debug
 debug */
 
 
-{"rax"} >> rax
-{"$5"} >> 5
-{"mov " rax ", " 5 } >> mov 
+{ #executeFromOrderQueue } >> $ ;
+{ #escapeNextFromOrderQueue } >> \ ;
+{ #fromPrimaryToSecondaryOrderQueue } >> pTs ;
+{ #fromSecondaryToPrimaryOrderQueue } >> sTp ;
+
+#makeNextOrderCodeStackProof \
+
+{"rax"} >> rax ;
+{"$5"} >> 5 ;
 
 
-mov ;
+
+{ "mov " $ ", " $ } >> mov ;
+
+{ rax 5 } mov ;
+
+/* swapping */
+
+{ 
+    pTs
+    sTp
+} >> swap ;
+
+{ "1" "2" } swap
+
+$ $

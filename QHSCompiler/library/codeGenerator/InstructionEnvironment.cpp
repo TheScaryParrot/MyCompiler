@@ -15,12 +15,12 @@ class InstructionEnvironment : private Environment
 InstructionEnvironment::InstructionEnvironment()
 {
     this->AddCallable("enterComment", new Callable([](ICodeGenerator* generator)
-                                                   { generator->PushMode(ICodeGenerator::EModes::Comment); }));
+                                                   { generator->PushMode(ICodeGenerator::EModes::COMMENT); }));
 
     this->AddCallable("exitComment", new Callable(
                                          [](ICodeGenerator* generator)
                                          {
-                                             if (!generator->IsInMode(ICodeGenerator::EModes::Comment))
+                                             if (!generator->IsInMode(ICodeGenerator::EModes::COMMENT))
                                              {
                                                  Logger.Log("Trying to exit comment mode while not in comment mode",
                                                             Logger::ERROR);
@@ -36,12 +36,12 @@ InstructionEnvironment::InstructionEnvironment()
 
                                                 // If is already in CodeStack Mode, push the current order
                                                 // (enterCodeStack)
-                                                if (generator->IsInMode(ICodeGenerator::EModes::CodeStack))
+                                                if (generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
                                                 {
-                                                    generator->PushToOrderStack(generator->GetCurrentOrder());
+                                                    generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
                                                 }
 
-                                                generator->IncrementCodeStackDepth();
+                                                generator->IncrementOrderQueueDepth();
                                             }));
 
     this->AddCallable("exitCodeStack", new Callable(
@@ -49,32 +49,68 @@ InstructionEnvironment::InstructionEnvironment()
                                            {
                                                Logger.Log("Exiting code stack mode", Logger::DEBUG);
 
-                                               generator->DecrementCodeStackDepth();
+                                               generator->DecrementOrderQueueDepth();
 
                                                // If is still in CodeStack Mode, push the current order (exitCodeStack)
                                                // to the code stack
-                                               if (generator->IsInMode(ICodeGenerator::EModes::CodeStack))
+                                               if (generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
                                                {
-                                                   generator->PushToOrderStack(generator->GetCurrentOrder());
+                                                   generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
                                                }
                                            }));
 
     this->AddCallable(
         "pushNextOrderToCodeStack",
-        new Callable([](ICodeGenerator* generator) { generator->PushToOrderStack(generator->GetNextOrder()); }));
+        new Callable([](ICodeGenerator* generator) { generator->EnqueueInOrderQueue(generator->GetNextOrder()); }));
+
+    this->AddCallable("clearOrderQueue", new Callable([](ICodeGenerator* generator) { generator->ClearOrderQueue(); }));
+
+    this->AddCallable("executeFromOrderQueue", new Callable(
+                                                   [](ICodeGenerator* generator)
+                                                   {
+                                                       Logger.Log("Executing from order queue", Logger::DEBUG);
+                                                       generator->ExecuteFromOrderQueue();
+                                                   }));
+
+    this->AddCallable("escapeNextFromOrderQueue",
+                      new Callable(
+                          [](ICodeGenerator* generator)
+                          {
+                              if (!generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
+                              {
+                                  Logger.Log(
+                                      "Trying to escape next order from order queue while not in order queue mode",
+                                      Logger::ERROR);
+                                  return;
+                              }
+
+                              Logger.Log("Escaping next order from order queue", Logger::DEBUG);
+
+                              generator->DecrementOrderQueueDepth();
+
+                              generator->ExecuteNextOrder();
+
+                              generator->IncrementOrderQueueDepth();
+                          }));
+
+    this->AddCallable("fromPrimaryToSecondaryOrderQueue",
+                      new Callable([](ICodeGenerator* generator) { generator->FromPrimaryToSecondaryOrderQueue(); }));
+
+    this->AddCallable("fromSecondaryToPrimaryOrderQueue",
+                      new Callable([](ICodeGenerator* generator) { generator->FromSecondaryToPrimaryOrderQueue(); }));
 
     this->AddCallable("enterTypeStack", new Callable(
                                             [](ICodeGenerator* generator)
                                             {
                                                 Logger.Log("Entering type stack mode", Logger::DEBUG);
                                                 generator->NewTypeStack();
-                                                generator->PushMode(ICodeGenerator::EModes::TypeStack);
+                                                generator->PushMode(ICodeGenerator::EModes::TYPE_STACK);
                                             }));
 
     this->AddCallable("exitTypeStack", new Callable(
                                            [](ICodeGenerator* generator)
                                            {
-                                               if (!generator->IsInMode(ICodeGenerator::EModes::TypeStack))
+                                               if (!generator->IsInMode(ICodeGenerator::EModes::TYPE_STACK))
                                                {
                                                    Logger.Log(
                                                        "Trying to exit type stack mode while not in type stack mode",
@@ -106,7 +142,7 @@ InstructionEnvironment::InstructionEnvironment()
 
                 std::vector<Type*> popTypes = generator->PopTypeStack();
                 std::vector<Type*> pushTypes = generator->PopTypeStack();
-                OrderQueue code = generator->PopFromCodeStack();
+                OrderQueue code = generator->GetOrderQueue();
 
                 Identifier* callable = new Identifier(pushTypes, popTypes, code);
 

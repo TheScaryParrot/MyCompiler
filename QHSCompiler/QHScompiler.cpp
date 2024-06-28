@@ -14,6 +14,8 @@ void CompileFile(std::string filename)
     delete file;
 
     std::cout << assemblyCode->ToString() << "\n";
+
+    delete assemblyCode;
 }
 
 int main(int argc, char const* argv[])

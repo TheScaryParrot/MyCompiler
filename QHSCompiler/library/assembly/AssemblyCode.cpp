@@ -6,7 +6,6 @@ class AssemblyCode
 {
    public:
     void AddCode(std::string code);
-    void AddCode(AssemblyCode* code);
 
     std::string GetCode();
     std::string ToString();
@@ -15,9 +14,16 @@ class AssemblyCode
     std::string code = "";
 };
 
-void AssemblyCode::AddCode(std::string code) { this->code += code; }
+void AssemblyCode::AddCode(std::string code)
+{
+    // Remove empty lines
+    if (this->code.back() == '\n' && code.front() == '\n')
+    {
+        code = code.substr(1);
+    }
 
-void AssemblyCode::AddCode(AssemblyCode* code) { AddCode(code->GetCode()); }
+    this->code += code;
+}
 
 std::string AssemblyCode::GetCode() { return code; }
 

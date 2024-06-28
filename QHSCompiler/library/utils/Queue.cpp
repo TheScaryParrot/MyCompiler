@@ -27,6 +27,14 @@ class Queue
 
     bool IsEmpty() { return items.empty(); }
 
+    void Clear()
+    {
+        while (!IsEmpty())
+        {
+            Dequeue();
+        }
+    }
+
    private:
     std::queue<T> items;
 };

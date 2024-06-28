@@ -12,6 +12,7 @@ class OrderQueue
     Order Dequeue();
     Order Front();
     bool IsEmpty();
+    void Clear();
 
    private:
     Queue<Order> queue;
@@ -26,3 +27,5 @@ Order OrderQueue::Dequeue() { return this->queue.Dequeue(); }
 Order OrderQueue::Front() { return this->queue.Front(); }
 
 bool OrderQueue::IsEmpty() { return this->queue.IsEmpty(); }
+
+void OrderQueue::Clear() { this->queue.Clear(); }

@@ -35,7 +35,6 @@ Callable* Environment::GetCallable(std::string name)
 {
     if (callables.find(name) == callables.end())
     {
-        Logger.Log("Callable " + name + " not found", Logger::ERROR);
         return nullptr;
     }
 

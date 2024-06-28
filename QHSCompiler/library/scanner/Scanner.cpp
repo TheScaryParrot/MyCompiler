@@ -15,6 +15,8 @@ class CharacterGroup
         {
             this->characters.push_back(characters[i]);
         }
+
+        delete[] characters;
     }
 
     bool IsCharacterInGroup(char character)
