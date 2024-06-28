@@ -74,10 +74,13 @@
 
 #makeNextOrderCommentProof */
 
-[ ] [ ] {"
+[ ] [ ] { "
 " #clearOrderQueue }  -> ;
 
 [ ] [ ] { [ ] [ ] -> } -> >> ;
+
+"aaa
+aaa"
 
 { #debug } >> debug ;
 
