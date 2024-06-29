@@ -90,6 +90,9 @@ static class PredictiveParser
     ELookAheadCertainties LookAhead_ParamDeclaration(TokenList* tokens);
     ParameterDeclarationNode* Parse_ParamDeclaration(TokenList* tokens);
 
+    ELookAheadCertainties LookAhead_ParamAttributes(TokenList* tokens);
+    SyntaxTreeParamAttributes Parse_ParamAttributes(TokenList* tokens);
+
     ELookAheadCertainties LookAhead_Body(TokenList* tokens);
     BodyNode* Parse_Body(TokenList* tokens);
 

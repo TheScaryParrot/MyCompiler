@@ -1,16 +1,16 @@
 class int
 {
-    public void Assign(int this, int other)
+    public inline void Assign(final inline int this, final inline int other)
     {
         return;
     }
 
-    public int Add(int this, int other)
+    public inline int Add(final int this, final inline int other)
     {
         return 0;
     }
 
-    public int Mul(int this, int other)
+    public inline int Mul(final int this, final inline int other)
     {
         this += other;
         return 0;

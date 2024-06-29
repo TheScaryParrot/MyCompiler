@@ -21,4 +21,12 @@ ReturnStatementNode::ReturnStatementNode(AbstractExpressionNode* expression) : A
 
 ReturnStatementNode::~ReturnStatementNode() { delete expression; }
 
-std::string ReturnStatementNode::ToString() { return "return " + expression->ToString(); }
+std::string ReturnStatementNode::ToString()
+{
+    if (expression == nullptr)
+    {
+        return "return";
+    }
+
+    return "return " + expression->ToString();
+}

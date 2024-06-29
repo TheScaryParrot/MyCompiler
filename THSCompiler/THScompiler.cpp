@@ -18,7 +18,6 @@ void CompileFile(std::string filename)
     // Parsing
     SyntaxTree* syntaxTree = PredictiveParser.Parse(tokens);
     delete tokens;
-    // std::cout << syntaxTree->ToString() << std::endl;
 
     // Code generation
     CodeGenerator* codeGenerator = new CodeGenerator();

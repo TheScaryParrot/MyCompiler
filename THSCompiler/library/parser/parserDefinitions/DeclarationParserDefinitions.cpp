@@ -236,17 +236,50 @@ std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList
 
 ELookAheadCertainties PredictiveParser::LookAhead_ParamDeclaration(TokenList* tokens)
 {
-    // ID ID
+    // <paramAttributes> | ID ID
     if (tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) &&
         tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1))
         return ELookAheadCertainties::CertainlyPresent;
 
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return LookAhead_ParamAttributes(tokens);
 }
 ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* tokens)
 {
+    SyntaxTreeParamAttributes attributes;
+
+    if (LookAhead_ParamAttributes(tokens) == ELookAheadCertainties::CertainlyPresent)
+    {
+        attributes = Parse_ParamAttributes(tokens);
+    }
+
     std::string type = tokens->Next<IdentifierToken>()->GetValue();
-    return new ParameterDeclarationNode(type, tokens->Next<IdentifierToken>()->GetValue());
+
+    return new ParameterDeclarationNode(attributes, type, tokens->Next<IdentifierToken>()->GetValue());
+}
+
+ELookAheadCertainties PredictiveParser::LookAhead_ParamAttributes(TokenList* tokens)
+{
+    // FINAL | INLINE
+    if (LookAhead_FinalAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+        return ELookAheadCertainties::CertainlyPresent;
+
+    return LookAhead_InlineAttribute(tokens);
+}
+SyntaxTreeParamAttributes PredictiveParser::Parse_ParamAttributes(TokenList* tokens)
+{
+    SyntaxTreeParamAttributes attributes;
+
+    if (LookAhead_FinalAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    {
+        attributes.isFinal = Parse_FinalAttribute(tokens);
+    }
+
+    if (LookAhead_InlineAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    {
+        attributes.isInline = Parse_InlineAttribute(tokens);
+    }
+
+    return attributes;
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_Body(TokenList* tokens)
