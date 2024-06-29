@@ -1,10 +1,10 @@
 #include <iostream>
 
-// #include "library/codeGenerator/generator/CodeGenerator.cpp"
-//  #include "library/parser/parserDefinitions/DeclarationParserDefinitions.cpp"
-//  #include "library/parser/parserDefinitions/ExpressionParserDefinitions.cpp"
-//  #include "library/parser/parserDefinitions/GeneralParserDefinitions.cpp"
-//  #include "library/parser/parserDefinitions/StatementParserDefinitions.cpp"
+#include "library/codeGenerator/generator/CodeGenerator.cpp"
+#include "library/parser/parserDefinitions/DeclarationParserDefinitions.cpp"
+#include "library/parser/parserDefinitions/ExpressionParserDefinitions.cpp"
+#include "library/parser/parserDefinitions/GeneralParserDefinitions.cpp"
+#include "library/parser/parserDefinitions/StatementParserDefinitions.cpp"
 #include "library/scanner/Scanner.cpp"
 
 void CompileFile(std::string filename)
@@ -15,10 +15,6 @@ void CompileFile(std::string filename)
     TokenList* tokens = Scanner.Scan(file);
     delete file;
 
-    std::cout << "Tokens: \n" << tokens->ToString() << std::endl;
-    return;
-
-    /*
     // Parsing
     SyntaxTree* syntaxTree = PredictiveParser.Parse(tokens);
     delete tokens;
@@ -33,7 +29,6 @@ void CompileFile(std::string filename)
     std::cout << assemblyCode->ToString() << std::endl;
 
     delete assemblyCode;
-    */
 }
 
 int main(int argc, char const* argv[])

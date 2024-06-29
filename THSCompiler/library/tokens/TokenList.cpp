@@ -15,6 +15,12 @@ class TokenList
     void AddToken(std::shared_ptr<AbstractToken> token);
     unsigned int GetSize();
 
+    template <typename T>
+    std::shared_ptr<T> Next()
+    {
+        return std::dynamic_pointer_cast<T>(Next());
+    }
+
     std::shared_ptr<AbstractToken> Next();
 
     std::shared_ptr<AbstractToken> Peek(int offset = 0);

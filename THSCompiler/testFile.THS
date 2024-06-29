@@ -17,8 +17,6 @@ class int
     }
 }
 
-[ hello , moin]
-
 public int num1 = 0;
 public final int num2 = 1;
 
