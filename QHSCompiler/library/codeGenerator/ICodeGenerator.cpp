@@ -37,7 +37,7 @@ class ICodeGenerator
     virtual void EnqueueInOrderQueue(Order order) = 0;
     virtual OrderQueue GetOrderQueue() = 0;
     virtual void ClearOrderQueue() = 0;
-    virtual void ExecuteFromOrderQueue() = 0;
+    virtual void PutInFrontFromOrderQueue() = 0;
 
     virtual void FromPrimaryToSecondaryOrderQueue() = 0;
     virtual void FromSecondaryToPrimaryOrderQueue() = 0;

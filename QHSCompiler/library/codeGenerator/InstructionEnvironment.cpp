@@ -2,6 +2,7 @@
 
 #include "../utils/Logger.cpp"
 #include "Environment.cpp"
+#include "Identifier.cpp"
 
 class InstructionEnvironment : private Environment
 {
@@ -65,12 +66,12 @@ InstructionEnvironment::InstructionEnvironment()
 
     this->AddCallable("clearOrderQueue", new Callable([](ICodeGenerator* generator) { generator->ClearOrderQueue(); }));
 
-    this->AddCallable("executeFromOrderQueue", new Callable(
-                                                   [](ICodeGenerator* generator)
-                                                   {
-                                                       Logger.Log("Executing from order queue", Logger::DEBUG);
-                                                       generator->ExecuteFromOrderQueue();
-                                                   }));
+    this->AddCallable("putInFrontFromOrderQueue", new Callable(
+                                                      [](ICodeGenerator* generator)
+                                                      {
+                                                          Logger.Log("Executing from order queue", Logger::DEBUG);
+                                                          generator->PutInFrontFromOrderQueue();
+                                                      }));
 
     this->AddCallable("escapeNextFromOrderQueue",
                       new Callable(
@@ -87,6 +88,12 @@ InstructionEnvironment::InstructionEnvironment()
                               Logger.Log("Escaping next order from order queue", Logger::DEBUG);
 
                               generator->DecrementOrderQueueDepth();
+
+                              // if is still in order queue mode, push the current order (escapeNextFromOrderQueue)
+                              if (generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
+                              {
+                                  generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
+                              }
 
                               generator->ExecuteNextOrder();
 

@@ -89,8 +89,8 @@ debug
 debug */
 
 
-{ #executeFromOrderQueue } >> $ ;
-{ #escapeNextFromOrderQueue } >> \ ;
+{ #putInFrontFromOrderQueue } >> $ ;
+{ #pushNextOrderToCodeStack #escapeNextFromOrderQueue } >> \ ;
 { #fromPrimaryToSecondaryOrderQueue } >> pTs ;
 { #fromSecondaryToPrimaryOrderQueue } >> sTp ;
 
@@ -107,11 +107,13 @@ debug */
 
 /* swapping */
 
+#activateDebugMode
+
 { 
-    pTs
-    sTp
+    { \ #putInFrontFromOrderQueue }
 } >> swap ;
 
 { "1" "2" } swap
 
-$ $
+$ $ 
+

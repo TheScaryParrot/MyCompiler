@@ -33,7 +33,7 @@ class CodeGenerator : public ICodeGenerator
     virtual void EnqueueInOrderQueue(Order order) override;
     virtual OrderQueue GetOrderQueue() override;
     virtual void ClearOrderQueue() override;
-    virtual void ExecuteFromOrderQueue() override;
+    virtual void PutInFrontFromOrderQueue() override;
 
     virtual void FromPrimaryToSecondaryOrderQueue() override;
     virtual void FromSecondaryToPrimaryOrderQueue() override;
@@ -194,7 +194,7 @@ OrderQueue CodeGenerator::GetOrderQueue()
     return queue;
 }
 
-void CodeGenerator::ExecuteFromOrderQueue()
+void CodeGenerator::PutInFrontFromOrderQueue()
 {
     if (primaryOrderQueue.IsEmpty())
     {
@@ -203,7 +203,7 @@ void CodeGenerator::ExecuteFromOrderQueue()
     }
 
     Order order = primaryOrderQueue.Dequeue();
-    HandleOrder(order);
+    orderHandler.PutInFront(order);
 }
 
 void CodeGenerator::ClearOrderQueue() { primaryOrderQueue.Clear(); }

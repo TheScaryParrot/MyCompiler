@@ -20,6 +20,7 @@ class OrderHandler
     /// @brief Advances next order; order can be retrieved from GetCurrentOrder()
     void NextOrder();
 
+    void PutInFront(Order order);
     void PutInFront(OrderQueue queue);
 
     bool IsDone();
@@ -61,6 +62,14 @@ void OrderHandler::NextOrder()
     }
 
     currentOrder = order;
+}
+
+void OrderHandler::PutInFront(Order order)
+{
+    OrderQueue* newQueue = new OrderQueue();
+    newQueue->Enqueue(order);
+
+    stackedOrderQueues.Push(newQueue);
 }
 
 void OrderHandler::PutInFront(OrderQueue queue)
