@@ -1,14 +1,11 @@
-#makeNextOrderCodeStackProof
-#enterCodeStack
+#makeNextOrderOrderQueueProof
+#enterOrderQueue
 
-#makeNextOrderCodeStackProof
-#exitCodeStack
+#makeNextOrderOrderQueueProof
+#exitOrderQueue
 
-#makeNextOrderCodeStackProof
-#pushNextOrderToCodeStack
-
-#makeNextOrderCodeStackProof
-#escapeNextFromOrderQueue
+#makeNextOrderOrderQueueProof
+#pushNextOrderToOrderQueue
 
 #makeNextOrderCommentProof
 #exitComment
@@ -20,9 +17,10 @@
 #enterTypeStack
 #exitTypeStack
 
-#enterCodeStack
+#pushNewOrderQueue
+#enterOrderQueue
 #enterTypeStack
-#exitCodeStack
+#exitOrderQueue
 
 #assignNextIdentifier
 [
@@ -34,86 +32,88 @@
 #enterTypeStack
 #exitTypeStack
 
-#enterCodeStack
+#pushNewOrderQueue
+#enterOrderQueue
 #exitTypeStack
-#exitCodeStack
+#exitOrderQueue
 
 #assignNextIdentifier
 ]
 
 [ ] [ ]
 
-#enterCodeStack
-#pushNextOrderToCodeStack
-#enterCodeStack
-#exitCodeStack
+#pushNewOrderQueue
+#enterOrderQueue
+#pushNewOrderQueue
+#pushNextOrderToOrderQueue
+#enterOrderQueue
+#exitOrderQueue
 
 #assignNextIdentifier
 {
 
-#makeNextOrderCodeStackProof {
+#makeNextOrderOrderQueueProof {
 
 
 [ ] [ ]
 
-#enterCodeStack
-#pushNextOrderToCodeStack
-#exitCodeStack
-#exitCodeStack
+#pushNewOrderQueue
+#enterOrderQueue
+#pushNextOrderToOrderQueue
+#exitOrderQueue
+#exitOrderQueue
 
 #assignNextIdentifier
 }
 
-#makeNextOrderCodeStackProof }
+#makeNextOrderOrderQueueProof }
+
+[ ] [ ] { #assignNextIdentifierToOneOrder } #assignNextIdentifier ->
+[ ] [ ] { #assignNextIdentifier } #assignNextIdentifier >>
+
+[ ] [ ] { #pushNextOrderToOrderQueue #enterOrderQueue } >> (
+#makeNextOrderOrderQueueProof (
+[ ] [ ] { #pushNextOrderToOrderQueue #exitOrderQueue } >> )
+#makeNextOrderOrderQueueProof )
 
 
-[ ] [ ]  { #assignNextIdentifier } #assignNextIdentifier ->
-
-[ ] [ ] { #enterComment } -> /*
-[ ] [ ] { #exitComment } -> */
-
+[ ] [ ] { #enterComment } >> /*
+[ ] [ ] { #exitComment } >> */
 #makeNextOrderCommentProof */
 
 [ ] [ ] { "
-" #clearOrderQueue }  -> ;
-
-[ ] [ ] { [ ] [ ] -> } -> >> ;
+" #clearOrderQueue }  >> ;
 
 "aaa
 aaa"
 
-{ #debug } >> debug ;
+[ ] [ ] { #debug } >> debug ;
 
 /*
 debug
 debug */
 
 
-{ #putInFrontFromOrderQueue } >> $ ;
-{ #pushNextOrderToCodeStack #escapeNextFromOrderQueue } >> \ ;
-{ #fromPrimaryToSecondaryOrderQueue } >> pTs ;
-{ #fromSecondaryToPrimaryOrderQueue } >> sTp ;
-
-#makeNextOrderCodeStackProof \
-
-{"rax"} >> rax ;
-{"$5"} >> 5 ;
+[ ] [ ] { #putInFrontFromOrderQueue } >> $ ;
 
 
+[ ] [ ] {"rax"} >> rax ;
+[ ] [ ] {"$5"} >> 5 ;
 
-{ "mov " $ ", " $ } >> mov ;
+[ ] [ ] { "mov " $ ", " $ } >> mov ;
 
-{ rax 5 } mov ;
+( rax 5 ) mov ;
 
 /* swapping */
 
-#activateDebugMode
 
+[ ] [ ] 
 { 
-    { \ #putInFrontFromOrderQueue }
+    [ ] [ ] -> second
+    ( second )
 } >> swap ;
 
-{ "1" "2" } swap
+( "1" "2" ) swap
 
-$ $ 
+$ $
 

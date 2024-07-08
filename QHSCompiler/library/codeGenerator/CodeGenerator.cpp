@@ -10,6 +10,7 @@
 #include "IdentifierEnvironment.cpp"
 #include "InstructionEnvironment.cpp"
 #include "OrderHandler.cpp"
+#include "OrderQueueStackHandler.cpp"
 #include "TypeStackHandler.cpp"
 
 class CodeGenerator : public ICodeGenerator
@@ -30,13 +31,12 @@ class CodeGenerator : public ICodeGenerator
 
     virtual void IncrementOrderQueueDepth() override;
     virtual void DecrementOrderQueueDepth() override;
+    virtual void PushNewOrderQueue() override;
+    virtual Order DequeueFromOrderQueue() override;
     virtual void EnqueueInOrderQueue(Order order) override;
-    virtual OrderQueue GetOrderQueue() override;
+    virtual OrderQueue* PopOrderQueue() override;
     virtual void ClearOrderQueue() override;
     virtual void PutInFrontFromOrderQueue() override;
-
-    virtual void FromPrimaryToSecondaryOrderQueue() override;
-    virtual void FromSecondaryToPrimaryOrderQueue() override;
 
     virtual void NewTypeStack() override;
     virtual std::vector<Type*> PopTypeStack() override;
@@ -53,8 +53,7 @@ class CodeGenerator : public ICodeGenerator
 
     Stack<EModes> modeStack = Stack<EModes>();
 
-    OrderQueue primaryOrderQueue = OrderQueue();
-    OrderQueue secondaryOrderQueue = OrderQueue();
+    OrderQueueStackHandler orderQueueStack = OrderQueueStackHandler();
 
     TypeStackHandler typeStack = TypeStackHandler();
 
@@ -185,32 +184,17 @@ void CodeGenerator::DecrementOrderQueueDepth()
     }
 }
 
-void CodeGenerator::EnqueueInOrderQueue(Order order) { primaryOrderQueue.Enqueue(order); }
+void CodeGenerator::PushNewOrderQueue() { orderQueueStack.PushNewOrderQueue(); }
 
-OrderQueue CodeGenerator::GetOrderQueue()
-{
-    OrderQueue queue = this->primaryOrderQueue;
-    this->ClearOrderQueue();
-    return queue;
-}
+void CodeGenerator::EnqueueInOrderQueue(Order order) { orderQueueStack.EnqueueOrder(order); }
 
-void CodeGenerator::PutInFrontFromOrderQueue()
-{
-    if (primaryOrderQueue.IsEmpty())
-    {
-        Logger.Log("Trying to execute from order queue while queue is empty", Logger::ERROR);
-        return;
-    }
+Order CodeGenerator::DequeueFromOrderQueue() { return orderQueueStack.DequeueOrder(); }
 
-    Order order = primaryOrderQueue.Dequeue();
-    orderHandler.PutInFront(order);
-}
+OrderQueue* CodeGenerator::PopOrderQueue() { return orderQueueStack.PopOrderQueue(); }
 
-void CodeGenerator::ClearOrderQueue() { primaryOrderQueue.Clear(); }
+void CodeGenerator::PutInFrontFromOrderQueue() { orderHandler.PutInFront(orderQueueStack.DequeueOrder()); }
 
-void CodeGenerator::FromPrimaryToSecondaryOrderQueue() { secondaryOrderQueue.Enqueue(primaryOrderQueue.Dequeue()); }
-
-void CodeGenerator::FromSecondaryToPrimaryOrderQueue() { primaryOrderQueue.Enqueue(secondaryOrderQueue.Dequeue()); }
+void CodeGenerator::ClearOrderQueue() { orderQueueStack.ClearAllOrderQueues(); }
 
 void CodeGenerator::NewTypeStack() { typeStack.NewStack(); }
 
