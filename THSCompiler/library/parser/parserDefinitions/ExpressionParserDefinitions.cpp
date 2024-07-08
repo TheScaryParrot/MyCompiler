@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../syntaxTree/nodes/line/expression/values/ValueChainNode.cpp"
 #include "../../tokens/ConstTokens.cpp"
 #include "../../tokens/Keywords.cpp"
 #include "../PredictiveParser.hpp"
@@ -81,7 +80,7 @@ ELookAheadCertainties PredictiveParser::LookAhead_OrExpression(TokenList* tokens
 {
     return LookAhead_UnaryExpression(tokens);
 }
-AbstractExpressionNode* PredictiveParser::Parse_OrExpression(TokenList* tokens)
+BinaryOperatorExpressionNode* PredictiveParser::Parse_OrExpression(TokenList* tokens)
 {
     AbstractExpressionNode* firstExpression = Parse_AndExpression(tokens);
 
@@ -95,7 +94,7 @@ AbstractExpressionNode* PredictiveParser::Parse_OrExpression(TokenList* tokens)
         operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::OR_OPERATOR, Parse_AndExpression(tokens)));
     }
 
-    return new OperatorExpressionNode(firstExpression, operatorValuePairs);
+    return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_AndExpression(TokenList* tokens)
@@ -117,7 +116,7 @@ AbstractExpressionNode* PredictiveParser::Parse_AndExpression(TokenList* tokens)
             new OperatorExpressionPair(EOperators::AND_OPERATOR, Parse_EqualExpression(tokens)));
     }
 
-    return new OperatorExpressionNode(firstExpression, operatorValuePairs);
+    return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_EqualExpression(TokenList* tokens)
@@ -141,7 +140,7 @@ AbstractExpressionNode* PredictiveParser::Parse_EqualExpression(TokenList* token
         operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_SumExpression(tokens)));
     }
 
-    return new OperatorExpressionNode(firstExpression, operatorValuePairs);
+    return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_EqualOperator(TokenList* tokens)
@@ -193,7 +192,7 @@ AbstractExpressionNode* PredictiveParser::Parse_SumExpression(TokenList* tokens)
         operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_MulExpression(tokens)));
     }
 
-    return new OperatorExpressionNode(firstExpression, operatorValuePairs);
+    return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_SumOperator(TokenList* tokens)
@@ -233,7 +232,7 @@ AbstractExpressionNode* PredictiveParser::Parse_MulExpression(TokenList* tokens)
         operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_UnaryExpression(tokens)));
     }
 
-    return new OperatorExpressionNode(firstExpression, operatorValuePairs);
+    return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_MulOperator(TokenList* tokens)
@@ -285,7 +284,7 @@ AbstractExpressionNode* PredictiveParser::Parse_UnaryExpression(TokenList* token
     if (preUnaryOperator == EPreUnaryOperators::PRE_NONE && postUnaryOperator == EPostUnaryOperators::POST_NONE)
         return value;
 
-    return new UnaryExpressionNode(preUnaryOperator, value, postUnaryOperator);
+    return new UnaryOperatorExpressionNode(preUnaryOperator, value, postUnaryOperator);
 }
 
 ELookAheadCertainties PredictiveParser::LookAhead_PreUnaryOperator(TokenList* tokens)
@@ -345,7 +344,7 @@ AbstractExpressionNode* PredictiveParser::Parse_ValueChain(TokenList* tokens)
         return firstValue;  // No PropertyAccessor found
     }
 
-    ValueChainNode* valueChain = (new ValueChainNode())->AddPropertyAccess(firstValue);
+    IdentifierChainNode* valueChain = (new IdentifierChainNode())->AddPropertyAccess(firstValue);
 
     while (LookAhead_NormalAccessor(tokens) == ELookAheadCertainties::CertainlyPresent)
     {
@@ -355,8 +354,7 @@ AbstractExpressionNode* PredictiveParser::Parse_ValueChain(TokenList* tokens)
 
     return valueChain;
 }
-
-ELookAheadCertainties PredictiveParser::LookAhead_StaticValueChain(TokenList* tokens)
+, ELookAheadCertainties PredictiveParser::LookAhead_StaticValueChain(TokenList* tokens)
 {
     // <value>
     return LookAhead_Value(tokens);
@@ -372,7 +370,7 @@ AbstractExpressionNode* PredictiveParser::Parse_StaticValueChain(TokenList* toke
         return firstValue;  // No PropertyAccessor found
     }
 
-    ValueChainNode* valueChain = (new ValueChainNode())->AddPropertyAccess(firstValue);
+    ValueChainNode* valueChain = (new StaticValue())->AddPropertyAccess(firstValue);
 
     while (LookAhead_StaticAccessor(tokens) == ELookAheadCertainties::CertainlyPresent)
     {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../codeGenerator/environment/funcVars/variables/Variable.cpp"
-#include "../codeGenerator/environment/jumpLabels/JumpLabel.cpp"
+#include "../oldCodeGenerator/environment/funcVars/variables/Variable.cpp"
+#include "../oldCodeGenerator/environment/jumpLabels/JumpLabel.cpp"
 #include "AssemblyCode.cpp"
 #include "AssemblyInstructionLine.cpp"
 #include "AssemblyLabelLine.cpp"

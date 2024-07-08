@@ -5,19 +5,20 @@
 
 #include "../AbstractValueNode.cpp"
 
-class ValueChainNode : public AbstractValueNode
+class IdentifierChainNode : public AbstractValueNode
 {
    public:
-    virtual ~ValueChainNode();
+    IdentifierChainNode(bool isStatic);
+    virtual ~IdentifierChainNode();
 
-    ValueChainNode* AddPropertyAccess(AbstractExpressionNode* value);
+    IdentifierChainNode* AddPropertyAccess(AbstractExpressionNode* value);
 
     virtual std::string ToString() override;
 
     std::vector<AbstractExpressionNode*> propertyAccesses;
 };
 
-ValueChainNode::~ValueChainNode()
+IdentifierChainNode::~IdentifierChainNode()
 {
     for (AbstractExpressionNode* property : propertyAccesses)
     {
@@ -25,14 +26,14 @@ ValueChainNode::~ValueChainNode()
     }
 }
 
-ValueChainNode* ValueChainNode::AddPropertyAccess(AbstractExpressionNode* value)
+IdentifierChainNode* IdentifierChainNode::AddPropertyAccess(AbstractExpressionNode* value)
 {
     propertyAccesses.push_back(value);
 
     return this;
 }
 
-std::string ValueChainNode::ToString()
+std::string IdentifierChainNode::ToString()
 {
     std::string result = propertyAccesses[0]->ToString();
 

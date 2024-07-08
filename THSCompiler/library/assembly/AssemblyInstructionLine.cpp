@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../codeGenerator/environment/funcVars/variables/VariableLocation.cpp"
+#include "../oldCodeGenerator/environment/funcVars/variables/VariableLocation.cpp"
 #include "IAssemblyLine.cpp"
 #include "instructions/AssemblyInstruction.cpp"
 

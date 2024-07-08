@@ -180,9 +180,9 @@ AssemblyCode* SyntaxTreeTraverser::GenerateExpression(ISyntaxTreeNodeIn* nodeIn,
 
 AssemblyCode* SyntaxTreeTraverser::GenerateValue(ISyntaxTreeNodeIn* nodeIn, AbstractValueNode* value)
 {
-    if (dynamic_cast<ValueChainNode*>(value) != nullptr)
+    if (dynamic_cast<IdentifierChainNode*>(value) != nullptr)
     {
-        return nodeIn->GenerateValueChain(dynamic_cast<ValueChainNode*>(value));
+        return nodeIn->GenerateValueChain(dynamic_cast<IdentifierChainNode*>(value));
     }
 
     if (dynamic_cast<StaticValueChainNode*>(value) != nullptr)

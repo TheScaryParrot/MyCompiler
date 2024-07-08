@@ -23,8 +23,8 @@
 #pragma region Expressions
 #include "../syntaxTree/nodes/line/expression/AbstractExpressionNode.cpp"
 #include "../syntaxTree/nodes/line/expression/AssignmentNode.cpp"
-#include "../syntaxTree/nodes/line/expression/OperatorExpressionNode.cpp"
-#include "../syntaxTree/nodes/line/expression/UnaryExpressionNode.cpp"
+#include "../syntaxTree/nodes/line/expression/BinaryOperatorExpressionNode.cpp"
+#include "../syntaxTree/nodes/line/expression/UnaryOperatorExpressionNode.cpp"
 #include "../syntaxTree/nodes/line/expression/functionCall/CallNode.cpp"
 #include "../syntaxTree/nodes/line/expression/operators/EAssignOperators.cpp"
 #include "../syntaxTree/nodes/line/expression/operators/EOperators.cpp"
@@ -32,7 +32,9 @@
 #include "../syntaxTree/nodes/line/expression/values/IDValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/LogicalConstValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/NumberConstValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/StaticValueChainNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/StringConstValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/ValueChainNode.cpp"
 
 #pragma endregion
 
@@ -121,7 +123,7 @@ static class PredictiveParser
     AbstractExpressionNode* Parse_Expression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_AssignmentExpression(TokenList* tokens);
-    AbstractExpressionNode* Parse_AssignmentExpression(TokenList* tokens);
+    AssignmentNode* Parse_AssignmentExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Assignment(TokenList* tokens);
     Assignment* Parse_Assignment(TokenList* tokens);
@@ -130,31 +132,31 @@ static class PredictiveParser
     EAssignOperators Parse_AssignOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_OrExpression(TokenList* tokens);
-    AbstractExpressionNode* Parse_OrExpression(TokenList* tokens);
+    BinaryOperatorExpressionNode* Parse_OrExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_AndExpression(TokenList* tokens);
-    AbstractExpressionNode* Parse_AndExpression(TokenList* tokens);
+    BinaryOperatorExpressionNode* Parse_AndExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_EqualExpression(TokenList* tokens);
-    AbstractExpressionNode* Parse_EqualExpression(TokenList* tokens);
+    BinaryOperatorExpressionNode* Parse_EqualExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_EqualOperator(TokenList* tokens);
     EOperators Parse_EqualOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_SumExpression(TokenList* tokens);
-    AbstractExpressionNode* Parse_SumExpression(TokenList* tokens);
+    BinaryOperatorExpressionNode* Parse_SumExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_SumOperator(TokenList* tokens);
     EOperators Parse_SumOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_MulExpression(TokenList* tokens);
-    AbstractExpressionNode* Parse_MulExpression(TokenList* tokens);
+    BinaryOperatorExpressionNode* Parse_MulExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_MulOperator(TokenList* tokens);
     EOperators Parse_MulOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_UnaryExpression(TokenList* tokens);
-    AbstractExpressionNode* Parse_UnaryExpression(TokenList* tokens);
+    UnaryOperatorExpressionNode* Parse_UnaryExpression(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_PreUnaryOperator(TokenList* tokens);
     EPreUnaryOperators Parse_PreUnaryOperator(TokenList* tokens);
@@ -163,10 +165,10 @@ static class PredictiveParser
     EPostUnaryOperators Parse_PostUnaryOperator(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_ValueChain(TokenList* tokens);
-    AbstractExpressionNode* Parse_ValueChain(TokenList* tokens);
+    IdentifierChainNode* Parse_ValueChain(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_StaticValueChain(TokenList* tokens);
-    AbstractExpressionNode* Parse_StaticValueChain(TokenList* tokens);
+    StaticValueChainNode* Parse_StaticValueChain(TokenList* tokens);
 
     ELookAheadCertainties LookAhead_Value(TokenList* tokens);
     AbstractExpressionNode* Parse_Value(TokenList* tokens);

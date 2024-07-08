@@ -41,7 +41,7 @@ class ISyntaxTreeNodeIn
     virtual AssemblyCode* GenerateBinaryOperation(OperatorExpressionNode* binaryOperation) = 0;
     virtual AssemblyCode* GenerateUnaryOperation(UnaryExpressionNode* unaryOperation) = 0;
 
-    virtual AssemblyCode* GenerateValueChain(ValueChainNode* valueChain) = 0;
+    virtual AssemblyCode* GenerateValueChain(IdentifierChainNode* valueChain) = 0;
     virtual AssemblyCode* GenerateStaticValueChain(StaticValueChainNode* valueChain) = 0;
     virtual AssemblyCode* GenerateIDValue(IDValueNode* value) = 0;
     virtual AssemblyCode* GenerateCall(CallNode* call) = 0;

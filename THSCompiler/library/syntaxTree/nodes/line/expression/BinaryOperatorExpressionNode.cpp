@@ -5,12 +5,12 @@
 #include "AbstractExpressionNode.cpp"
 #include "operators/OperatorExpressionPair.cpp"
 
-class OperatorExpressionNode : public AbstractExpressionNode
+class BinaryOperatorExpressionNode : public AbstractExpressionNode
 {
    public:
-    OperatorExpressionNode(AbstractExpressionNode* firstExpression,
-                           std::vector<OperatorExpressionPair*>* OperatorValuePairs = nullptr);
-    ~OperatorExpressionNode();
+    BinaryOperatorExpressionNode(AbstractExpressionNode* firstExpression,
+                                 std::vector<OperatorExpressionPair*>* OperatorValuePairs = nullptr);
+    ~BinaryOperatorExpressionNode();
 
     virtual std::string ToString() override;
 
@@ -18,15 +18,15 @@ class OperatorExpressionNode : public AbstractExpressionNode
     std::vector<OperatorExpressionPair*>* operatorExpressionPairs;
 };
 
-OperatorExpressionNode::OperatorExpressionNode(AbstractExpressionNode* firstExpression,
-                                               std::vector<OperatorExpressionPair*>* operatorExpressionPairs)
+BinaryOperatorExpressionNode::BinaryOperatorExpressionNode(
+    AbstractExpressionNode* firstExpression, std::vector<OperatorExpressionPair*>* operatorExpressionPairs)
     : AbstractExpressionNode()
 {
     this->firstExpression = firstExpression;
     this->operatorExpressionPairs = operatorExpressionPairs;
 }
 
-OperatorExpressionNode::~OperatorExpressionNode()
+BinaryOperatorExpressionNode::~BinaryOperatorExpressionNode()
 {
     delete firstExpression;
 
@@ -37,7 +37,7 @@ OperatorExpressionNode::~OperatorExpressionNode()
     delete operatorExpressionPairs;
 }
 
-std::string OperatorExpressionNode::ToString()
+std::string BinaryOperatorExpressionNode::ToString()
 {
     std::string result = firstExpression->ToString();
 

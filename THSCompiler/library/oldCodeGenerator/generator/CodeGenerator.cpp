@@ -36,7 +36,7 @@ class CodeGenerator : ISyntaxTreeNodeIn
     virtual AssemblyCode* GenerateBinaryOperation(OperatorExpressionNode* binaryOperation) override;
     virtual AssemblyCode* GenerateUnaryOperation(UnaryExpressionNode* unaryOperation) override;
 
-    virtual AssemblyCode* GenerateValueChain(ValueChainNode* valueChain) override;
+    virtual AssemblyCode* GenerateValueChain(IdentifierChainNode* valueChain) override;
     virtual AssemblyCode* GenerateStaticValueChain(StaticValueChainNode* valueChain) override;
     virtual AssemblyCode* GenerateIDValue(IDValueNode* value) override;
     virtual AssemblyCode* GenerateCall(CallNode* call) override;
@@ -74,6 +74,7 @@ class CodeGenerator : ISyntaxTreeNodeIn
                                                       ECodeGeneratorBinaryOperators operation);
 
     AssemblyCode* AssignVariable(Variable* variable, AbstractExpressionNode* value);
+    AssemblyCode* AssignVariable(Variable* variable, Variable* value);
 
     AssemblyCode* AssignFunction(std::string mangledName, Function* function, AssemblyCode* body);
 
@@ -362,7 +363,7 @@ AssemblyCode* CodeGenerator::GenerateUnaryOperation(UnaryExpressionNode* unaryOp
     return nullptr;
 }
 
-AssemblyCode* CodeGenerator::GenerateValueChain(ValueChainNode* valueChain)
+AssemblyCode* CodeGenerator::GenerateValueChain(IdentifierChainNode* valueChain)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
@@ -515,6 +516,13 @@ AssemblyCode* CodeGenerator::AssignVariable(Variable* variable, AbstractExpressi
     return assemblyCode->AddLines(PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN));
 }
 
+AssemblyCode* CodeGenerator::AssignVariable(Variable* variable, Variable* value)
+{
+    relativeAccessVariable = variable;
+    tempVariableStack.Push(value);
+    return PerformBinaryOperationWithTempVariable(ECodeGeneratorBinaryOperators::ASSIGN);
+}
+
 AssemblyCode* CodeGenerator::AssignFunction(std::string mangledName, Function* function, AssemblyCode* body)
 {
     if (function->IsInline())
@@ -603,13 +611,44 @@ AssemblyCode* CodeGenerator::CallFunction(std::string name, unsigned int argumen
 
 AssemblyCode* CodeGenerator::CallFunction(Function* function, Stack<Variable*> arguments)
 {
-    if (function->IsInline())
+    AssemblyCode* assemblyCode = new AssemblyCode();
+    bool isInline = function->IsInline();
+
+    if (isInline)
     {
-        // TODO: this
         environmentLinkedList->PushNew();
     }
 
-    return nullptr;
+    for (unsigned int i = 0; i < function->parameters.size(); i++)
+    {
+        Variable* functionParameterVar = function->parameters[i];
+        Variable* argumentVar = arguments.Pop();
+
+        if (functionParameterVar == nullptr)
+        {
+            std::cout << "Function argument variable is null" << std::endl;
+            continue;
+        }
+
+        if (argumentVar == nullptr)
+        {
+            std::cout << "Argument variable is null" << std::endl;
+            continue;
+        }
+
+        if (functionParameterVar->IsInline())
+        {
+            if (!isInline)
+            {
+                std::cout << "Function parameter is inline but function is not" << std::endl;
+                return;
+            }
+        }
+        else
+        {
+            assemblyCode->AddLines(AssignVariable(functionParameterVar, argumentVar));
+        }
+    }
 }
 
 void CodeGenerator::ActivateRelativeAccessVariableEnvironment(bool isStatic)
