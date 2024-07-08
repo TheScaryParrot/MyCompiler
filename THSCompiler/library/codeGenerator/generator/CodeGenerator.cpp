@@ -80,9 +80,10 @@ class CodeGenerator : ISyntaxTreeNodeIn
     std::string MangleFunctionName(std::string functionName, std::vector<Variable*> arguments);
 
     AssemblyCode* CallFunction(std::string name, unsigned int argumentsCount);
+    AssemblyCode* CallFunction(Function* function, Stack<Variable*> arguments);
 
-    /// @brief Sets the environmentLinkedList to the environment of the relativeAccessVariable. Old linked list is lost.
-    /// Don't forget to backup and restore
+    /// @brief Sets the environmentLinkedList to the environment of the relativeAccessVariable. Old linked list is
+    /// lost. Don't forget to backup and restore
     void ActivateRelativeAccessVariableEnvironment(bool isStatic);
 
     unsigned int functionLabelCounter = 1;
@@ -598,6 +599,17 @@ AssemblyCode* CodeGenerator::CallFunction(std::string name, unsigned int argumen
     }
 
     return assemblyCode->AddLines(function->GetFunctionCallCode());
+}
+
+AssemblyCode* CodeGenerator::CallFunction(Function* function, Stack<Variable*> arguments)
+{
+    if (function->IsInline())
+    {
+        // TODO: this
+        environmentLinkedList->PushNew();
+    }
+
+    return nullptr;
 }
 
 void CodeGenerator::ActivateRelativeAccessVariableEnvironment(bool isStatic)
