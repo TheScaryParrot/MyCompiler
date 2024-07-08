@@ -38,7 +38,7 @@ std::string ValueChainNode::ToString()
 
     for (size_t i = 1; i < propertyAccesses.size(); i++)
     {
-        result += ":";
+        result += ".";
         result += propertyAccesses[i]->ToString();
     }
 
