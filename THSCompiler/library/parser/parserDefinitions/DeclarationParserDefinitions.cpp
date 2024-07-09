@@ -4,35 +4,25 @@
 #include "../../tokens/Keywords.cpp"
 #include "../PredictiveParser.hpp"
 
-ELookAheadCertainties PredictiveParser::LookAhead_Declaration(TokenList* tokens)
+bool PredictiveParser::LookAhead_Declaration(TokenList* tokens)
 {
-    if (tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD)) return ELookAheadCertainties::CertainlyPresent;
-
-    return LookAhead_VarFuncDeclaration(tokens);
+    return tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD) || LookAhead_VarFuncDeclaration(tokens);
 }
 AbstractDeclarationNode* PredictiveParser::Parse_Declaration(TokenList* tokens)
 {
-    if (LookAhead_ClassDeclaration(tokens) == ELookAheadCertainties::CertainlyPresent)
-        return Parse_ClassDeclaration(tokens);
+    if (LookAhead_ClassDeclaration(tokens)) return Parse_ClassDeclaration(tokens);
     return Parse_VarFuncDeclaration(tokens);
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_ClassDeclaration(TokenList* tokens)
+bool PredictiveParser::LookAhead_ClassDeclaration(TokenList* tokens)
 {
     if (tokens->IsPeekOfTokenType(Keywords.STATIC_KEYWORD))
     {
         // If static keyword is present, look at the next token
-        if (tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD, 1))
-        {
-            return ELookAheadCertainties::CertainlyPresent;
-        }
-    }
-    else if (tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD))
-    {
-        return ELookAheadCertainties::CertainlyPresent;
+        return tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD, 1);
     }
 
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD);
 }
 ClassDeclarationNode* PredictiveParser::Parse_ClassDeclaration(TokenList* tokens)
 {
@@ -53,42 +43,24 @@ ClassDeclarationNode* PredictiveParser::Parse_ClassDeclaration(TokenList* tokens
     return new ClassDeclarationNode(isStatic, className, body);
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclaration(TokenList* tokens)
+bool PredictiveParser::LookAhead_VarFuncDeclaration(TokenList* tokens)
 {
-    // <varFuncDeclarationAttributes>
-    if (LookAhead_VarFuncDeclarationAttributes(tokens) == ELookAheadCertainties::CertainlyPresent)
-        return ELookAheadCertainties::CertainlyPresent;
-
-    // VOID
-    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD)) return ELookAheadCertainties::CertainlyPresent;
-
-    // ID ID
-    if (tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) &&
-        tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1))
-        return ELookAheadCertainties::CertainlyPresent;
-
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return LookAhead_VarDeclaration(tokens) || LookAhead_FuncDeclaration(tokens);
 }
 AbstractVarFuncDeclarationNode* PredictiveParser::Parse_VarFuncDeclaration(TokenList* tokens)
 {
-    if (LookAhead_FuncDeclaration(tokens) == ELookAheadCertainties::CertainlyPresent)
-        return Parse_FuncDeclaration(tokens);
+    if (LookAhead_FuncDeclaration(tokens) == true) return Parse_FuncDeclaration(tokens);
     return Parse_VarDeclaration(tokens);
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_VarDeclaration(TokenList* tokens)
+bool PredictiveParser::LookAhead_VarDeclaration(TokenList* tokens)
 {
     unsigned int i = Skip_VarFuncDeclarationAttributes(tokens);
 
     // <varFuncDeclarationAttributes>? ID ID !(
-    if (!tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++))
-        return ELookAheadCertainties::CertainlyNotPresent;
-    if (!tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++))
-        return ELookAheadCertainties::CertainlyNotPresent;
-    if (tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, i))
-        return ELookAheadCertainties::CertainlyNotPresent;
-
-    return ELookAheadCertainties::CertainlyPresent;
+    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           !tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, i);     // !(
 }
 VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens)
 {
@@ -108,22 +80,17 @@ VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens)
     return new VarDeclarationNode(attributes, type, name, value);
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_FuncDeclaration(TokenList* tokens)
+bool PredictiveParser::LookAhead_FuncDeclaration(TokenList* tokens)
 {
     unsigned int i = Skip_VarFuncDeclarationAttributes(tokens);
 
     // <varFuncDeclarationAttributes>? VOID
-    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD, i)) return ELookAheadCertainties::CertainlyPresent;
+    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD, i)) return true;
 
     // <varFuncDeclarationAttributes>? ID ID (
-    if (!tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++))
-        return ELookAheadCertainties::CertainlyNotPresent;
-    if (!tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++))
-        return ELookAheadCertainties::CertainlyNotPresent;
-    if (!tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, i))
-        return ELookAheadCertainties::CertainlyNotPresent;
-
-    return ELookAheadCertainties::CertainlyPresent;
+    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, i);      // (
 }
 FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 {
@@ -153,28 +120,18 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
     return new FuncDeclarationNode(attributes, returnType, name, parameters, body);
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_VarFuncDeclarationAttributes(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_VarFuncDeclarationAttributes(TokenList* tokens, unsigned int offset)
 {
-    // <scope> | <static> | <readWrite>
-    if (LookAhead_ScopeAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent)
-        return ELookAheadCertainties::CertainlyPresent;
-    if (LookAhead_StaticAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent)
-        return ELookAheadCertainties::CertainlyPresent;
-    if (LookAhead_FinalAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent)
-        return ELookAheadCertainties::CertainlyPresent;
-    if (LookAhead_InlineAttribute(tokens, offset) == ELookAheadCertainties::CertainlyPresent)
-        return ELookAheadCertainties::CertainlyPresent;
-
-    // no attributes case
-    return ELookAheadCertainties::Unknown;
+    // <scope> | <static> | <final> | <inline>
+    return LookAhead_ScopeAttribute(tokens, offset) || LookAhead_StaticAttribute(tokens, offset) ||
+           LookAhead_FinalAttribute(tokens, offset) || LookAhead_InlineAttribute(tokens, offset);
 }
 unsigned int PredictiveParser::Skip_VarFuncDeclarationAttributes(TokenList* tokens)
 {
     unsigned int skippedTokens = 0;
 
-    // while either scope, static or readwrite attribute is present. If empty this will be
-    // ELookAheadCertainties::Unknown
-    while (LookAhead_VarFuncDeclarationAttributes(tokens, skippedTokens) == ELookAheadCertainties::CertainlyPresent)
+    // while either scope, static or readwrite attribute is present. If empty this will be false
+    while (LookAhead_VarFuncDeclarationAttributes(tokens, skippedTokens))
     {
         skippedTokens++;
     }
@@ -185,22 +142,22 @@ SyntaxTreeDeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttrib
 {
     SyntaxTreeDeclarationAttributes attributes;
 
-    if (LookAhead_ScopeAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_ScopeAttribute(tokens))
     {
         attributes.scope = Parse_ScopeAttribute(tokens);
     }
 
-    if (LookAhead_StaticAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_StaticAttribute(tokens))
     {
         attributes.isStatic = Parse_StaticAttribute(tokens);
     }
 
-    if (LookAhead_FinalAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_FinalAttribute(tokens))
     {
         attributes.isFinal = Parse_FinalAttribute(tokens);
     }
 
-    if (LookAhead_InlineAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_InlineAttribute(tokens))
     {
         attributes.isInline = Parse_InlineAttribute(tokens);
     }
@@ -208,16 +165,16 @@ SyntaxTreeDeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttrib
     return attributes;
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_Params(TokenList* tokens)
+bool PredictiveParser::LookAhead_Params(TokenList* tokens)
 {
-    // <paramDeclaration> (SEPERATOR <paramDeclaration>)* can be empty, therefore always unknown
-    return ELookAheadCertainties::Unknown;
+    // <paramDeclaration> (SEPERATOR <paramDeclaration>)* can be empty, therefore always true
+    return true;
 }
 std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList* tokens)
 {
     std::vector<ParameterDeclarationNode*>* parameters = new std::vector<ParameterDeclarationNode*>();
 
-    if (LookAhead_ParamDeclaration(tokens) != ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_ParamDeclaration(tokens) != true)
     {
         return parameters;
     }
@@ -234,12 +191,12 @@ std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList
     return parameters;
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_ParamDeclaration(TokenList* tokens)
+bool PredictiveParser::LookAhead_ParamDeclaration(TokenList* tokens)
 {
     // <paramAttributes> | ID ID
     if (tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) &&
         tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1))
-        return ELookAheadCertainties::CertainlyPresent;
+        return true;
 
     return LookAhead_ParamAttributes(tokens);
 }
@@ -247,7 +204,7 @@ ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* to
 {
     SyntaxTreeParamAttributes attributes;
 
-    if (LookAhead_ParamAttributes(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_ParamAttributes(tokens) == true)
     {
         attributes = Parse_ParamAttributes(tokens);
     }
@@ -257,24 +214,21 @@ ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* to
     return new ParameterDeclarationNode(attributes, type, tokens->Next<IdentifierToken>()->GetValue());
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_ParamAttributes(TokenList* tokens)
+bool PredictiveParser::LookAhead_ParamAttributes(TokenList* tokens)
 {
     // FINAL | INLINE
-    if (LookAhead_FinalAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
-        return ELookAheadCertainties::CertainlyPresent;
-
-    return LookAhead_InlineAttribute(tokens);
+    return LookAhead_FinalAttribute(tokens) || LookAhead_InlineAttribute(tokens);
 }
 SyntaxTreeParamAttributes PredictiveParser::Parse_ParamAttributes(TokenList* tokens)
 {
     SyntaxTreeParamAttributes attributes;
 
-    if (LookAhead_FinalAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_FinalAttribute(tokens) == true)
     {
         attributes.isFinal = Parse_FinalAttribute(tokens);
     }
 
-    if (LookAhead_InlineAttribute(tokens) == ELookAheadCertainties::CertainlyPresent)
+    if (LookAhead_InlineAttribute(tokens) == true)
     {
         attributes.isInline = Parse_InlineAttribute(tokens);
     }
@@ -282,12 +236,10 @@ SyntaxTreeParamAttributes PredictiveParser::Parse_ParamAttributes(TokenList* tok
     return attributes;
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_Body(TokenList* tokens)
+bool PredictiveParser::LookAhead_Body(TokenList* tokens)
 {
     // BODY_OPEN
-    if (tokens->IsPeekOfTokenType(ConstTokens.BODY_OPEN_TOKEN)) return ELookAheadCertainties::CertainlyPresent;
-
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return tokens->IsPeekOfTokenType(ConstTokens.BODY_OPEN_TOKEN);
 }
 BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
 {
@@ -305,15 +257,12 @@ BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
     return bodynode;
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_ScopeAttribute(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_ScopeAttribute(TokenList* tokens, unsigned int offset)
 {
     // PUBLIC | PRIVATE | PROTECTED
-    if (tokens->IsPeekOfTokenType(Keywords.PUBLIC_KEYWORD, offset) ||
-        tokens->IsPeekOfTokenType(Keywords.PRIVATE_KEYWORD, offset) ||
-        tokens->IsPeekOfTokenType(Keywords.PROTECTED_KEYWORD, offset))
-        return ELookAheadCertainties::CertainlyPresent;
-
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return tokens->IsPeekOfTokenType(Keywords.PUBLIC_KEYWORD, offset) ||
+           tokens->IsPeekOfTokenType(Keywords.PRIVATE_KEYWORD, offset) ||
+           tokens->IsPeekOfTokenType(Keywords.PROTECTED_KEYWORD, offset);
 }
 ESyntaxTreeScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens)
 {
@@ -326,12 +275,10 @@ ESyntaxTreeScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens)
     return ESyntaxTreeScopes::PROTECTED;
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset)
 {
     // STATIC
-    if (tokens->IsPeekOfTokenType(Keywords.STATIC_KEYWORD, offset)) return ELookAheadCertainties::CertainlyPresent;
-
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return tokens->IsPeekOfTokenType(Keywords.STATIC_KEYWORD, offset);
 }
 bool PredictiveParser::Parse_StaticAttribute(TokenList* tokens)
 {
@@ -339,12 +286,10 @@ bool PredictiveParser::Parse_StaticAttribute(TokenList* tokens)
     return true;  // As LookAhead_StaticAttribute() has returned CertainlyPresent, we know that static must be present
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset)
 {
     // FINAL
-    if (tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD, offset)) return ELookAheadCertainties::CertainlyPresent;
-
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD, offset);
 }
 bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens)
 {
@@ -352,12 +297,10 @@ bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens)
     return true;     // As LookAhead_FinalAttribute() has returned CertainlyPresent, we know that final must be present
 }
 
-ELookAheadCertainties PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens, unsigned int offset)
 {
     // INLINE
-    if (tokens->IsPeekOfTokenType(Keywords.INLINE_KEYWORD, offset)) return ELookAheadCertainties::CertainlyPresent;
-
-    return ELookAheadCertainties::CertainlyNotPresent;
+    return tokens->IsPeekOfTokenType(Keywords.INLINE_KEYWORD, offset);
 }
 bool PredictiveParser::Parse_InlineAttribute(TokenList* tokens)
 {

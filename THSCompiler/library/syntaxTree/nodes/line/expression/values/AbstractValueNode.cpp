@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AbstractExpressionNode.cpp"
+#include "../AbstractExpressionNode.cpp"
 
 class AbstractValueNode : public AbstractExpressionNode
 {

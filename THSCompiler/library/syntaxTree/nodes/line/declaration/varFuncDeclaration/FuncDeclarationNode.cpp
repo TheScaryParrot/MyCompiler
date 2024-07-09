@@ -48,7 +48,7 @@ FuncDeclarationNode::~FuncDeclarationNode()
 
 std::string FuncDeclarationNode::ToString()
 {
-    std::string result = "func: " + attributes.ToString() + " " + returnType.ToString() + " " + name + "(";
+    std::string result = attributes.ToString() + " " + returnType.ToString() + " " + name + "(";
 
     for (ParameterDeclarationNode* parameter : *parameters)
     {

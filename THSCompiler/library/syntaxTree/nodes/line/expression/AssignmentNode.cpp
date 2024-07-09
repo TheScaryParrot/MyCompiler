@@ -21,7 +21,6 @@ class Assignment
 class AssignmentNode : public AbstractExpressionNode
 {
    public:
-    AssignmentNode(std::vector<Assignment*> assignments, AbstractExpressionNode* value);
     virtual ~AssignmentNode();
 
     virtual std::string ToString() override;
@@ -29,13 +28,6 @@ class AssignmentNode : public AbstractExpressionNode
     std::vector<Assignment*> assignments;
     AbstractExpressionNode* value;
 };
-
-AssignmentNode::AssignmentNode(std::vector<Assignment*> assignments, AbstractExpressionNode* value)
-    : AbstractExpressionNode()
-{
-    this->assignments = assignments;
-    this->value = value;
-}
 
 AssignmentNode::~AssignmentNode() { delete value; }
 

@@ -22,3 +22,23 @@ public final int num2 = 1;
 
 num1 += num2 * 5;
 
+class doubleInt
+{
+    public int num1;
+    public int num2;
+
+    public static doubleInt doubleInt()
+    {
+
+    }
+}
+
+public doubleInt dInt = doubleInt();
+
+dInt.num1:hello().(5 + dInt.num2).moin."hi";
+
+dInt.num1 = dInt.num2:hello() * 5;
+dInt.num2 = 2;
+
+int num3 = dInt.num1 + dInt.num2;
+
