@@ -21,6 +21,7 @@
 #include "../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
 #include "CodeGenerator.cpp"
+#include "Environment.cpp"
 
 class SyntaxTreeTraverser
 {
@@ -30,6 +31,7 @@ class SyntaxTreeTraverser
    private:
     CodeGenerator* codeGenerator;
 
+    void TraverseCodeBlock(CodeblockNode* node, AssemblyCode* assemblyCode);
     void TraverseLineNode(AbstractLineNode* node, AssemblyCode* assemblyCode);
 
     void TraverseDeclarationNode(AbstractDeclarationNode* node, AssemblyCode* assemblyCode);
@@ -41,6 +43,9 @@ class SyntaxTreeTraverser
     void TraverseEmptyStatementNode(EmptyStatementNode* node, AssemblyCode* assemblyCode);
     void TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, AssemblyCode* assemblyCode);
     void TraverseBodyNode(BodyNode* node, AssemblyCode* assemblyCode);
+    /// @brief Overload of TraverseBodyNode for when instead of pushing a new environment, the environment  passed as
+    /// an argument is pushed(eg. used by TraverseClassDeclarationNode)
+    void TraverseBodyNode(BodyNode* node, AssemblyCode* assemblyCode, Environment* environment);
 
     void TraverseExpressionNode(AbstractExpressionNode* node, AssemblyCode* assemblyCode);
     void TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, AssemblyCode* assemblyCode);
@@ -62,16 +67,21 @@ AssemblyCode* SyntaxTreeTraverser::Traverse(SyntaxTree* syntaxTree)
 {
     AssemblyCode* assemblyCode = new AssemblyCode();
 
-    for (unsigned int i = 0; i < syntaxTree->GetLineCount(); i++)
-    {
-        AbstractLineNode* node = syntaxTree->GetLine(i);
-
-        if (node == nullptr) continue;
-
-        TraverseLineNode(node, assemblyCode);
-    }
+    TraverseCodeBlock(syntaxTree->GetCodeBlock(), assemblyCode);
 
     return assemblyCode;
+}
+
+void SyntaxTreeTraverser::TraverseCodeBlock(CodeblockNode* node, AssemblyCode* assemblyCode)
+{
+    for (unsigned int i = 0; i < node->GetLineCount(); i++)
+    {
+        AbstractLineNode* lineNode = node->GetLine(i);
+
+        if (lineNode == nullptr) continue;
+
+        TraverseLineNode(lineNode, assemblyCode);
+    }
 }
 
 void SyntaxTreeTraverser::TraverseLineNode(AbstractLineNode* node, AssemblyCode* assemblyCode)
@@ -117,7 +127,15 @@ void SyntaxTreeTraverser::TraverseFuncDeclarationNode(FuncDeclarationNode* node,
 
 void SyntaxTreeTraverser::TraverseClassDeclarationNode(ClassDeclarationNode* node, AssemblyCode* assemblyCode)
 {
-    // TODO: Class declaration
+    CodeGenerator::CodeGeneratorStates stateBackup = codeGenerator->state;
+    codeGenerator->state = CodeGenerator::CodeGeneratorStates::CLASS;
+
+    Environment* classEnv = new Environment();
+    // TODO: Add type with Environment
+    TraverseBodyNode(node->body, assemblyCode, classEnv);
+
+    codeGenerator->state = stateBackup;
+    // TODO: Implement node->isStatic (add variable called like the class)
 }
 
 void SyntaxTreeTraverser::TraverseStatementNode(AbstractStatementNode* node, AssemblyCode* assemblyCode)
@@ -152,7 +170,16 @@ void SyntaxTreeTraverser::TraverseKeywordStatementNode(AbstractKeywordStatementN
 
 void SyntaxTreeTraverser::TraverseBodyNode(BodyNode* node, AssemblyCode* assemblyCode)
 {
-    // TODO: Body
+    Environment* environment = new Environment();
+    TraverseBodyNode(node, assemblyCode, environment);
+    delete environment;
+}
+
+void SyntaxTreeTraverser::TraverseBodyNode(BodyNode* node, AssemblyCode* assemblyCode, Environment* environment)
+{
+    codeGenerator->environmentList->Push(environment);
+    TraverseCodeBlock(node->GetCodeBlock(), assemblyCode);
+    codeGenerator->environmentList->Pop();
 }
 
 void SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressionNode* node, AssemblyCode* assemblyCode)

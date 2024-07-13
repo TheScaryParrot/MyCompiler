@@ -11,8 +11,6 @@ class SyntaxTree
     ~SyntaxTree();
 
     void AddCodeLineNode(AbstractLineNode* codeLine);
-    AbstractLineNode* GetLine(int index);
-    unsigned int GetLineCount();
 
     CodeblockNode* GetCodeBlock();
 
@@ -27,10 +25,6 @@ SyntaxTree::SyntaxTree() {}
 SyntaxTree::~SyntaxTree() { delete codeBlock; }
 
 void SyntaxTree::AddCodeLineNode(AbstractLineNode* codeLine) { codeBlock->AddCodeline(codeLine); }
-
-AbstractLineNode* SyntaxTree::GetLine(int index) { return codeBlock->GetLine(index); }
-
-unsigned int SyntaxTree::GetLineCount() { return codeBlock->GetLineCount(); }
 
 CodeblockNode* SyntaxTree::GetCodeBlock() { return codeBlock; }
 
