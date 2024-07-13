@@ -40,5 +40,5 @@ std::string CallNode::ToString()
         result += argument->ToString() + ", ";
     }
 
-    return result + ");";
+    return result + ")";
 }
