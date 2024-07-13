@@ -1,0 +1,72 @@
+\documentclass[]{article}
+\title{Compiler Construction}
+\author{Fabio Stalder}
+\date{2024}
+
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+    Abstract Here
+\end{abstract}
+\begin{enumerate}
+    \item what is a compiler
+          \begin{enumerate}
+              \item general idea
+              \item how to implement
+          \end{enumerate}
+    \item my different approach (QHS)
+          \begin{enumerate}
+              \item define lots of macros, use lots of macros. W
+              \item write direct assembly code
+              \item only few responsibilities for Compiler
+          \end{enumerate}
+    \item approach for comparison
+          \begin{enumerate}
+              \item 3 compilers THS, QHS and gcc
+              \item required features
+                    \begin{enumerate}
+                        \item output as assembly
+                        \item C like syntax
+                        \item basic OOP features
+                        \item every type defined as a class
+                    \end{enumerate}
+              \item comparison
+                    \begin{enumerate}
+                        \item ease of use
+                        \item speed of compilation
+                        \item speed of assembly output
+                        \item customizability, freedom and possibility for extension
+                        \item error handling (required skill as a programmer)
+                    \end{enumerate}
+          \end{enumerate}
+    \item building the compilers
+          \begin{enumerate}
+              \item written in C++
+              \item THS compiler
+                    \begin{enumerate}
+                        \item compiler instructions in code
+                        \item switch to assembly code in lexer
+                        \item the Assign function problem (args for Assign function are set by calling Assign function)
+                    \end{enumerate}
+              \item QHS compiler
+                    \begin{enumerate}
+                        \item super simple lexer
+                        \item no parser
+                        \item compiler instructions
+                              \begin{enumerate}
+                                  \item orderStack
+                                  \item typeStack
+                                  \item defining identifiers
+                              \end{enumerate}
+                        \item preambel defining all the stuff
+                              \begin{enumerate}
+                                  \item simple shortcuts (braces, semicolons)
+                                  \item more complicated stuff (classes, functions)
+                              \end{enumerate}
+                    \end{enumerate}
+          \end{enumerate}
+\end{enumerate}
+\end{document}
