@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../utils/Stack.cpp"
-#include "EnvironmentLinkedList.cpp"
 #include "VariableLocation.cpp"
+#include "environment/EnvironmentLinkedList.cpp"
 
 class CodeGenerator
 {
@@ -15,6 +15,5 @@ class CodeGenerator
     } state;
 
     VariableLocation* relAccessVarLocation;
-    Stack<VariableLocation*> varLocationStack;
     EnvironmentLinkedList* environmentList;
 };

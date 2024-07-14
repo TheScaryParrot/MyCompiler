@@ -22,10 +22,10 @@ static class VariableLocationFactory
 
     static VariableLocation* CreateVariableLocation(Type* type) { return new VariableLocation("", 0, type); }
 
-    /// @brief New VariableLocation with base of loc1, type of loc2 and offset of loc1 + loc2; used for relative access
-    /// (eg. properties)
-    static VariableLocation* CreateVariableLocation(VariableLocation* loc1, VariableLocation* loc2)
+    /// @brief New VariableLocation with base of owner, type of property and offset of owner + property; used for
+    /// relative access (eg. properties)
+    static VariableLocation* CreateRelativeVariableLocation(VariableLocation* owner, VariableLocation* property)
     {
-        return new VariableLocation(loc1->GetBase(), loc1->GetOffset() + loc2->GetOffset(), loc2->GetType());
+        return new VariableLocation(owner->GetBase(), owner->GetOffset() + property->GetOffset(), property->GetType());
     }
 } VariableLocationFactory;

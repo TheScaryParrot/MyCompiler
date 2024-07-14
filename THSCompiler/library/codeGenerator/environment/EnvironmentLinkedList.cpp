@@ -30,6 +30,19 @@ class EnvironmentLinkedList
         return oldEnvironment;
     }
 
+    VariableLocation* GetVariableLocation(std::string name);
+
    private:
     EnvironmentLinkedListElement* head;
 };
+
+VariableLocation* EnvironmentLinkedList::GetVariableLocation(std::string name)
+{
+    for (EnvironmentLinkedListElement* current = head; current != nullptr; current = current->next)
+    {
+        VariableLocation* location = current->self->GetVariableLocation(name);
+        if (location != nullptr) return location;
+    }
+
+    return nullptr;
+}
