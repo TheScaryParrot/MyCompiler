@@ -16,4 +16,14 @@ class CodeGenerator
 
     VariableLocation* relAccessVarLocation;
     EnvironmentLinkedList* environmentList;
+
+    const std::string CLASS_SIZE_COMPILE_VAR = "classSize";
+
+    CodeGenerator()
+    {
+        state = CodeGeneratorStates::GLOBAL;
+        relAccessVarLocation = nullptr;
+        environmentList = new EnvironmentLinkedList();
+        environmentList->Push(new Environment());
+    }
 };
