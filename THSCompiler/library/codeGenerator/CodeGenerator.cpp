@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../utils/Stack.cpp"
-#include "VariableLocation.cpp"
 #include "environment/EnvironmentLinkedList.cpp"
+#include "varLocation/IVariableLocation.cpp"
 
 class CodeGenerator
 {
@@ -14,7 +14,7 @@ class CodeGenerator
         CLASS
     } state;
 
-    VariableLocation* relAccessVarLocation;
+    IVariableLocation* relAccessBaseVarLocation;
     EnvironmentLinkedList* environmentList;
 
     const std::string CLASS_SIZE_COMPILE_VAR = "classSize";
@@ -22,7 +22,7 @@ class CodeGenerator
     CodeGenerator()
     {
         state = CodeGeneratorStates::GLOBAL;
-        relAccessVarLocation = nullptr;
+        relAccessBaseVarLocation = nullptr;
         environmentList = new EnvironmentLinkedList();
         environmentList->Push(new Environment());
     }

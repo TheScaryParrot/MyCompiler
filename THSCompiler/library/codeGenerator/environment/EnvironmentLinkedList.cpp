@@ -38,8 +38,8 @@ class EnvironmentLinkedList : public IEnvironment
     /// @brief Sets head to nullptr; Does not delete the Environment objects!
     void Clear() { head = nullptr; }
 
-    virtual Map<std::string, VariableLocation*>* GetVariableMap() override { return head->self->GetVariableMap(); }
-    VariableLocation* GetVariable(std::string key)
+    virtual Map<std::string, IVariableLocation*>* GetVariableMap() override { return head->self->GetVariableMap(); }
+    IVariableLocation* GetVariable(std::string key)
     {
         for (EnvironmentLinkedListElement* current = head; current != nullptr; current = current->next)
         {
@@ -141,4 +141,20 @@ class EnvironmentLinkedList : public IEnvironment
 
         return false;
     }
+
+    virtual Type* GetNumConstType() override
+    {
+        for (EnvironmentLinkedListElement* current = head; current != nullptr; current = current->next)
+        {
+            Type* type = current->self->GetNumConstType();
+
+            if (type != nullptr)
+            {
+                return type;
+            }
+        }
+
+        return nullptr;
+    }
+    virtual void SetNumConstType(Type* type) override { head->self->SetNumConstType(type); }
 };
