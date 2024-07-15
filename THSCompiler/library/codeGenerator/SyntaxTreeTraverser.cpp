@@ -126,6 +126,7 @@ void SyntaxTreeTraverser::TraverseVarDeclarationNode(VarDeclarationNode* node, A
     switch (codeGenerator->state)
     {
         case CodeGenerator::CodeGeneratorStates::GLOBAL:
+            // TODO: New variable in data section of assemblyCode
             break;
         case CodeGenerator::CodeGeneratorStates::FUNCTION:
             if (node->attributes.isInline)
@@ -137,6 +138,10 @@ void SyntaxTreeTraverser::TraverseVarDeclarationNode(VarDeclarationNode* node, A
 
                 break;
             }
+
+            propertyLocation = codeGenerator->AllocateNewVariableLocation(type, assemblyCode);
+            break;
+
         case CodeGenerator::CodeGeneratorStates::CLASS:
 
             if (node->attributes.isInline)
