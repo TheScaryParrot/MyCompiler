@@ -22,6 +22,7 @@
 #include "../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
 #include "CodeGenerator.cpp"
 #include "environment/Environment.cpp"
+#include "function/Function.cpp"
 #include "varLocation/IVariableLocation.cpp"
 #include "varLocation/NumConstVarLocation.cpp"
 #include "varLocation/RelAccessVarLocation.cpp"
@@ -136,10 +137,19 @@ void SyntaxTreeTraverser::TraverseVarDeclarationNode(VarDeclarationNode* node, A
                     propertyLocation = TraverseExpressionNode(node->value, assemblyCode);
                 }
 
+                propertyLocation->SetIsInline(true);
+
                 break;
             }
 
             propertyLocation = codeGenerator->AllocateNewVariableLocation(type, assemblyCode);
+
+            if (node->value != nullptr)
+            {
+                IVariableLocation* valueLocation = TraverseExpressionNode(node->value, assemblyCode);
+                // TODO: Move value from valueLocation to propertyLocation
+            }
+
             break;
 
         case CodeGenerator::CodeGeneratorStates::CLASS:
@@ -157,6 +167,7 @@ void SyntaxTreeTraverser::TraverseVarDeclarationNode(VarDeclarationNode* node, A
                     propertyLocation = TraverseExpressionNode(node->value, assemblyCode);
                 }
 
+                propertyLocation->SetIsInline(true);
                 break;
             }
 
@@ -317,7 +328,57 @@ IVariableLocation* SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* nod
 
 IVariableLocation* SyntaxTreeTraverser::TraverseCallNode(CallNode* node, AssemblyCode* assemblyCode)
 {
-    // TODO: Call
+    Function* function = nullptr;
+
+    std::vector<IVariableLocation*> arguments;
+    Map<std::string, IVariableLocation*>* parameterMap = function->environment->GetVariableMap();
+
+    if (function->isInline)
+    {
+        codeGenerator->environmentList->Push(function->environment);
+        CodeGenerator::CodeGeneratorStates stateBackup = codeGenerator->state;
+        codeGenerator->state = CodeGenerator::CodeGeneratorStates::FUNCTION;
+
+        unsigned int i = 0;
+
+        for (std::pair<std::string, IVariableLocation*> pair : *parameterMap)
+        {
+            IVariableLocation* argument = arguments[i];
+            std::string parameterName = pair.first;
+            IVariableLocation* parameter = pair.second;
+
+            if (parameter->IsInline())
+            {
+                // Directly sets the variable in the environment to the argument
+                codeGenerator->environmentList->GetVariableMap()->Insert(parameterName, argument);
+            }
+            else
+            {
+                codeGenerator->GenerateCodeAssign(parameter, argument, assemblyCode);
+                // Varlocation in environment remains unchanged as it was just assigned to
+            }
+
+            i++;
+        }
+
+        // TODO: Make function body
+    }
+    else
+    {
+        unsigned int i = 0;
+
+        for (std::pair<std::string, IVariableLocation*> pair : *parameterMap)
+        {
+            IVariableLocation* argument = arguments[i];
+            IVariableLocation* parameter = pair.second;
+            codeGenerator->GenerateCodeAssign(parameter, argument, assemblyCode);
+            i++;
+        }
+
+        // TODO: Call function
+    }
+
+    return parameterMap->Get(function->RETURN_VARIABLE_NAME);
 }
 
 IVariableLocation* SyntaxTreeTraverser::TraverseIdentifierNode(IdentifierNode* node, AssemblyCode* assemblyCode)

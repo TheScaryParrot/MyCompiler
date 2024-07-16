@@ -40,4 +40,9 @@ class CodeGenerator
 
         return new RegistryVarLocation("eax", 0, type);
     }
+
+    void GenerateCodeAssign(IVariableLocation* dest, IVariableLocation* src, AssemblyCode* assemblyCode)
+    {
+        // TODO: Call assign function
+    }
 };
