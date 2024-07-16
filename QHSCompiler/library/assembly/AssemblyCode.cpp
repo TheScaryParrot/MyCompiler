@@ -27,4 +27,4 @@ void AssemblyCode::AddCode(std::string code)
 
 std::string AssemblyCode::GetCode() { return code; }
 
-std::string AssemblyCode::ToString() { return "---- AssemblyCode ----\n" + GetCode(); }
+std::string AssemblyCode::ToString() { return GetCode(); }

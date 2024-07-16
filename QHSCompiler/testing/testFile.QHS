@@ -84,9 +84,6 @@
 [ ] [ ] { "
 " #clearOrderQueue }  >> ;
 
-"aaa
-aaa"
-
 [ ] [ ] { #debug } >> debug ;
 
 /*
@@ -97,13 +94,6 @@ debug */
 [ ] [ ] { #putInFrontFromOrderQueue } >> $ ;
 
 
-[ ] [ ] {"rax"} >> rax ;
-[ ] [ ] {"$5"} >> 5 ;
-
-[ ] [ ] { "mov " $ ", " $ } >> mov ;
-
-( rax 5 ) mov ;
-
 /* swapping */
 
 
@@ -113,7 +103,59 @@ debug */
     ( second )
 } >> swap ;
 
-( "1" "2" ) swap
+/* ( "1" "2" ) swap
 
-$ $
+$ $ */
+
+[ ] [ ] {
+"global _start
+
+section .text
+
+_start:
+"} >> startCode ;
+
+[ ] [ ] { "section .rodata" } >> rodata ;
+
+[ ] [ ] { "mov rax, 60
+mov rdi, 0
+syscall " } >> exit ;
+
+[ ] [ ]
+{
+    [ ] [ ] -> message
+    [ ] [ ] -> messageLength
+    "mov rax, 1
+mov rdi, 1
+mov rsi, " message
+"
+mov rdx, " messageLength
+"
+syscall"
+} >> print ;
+
+[ ] [ ] 
+{
+    [ ] [ ] -> name
+    [ ] [ ] -> assignCode
+    name ": " assignCode ;
+} >> globalVar
+
+/* actually coding */
+
+rodata ;
+
+[ ] [ ] { "wordToGuess" } >> wordToGuess ;
+( wordToGuess "db 'moin', 0xa" ) globalVar ;
+
+[ ] [ ] { "wordLength" } >> wordLength ;
+( wordLength "equ $ - wordToGuess" ) globalVar ;
+
+
+startCode ;
+
+( wordToGuess wordLength ) print ;
+
+
+exit ;
 
