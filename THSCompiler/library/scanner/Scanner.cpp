@@ -61,8 +61,8 @@ TokenList* Scanner::Scan(InputFile* file)
         // --- Delimitors ---
         if (TryAddCharacterGroupToken(file, tokens, Tokens.STATEMENT_END_TOKEN, character, peekCharacter)) continue;
 
-        if (TryAddCharacterGroupToken(file, tokens, Tokens.BODY_OPEN_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, Tokens.BODY_CLOSE_TOKEN, character, peekCharacter)) continue;
+        if (TryAddCharacterGroupToken(file, tokens, Tokens.BRACES_OPEN_TOKEN, character, peekCharacter)) continue;
+        if (TryAddCharacterGroupToken(file, tokens, Tokens.BRACES_CLOSE_TOKEN, character, peekCharacter)) continue;
 
         if (TryAddCharacterGroupToken(file, tokens, Tokens.PARENTHESIS_OPEN_TOKEN, character, peekCharacter)) continue;
         if (TryAddCharacterGroupToken(file, tokens, Tokens.PARENTHESIS_CLOSE_TOKEN, character, peekCharacter)) continue;

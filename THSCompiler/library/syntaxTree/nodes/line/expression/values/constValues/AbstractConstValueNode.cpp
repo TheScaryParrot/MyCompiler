@@ -5,10 +5,5 @@
 class AbstractConstValueNode : public AbstractValueNode
 {
    public:
-    AbstractConstValueNode();
-    virtual ~AbstractConstValueNode();
+    AbstractConstValueNode() : AbstractValueNode() {}
 };
-
-AbstractConstValueNode::AbstractConstValueNode() : AbstractValueNode() {}
-
-AbstractConstValueNode::~AbstractConstValueNode() {}

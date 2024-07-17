@@ -4,17 +4,18 @@
 
 #include "AbstractExpressionNode.cpp"
 #include "operators/EAssignOperators.cpp"
+#include "values/VariableNode.cpp"
 
 class Assignment
 {
    public:
-    Assignment(AbstractExpressionNode* L_value, EAssignOperators assignOperator)
+    Assignment(VariableNode* L_value, EAssignOperators assignOperator)
     {
         this->L_value = L_value;
         this->assignOperator = assignOperator;
     }
 
-    AbstractExpressionNode* L_value;
+    VariableNode* L_value;
     EAssignOperators assignOperator;
 };
 

@@ -2,30 +2,21 @@
 
 #include <iostream>
 
-#include "nodes/line/CodeblockNode.cpp"
+#include "nodes/GlobalCodeNode.cpp"
 
 class SyntaxTree
 {
-   public:
-    SyntaxTree();
-    ~SyntaxTree();
-
-    void AddCodeLineNode(AbstractLineNode* codeLine);
-
-    CodeblockNode* GetCodeBlock();
-
-    std::string ToString();
-
    private:
-    CodeblockNode* codeBlock = new CodeblockNode();
+    GlobalCodeNode* code;
+
+   public:
+    SyntaxTree() { code = new GlobalCodeNode(); }
+    ~SyntaxTree() { delete code; };
+
+    void AddCodeLineNode(AbstractDeclarationNode* codeLine) { code->AddDeclaration(codeLine); }
+
+    void SetCode(GlobalCodeNode* code) { this->code = code; }
+    GlobalCodeNode* GetCode() { return code; };
+
+    std::string ToString() { return "-----SyntaxTree-----\n" + code->ToString(); }
 };
-
-SyntaxTree::SyntaxTree() {}
-
-SyntaxTree::~SyntaxTree() { delete codeBlock; }
-
-void SyntaxTree::AddCodeLineNode(AbstractLineNode* codeLine) { codeBlock->AddCodeline(codeLine); }
-
-CodeblockNode* SyntaxTree::GetCodeBlock() { return codeBlock; }
-
-std::string SyntaxTree::ToString() { return "SyntaxTree: " + codeBlock->ToString(); }

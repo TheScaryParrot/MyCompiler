@@ -8,7 +8,7 @@
 class GlobalCodeNode : AbstractTreeNode
 {
    public:
-    void AddCodeline(AbstractDeclarationNode* line);
+    void AddDeclaration(AbstractDeclarationNode* line);
     AbstractDeclarationNode* GetLine(int index);
     unsigned int GetLineCount();
 
@@ -18,7 +18,7 @@ class GlobalCodeNode : AbstractTreeNode
     std::vector<std::unique_ptr<AbstractDeclarationNode>> lines;
 };
 
-void GlobalCodeNode::AddCodeline(AbstractDeclarationNode* codeLine) { lines.push_back(std::unique_ptr<AbstractDeclarationNode>(codeLine)); }
+void GlobalCodeNode::AddDeclaration(AbstractDeclarationNode* codeLine) { lines.push_back(std::unique_ptr<AbstractDeclarationNode>(codeLine)); }
 
 AbstractDeclarationNode* GlobalCodeNode::GetLine(int index) { return lines[index].get(); }
 

@@ -1,75 +1,37 @@
 #pragma once
 
-#include "../../tokens/ConstTokens.cpp"
 #include "../../tokens/Keywords.cpp"
+#include "../../tokens/Tokens.cpp"
 #include "../PredictiveParser.hpp"
 
 bool PredictiveParser::LookAhead_Declaration(TokenList* tokens)
 {
-    return tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD) || LookAhead_VarFuncDeclaration(tokens);
+    return LookAhead_VarDeclaration(tokens) || LookAhead_FuncDeclaration(tokens) || LookAhead_TypeDeclaration(tokens);
 }
 AbstractDeclarationNode* PredictiveParser::Parse_Declaration(TokenList* tokens)
 {
-    if (LookAhead_ClassDeclaration(tokens)) return Parse_ClassDeclaration(tokens);
-    return Parse_VarFuncDeclaration(tokens);
-}
-
-bool PredictiveParser::LookAhead_ClassDeclaration(TokenList* tokens)
-{
-    if (tokens->IsPeekOfTokenType(Keywords.STATIC_KEYWORD))
-    {
-        // If static keyword is present, look at the next token
-        return tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD, 1);
-    }
-
-    return tokens->IsPeekOfTokenType(Keywords.CLASS_KEYWORD);
-}
-ClassDeclarationNode* PredictiveParser::Parse_ClassDeclaration(TokenList* tokens)
-{
-    // STATIC? CLASS ID BODY_OPEN <varFuncDeclaration>* BODY_CLOSE
-    bool isStatic = false;
-    if (tokens->IsPeekOfTokenType(Keywords.STATIC_KEYWORD))
-    {
-        isStatic = true;
-        tokens->Next();  // Consume STATIC
-    }
-
-    tokens->Next();  // Consume CLASS
-
-    std::string className = tokens->Next<IdentifierToken>()->GetValue();  // Consume ID
-
-    BodyNode* body = Parse_Body(tokens);
-
-    return new ClassDeclarationNode(isStatic, className, body);
-}
-
-bool PredictiveParser::LookAhead_VarFuncDeclaration(TokenList* tokens)
-{
-    return LookAhead_VarDeclaration(tokens) || LookAhead_FuncDeclaration(tokens);
-}
-AbstractVarFuncDeclarationNode* PredictiveParser::Parse_VarFuncDeclaration(TokenList* tokens)
-{
-    if (LookAhead_FuncDeclaration(tokens) == true) return Parse_FuncDeclaration(tokens);
-    return Parse_VarDeclaration(tokens);
+    if (LookAhead_FuncDeclaration(tokens)) return Parse_FuncDeclaration(tokens);
+    if (LookAhead_VarDeclaration(tokens)) return Parse_VarDeclaration(tokens);
+    return Parse_TypeDeclaration(tokens);
 }
 
 bool PredictiveParser::LookAhead_VarDeclaration(TokenList* tokens)
 {
-    unsigned int i = Skip_VarFuncDeclarationAttributes(tokens);
+    unsigned int i = Skip_DeclarationAttributes(tokens);
 
-    // <varFuncDeclarationAttributes>? ID ID !(
-    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           !tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, i);     // !(
+    // <DeclarationAttributes>? ID ID !(
+    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           !tokens->IsPeekOfTokenType(Tokens.PARENTHESIS_OPEN_TOKEN, i);     // !(
 }
 VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens)
 {
-    SyntaxTreeDeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
-    TypeNode type = TypeNode(tokens->Next<IdentifierToken>()->GetValue());
-    std::string name = tokens->Next<IdentifierToken>()->GetValue();
+    DeclarationAttributes attributes = Parse_DeclarationAttributes(tokens);
+    TypeNode type = TypeNode(tokens->Next<TokenWithValue>()->GetValue());
+    std::string name = tokens->Next<TokenWithValue>()->GetValue();
     AbstractExpressionNode* value = nullptr;
 
-    if (tokens->IsPeekOfTokenType(ConstTokens.ASSIGN_OPERATOR_TOKEN))
+    if (tokens->IsPeekOfTokenType(Tokens.ASSIGN_OPERATOR_TOKEN))
     {
         tokens->Next();  // Consume ASSIGN_OPERATOR
         value = Parse_Expression(tokens);
@@ -82,19 +44,19 @@ VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens)
 
 bool PredictiveParser::LookAhead_FuncDeclaration(TokenList* tokens)
 {
-    unsigned int i = Skip_VarFuncDeclarationAttributes(tokens);
+    unsigned int i = Skip_DeclarationAttributes(tokens);
 
-    // <varFuncDeclarationAttributes>? VOID
+    // <DeclarationAttributes>? VOID
     if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD, i)) return true;
 
-    // <varFuncDeclarationAttributes>? ID ID (
-    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, i);      // (
+    // <DeclarationAttributes>? ID ID (
+    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
+           tokens->IsPeekOfTokenType(Tokens.PARENTHESIS_OPEN_TOKEN, i);      // (
 }
 FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 {
-    SyntaxTreeDeclarationAttributes attributes = Parse_VarFuncDeclarationAttributes(tokens);
+    DeclarationAttributes attributes = Parse_DeclarationAttributes(tokens);
     FunctionReturnTypeNode returnType;
 
     if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD))
@@ -104,10 +66,10 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
     }
     else
     {
-        returnType = FunctionReturnTypeNode(tokens->Next<IdentifierToken>()->GetValue());
+        returnType = FunctionReturnTypeNode(tokens->Next<TokenWithValue>()->GetValue());
     }
 
-    std::string name = tokens->Next<IdentifierToken>()->GetValue();
+    std::string name = tokens->Next<TokenWithValue>()->GetValue();
 
     tokens->Next();  // Consume PARENTHESIS_OPEN
 
@@ -120,37 +82,26 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
     return new FuncDeclarationNode(attributes, returnType, name, parameters, body);
 }
 
-bool PredictiveParser::LookAhead_VarFuncDeclarationAttributes(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_DeclarationAttributes(TokenList* tokens, unsigned int offset)
 {
-    // <scope> | <static> | <final> | <inline>
-    return LookAhead_ScopeAttribute(tokens, offset) || LookAhead_StaticAttribute(tokens, offset) || LookAhead_FinalAttribute(tokens, offset) ||
-           LookAhead_InlineAttribute(tokens, offset);
+    // <final> | <inline>
+    return LookAhead_FinalAttribute(tokens, offset) || LookAhead_InlineAttribute(tokens, offset);
 }
-unsigned int PredictiveParser::Skip_VarFuncDeclarationAttributes(TokenList* tokens)
+unsigned int PredictiveParser::Skip_DeclarationAttributes(TokenList* tokens)
 {
     unsigned int skippedTokens = 0;
 
-    // while either scope, static or readwrite attribute is present. If empty this will be false
-    while (LookAhead_VarFuncDeclarationAttributes(tokens, skippedTokens))
+    // while final or inline attribute is present. If empty this will be false
+    while (LookAhead_DeclarationAttributes(tokens, skippedTokens))
     {
         skippedTokens++;
     }
 
     return skippedTokens;
 }
-SyntaxTreeDeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttributes(TokenList* tokens)
+DeclarationAttributes PredictiveParser::Parse_DeclarationAttributes(TokenList* tokens)
 {
-    SyntaxTreeDeclarationAttributes attributes;
-
-    if (LookAhead_ScopeAttribute(tokens))
-    {
-        attributes.scope = Parse_ScopeAttribute(tokens);
-    }
-
-    if (LookAhead_StaticAttribute(tokens))
-    {
-        attributes.isStatic = Parse_StaticAttribute(tokens);
-    }
+    DeclarationAttributes attributes;
 
     if (LookAhead_FinalAttribute(tokens))
     {
@@ -163,6 +114,38 @@ SyntaxTreeDeclarationAttributes PredictiveParser::Parse_VarFuncDeclarationAttrib
     }
 
     return attributes;
+}
+
+bool PredictiveParser::LookAhead_TypeDeclaration(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.TYPEDEF_KEYWORD); }
+TypeDeclarationNode* PredictiveParser::Parse_TypeDeclaration(TokenList* tokens)
+{
+    tokens->Next();  // Consume TYPEDEF_KEYWORD
+    tokens->Next();  // Consume BRACES_OPEN_TOKEN
+
+    TypeDefCodeNode* typeDefCode = Parse_TypeDefCode(tokens);
+
+    tokens->Next();  // Consume BRACES_CLOSE_TOKEN
+
+    std::string name = tokens->Next<TokenWithValue>()->GetValue();
+
+    tokens->Next();  // Consume STATEMENT_END_TOKEN
+
+    return new TypeDeclarationNode(name, typeDefCode);
+}
+
+bool PredictiveParser::LookAhead_PropertyDeclaration(TokenList* tokens)
+{
+    // ID ID
+    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, 1);
+}
+PropertyDeclarationNode* PredictiveParser::Parse_PropertyDeclaration(TokenList* tokens)
+{
+    TypeNode type = TypeNode(tokens->Next<TokenWithValue>()->GetValue());
+    std::string name = tokens->Next<TokenWithValue>()->GetValue();
+
+    tokens->Next();  // Consume STATEMENT_END
+
+    return new PropertyDeclarationNode(type, name);
 }
 
 bool PredictiveParser::LookAhead_Params(TokenList* tokens)
@@ -182,7 +165,7 @@ std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList
     parameters->push_back(Parse_ParamDeclaration(tokens));  // Parse first parameter
 
     // (SEPERATOR <paramDeclaration>)*
-    while (tokens->IsPeekOfTokenType(ConstTokens.SEPERATOR_TOKEN))
+    while (tokens->IsPeekOfTokenType(Tokens.SEPERATOR_TOKEN))
     {
         tokens->Next();                                         // Consume seperator
         parameters->push_back(Parse_ParamDeclaration(tokens));  // Parse next parameter
@@ -194,51 +177,28 @@ std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList
 bool PredictiveParser::LookAhead_ParamDeclaration(TokenList* tokens)
 {
     // <paramAttributes> | ID ID
-    if (tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1))
-        return true;
+    if (tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, 1)) return true;
 
-    return LookAhead_ParamAttributes(tokens);
+    return LookAhead_DeclarationAttributes(tokens);
 }
 ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* tokens)
 {
-    SyntaxTreeParamAttributes attributes;
+    DeclarationAttributes attributes;
 
-    if (LookAhead_ParamAttributes(tokens) == true)
+    if (LookAhead_DeclarationAttributes(tokens) == true)
     {
-        attributes = Parse_ParamAttributes(tokens);
+        attributes = Parse_DeclarationAttributes(tokens);
     }
 
-    std::string type = tokens->Next<IdentifierToken>()->GetValue();
+    std::string type = tokens->Next<TokenWithValue>()->GetValue();
 
-    return new ParameterDeclarationNode(attributes, type, tokens->Next<IdentifierToken>()->GetValue());
-}
-
-bool PredictiveParser::LookAhead_ParamAttributes(TokenList* tokens)
-{
-    // FINAL | INLINE
-    return LookAhead_FinalAttribute(tokens) || LookAhead_InlineAttribute(tokens);
-}
-SyntaxTreeParamAttributes PredictiveParser::Parse_ParamAttributes(TokenList* tokens)
-{
-    SyntaxTreeParamAttributes attributes;
-
-    if (LookAhead_FinalAttribute(tokens) == true)
-    {
-        attributes.isFinal = Parse_FinalAttribute(tokens);
-    }
-
-    if (LookAhead_InlineAttribute(tokens) == true)
-    {
-        attributes.isInline = Parse_InlineAttribute(tokens);
-    }
-
-    return attributes;
+    return new ParameterDeclarationNode(attributes, type, tokens->Next<TokenWithValue>()->GetValue());
 }
 
 bool PredictiveParser::LookAhead_Body(TokenList* tokens)
 {
-    // BODY_OPEN
-    return tokens->IsPeekOfTokenType(ConstTokens.BODY_OPEN_TOKEN);
+    // BRACES_OPEN
+    return tokens->IsPeekOfTokenType(Tokens.BRACES_OPEN_TOKEN);
 }
 BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
 {
@@ -246,7 +206,7 @@ BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
 
     tokens->Next();  // Consume BODY_OPEN
 
-    while (!tokens->IsPeekOfTokenType(ConstTokens.BODY_CLOSE_TOKEN))
+    while (!tokens->IsPeekOfTokenType(Tokens.BRACES_CLOSE_TOKEN))
     {
         bodynode->AddCodeLine(Parse_Line(tokens));
     }
@@ -254,34 +214,6 @@ BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
     tokens->Next();  // Consume BODY_CLOSE
 
     return bodynode;
-}
-
-bool PredictiveParser::LookAhead_ScopeAttribute(TokenList* tokens, unsigned int offset)
-{
-    // PUBLIC | PRIVATE | PROTECTED
-    return tokens->IsPeekOfTokenType(Keywords.PUBLIC_KEYWORD, offset) || tokens->IsPeekOfTokenType(Keywords.PRIVATE_KEYWORD, offset) ||
-           tokens->IsPeekOfTokenType(Keywords.PROTECTED_KEYWORD, offset);
-}
-ESyntaxTreeScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens)
-{
-    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume scope keyword
-
-    if (nextToken->IsThisToken(Keywords.PUBLIC_KEYWORD)) return ESyntaxTreeScopes::PUBLIC;
-
-    if (nextToken->IsThisToken(Keywords.PRIVATE_KEYWORD)) return ESyntaxTreeScopes::PRIVATE;
-
-    return ESyntaxTreeScopes::PROTECTED;
-}
-
-bool PredictiveParser::LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset)
-{
-    // STATIC
-    return tokens->IsPeekOfTokenType(Keywords.STATIC_KEYWORD, offset);
-}
-bool PredictiveParser::Parse_StaticAttribute(TokenList* tokens)
-{
-    tokens->Next();  // Constume STATIC
-    return true;     // As LookAhead_StaticAttribute() has returned CertainlyPresent, we know that static must be present
 }
 
 bool PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset)
@@ -292,7 +224,7 @@ bool PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens, unsigned int 
 bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens)
 {
     tokens->Next();  // Consume FINAL
-    return true;     // As LookAhead_FinalAttribute() has returned CertainlyPresent, we know that final must be present
+    return true;     // As LookAhead_FinalAttribute() has returned true, we know that final must be present
 }
 
 bool PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens, unsigned int offset)
@@ -303,5 +235,5 @@ bool PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens, unsigned int
 bool PredictiveParser::Parse_InlineAttribute(TokenList* tokens)
 {
     tokens->Next();  // Consume INLINE
-    return true;     // As LookAhead_InlineAttribute() has returned CertainlyPresent, we know that inline must be present
+    return true;     // As LookAhead_InlineAttribute() has returned true, we know that inline must be present
 }

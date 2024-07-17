@@ -5,11 +5,11 @@
 
 #include "line/declaration/PropertyDeclarationNode.cpp"
 
-class GlobalCodeNode : AbstractTreeNode
+class TypeDefCodeNode : AbstractTreeNode
 {
    public:
-    void AddCodeline(PropertyDeclarationNode* line);
-    PropertyDeclarationNode* GetLine(int index);
+    void AddProperty(PropertyDeclarationNode* line);
+    PropertyDeclarationNode* GetProperty(int index);
     unsigned int GetLineCount();
 
     std::string ToString();
@@ -18,13 +18,13 @@ class GlobalCodeNode : AbstractTreeNode
     std::vector<std::unique_ptr<PropertyDeclarationNode>> lines;
 };
 
-void GlobalCodeNode::AddCodeline(PropertyDeclarationNode* codeLine) { lines.push_back(std::unique_ptr<PropertyDeclarationNode>(codeLine)); }
+void TypeDefCodeNode::AddProperty(PropertyDeclarationNode* codeLine) { lines.push_back(std::unique_ptr<PropertyDeclarationNode>(codeLine)); }
 
-PropertyDeclarationNode* GlobalCodeNode::GetLine(int index) { return lines[index].get(); }
+PropertyDeclarationNode* TypeDefCodeNode::GetProperty(int index) { return lines[index].get(); }
 
-unsigned int GlobalCodeNode::GetLineCount() { return lines.size(); }
+unsigned int TypeDefCodeNode::GetLineCount() { return lines.size(); }
 
-std::string GlobalCodeNode::ToString()
+std::string TypeDefCodeNode::ToString()
 {
     std::string result = "{\n";
 

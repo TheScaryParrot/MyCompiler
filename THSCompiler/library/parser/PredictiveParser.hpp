@@ -9,13 +9,13 @@
 #include "../syntaxTree/nodes/line/AbstractLineNode.cpp"
 
 #pragma region Declarations
-#include "../syntaxTree/nodes/line/declaration/BodyNode.cpp"
-#include "../syntaxTree/nodes/line/declaration/ClassDeclarationNode.cpp"
-#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/FuncDeclarationNode.cpp"
-#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/ParameterDeclarationNode.cpp"
-#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/VarDeclarationNode.cpp"
-#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/declarationAttributes/SyntaxTreeDeclarationAttributes.cpp"
-#include "../syntaxTree/nodes/line/declaration/varFuncDeclaration/types/FunctionReturnTypeNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/DeclarationAttributes.cpp"
+#include "../syntaxTree/nodes/line/declaration/FuncDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/ParameterDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/PropertyDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/TypeDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/VarDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/types/FunctionReturnTypeNode.cpp"
 
 #pragma endregion
 
@@ -28,15 +28,18 @@
 #include "../syntaxTree/nodes/line/expression/operators/EOperators.cpp"
 #include "../syntaxTree/nodes/line/expression/operators/EUnaryOperators.cpp"
 #include "../syntaxTree/nodes/line/expression/values/CallNode.cpp"
-#include "../syntaxTree/nodes/line/expression/values/IdentifierNode.cpp"
-#include "../syntaxTree/nodes/line/expression/values/RelAccessValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/ParenthesisExpressionNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/StructNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/VariableNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/constValues/FloatConstValueNode.cpp"
+#include "../syntaxTree/nodes/line/expression/values/constValues/IntConstValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/constValues/LogicalConstValueNode.cpp"
-#include "../syntaxTree/nodes/line/expression/values/constValues/NumberConstValueNode.cpp"
 #include "../syntaxTree/nodes/line/expression/values/constValues/StringConstValueNode.cpp"
 
 #pragma endregion
 
 #pragma region Statements
+#include "../syntaxTree/nodes/line/statement/BodyNode.cpp"
 #include "../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
@@ -56,8 +59,17 @@ static class PredictiveParser
     SyntaxTree* Parse(TokenList* tokens);
 
    private:
+    bool LookAhead_GlobalCode(TokenList* tokens);
+    GlobalCodeNode* Parse_GlobalCode(TokenList* tokens);
+
+    bool LookAhead_BodyCode(TokenList* tokens);
+    BodyCodeNode* Parse_BodyCode(TokenList* tokens);
+
     bool LookAhead_Line(TokenList* tokens);
     AbstractLineNode* Parse_Line(TokenList* tokens);
+
+    bool LookAhead_TypeDefCode(TokenList* tokens);
+    TypeDefCodeNode* Parse_TypeDefCode(TokenList* tokens);
 
 // ------- Declarations -------
 #pragma region Declarations
@@ -65,24 +77,23 @@ static class PredictiveParser
     bool LookAhead_Declaration(TokenList* tokens);
     AbstractDeclarationNode* Parse_Declaration(TokenList* tokens);
 
-    bool LookAhead_ClassDeclaration(TokenList* tokens);
-    ClassDeclarationNode* Parse_ClassDeclaration(TokenList* tokens);
-
-    bool LookAhead_VarFuncDeclaration(TokenList* tokens);
-    AbstractVarFuncDeclarationNode* Parse_VarFuncDeclaration(TokenList* tokens);
-
     bool LookAhead_VarDeclaration(TokenList* tokens);
     VarDeclarationNode* Parse_VarDeclaration(TokenList* tokens);
 
     bool LookAhead_FuncDeclaration(TokenList* tokens);
     FuncDeclarationNode* Parse_FuncDeclaration(TokenList* tokens);
 
-    bool LookAhead_VarFuncDeclarationAttributes(TokenList* tokens,
-                                                unsigned int offset = 0);  // Has offset to allow for skipping tokens
-    unsigned int Skip_VarFuncDeclarationAttributes(
-        TokenList* tokens);  // Returns the number of tokens that belong to VarFuncDeclarationAttributes. Allows
-                             // skipping the tokens
-    SyntaxTreeDeclarationAttributes Parse_VarFuncDeclarationAttributes(TokenList* tokens);
+    bool LookAhead_DeclarationAttributes(TokenList* tokens,
+                                         unsigned int offset = 0);  // Has offset to allow for skipping tokens
+    unsigned int Skip_DeclarationAttributes(TokenList* tokens);     // Returns the number of tokens that belong to DeclarationAttributes.
+                                                                    // Allows skipping the tokens
+    DeclarationAttributes Parse_DeclarationAttributes(TokenList* tokens);
+
+    bool LookAhead_TypeDeclaration(TokenList* tokens);
+    TypeDeclarationNode* Parse_TypeDeclaration(TokenList* tokens);
+
+    bool LookAhead_PropertyDeclaration(TokenList* tokens);
+    PropertyDeclarationNode* Parse_PropertyDeclaration(TokenList* tokens);
 
     bool LookAhead_Params(TokenList* tokens);
     std::vector<ParameterDeclarationNode*>* Parse_Params(TokenList* tokens);
@@ -90,17 +101,8 @@ static class PredictiveParser
     bool LookAhead_ParamDeclaration(TokenList* tokens);
     ParameterDeclarationNode* Parse_ParamDeclaration(TokenList* tokens);
 
-    bool LookAhead_ParamAttributes(TokenList* tokens);
-    SyntaxTreeParamAttributes Parse_ParamAttributes(TokenList* tokens);
-
     bool LookAhead_Body(TokenList* tokens);
     BodyNode* Parse_Body(TokenList* tokens);
-
-    bool LookAhead_ScopeAttribute(TokenList* tokens, unsigned int offset = 0);
-    ESyntaxTreeScopes Parse_ScopeAttribute(TokenList* tokens);
-
-    bool LookAhead_StaticAttribute(TokenList* tokens, unsigned int offset = 0);
-    bool Parse_StaticAttribute(TokenList* tokens);
 
     bool LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset = 0);
     bool Parse_FinalAttribute(TokenList* tokens);
@@ -155,29 +157,29 @@ static class PredictiveParser
     bool LookAhead_PostUnaryOperator(TokenList* tokens);
     EPostUnaryOperators Parse_PostUnaryOperator(TokenList* tokens);
 
-    bool LookAhead_RelAccessValue(TokenList* tokens);
-    AbstractExpressionNode* Parse_RelAccessValue(TokenList* tokens);
-
-    bool LookAhead_Accessor(TokenList* tokens);
-    bool Parse_Accessor(TokenList* tokens);  // returns true if accessor is static
-
     bool LookAhead_Value(TokenList* tokens);
-    AbstractExpressionNode* Parse_Value(TokenList* tokens);
+    AbstractValueNode* Parse_Value(TokenList* tokens);
 
     bool LookAhead_Call(TokenList* tokens);
     CallNode* Parse_Call(TokenList* tokens);
 
-    bool LookAhead_Identifier(TokenList* tokens);
-    IdentifierNode* Parse_Identifier(TokenList* tokens);
-
-    bool LookAhead_Constant(TokenList* tokens);
-    AbstractConstValueNode* Parse_Constant(TokenList* tokens);
-
-    bool LookAhead_LogicalConstant(TokenList* tokens);
-    LogicalConstValueNode* Parse_LogicalConstant(TokenList* tokens);
-
     bool LookAhead_Arguments(TokenList* tokens);
     std::vector<AbstractExpressionNode*> Parse_Arguments(TokenList* tokens);
+
+    bool LookAhead_Parenthesis_Expression(TokenList* tokens);
+    ParenthesisExpressionNode* Parse_Parenthesis_Expression(TokenList* tokens);
+
+    bool LookAhead_Struct(TokenList* tokens);
+    StructNode* Parse_Struct(TokenList* tokens);
+
+    bool LookAhead_Variable(TokenList* tokens);
+    VariableNode* Parse_Variable(TokenList* tokens);
+
+    bool LookAhead_Const(TokenList* tokens);
+    AbstractConstValueNode* Parse_Const(TokenList* tokens);
+
+    bool LookAhead_LogicalConst(TokenList* tokens);
+    LogicalConstValueNode* Parse_LogicalConst(TokenList* tokens);
 
 #pragma endregion
 
@@ -226,16 +228,14 @@ SyntaxTree* PredictiveParser::Parse(TokenList* tokens)
 {
     SyntaxTree* syntaxTree = new SyntaxTree();
 
-    while (tokens->HasNext())
+    if (LookAhead_GlobalCode(tokens))
     {
-        if (!LookAhead_Line(tokens))
-        {
-            std::cout << "Unexpected token during parsing: " << tokens->Next()->ToString() << "\n";
-            continue;
-        }
+        syntaxTree->SetCode(Parse_GlobalCode(tokens));
+    }
 
-        AbstractLineNode* line = Parse_Line(tokens);
-        syntaxTree->AddCodeLineNode(line);
+    if (tokens->HasNext())
+    {
+        std::cerr << "Unexpected token: " + tokens->Peek()->ToString() + "\n Terminating compiler." << std::endl;
     }
 
     return syntaxTree;

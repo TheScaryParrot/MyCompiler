@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../statement/BodyNode.cpp"
 #include "AbstractDeclarationNode.cpp"
-#include "BodyNode.cpp"
 #include "DeclarationAttributes.cpp"
 #include "ParameterDeclarationNode.cpp"
 #include "types/FunctionReturnTypeNode.cpp"

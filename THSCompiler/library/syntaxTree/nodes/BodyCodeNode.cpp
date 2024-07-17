@@ -8,7 +8,7 @@
 class BodyCodeNode : AbstractTreeNode
 {
    public:
-    void AddCodeline(AbstractLineNode* line);
+    void AddLine(AbstractLineNode* line);
     AbstractLineNode* GetLine(int index);
     unsigned int GetLineCount();
 
@@ -18,7 +18,7 @@ class BodyCodeNode : AbstractTreeNode
     std::vector<std::unique_ptr<AbstractLineNode>> lines;
 };
 
-void BodyCodeNode::AddCodeline(AbstractLineNode* codeLine) { lines.push_back(std::unique_ptr<AbstractLineNode>(codeLine)); }
+void BodyCodeNode::AddLine(AbstractLineNode* codeLine) { lines.push_back(std::unique_ptr<AbstractLineNode>(codeLine)); }
 
 AbstractLineNode* BodyCodeNode::GetLine(int index) { return lines[index].get(); }
 

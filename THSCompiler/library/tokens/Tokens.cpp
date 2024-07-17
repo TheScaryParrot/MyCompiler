@@ -12,8 +12,8 @@ static class Tokens
         std::make_shared<CharacterGroupToken>("parenthesisOpen", CharacterGroups.PARENTHESIS_OPEN);
     std::shared_ptr<CharacterGroupToken> PARENTHESIS_CLOSE_TOKEN =
         std::make_shared<CharacterGroupToken>("parenthesisClose", CharacterGroups.PARENTHESIS_CLOSE);
-    std::shared_ptr<CharacterGroupToken> BODY_OPEN_TOKEN = std::make_shared<CharacterGroupToken>("bracesOpen", CharacterGroups.BRACES_OPEN);
-    std::shared_ptr<CharacterGroupToken> BODY_CLOSE_TOKEN = std::make_shared<CharacterGroupToken>("bracesClose", CharacterGroups.BRACES_CLOSE);
+    std::shared_ptr<CharacterGroupToken> BRACES_OPEN_TOKEN = std::make_shared<CharacterGroupToken>("bracesOpen", CharacterGroups.BRACES_OPEN);
+    std::shared_ptr<CharacterGroupToken> BRACES_CLOSE_TOKEN = std::make_shared<CharacterGroupToken>("bracesClose", CharacterGroups.BRACES_CLOSE);
     std::shared_ptr<CharacterGroupToken> SEPERATOR_TOKEN = std::make_shared<CharacterGroupToken>("seperator", CharacterGroups.SEPERATOR);
 
     std::shared_ptr<CharacterGroupToken> EQUAL_OPERATOR_TOKEN =

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../../declaration/varFuncDeclaration/VarDeclarationNode.cpp"
+#include "../../declaration/VarDeclarationNode.cpp"
 #include "../../expression/AbstractExpressionNode.cpp"
 #include "AbstractKeywordStatementNode.cpp"
 
 class ForStatementNode : public AbstractKeywordStatementNode
 {
    public:
-    ForStatementNode(VarDeclarationNode* initialization, AbstractExpressionNode* condition,
-                     AbstractStatementNode* increment, AbstractStatementNode* statement);
+    ForStatementNode(VarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
+                     AbstractStatementNode* statement);
     ~ForStatementNode();
 
     virtual std::string ToString() override;
@@ -19,8 +19,8 @@ class ForStatementNode : public AbstractKeywordStatementNode
     AbstractStatementNode* statement;
 };
 
-ForStatementNode::ForStatementNode(VarDeclarationNode* initialization, AbstractExpressionNode* condition,
-                                   AbstractStatementNode* increment, AbstractStatementNode* statement)
+ForStatementNode::ForStatementNode(VarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
+                                   AbstractStatementNode* statement)
     : AbstractKeywordStatementNode()
 {
     this->initialization = initialization;
@@ -39,6 +39,5 @@ ForStatementNode::~ForStatementNode()
 
 std::string ForStatementNode::ToString()
 {
-    return "for (" + initialization->ToString() + " " + condition->ToString() + "; " + increment->ToString() + ")\n" +
-           statement->ToString();
+    return "for (" + initialization->ToString() + " " + condition->ToString() + "; " + increment->ToString() + ";)\n" + statement->ToString();
 }

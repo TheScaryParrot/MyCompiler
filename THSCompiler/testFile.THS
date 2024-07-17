@@ -37,5 +37,10 @@ int main(int argc, char argv)
         myType1.boolProp = false;
     }
 
+    for (int i = 0; i < 10; i++;)
+    {
+        myType1.floatProp += 1.0;
+    }
+
     char char2 = myType3.charProp;
 }

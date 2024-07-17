@@ -26,7 +26,7 @@ BodyNode::BodyNode(BodyCodeNode* bodyCodeNode) : AbstractStatementNode() { this-
 
 BodyNode::~BodyNode() { delete bodyCodeNode; }
 
-void BodyNode::AddCodeLine(AbstractLineNode* codeLine) { bodyCodeNode->AddCodeline(codeLine); }
+void BodyNode::AddCodeLine(AbstractLineNode* codeLine) { bodyCodeNode->AddLine(codeLine); }
 
 BodyCodeNode* BodyNode::GetCodeBlock() { return bodyCodeNode; }
 

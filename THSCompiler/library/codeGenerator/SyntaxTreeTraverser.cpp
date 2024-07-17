@@ -58,12 +58,12 @@ class SyntaxTreeTraverser
 
     IVariableLocation* TraverseValueNode(AbstractValueNode* node, AssemblyCode* assemblyCode);
     IVariableLocation* TraverseCallNode(CallNode* node, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseIdentifierNode(IdentifierNode* node, AssemblyCode* assemblyCode);
+    IVariableLocation* TraverseIdentifierNode(VariableNode* node, AssemblyCode* assemblyCode);
     IVariableLocation* TraverseRelAccessValueNode(RelAccessValueNode* node, AssemblyCode* assemblyCode);
 
     IVariableLocation* TraverseAbstractConstValueNode(AbstractConstValueNode* node, AssemblyCode* assemblyCode);
     IVariableLocation* TraverseLogicalConstValueNode(LogicalConstValueNode* node, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseNumberConstValueNode(NumberConstValueNode* node, AssemblyCode* assemblyCode);
+    IVariableLocation* TraverseNumberConstValueNode(IntConstValueNode* node, AssemblyCode* assemblyCode);
     IVariableLocation* TraverseStringConstValueNode(StringConstValueNode* node, AssemblyCode* assemblyCode);
 };
 
@@ -310,9 +310,9 @@ IVariableLocation* SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* nod
         TraverseCallNode(dynamic_cast<CallNode*>(node), assemblyCode);
     }
 
-    if (dynamic_cast<IdentifierNode*>(node) != nullptr)
+    if (dynamic_cast<VariableNode*>(node) != nullptr)
     {
-        TraverseIdentifierNode(dynamic_cast<IdentifierNode*>(node), assemblyCode);
+        TraverseIdentifierNode(dynamic_cast<VariableNode*>(node), assemblyCode);
     }
 
     if (dynamic_cast<RelAccessValueNode*>(node) != nullptr)
@@ -381,7 +381,7 @@ IVariableLocation* SyntaxTreeTraverser::TraverseCallNode(CallNode* node, Assembl
     return parameterMap->Get(function->RETURN_VARIABLE_NAME);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseIdentifierNode(IdentifierNode* node, AssemblyCode* assemblyCode)
+IVariableLocation* SyntaxTreeTraverser::TraverseIdentifierNode(VariableNode* node, AssemblyCode* assemblyCode)
 {
     IVariableLocation* idVarLocation = codeGenerator->environmentList->GetVariable(node->id);
 
@@ -428,9 +428,9 @@ IVariableLocation* SyntaxTreeTraverser::TraverseAbstractConstValueNode(AbstractC
         return TraverseLogicalConstValueNode(dynamic_cast<LogicalConstValueNode*>(node), assemblyCode);
     }
 
-    if (dynamic_cast<NumberConstValueNode*>(node) != nullptr)
+    if (dynamic_cast<IntConstValueNode*>(node) != nullptr)
     {
-        return TraverseNumberConstValueNode(dynamic_cast<NumberConstValueNode*>(node), assemblyCode);
+        return TraverseNumberConstValueNode(dynamic_cast<IntConstValueNode*>(node), assemblyCode);
     }
 
     if (dynamic_cast<StringConstValueNode*>(node) != nullptr)
@@ -444,7 +444,7 @@ IVariableLocation* SyntaxTreeTraverser::TraverseLogicalConstValueNode(LogicalCon
     // TODO: Logical const value
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseNumberConstValueNode(NumberConstValueNode* node, AssemblyCode* assemblyCode)
+IVariableLocation* SyntaxTreeTraverser::TraverseNumberConstValueNode(IntConstValueNode* node, AssemblyCode* assemblyCode)
 {
     Type* type = codeGenerator->environmentList->GetNumConstType();
     return new NumConstVarLocation(node->GetValue(), type);

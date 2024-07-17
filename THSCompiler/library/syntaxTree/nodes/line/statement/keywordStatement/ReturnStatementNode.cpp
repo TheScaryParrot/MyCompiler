@@ -14,10 +14,7 @@ class ReturnStatementNode : public AbstractKeywordStatementNode
     AbstractExpressionNode* expression;
 };
 
-ReturnStatementNode::ReturnStatementNode(AbstractExpressionNode* expression) : AbstractKeywordStatementNode()
-{
-    this->expression = expression;
-}
+ReturnStatementNode::ReturnStatementNode(AbstractExpressionNode* expression) : AbstractKeywordStatementNode() { this->expression = expression; }
 
 ReturnStatementNode::~ReturnStatementNode() { delete expression; }
 
@@ -25,8 +22,8 @@ std::string ReturnStatementNode::ToString()
 {
     if (expression == nullptr)
     {
-        return "return";
+        return "return;";
     }
 
-    return "return " + expression->ToString();
+    return "return " + expression->ToString() + ";";
 }

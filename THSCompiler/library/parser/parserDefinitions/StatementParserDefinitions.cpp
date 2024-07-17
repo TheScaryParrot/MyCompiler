@@ -1,17 +1,17 @@
 #pragma once
 
-#include "../../tokens/ConstTokens.cpp"
 #include "../../tokens/Keywords.cpp"
+#include "../../tokens/Tokens.cpp"
 #include "../PredictiveParser.hpp"
 
 bool PredictiveParser::LookAhead_Statement(TokenList* tokens)
 {
-    return tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN) || LookAhead_Body(tokens) || LookAhead_KeywordStatement(tokens) ||
+    return tokens->IsPeekOfTokenType(Tokens.STATEMENT_END_TOKEN) || LookAhead_Body(tokens) || LookAhead_KeywordStatement(tokens) ||
            LookAhead_Expression(tokens);
 }
 AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 {
-    if (tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN))
+    if (tokens->IsPeekOfTokenType(Tokens.STATEMENT_END_TOKEN))
     {
         tokens->Next();  // Consume STATEMENT_END_TOKEN
         return new EmptyStatementNode();
@@ -99,7 +99,7 @@ AbstractStatementNode* PredictiveParser::Parse_ElseStatement(TokenList* tokens)
 bool PredictiveParser::LookAhead_ReturnStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.RETURN_KEYWORD); }
 ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
 {
-    if (tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN))
+    if (tokens->IsPeekOfTokenType(Tokens.STATEMENT_END_TOKEN))
     {
         tokens->Next();  // Consume STATEMENT_END_TOKEN
         return new ReturnStatementNode(nullptr);
