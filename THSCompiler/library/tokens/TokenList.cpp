@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "AbstractToken.cpp"
+#include "Token.cpp"
 
 class TokenList
 {
@@ -12,7 +12,7 @@ class TokenList
     TokenList();
     ~TokenList();
 
-    void AddToken(std::shared_ptr<AbstractToken> token);
+    void AddToken(std::shared_ptr<Token> token);
     unsigned int GetSize();
 
     template <typename T>
@@ -21,17 +21,17 @@ class TokenList
         return std::dynamic_pointer_cast<T>(Next());
     }
 
-    std::shared_ptr<AbstractToken> Next();
+    std::shared_ptr<Token> Next();
 
-    std::shared_ptr<AbstractToken> Peek(int offset = 0);
-    bool IsPeekOfTokenType(std::shared_ptr<AbstractToken> other, int offset = 0);
+    std::shared_ptr<Token> Peek(int offset = 0);
+    bool IsPeekOfTokenType(std::shared_ptr<Token> other, int offset = 0);
 
     bool HasNext(int offset = 0);
 
     std::string ToString();
 
    private:
-    std::vector<std::shared_ptr<AbstractToken>> tokens = std::vector<std::shared_ptr<AbstractToken>>();
+    std::vector<std::shared_ptr<Token>> tokens = std::vector<std::shared_ptr<Token>>();
     unsigned int readIndex = 0;
 };
 
@@ -50,11 +50,11 @@ TokenList::~TokenList()
     }*/
 }
 
-void TokenList::AddToken(std::shared_ptr<AbstractToken> token) { tokens.push_back(token); }
+void TokenList::AddToken(std::shared_ptr<Token> token) { tokens.push_back(token); }
 
 unsigned int TokenList::GetSize() { return tokens.size(); }
 
-std::shared_ptr<AbstractToken> TokenList::Next()
+std::shared_ptr<Token> TokenList::Next()
 {
     if (HasNext())
     {
@@ -64,7 +64,7 @@ std::shared_ptr<AbstractToken> TokenList::Next()
     return nullptr;
 }
 
-std::shared_ptr<AbstractToken> TokenList::Peek(int offset)
+std::shared_ptr<Token> TokenList::Peek(int offset)
 {
     if (readIndex + offset < 0 || readIndex + offset >= GetSize())
     {
@@ -74,7 +74,7 @@ std::shared_ptr<AbstractToken> TokenList::Peek(int offset)
     return tokens[readIndex + offset];
 }
 
-bool TokenList::IsPeekOfTokenType(std::shared_ptr<AbstractToken> other, int offset)
+bool TokenList::IsPeekOfTokenType(std::shared_ptr<Token> other, int offset)
 {
     if (!HasNext(offset))
     {

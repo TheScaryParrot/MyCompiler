@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AbstractToken.cpp"
+#include "Token.cpp"
 
-class CharacterGroupToken : public AbstractToken
+class CharacterGroupToken : public Token
 {
    public:
     CharacterGroupToken(std::string tokenName, CharacterGroup& characterGroup);
@@ -15,8 +15,7 @@ class CharacterGroupToken : public AbstractToken
     CharacterGroup characterGroup;
 };
 
-CharacterGroupToken::CharacterGroupToken(std::string tokenName, CharacterGroup& characterGroup)
-    : AbstractToken(tokenName)
+CharacterGroupToken::CharacterGroupToken(std::string tokenName, CharacterGroup& characterGroup) : Token(tokenName)
 {
     this->characterGroup = characterGroup;
 }

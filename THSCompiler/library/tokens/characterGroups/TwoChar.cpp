@@ -16,6 +16,12 @@ class TwoChar
         this->second = second;
     }
 
+    TwoChar(char* chars)
+    {
+        this->first = chars[0];
+        this->second = chars[1];
+    }
+
     /// @brief How many of the given characters match the TwoChar.
     unsigned int Match(char first, char second) const
     {

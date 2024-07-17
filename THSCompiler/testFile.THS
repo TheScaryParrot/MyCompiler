@@ -1,44 +1,41 @@
-class int
+final inline int int1 = 1;
+
+final bool bool1 = true;
+
+inline float float1 = 1.0;
+
+char char1 = 'a';
+
+typedef
 {
-    public inline void Assign(final inline int this, final inline int other)
-    {
-        return;
-    }
+    int intProp;
+    bool boolProp;
+    float floatProp;
+    char charProp;
+} MyType;
 
-    public inline int Add(final int this, final inline int other)
-    {
-        return 0;
-    }
+MyType myType1 = {1, true, 1.0, 'a'};
 
-    public inline int Mul(final int this, final inline int other)
-    {
-        this += other;
-        return 0;
-    }
-}
+final MyType myType2 = {int1, bool1, float1, char1};
 
-public int num1 = 0;
-public final int num2 = 1;
-
-num1 += num2 * 5;
-
-class doubleInt
+int main(int argc, char argv)
 {
-    public int num1;
-    public int num2;
+    final inline int int1 = 2;
+    MyType myType3 = {int1, bool1, float1, char1};
 
-    public static doubleInt doubleInt()
+    if (myType1.intProp == myType2.intProp)
     {
-
+        return 1;
     }
+    else
+    {
+        myType1.intProp = myType3.intProp;
+    }
+
+    while (myType1.boolProp)
+    {
+        myType1.boolProp = false;
+    }
+
+    char char2 = myType3.charProp;
 }
-
-public doubleInt dInt = doubleInt();
-
-dInt.num1:hello().(5 + dInt.num2).moin."hi";
-
-dInt.num1 = dInt.num2:hello() * 5;
-dInt.num2 = 2;
-
-int num3 = dInt.num1 + dInt.num2;
-
