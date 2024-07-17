@@ -5,10 +5,7 @@
 #include "../PredictiveParser.hpp"
 
 bool PredictiveParser::LookAhead_Expression(TokenList* tokens) { return LookAhead_UnaryExpression(tokens); }
-AbstractExpressionNode* PredictiveParser::Parse_Expression(TokenList* tokens)
-{
-    return Parse_AssignmentExpression(tokens);
-}
+AbstractExpressionNode* PredictiveParser::Parse_Expression(TokenList* tokens) { return Parse_AssignmentExpression(tokens); }
 
 bool PredictiveParser::LookAhead_AssignmentExpression(TokenList* tokens) { return LookAhead_UnaryExpression(tokens); }
 AbstractExpressionNode* PredictiveParser::Parse_AssignmentExpression(TokenList* tokens)
@@ -33,7 +30,7 @@ AbstractExpressionNode* PredictiveParser::Parse_AssignmentExpression(TokenList* 
 
 bool PredictiveParser::LookAhead_AssignOperator(TokenList* tokens, unsigned int offset)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Peek(offset);
+    std::shared_ptr<Token> nextToken = tokens->Peek(offset);
 
     return nextToken->IsThisToken(ConstTokens.ASSIGN_OPERATOR_TOKEN) ||      // ASSIGN_OPERATOR
            nextToken->IsThisToken(ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN) ||  // ADD_ASSIGN_OPERATOR
@@ -44,7 +41,7 @@ bool PredictiveParser::LookAhead_AssignOperator(TokenList* tokens, unsigned int 
 }
 EAssignOperators PredictiveParser::Parse_AssignOperator(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume AssignOperator
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume AssignOperator
 
     if (nextToken->IsThisToken(ConstTokens.ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ASSIGN;
     if (nextToken->IsThisToken(ConstTokens.ADD_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ADD_ASSIGN;
@@ -85,8 +82,7 @@ AbstractExpressionNode* PredictiveParser::Parse_AndExpression(TokenList* tokens)
     while (tokens->IsPeekOfTokenType(ConstTokens.AND_OPERATOR_TOKEN))
     {
         tokens->Next();  // Consume AND_OPERATOR
-        operatorValuePairs->push_back(
-            new OperatorExpressionPair(EOperators::AND_OPERATOR, Parse_EqualExpression(tokens)));
+        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::AND_OPERATOR, Parse_EqualExpression(tokens)));
     }
 
     return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -103,9 +99,8 @@ AbstractExpressionNode* PredictiveParser::Parse_EqualExpression(TokenList* token
 
     while (LookAhead_EqualOperator(tokens))
     {
-        EOperators op = Parse_EqualOperator(
-            tokens);  // Ensure EqualOperator is parsed ahead of Parse_SumExpression. Complier sometimes does weird
-                      // stuff: https://en.cppreference.com/w/c/language/eval_order
+        EOperators op = Parse_EqualOperator(tokens);  // Ensure EqualOperator is parsed ahead of Parse_SumExpression. Complier sometimes does weird
+                                                      // stuff: https://en.cppreference.com/w/c/language/eval_order
         operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_SumExpression(tokens)));
     }
 
@@ -114,23 +109,21 @@ AbstractExpressionNode* PredictiveParser::Parse_EqualExpression(TokenList* token
 
 bool PredictiveParser::LookAhead_EqualOperator(TokenList* tokens)
 {
-    return tokens->IsPeekOfTokenType(ConstTokens.EQUAL_OPERATOR_TOKEN) ||               // EQUAL_OPERATOR
-           tokens->IsPeekOfTokenType(ConstTokens.NOT_EQUAL_OPERATOR_TOKEN) ||           // NOT_EQUAL_OPERATOR
-           tokens->IsPeekOfTokenType(ConstTokens.LESS_THAN_OPERATOR_TOKEN) ||           // LESS_THAN_OPERATOR
-           tokens->IsPeekOfTokenType(ConstTokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN) ||  // LESS_THAN_OR_EQUAL_OPERATOR
-           tokens->IsPeekOfTokenType(ConstTokens.GREATER_THAN_OPERATOR_TOKEN) ||        // GREATER_THAN_OPERATOR
-           tokens->IsPeekOfTokenType(
-               ConstTokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN);  // GREATER_THAN_OR_EQUAL_OPERATOR
+    return tokens->IsPeekOfTokenType(ConstTokens.EQUAL_OPERATOR_TOKEN) ||                // EQUAL_OPERATOR
+           tokens->IsPeekOfTokenType(ConstTokens.NOT_EQUAL_OPERATOR_TOKEN) ||            // NOT_EQUAL_OPERATOR
+           tokens->IsPeekOfTokenType(ConstTokens.LESS_THAN_OPERATOR_TOKEN) ||            // LESS_THAN_OPERATOR
+           tokens->IsPeekOfTokenType(ConstTokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN) ||   // LESS_THAN_OR_EQUAL_OPERATOR
+           tokens->IsPeekOfTokenType(ConstTokens.GREATER_THAN_OPERATOR_TOKEN) ||         // GREATER_THAN_OPERATOR
+           tokens->IsPeekOfTokenType(ConstTokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN);  // GREATER_THAN_OR_EQUAL_OPERATOR
 }
 EOperators PredictiveParser::Parse_EqualOperator(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();
+    std::shared_ptr<Token> nextToken = tokens->Next();
 
     if (nextToken->IsThisToken(ConstTokens.EQUAL_OPERATOR_TOKEN)) return EOperators::EQUAL_OPERATOR;
     if (nextToken->IsThisToken(ConstTokens.NOT_EQUAL_OPERATOR_TOKEN)) return EOperators::NOT_EQUAL_OPERATOR;
     if (nextToken->IsThisToken(ConstTokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN)) return EOperators::LESS_THAN_OPERATOR;
-    if (nextToken->IsThisToken(ConstTokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN))
-        return EOperators::LESS_THAN_OR_EQUAL_OPERATOR;
+    if (nextToken->IsThisToken(ConstTokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN)) return EOperators::LESS_THAN_OR_EQUAL_OPERATOR;
     if (nextToken->IsThisToken(ConstTokens.GREATER_THAN_OPERATOR_TOKEN)) return EOperators::GREATER_THAN_OPERATOR;
 
     return EOperators::LESS_THAN_OPERATOR;
@@ -147,9 +140,8 @@ AbstractExpressionNode* PredictiveParser::Parse_SumExpression(TokenList* tokens)
 
     while (LookAhead_SumOperator(tokens))
     {
-        EOperators op =
-            Parse_SumOperator(tokens);  // Ensure SumOperator is parsed ahead of MulExpression. Complier sometimes
-                                        // does weird stuff: https://en.cppreference.com/w/c/language/eval_order
+        EOperators op = Parse_SumOperator(tokens);  // Ensure SumOperator is parsed ahead of MulExpression. Complier sometimes
+                                                    // does weird stuff: https://en.cppreference.com/w/c/language/eval_order
         operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_MulExpression(tokens)));
     }
 
@@ -158,12 +150,11 @@ AbstractExpressionNode* PredictiveParser::Parse_SumExpression(TokenList* tokens)
 
 bool PredictiveParser::LookAhead_SumOperator(TokenList* tokens)
 {
-    return tokens->IsPeekOfTokenType(ConstTokens.ADD_OPERATOR_TOKEN) ||
-           tokens->IsPeekOfTokenType(ConstTokens.SUB_OPERATOR_TOKEN);
+    return tokens->IsPeekOfTokenType(ConstTokens.ADD_OPERATOR_TOKEN) || tokens->IsPeekOfTokenType(ConstTokens.SUB_OPERATOR_TOKEN);
 }
 EOperators PredictiveParser::Parse_SumOperator(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume SumOperator
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume SumOperator
 
     if (nextToken->IsThisToken(ConstTokens.ADD_OPERATOR_TOKEN)) return EOperators::ADD_OPERATOR;
 
@@ -181,9 +172,8 @@ AbstractExpressionNode* PredictiveParser::Parse_MulExpression(TokenList* tokens)
 
     while (LookAhead_MulOperator(tokens))
     {
-        EOperators op =
-            Parse_MulOperator(tokens);  // Ensure MulOperator is parsed ahead of UnaryExpression. Complier sometimes
-                                        // does weird stuff: https://en.cppreference.com/w/c/language/eval_order
+        EOperators op = Parse_MulOperator(tokens);  // Ensure MulOperator is parsed ahead of UnaryExpression. Complier sometimes
+                                                    // does weird stuff: https://en.cppreference.com/w/c/language/eval_order
         operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_UnaryExpression(tokens)));
     }
 
@@ -192,13 +182,12 @@ AbstractExpressionNode* PredictiveParser::Parse_MulExpression(TokenList* tokens)
 
 bool PredictiveParser::LookAhead_MulOperator(TokenList* tokens)
 {
-    return tokens->IsPeekOfTokenType(ConstTokens.MUL_OPERATOR_TOKEN) ||
-           tokens->IsPeekOfTokenType(ConstTokens.DIV_OPERATOR_TOKEN) ||
+    return tokens->IsPeekOfTokenType(ConstTokens.MUL_OPERATOR_TOKEN) || tokens->IsPeekOfTokenType(ConstTokens.DIV_OPERATOR_TOKEN) ||
            tokens->IsPeekOfTokenType(ConstTokens.MOD_OPERATOR_TOKEN);
 }
 EOperators PredictiveParser::Parse_MulOperator(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume MulOperator
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume MulOperator
 
     if (nextToken->IsThisToken(ConstTokens.MUL_OPERATOR_TOKEN)) return EOperators::MUL_OPERATOR;
     if (nextToken->IsThisToken(ConstTokens.DIV_OPERATOR_TOKEN)) return EOperators::DIV_OPERATOR;
@@ -231,8 +220,7 @@ AbstractExpressionNode* PredictiveParser::Parse_UnaryExpression(TokenList* token
         postUnaryOperator = Parse_PostUnaryOperator(tokens);
     }
 
-    if (preUnaryOperator == EPreUnaryOperators::PRE_NONE && postUnaryOperator == EPostUnaryOperators::POST_NONE)
-        return value;
+    if (preUnaryOperator == EPreUnaryOperators::PRE_NONE && postUnaryOperator == EPostUnaryOperators::POST_NONE) return value;
 
     return new UnaryOperatorExpressionNode(preUnaryOperator, value, postUnaryOperator);
 }
@@ -240,7 +228,7 @@ AbstractExpressionNode* PredictiveParser::Parse_UnaryExpression(TokenList* token
 bool PredictiveParser::LookAhead_PreUnaryOperator(TokenList* tokens)
 {
     // NEGATE | NOT | INCREMENT | DECREMENT
-    std::shared_ptr<AbstractToken> next = tokens->Peek();
+    std::shared_ptr<Token> next = tokens->Peek();
 
     return next->IsThisToken(ConstTokens.NEGATE_OPERATOR_TOKEN) ||     // NEGATE
            next->IsThisToken(ConstTokens.NOT_OPERATOR_TOKEN) ||        // NOT
@@ -249,7 +237,7 @@ bool PredictiveParser::LookAhead_PreUnaryOperator(TokenList* tokens)
 }
 EPreUnaryOperators PredictiveParser::Parse_PreUnaryOperator(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume UnaryOperator
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume UnaryOperator
 
     if (nextToken->IsThisToken(ConstTokens.NEGATE_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_NEGATE;
     if (nextToken->IsThisToken(ConstTokens.NOT_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_NOT;
@@ -261,12 +249,11 @@ EPreUnaryOperators PredictiveParser::Parse_PreUnaryOperator(TokenList* tokens)
 bool PredictiveParser::LookAhead_PostUnaryOperator(TokenList* tokens)
 {
     // INCREMENT | DECREMENT
-    return tokens->IsPeekOfTokenType(ConstTokens.INCREMENT_OPERATOR_TOKEN) ||
-           tokens->IsPeekOfTokenType(ConstTokens.DECREMENT_OPERATOR_TOKEN);
+    return tokens->IsPeekOfTokenType(ConstTokens.INCREMENT_OPERATOR_TOKEN) || tokens->IsPeekOfTokenType(ConstTokens.DECREMENT_OPERATOR_TOKEN);
 }
 EPostUnaryOperators PredictiveParser::Parse_PostUnaryOperator(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume UnaryOperator
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume UnaryOperator
 
     if (nextToken->IsThisToken(ConstTokens.INCREMENT_OPERATOR_TOKEN)) return EPostUnaryOperators::POST_INCREMENT;
 
@@ -307,8 +294,8 @@ AbstractExpressionNode* PredictiveParser::Parse_RelAccessValue(TokenList* tokens
 bool PredictiveParser::LookAhead_Value(TokenList* tokens)
 {
     // ID | PARENTHESIS_OPEN  | <const>
-    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) ||
-           tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN) || LookAhead_Constant(tokens);
+    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) || tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN) ||
+           LookAhead_Constant(tokens);
 }
 AbstractExpressionNode* PredictiveParser::Parse_Value(TokenList* tokens)
 {
@@ -335,8 +322,7 @@ AbstractExpressionNode* PredictiveParser::Parse_Value(TokenList* tokens)
 bool PredictiveParser::LookAhead_Call(TokenList* tokens)
 {
     // ID (
-    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) &&
-           tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, 1);
+    return tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(ConstTokens.PARENTHESIS_OPEN_TOKEN, 1);
 }
 CallNode* PredictiveParser::Parse_Call(TokenList* tokens)
 {
@@ -351,16 +337,14 @@ CallNode* PredictiveParser::Parse_Call(TokenList* tokens)
 bool PredictiveParser::LookAhead_Constant(TokenList* tokens)
 {
     // INT | STRING | <logicalConst>
-    return tokens->IsPeekOfTokenType(ConstTokens.CONST_NUMBER_TOKEN) ||
-           tokens->IsPeekOfTokenType(ConstTokens.CONST_STRING_TOKEN) || LookAhead_LogicalConstant(tokens);
+    return tokens->IsPeekOfTokenType(ConstTokens.CONST_NUMBER_TOKEN) || tokens->IsPeekOfTokenType(ConstTokens.CONST_STRING_TOKEN) ||
+           LookAhead_LogicalConstant(tokens);
 }
 AbstractConstValueNode* PredictiveParser::Parse_Constant(TokenList* tokens)
 {
-    if (LookAhead_LogicalConstant(tokens))
-        return Parse_LogicalConstant(tokens);  // Consumtion of token is handled by Parse_LogicalConstant()
+    if (LookAhead_LogicalConstant(tokens)) return Parse_LogicalConstant(tokens);  // Consumtion of token is handled by Parse_LogicalConstant()
 
-    if (tokens->IsPeekOfTokenType(ConstTokens.CONST_NUMBER_TOKEN))
-        return new NumberConstValueNode(tokens->Next<NumberConstToken>()->GetValue());
+    if (tokens->IsPeekOfTokenType(ConstTokens.CONST_NUMBER_TOKEN)) return new NumberConstValueNode(tokens->Next<IntConstToken>()->GetValue());
 
     return new StringConstValueNode(tokens->Next<StringConstToken>()->GetValue());
 }
@@ -368,12 +352,11 @@ AbstractConstValueNode* PredictiveParser::Parse_Constant(TokenList* tokens)
 bool PredictiveParser::LookAhead_LogicalConstant(TokenList* tokens)
 {
     // TRUE | FALSE
-    return tokens->IsPeekOfTokenType(Keywords.LOGICAL_TRUE_KEYWORD) ||
-           tokens->IsPeekOfTokenType(Keywords.LOGICAL_FALSE_KEYWORD);
+    return tokens->IsPeekOfTokenType(Keywords.LOGICAL_TRUE_KEYWORD) || tokens->IsPeekOfTokenType(Keywords.LOGICAL_FALSE_KEYWORD);
 }
 LogicalConstValueNode* PredictiveParser::Parse_LogicalConstant(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume LogicalConstant
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume LogicalConstant
 
     if (nextToken->IsThisToken(Keywords.LOGICAL_TRUE_KEYWORD)) return new LogicalConstValueNode(true);
 
@@ -387,7 +370,7 @@ bool PredictiveParser::LookAhead_Accessor(TokenList* tokens)
 }
 bool PredictiveParser::Parse_Accessor(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume Accessor
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume Accessor
 
     // Static if token was COLON, otherwise (DOT) not static
     return nextToken->IsThisToken(ConstTokens.COLON_TOKEN);

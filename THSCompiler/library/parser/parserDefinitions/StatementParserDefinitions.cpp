@@ -6,8 +6,8 @@
 
 bool PredictiveParser::LookAhead_Statement(TokenList* tokens)
 {
-    return tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN) || LookAhead_Body(tokens) ||
-           LookAhead_KeywordStatement(tokens) || LookAhead_Expression(tokens);
+    return tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN) || LookAhead_Body(tokens) || LookAhead_KeywordStatement(tokens) ||
+           LookAhead_Expression(tokens);
 }
 AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 {
@@ -27,12 +27,12 @@ AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 
 bool PredictiveParser::LookAhead_KeywordStatement(TokenList* tokens)
 {
-    return LookAhead_IfStatement(tokens) || LookAhead_ReturnStatement(tokens) || LookAhead_WhileStatement(tokens) ||
-           LookAhead_ForStatement(tokens) || LookAhead_BreakStatement(tokens) || LookAhead_ContinueStatement(tokens);
+    return LookAhead_IfStatement(tokens) || LookAhead_ReturnStatement(tokens) || LookAhead_WhileStatement(tokens) || LookAhead_ForStatement(tokens) ||
+           LookAhead_BreakStatement(tokens) || LookAhead_ContinueStatement(tokens);
 }
 AbstractKeywordStatementNode* PredictiveParser::Parse_KeywordStatement(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> token = tokens->Next();
+    std::shared_ptr<Token> token = tokens->Next();
 
     if (token->IsThisToken(Keywords.IF_KEYWORD)) return Parse_IfStatement(tokens);
     if (token->IsThisToken(Keywords.RETURN_KEYWORD)) return Parse_ReturnStatement(tokens);
@@ -43,10 +43,7 @@ AbstractKeywordStatementNode* PredictiveParser::Parse_KeywordStatement(TokenList
     return Parse_ContinueStatement(tokens);
 }
 
-bool PredictiveParser::LookAhead_IfStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.IF_KEYWORD);
-}
+bool PredictiveParser::LookAhead_IfStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.IF_KEYWORD); }
 IfStatementNode* PredictiveParser::Parse_IfStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
@@ -76,10 +73,7 @@ IfStatementNode* PredictiveParser::Parse_IfStatement(TokenList* tokens)
     return new IfStatementNode(expression, statement, elifStatements, elseStatement);
 }
 
-bool PredictiveParser::LookAhead_ElifStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.ELIF_KEYWORD);
-}
+bool PredictiveParser::LookAhead_ElifStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.ELIF_KEYWORD); }
 ElifStatementNode* PredictiveParser::Parse_ElifStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume ELIF_KEYWORD
@@ -94,10 +88,7 @@ ElifStatementNode* PredictiveParser::Parse_ElifStatement(TokenList* tokens)
     return new ElifStatementNode(expression, statement);
 }
 
-bool PredictiveParser::LookAhead_ElseStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.ELSE_KEYWORD);
-}
+bool PredictiveParser::LookAhead_ElseStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.ELSE_KEYWORD); }
 AbstractStatementNode* PredictiveParser::Parse_ElseStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume ELSE_KEYWORD
@@ -105,10 +96,7 @@ AbstractStatementNode* PredictiveParser::Parse_ElseStatement(TokenList* tokens)
     return Parse_Statement(tokens);
 }
 
-bool PredictiveParser::LookAhead_ReturnStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.RETURN_KEYWORD);
-}
+bool PredictiveParser::LookAhead_ReturnStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.RETURN_KEYWORD); }
 ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
 {
     if (tokens->IsPeekOfTokenType(ConstTokens.STATEMENT_END_TOKEN))
@@ -124,10 +112,7 @@ ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
     return new ReturnStatementNode(expression);
 }
 
-bool PredictiveParser::LookAhead_WhileStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.WHILE_KEYWORD);
-}
+bool PredictiveParser::LookAhead_WhileStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.WHILE_KEYWORD); }
 WhileStatementNode* PredictiveParser::Parse_WhileStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
@@ -139,10 +124,7 @@ WhileStatementNode* PredictiveParser::Parse_WhileStatement(TokenList* tokens)
     return new WhileStatementNode(expression, Parse_Statement(tokens));
 }
 
-bool PredictiveParser::LookAhead_ForStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.FOR_KEYWORD);
-}
+bool PredictiveParser::LookAhead_ForStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.FOR_KEYWORD); }
 ForStatementNode* PredictiveParser::Parse_ForStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
@@ -159,20 +141,14 @@ ForStatementNode* PredictiveParser::Parse_ForStatement(TokenList* tokens)
     return new ForStatementNode(initialization, condition, increment, Parse_Statement(tokens));
 }
 
-bool PredictiveParser::LookAhead_BreakStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.BREAK_KEYWORD);
-}
+bool PredictiveParser::LookAhead_BreakStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.BREAK_KEYWORD); }
 BreakStatementNode* PredictiveParser::Parse_BreakStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume STATEMENT_END_TOKEN
     return new BreakStatementNode();
 }
 
-bool PredictiveParser::LookAhead_ContinueStatement(TokenList* tokens)
-{
-    return tokens->IsPeekOfTokenType(Keywords.CONTINUE_KEYWORD);
-}
+bool PredictiveParser::LookAhead_ContinueStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.CONTINUE_KEYWORD); }
 ContinueStatementNode* PredictiveParser::Parse_ContinueStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume STATEMENT_END_TOKEN

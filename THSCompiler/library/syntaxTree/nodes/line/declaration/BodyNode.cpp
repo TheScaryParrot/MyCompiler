@@ -1,33 +1,33 @@
 #pragma once
 
-#include "../CodeblockNode.cpp"
+#include "../../BodyCodeNode.cpp"
 #include "../statement/AbstractStatementNode.cpp"
 
 class BodyNode : public AbstractStatementNode
 {
    public:
     BodyNode();
-    BodyNode(CodeblockNode* codeblockNode);
+    BodyNode(BodyCodeNode* BodyCodeNode);
     ~BodyNode();
 
     void AddCodeLine(AbstractLineNode* codeLine);
 
-    CodeblockNode* GetCodeBlock();
+    BodyCodeNode* GetCodeBlock();
 
     virtual std::string ToString() override;
 
    private:
-    CodeblockNode* codeblockNode;
+    BodyCodeNode* bodyCodeNode;
 };
 
-BodyNode::BodyNode() : AbstractStatementNode() { this->codeblockNode = new CodeblockNode(); }
+BodyNode::BodyNode() : AbstractStatementNode() { this->bodyCodeNode = new BodyCodeNode(); }
 
-BodyNode::BodyNode(CodeblockNode* codeblockNode) : AbstractStatementNode() { this->codeblockNode = codeblockNode; }
+BodyNode::BodyNode(BodyCodeNode* bodyCodeNode) : AbstractStatementNode() { this->bodyCodeNode = bodyCodeNode; }
 
-BodyNode::~BodyNode() { delete codeblockNode; }
+BodyNode::~BodyNode() { delete bodyCodeNode; }
 
-void BodyNode::AddCodeLine(AbstractLineNode* codeLine) { codeblockNode->AddCodeline(codeLine); }
+void BodyNode::AddCodeLine(AbstractLineNode* codeLine) { bodyCodeNode->AddCodeline(codeLine); }
 
-CodeblockNode* BodyNode::GetCodeBlock() { return codeblockNode; }
+BodyCodeNode* BodyNode::GetCodeBlock() { return bodyCodeNode; }
 
-std::string BodyNode::ToString() { return codeblockNode->ToString(); }
+std::string BodyNode::ToString() { return bodyCodeNode->ToString(); }

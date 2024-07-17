@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "AbstractLineNode.cpp"
+#include "line/AbstractLineNode.cpp"
 
-class CodeblockNode : AbstractTreeNode
+class BodyCodeNode : AbstractTreeNode
 {
    public:
     void AddCodeline(AbstractLineNode* line);
@@ -18,16 +18,13 @@ class CodeblockNode : AbstractTreeNode
     std::vector<std::unique_ptr<AbstractLineNode>> lines;
 };
 
-void CodeblockNode::AddCodeline(AbstractLineNode* codeLine)
-{
-    lines.push_back(std::unique_ptr<AbstractLineNode>(codeLine));
-}
+void BodyCodeNode::AddCodeline(AbstractLineNode* codeLine) { lines.push_back(std::unique_ptr<AbstractLineNode>(codeLine)); }
 
-AbstractLineNode* CodeblockNode::GetLine(int index) { return lines[index].get(); }
+AbstractLineNode* BodyCodeNode::GetLine(int index) { return lines[index].get(); }
 
-unsigned int CodeblockNode::GetLineCount() { return lines.size(); }
+unsigned int BodyCodeNode::GetLineCount() { return lines.size(); }
 
-std::string CodeblockNode::ToString()
+std::string BodyCodeNode::ToString()
 {
     std::string result = "{\n";
 

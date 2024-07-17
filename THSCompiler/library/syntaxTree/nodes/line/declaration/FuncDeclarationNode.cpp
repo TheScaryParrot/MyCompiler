@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../BodyNode.cpp"
-#include "AbstractVarFuncDeclarationNode.cpp"
+#include "AbstractDeclarationNode.cpp"
+#include "BodyNode.cpp"
+#include "DeclarationAttributes.cpp"
 #include "ParameterDeclarationNode.cpp"
-#include "declarationAttributes/SyntaxTreeDeclarationAttributes.cpp"
 #include "types/FunctionReturnTypeNode.cpp"
 
-class FuncDeclarationNode : public AbstractVarFuncDeclarationNode
+class FuncDeclarationNode : public AbstractDeclarationNode
 {
    public:
-    FuncDeclarationNode(SyntaxTreeDeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name,
+    FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name,
                         std::vector<ParameterDeclarationNode*>* parameters, BodyNode* body);
     ~FuncDeclarationNode();
 
@@ -18,14 +18,13 @@ class FuncDeclarationNode : public AbstractVarFuncDeclarationNode
     std::string name;
     FunctionReturnTypeNode returnType;
     std::vector<ParameterDeclarationNode*>* parameters;
-    SyntaxTreeDeclarationAttributes attributes;
+    DeclarationAttributes attributes;
     BodyNode* body;
 };
 
-FuncDeclarationNode::FuncDeclarationNode(SyntaxTreeDeclarationAttributes attributes, FunctionReturnTypeNode returnType,
-                                         std::string name, std::vector<ParameterDeclarationNode*>* parameters,
-                                         BodyNode* body)
-    : AbstractVarFuncDeclarationNode()
+FuncDeclarationNode::FuncDeclarationNode(DeclarationAttributes attributes, FunctionReturnTypeNode returnType, std::string name,
+                                         std::vector<ParameterDeclarationNode*>* parameters, BodyNode* body)
+    : AbstractDeclarationNode()
 {
     this->attributes = attributes;
     this->returnType = returnType;

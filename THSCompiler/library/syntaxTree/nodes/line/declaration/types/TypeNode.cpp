@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../AbstractTreeNode.cpp"
+#include "../../../AbstractTreeNode.cpp"
 
 class TypeNode : public AbstractTreeNode
 {

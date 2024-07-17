@@ -123,8 +123,8 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 bool PredictiveParser::LookAhead_VarFuncDeclarationAttributes(TokenList* tokens, unsigned int offset)
 {
     // <scope> | <static> | <final> | <inline>
-    return LookAhead_ScopeAttribute(tokens, offset) || LookAhead_StaticAttribute(tokens, offset) ||
-           LookAhead_FinalAttribute(tokens, offset) || LookAhead_InlineAttribute(tokens, offset);
+    return LookAhead_ScopeAttribute(tokens, offset) || LookAhead_StaticAttribute(tokens, offset) || LookAhead_FinalAttribute(tokens, offset) ||
+           LookAhead_InlineAttribute(tokens, offset);
 }
 unsigned int PredictiveParser::Skip_VarFuncDeclarationAttributes(TokenList* tokens)
 {
@@ -194,8 +194,7 @@ std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList
 bool PredictiveParser::LookAhead_ParamDeclaration(TokenList* tokens)
 {
     // <paramAttributes> | ID ID
-    if (tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) &&
-        tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1))
+    if (tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(ConstTokens.CONST_IDENTIFIER_TOKEN, 1))
         return true;
 
     return LookAhead_ParamAttributes(tokens);
@@ -260,13 +259,12 @@ BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
 bool PredictiveParser::LookAhead_ScopeAttribute(TokenList* tokens, unsigned int offset)
 {
     // PUBLIC | PRIVATE | PROTECTED
-    return tokens->IsPeekOfTokenType(Keywords.PUBLIC_KEYWORD, offset) ||
-           tokens->IsPeekOfTokenType(Keywords.PRIVATE_KEYWORD, offset) ||
+    return tokens->IsPeekOfTokenType(Keywords.PUBLIC_KEYWORD, offset) || tokens->IsPeekOfTokenType(Keywords.PRIVATE_KEYWORD, offset) ||
            tokens->IsPeekOfTokenType(Keywords.PROTECTED_KEYWORD, offset);
 }
 ESyntaxTreeScopes PredictiveParser::Parse_ScopeAttribute(TokenList* tokens)
 {
-    std::shared_ptr<AbstractToken> nextToken = tokens->Next();  // Consume scope keyword
+    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume scope keyword
 
     if (nextToken->IsThisToken(Keywords.PUBLIC_KEYWORD)) return ESyntaxTreeScopes::PUBLIC;
 
@@ -283,7 +281,7 @@ bool PredictiveParser::LookAhead_StaticAttribute(TokenList* tokens, unsigned int
 bool PredictiveParser::Parse_StaticAttribute(TokenList* tokens)
 {
     tokens->Next();  // Constume STATIC
-    return true;  // As LookAhead_StaticAttribute() has returned CertainlyPresent, we know that static must be present
+    return true;     // As LookAhead_StaticAttribute() has returned CertainlyPresent, we know that static must be present
 }
 
 bool PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset)
@@ -305,5 +303,5 @@ bool PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens, unsigned int
 bool PredictiveParser::Parse_InlineAttribute(TokenList* tokens)
 {
     tokens->Next();  // Consume INLINE
-    return true;  // As LookAhead_InlineAttribute() has returned CertainlyPresent, we know that inline must be present
+    return true;     // As LookAhead_InlineAttribute() has returned CertainlyPresent, we know that inline must be present
 }
