@@ -36,9 +36,9 @@ AbstractExpressionNode* PredictiveParser::Parse_AssignmentExpression(TokenList* 
     return assignmentNode;
 }
 
-bool PredictiveParser::LookAhead_AssignOperator(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_AssignOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Peek(offset);
+    std::shared_ptr<Token> nextToken = tokens->Peek();
 
     return nextToken->IsThisToken(Tokens.ASSIGN_OPERATOR_TOKEN) ||      // ASSIGN_OPERATOR
            nextToken->IsThisToken(Tokens.ADD_ASSIGN_OPERATOR_TOKEN) ||  // ADD_ASSIGN_OPERATOR

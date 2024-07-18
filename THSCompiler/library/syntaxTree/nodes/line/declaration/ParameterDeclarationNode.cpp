@@ -1,29 +1,28 @@
 #pragma once
 
 #include "AbstractDeclarationNode.cpp"
-#include "DeclarationAttributes.cpp"
 
 class ParameterDeclarationNode : public AbstractDeclarationNode
 {
    public:
-    ParameterDeclarationNode(DeclarationAttributes attributes, std::string type, std::string name);
-    ~ParameterDeclarationNode();
+    ParameterDeclarationNode(bool isFinal, std::string type, std::string name)
+    {
+        this->isFinal = isFinal;
+        this->type = type;
+        this->name = name;
+    }
 
-    virtual std::string ToString() override;
+    virtual std::string ToString() override
+    {
+        std::string result = "param ";
+
+        if (isFinal) result += "final ";
+
+        return result + type + " " + name;
+    }
 
     std::string name;
     std::string type;
 
-    DeclarationAttributes attributes;
+    bool isFinal;
 };
-
-ParameterDeclarationNode::ParameterDeclarationNode(DeclarationAttributes attributes, std::string type, std::string name) : AbstractDeclarationNode()
-{
-    this->attributes = attributes;
-    this->type = type;
-    this->name = name;
-}
-
-ParameterDeclarationNode::~ParameterDeclarationNode() {}
-
-std::string ParameterDeclarationNode::ToString() { return "param: " + attributes.ToString() + type + " " + name; }

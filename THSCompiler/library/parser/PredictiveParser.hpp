@@ -9,12 +9,13 @@
 #include "../syntaxTree/nodes/line/AbstractLineNode.cpp"
 
 #pragma region Declarations
-#include "../syntaxTree/nodes/line/declaration/DeclarationAttributes.cpp"
 #include "../syntaxTree/nodes/line/declaration/FuncDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/GlobalVarDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/LocalVarDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/ParameterDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/PropertyDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/TypeDeclarationNode.cpp"
-#include "../syntaxTree/nodes/line/declaration/VarDeclarationNode.cpp"
+#include "../syntaxTree/nodes/line/declaration/VarDeclarationAttributes.cpp"
 #include "../syntaxTree/nodes/line/declaration/types/FunctionReturnTypeNode.cpp"
 
 #pragma endregion
@@ -78,16 +79,14 @@ static class PredictiveParser
     AbstractDeclarationNode* Parse_Declaration(TokenList* tokens);
 
     bool LookAhead_VarDeclaration(TokenList* tokens);
-    VarDeclarationNode* Parse_VarDeclaration(TokenList* tokens);
+    /// @param isLocal returns a LocalVarDeclarationNode if true, otherwise a GlobalVarDeclarationNode
+    AbstractVarDeclarationNode* Parse_VarDeclaration(TokenList* tokens, bool isLocal);
 
     bool LookAhead_FuncDeclaration(TokenList* tokens);
     FuncDeclarationNode* Parse_FuncDeclaration(TokenList* tokens);
 
-    bool LookAhead_DeclarationAttributes(TokenList* tokens,
-                                         unsigned int offset = 0);  // Has offset to allow for skipping tokens
-    unsigned int Skip_DeclarationAttributes(TokenList* tokens);     // Returns the number of tokens that belong to DeclarationAttributes.
-                                                                    // Allows skipping the tokens
-    DeclarationAttributes Parse_DeclarationAttributes(TokenList* tokens);
+    bool LookAhead_VarDeclarationAttributes(TokenList* tokens);
+    VarDeclarationAttributes Parse_VarDeclarationAttributes(TokenList* tokens);
 
     bool LookAhead_TypeDeclaration(TokenList* tokens);
     TypeDeclarationNode* Parse_TypeDeclaration(TokenList* tokens);
@@ -104,10 +103,10 @@ static class PredictiveParser
     bool LookAhead_Body(TokenList* tokens);
     BodyNode* Parse_Body(TokenList* tokens);
 
-    bool LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset = 0);
+    bool LookAhead_FinalAttribute(TokenList* tokens);
     bool Parse_FinalAttribute(TokenList* tokens);
 
-    bool LookAhead_InlineAttribute(TokenList* tokens, unsigned int offset = 0);
+    bool LookAhead_InlineAttribute(TokenList* tokens);
     bool Parse_InlineAttribute(TokenList* tokens);
 
 #pragma endregion
@@ -121,7 +120,7 @@ static class PredictiveParser
     bool LookAhead_AssignmentExpression(TokenList* tokens);
     AbstractExpressionNode* Parse_AssignmentExpression(TokenList* tokens);
 
-    bool LookAhead_AssignOperator(TokenList* tokens, unsigned int offset = 0);
+    bool LookAhead_AssignOperator(TokenList* tokens);
     EAssignOperators Parse_AssignOperator(TokenList* tokens);
 
     bool LookAhead_OrExpression(TokenList* tokens);

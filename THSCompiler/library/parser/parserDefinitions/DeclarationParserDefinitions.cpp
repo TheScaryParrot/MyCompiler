@@ -11,22 +11,23 @@ bool PredictiveParser::LookAhead_Declaration(TokenList* tokens)
 AbstractDeclarationNode* PredictiveParser::Parse_Declaration(TokenList* tokens)
 {
     if (LookAhead_FuncDeclaration(tokens)) return Parse_FuncDeclaration(tokens);
-    if (LookAhead_VarDeclaration(tokens)) return Parse_VarDeclaration(tokens);
+    // Parse_Declaration is only envoked in global scope, as Type and Func declarations are not allowed in local scope
+    if (LookAhead_VarDeclaration(tokens)) return Parse_VarDeclaration(tokens, false);
     return Parse_TypeDeclaration(tokens);
 }
 
 bool PredictiveParser::LookAhead_VarDeclaration(TokenList* tokens)
 {
-    unsigned int i = Skip_DeclarationAttributes(tokens);
+    // <VarDeclarationAttributes> | ID ID !(
+    if (LookAhead_VarDeclarationAttributes(tokens)) return true;
 
-    // <DeclarationAttributes>? ID ID !(
-    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           !tokens->IsPeekOfTokenType(Tokens.PARENTHESIS_OPEN_TOKEN, i);     // !(
+    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) &&     // ID
+           tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, 1) &&  // ID
+           !tokens->IsPeekOfTokenType(Tokens.PARENTHESIS_OPEN_TOKEN, 2);   // !(
 }
-VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens)
+AbstractVarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens, bool isLocal)
 {
-    DeclarationAttributes attributes = Parse_DeclarationAttributes(tokens);
+    VarDeclarationAttributes attributes = Parse_VarDeclarationAttributes(tokens);
     TypeNode type = TypeNode(tokens->Next<TokenWithValue>()->GetValue());
     std::string name = tokens->Next<TokenWithValue>()->GetValue();
     AbstractExpressionNode* value = nullptr;
@@ -39,24 +40,28 @@ VarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* tokens)
 
     tokens->Next();  // Consume STATEMENT_END
 
-    return new VarDeclarationNode(attributes, type, name, value);
+    if (isLocal)
+    {
+        return new LocalVarDeclarationNode(attributes, type, name, value);
+    }
+    else
+    {
+        return new GlobalVarDeclarationNode(attributes, type, name, value);
+    }
 }
 
 bool PredictiveParser::LookAhead_FuncDeclaration(TokenList* tokens)
 {
-    unsigned int i = Skip_DeclarationAttributes(tokens);
+    // VOID
+    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD)) return true;
 
-    // <DeclarationAttributes>? VOID
-    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD, i)) return true;
-
-    // <DeclarationAttributes>? ID ID (
-    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, i++) &&  // ID
-           tokens->IsPeekOfTokenType(Tokens.PARENTHESIS_OPEN_TOKEN, i);      // (
+    // ID ID (
+    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) &&     // ID
+           tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, 1) &&  // ID
+           tokens->IsPeekOfTokenType(Tokens.PARENTHESIS_OPEN_TOKEN, 2);    // (
 }
 FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 {
-    DeclarationAttributes attributes = Parse_DeclarationAttributes(tokens);
     FunctionReturnTypeNode returnType;
 
     if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD))
@@ -79,29 +84,17 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 
     BodyNode* body = Parse_Body(tokens);
 
-    return new FuncDeclarationNode(attributes, returnType, name, parameters, body);
+    return new FuncDeclarationNode(returnType, name, parameters, body);
 }
 
-bool PredictiveParser::LookAhead_DeclarationAttributes(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_VarDeclarationAttributes(TokenList* tokens)
 {
     // <final> | <inline>
-    return LookAhead_FinalAttribute(tokens, offset) || LookAhead_InlineAttribute(tokens, offset);
+    return LookAhead_FinalAttribute(tokens) || LookAhead_InlineAttribute(tokens);
 }
-unsigned int PredictiveParser::Skip_DeclarationAttributes(TokenList* tokens)
+VarDeclarationAttributes PredictiveParser::Parse_VarDeclarationAttributes(TokenList* tokens)
 {
-    unsigned int skippedTokens = 0;
-
-    // while final or inline attribute is present. If empty this will be false
-    while (LookAhead_DeclarationAttributes(tokens, skippedTokens))
-    {
-        skippedTokens++;
-    }
-
-    return skippedTokens;
-}
-DeclarationAttributes PredictiveParser::Parse_DeclarationAttributes(TokenList* tokens)
-{
-    DeclarationAttributes attributes;
+    VarDeclarationAttributes attributes;
 
     if (LookAhead_FinalAttribute(tokens))
     {
@@ -176,23 +169,24 @@ std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList
 
 bool PredictiveParser::LookAhead_ParamDeclaration(TokenList* tokens)
 {
-    // <paramAttributes> | ID ID
-    if (tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, 1)) return true;
+    // <final> | ID ID
+    if (tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD)) return true;
 
-    return LookAhead_DeclarationAttributes(tokens);
+    return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, 1);
 }
 ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* tokens)
 {
-    DeclarationAttributes attributes;
+    bool isFinal = false;
 
-    if (LookAhead_DeclarationAttributes(tokens) == true)
+    if (tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD))
     {
-        attributes = Parse_DeclarationAttributes(tokens);
+        isFinal = true;
+        tokens->Next();  // Consume FINAL
     }
 
     std::string type = tokens->Next<TokenWithValue>()->GetValue();
 
-    return new ParameterDeclarationNode(attributes, type, tokens->Next<TokenWithValue>()->GetValue());
+    return new ParameterDeclarationNode(isFinal, type, tokens->Next<TokenWithValue>()->GetValue());
 }
 
 bool PredictiveParser::LookAhead_Body(TokenList* tokens)
@@ -216,10 +210,10 @@ BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
     return bodynode;
 }
 
-bool PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens)
 {
     // FINAL
-    return tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD, offset);
+    return tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD);
 }
 bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens)
 {
@@ -227,10 +221,10 @@ bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens)
     return true;     // As LookAhead_FinalAttribute() has returned true, we know that final must be present
 }
 
-bool PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens, unsigned int offset)
+bool PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens)
 {
     // INLINE
-    return tokens->IsPeekOfTokenType(Keywords.INLINE_KEYWORD, offset);
+    return tokens->IsPeekOfTokenType(Keywords.INLINE_KEYWORD);
 }
 bool PredictiveParser::Parse_InlineAttribute(TokenList* tokens)
 {

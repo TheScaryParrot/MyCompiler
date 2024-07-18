@@ -12,7 +12,7 @@ class PropertyDeclarationNode : public AbstractDeclarationNode
         this->name = name;
     }
 
-    virtual std::string ToString() override { return "property: " + type.ToString() + " " + name + ";"; };
+    virtual std::string ToString() override { return "property " + type.ToString() + " " + name + ";"; };
 
     std::string name;
     TypeNode type;

@@ -1,25 +1,25 @@
 #pragma once
 
-#include "../../declaration/VarDeclarationNode.cpp"
+#include "../../declaration/AbstractVarDeclarationNode.cpp"
 #include "../../expression/AbstractExpressionNode.cpp"
 #include "AbstractKeywordStatementNode.cpp"
 
 class ForStatementNode : public AbstractKeywordStatementNode
 {
    public:
-    ForStatementNode(VarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
+    ForStatementNode(AbstractVarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
                      AbstractStatementNode* statement);
     ~ForStatementNode();
 
     virtual std::string ToString() override;
 
-    VarDeclarationNode* initialization;
+    AbstractVarDeclarationNode* initialization;
     AbstractExpressionNode* condition;
     AbstractStatementNode* increment;
     AbstractStatementNode* statement;
 };
 
-ForStatementNode::ForStatementNode(VarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
+ForStatementNode::ForStatementNode(AbstractVarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
                                    AbstractStatementNode* statement)
     : AbstractKeywordStatementNode()
 {

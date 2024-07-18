@@ -129,7 +129,7 @@ ForStatementNode* PredictiveParser::Parse_ForStatement(TokenList* tokens)
 {
     tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
 
-    VarDeclarationNode* initialization = Parse_VarDeclaration(tokens);
+    AbstractVarDeclarationNode* initialization = Parse_VarDeclaration(tokens, true);
 
     AbstractExpressionNode* condition = Parse_Expression(tokens);
     tokens->Next();  // Consume STATEMENT_END_TOKEN (Parse_Expression does not consume STATEMENT_END_TOKEN)

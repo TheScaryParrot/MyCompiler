@@ -2,7 +2,7 @@
 
 #include <string>
 
-struct DeclarationAttributes
+struct VarDeclarationAttributes
 {
     bool isFinal = false;
     bool isInline = false;

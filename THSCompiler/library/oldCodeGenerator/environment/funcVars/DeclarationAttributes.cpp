@@ -3,26 +3,26 @@
 #include "../../../syntaxTree/nodes/line/declaration/varFuncDeclaration/declarationAttributes/ESyntaxTreeScopes.cpp"
 #include "EScopes.cpp"
 
-struct DeclarationAttributes
+struct VarDeclarationAttributes
 {
    public:
-    DeclarationAttributes() = default;
-    DeclarationAttributes(EScopes scope, bool isFinal, bool isInline);
-    DeclarationAttributes(ESyntaxTreeScopes scope, bool isFinal, bool isInline);
+    VarDeclarationAttributes() = default;
+    VarDeclarationAttributes(EScopes scope, bool isFinal, bool isInline);
+    VarDeclarationAttributes(ESyntaxTreeScopes scope, bool isFinal, bool isInline);
 
     EScopes scope = EScopes::PRIVATE;
     bool isFinal = false;
     bool isInline = false;
 };
 
-DeclarationAttributes::DeclarationAttributes(EScopes scope, bool isFinal, bool isInline)
+VarDeclarationAttributes::VarDeclarationAttributes(EScopes scope, bool isFinal, bool isInline)
 {
     this->scope = scope;
     this->isFinal = isFinal;
     this->isInline = isInline;
 }
 
-DeclarationAttributes::DeclarationAttributes(ESyntaxTreeScopes scope, bool isFinal, bool isInline)
+VarDeclarationAttributes::VarDeclarationAttributes(ESyntaxTreeScopes scope, bool isFinal, bool isInline)
 {
     switch (scope)
     {

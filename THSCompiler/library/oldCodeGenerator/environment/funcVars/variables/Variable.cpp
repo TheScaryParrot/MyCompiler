@@ -9,7 +9,7 @@
 class Variable
 {
    public:
-    Variable(Type* type, DeclarationAttributes attributes);
+    Variable(Type* type, VarDeclarationAttributes attributes);
 
     Type* GetType();
 
@@ -27,10 +27,10 @@ class Variable
     Type* type;
     std::unique_ptr<IVariableLocationGetter> getLocation;
     std::unique_ptr<IVariableLocationGetter> setLocation;
-    DeclarationAttributes attributes;
+    VarDeclarationAttributes attributes;
 };
 
-Variable::Variable(Type* type, DeclarationAttributes attributes)
+Variable::Variable(Type* type, VarDeclarationAttributes attributes)
 {
     this->type = type;
     this->attributes = attributes;
@@ -43,20 +43,11 @@ void Variable::SetGetLocation(IVariableLocationGetter* locationGetter)
     this->getLocation = std::unique_ptr<IVariableLocationGetter>(locationGetter);
 }
 
-void Variable::SetSetLocation(IVariableLocationGetter* setLocation)
-{
-    this->setLocation = std::unique_ptr<IVariableLocationGetter>(setLocation);
-}
+void Variable::SetSetLocation(IVariableLocationGetter* setLocation) { this->setLocation = std::unique_ptr<IVariableLocationGetter>(setLocation); }
 
-VariableLocation Variable::GetLocation(VariableLocation parentLocation)
-{
-    return this->getLocation->GetLocation(parentLocation);
-}
+VariableLocation Variable::GetLocation(VariableLocation parentLocation) { return this->getLocation->GetLocation(parentLocation); }
 
-VariableLocation Variable::SetLocation(VariableLocation parentLocation)
-{
-    return this->setLocation->GetLocation(parentLocation);
-}
+VariableLocation Variable::SetLocation(VariableLocation parentLocation) { return this->setLocation->GetLocation(parentLocation); }
 
 EScopes Variable::GetScope() { return attributes.scope; }
 

@@ -14,7 +14,7 @@
 class Function
 {
    public:
-    Function(Variable* returnVariable, std::vector<Variable*> parameters, DeclarationAttributes attributes);
+    Function(Variable* returnVariable, std::vector<Variable*> parameters, VarDeclarationAttributes attributes);
 
     /// @brief Sets this function's call code
     /// @param callCode unique pointer to the function call code; the function takes ownership of the pointer
@@ -35,20 +35,17 @@ class Function
 
    private:
     std::unique_ptr<IFunctionCallCode> callCode = nullptr;
-    DeclarationAttributes attributes;
+    VarDeclarationAttributes attributes;
 };
 
-Function::Function(Variable* returnVariable, std::vector<Variable*> parameters, DeclarationAttributes attributes)
+Function::Function(Variable* returnVariable, std::vector<Variable*> parameters, VarDeclarationAttributes attributes)
 {
     this->returnVariable = returnVariable;
     this->parameters = parameters;
     this->attributes = attributes;
 }
 
-void Function::SetCallCode(IFunctionCallCode* callCode)
-{
-    this->callCode = std::unique_ptr<IFunctionCallCode>(callCode);
-}
+void Function::SetCallCode(IFunctionCallCode* callCode) { this->callCode = std::unique_ptr<IFunctionCallCode>(callCode); }
 
 bool Function::HasFunctionCallCode() { return callCode != nullptr; }
 
@@ -69,10 +66,7 @@ bool Function::IsFinal() { return attributes.isFinal; }
 
 bool Function::IsInline() { return attributes.isInline; }
 
-InlineFunctionCallCode* Function::GenerateInlineFunctionCallCode(AssemblyCode* functionBody)
-{
-    return new InlineFunctionCallCode(functionBody);
-}
+InlineFunctionCallCode* Function::GenerateInlineFunctionCallCode(AssemblyCode* functionBody) { return new InlineFunctionCallCode(functionBody); }
 
 CallInstructionFunctionCallCode* Function::GenerateCallInstructionFunctionCallCode(std::string functionLabel)
 {
