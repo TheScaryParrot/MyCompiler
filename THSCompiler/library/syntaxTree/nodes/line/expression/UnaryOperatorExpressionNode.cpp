@@ -6,32 +6,25 @@
 class UnaryOperatorExpressionNode : public AbstractExpressionNode
 {
    public:
-    UnaryOperatorExpressionNode(EPreUnaryOperators preUnaryOperator, AbstractExpressionNode* value,
-                                EPostUnaryOperators postUnaryOperator);
-    ~UnaryOperatorExpressionNode();
+    UnaryOperatorExpressionNode(EPreUnaryOperators preUnaryOperator, AbstractExpressionNode* value, EPostUnaryOperators postUnaryOperator,
+                                bool applyToReference)
+        : AbstractExpressionNode()
+    {
+        this->preUnaryOperator = preUnaryOperator;
+        this->value = value;
+        this->postUnaryOperator = postUnaryOperator;
+    }
 
-    virtual std::string ToString() override;
+    ~UnaryOperatorExpressionNode() { delete value; }
 
-   private:
+    virtual std::string ToString() override
+    {
+        return EPreUnaryOperatorsToString(preUnaryOperator) + value->ToString() + EPostUnaryOperatorsToString(postUnaryOperator);
+    }
+
     EPreUnaryOperators preUnaryOperator;
     AbstractExpressionNode* value;
     EPostUnaryOperators postUnaryOperator;
+    ///@brief Whether the operator should be applied to the reference of the value. For ++ this is true, for ! this is false
+    bool applyToReference;
 };
-
-UnaryOperatorExpressionNode::UnaryOperatorExpressionNode(EPreUnaryOperators preUnaryOperator,
-                                                         AbstractExpressionNode* value,
-                                                         EPostUnaryOperators postUnaryOperator)
-    : AbstractExpressionNode()
-{
-    this->preUnaryOperator = preUnaryOperator;
-    this->value = value;
-    this->postUnaryOperator = postUnaryOperator;
-}
-
-UnaryOperatorExpressionNode::~UnaryOperatorExpressionNode() { delete value; }
-
-std::string UnaryOperatorExpressionNode::ToString()
-{
-    return EPreUnaryOperatorsToString(preUnaryOperator) + value->ToString() +
-           EPostUnaryOperatorsToString(postUnaryOperator);
-}

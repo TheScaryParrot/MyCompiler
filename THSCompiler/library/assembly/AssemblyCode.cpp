@@ -53,9 +53,30 @@ class AssemblyCode
     {
         std::string result = "";
 
+        result += "global main\n";
+
+        result = ".section .text\n";
         for (auto& line : text)
         {
             result += line->ToString() + "\n";
+        }
+
+        if (roData.size() > 0)
+        {
+            result += ".section .rodata\n";
+            for (auto& line : roData)
+            {
+                result += line->ToString() + "\n";
+            }
+        }
+
+        if (data.size() > 0)
+        {
+            result += ".section .data\n";
+            for (auto& line : data)
+            {
+                result += line->ToString() + "\n";
+            }
         }
 
         return result;

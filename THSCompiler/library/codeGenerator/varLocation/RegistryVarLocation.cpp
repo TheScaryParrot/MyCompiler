@@ -7,14 +7,12 @@ class RegistryVarLocation : public IVariableLocation
    private:
     std::string registry;
     int offset;
-    Type* type;
 
    public:
-    RegistryVarLocation(std::string registry, int offset, Type* type)
+    RegistryVarLocation(std::string registry, int offset)
     {
         this->registry = registry;
         this->offset = offset;
-        this->type = type;
     }
 
     virtual std::string GetBase() override { return registry; };
@@ -25,9 +23,5 @@ class RegistryVarLocation : public IVariableLocation
     /// @brief Adds increment to the offset; increment can be negative
     virtual void IncrementOffset(int increment) override { offset += increment; };
 
-    virtual Type* GetType() override { return type; };
-    virtual void SetType(Type* type) override { this->type = type; };
-
-    virtual IVariableLocation* Copy() override { return new RegistryVarLocation(registry, offset, type); };
-    virtual IVariableLocation* ConstructionFromRelAccessBase(IVariableLocation* base) override { return this; };
+    virtual IVariableLocation* Clone() override { return new RegistryVarLocation(registry, offset); };
 };

@@ -225,12 +225,22 @@ AbstractExpressionNode* PredictiveParser::Parse_UnaryExpression(TokenList* token
 
     if (LookAhead_PostUnaryOperator(tokens))
     {
-        postUnaryOperator = Parse_PostUnaryOperator(tokens);
+        if (preUnaryOperator != EPreUnaryOperators::PRE_NONE)
+        {
+            Logger.Log("PreUnaryOperator and PostUnaryOperator cannot be used together. Add parenthesis", Logger::ERROR);
+        }
+        else
+        {
+            postUnaryOperator = Parse_PostUnaryOperator(tokens);
+        }
     }
 
     if (preUnaryOperator == EPreUnaryOperators::PRE_NONE && postUnaryOperator == EPostUnaryOperators::POST_NONE) return value;
 
-    return new UnaryOperatorExpressionNode(preUnaryOperator, value, postUnaryOperator);
+    bool applyToReference = preUnaryOperator == EPreUnaryOperators::PRE_INCREMENT || preUnaryOperator == EPreUnaryOperators::PRE_DECREMENT ||
+                            postUnaryOperator == EPostUnaryOperators::POST_INCREMENT || postUnaryOperator == EPostUnaryOperators::POST_DECREMENT;
+
+    return new UnaryOperatorExpressionNode(preUnaryOperator, value, postUnaryOperator, applyToReference);
 }
 
 bool PredictiveParser::LookAhead_PreUnaryOperator(TokenList* tokens)

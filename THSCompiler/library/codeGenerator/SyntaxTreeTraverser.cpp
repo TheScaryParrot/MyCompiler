@@ -25,8 +25,12 @@
 #include "../syntaxTree/nodes/line/statement/AbstractStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
+#include "../utils/Logger.cpp"
 #include "CodeGenerator.cpp"
+#include "Variable.cpp"
+#include "types/StructType.cpp"
 #include "varLocation/IVariableLocation.cpp"
+#include "varLocation/LabelVarLocation.cpp"
 
 class SyntaxTreeTraverser
 {
@@ -37,14 +41,15 @@ class SyntaxTreeTraverser
     void TraverseGlobalCodeNode(GlobalCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseBodyCodeNode(BodyCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseLineNode(AbstractLineNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    void TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    StructType* TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
     void TraverseDeclarationNode(AbstractDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseGlobalVarDeclarationNode(GlobalVarDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseLocalVarDeclarationNode(LocalVarDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseFuncDeclarationNode(FuncDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseParameterDeclarationNode(ParameterDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    void TraversePropertyDeclarationNode(PropertyDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraversePropertyDeclarationNode(PropertyDeclarationNode* node, StructType* structType, CodeGenerator* codeGenerator,
+                                         AssemblyCode* assemblyCode);
     void TraverseTypeDeclarationNode(TypeDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
     void TraverseStatementNode(AbstractStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
@@ -52,24 +57,22 @@ class SyntaxTreeTraverser
     void TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseBodyNode(BodyNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
-    IVariableLocation* TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
-                                                            AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
-                                                           AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
-    IVariableLocation* TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
-    IVariableLocation* TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    IVariableLocation* TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    Variable* TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 };
 
 AssemblyCode* SyntaxTreeTraverser::Traverse(SyntaxTree* syntaxTree)
@@ -119,16 +122,20 @@ void SyntaxTreeTraverser::TraverseLineNode(AbstractLineNode* node, CodeGenerator
     }
 }
 
-void SyntaxTreeTraverser::TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+StructType* SyntaxTreeTraverser::TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
+    StructType* structType = new StructType();
+
     for (unsigned int i = 0; i < node->GetLineCount(); i++)
     {
         PropertyDeclarationNode* declaration = node->GetProperty(i);
 
         if (declaration == nullptr) continue;
 
-        TraversePropertyDeclarationNode(declaration, codeGenerator, assemblyCode);
+        TraversePropertyDeclarationNode(declaration, structType, codeGenerator, assemblyCode);
     }
+
+    return structType;
 }
 
 void SyntaxTreeTraverser::TraverseDeclarationNode(AbstractDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -156,7 +163,46 @@ void SyntaxTreeTraverser::TraverseDeclarationNode(AbstractDeclarationNode* node,
 
 void SyntaxTreeTraverser::TraverseGlobalVarDeclarationNode(GlobalVarDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO Global var declaration
+    if (codeGenerator->DoesVariableExist(node->name))
+    {
+        Logger.Log("Variable " + node->name + " already exists. Cannot be declared again", Logger::ERROR);
+        return;
+    }
+
+    Type* type = codeGenerator->GetType(node->type.name);
+
+    Variable* value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
+
+    if (!value->isInline)
+    {
+        Logger.Log("Cannot assign a non-inline value to a global variable in global scope", Logger::ERROR);
+        return;
+    }
+
+    Variable* newVariable = nullptr;
+
+    if (node->attributes.isInline)
+    {
+        newVariable = new Variable(value->location, type, node->attributes.isFinal, true);
+    }
+    else
+    {
+        LabelVarLocation* location = new LabelVarLocation(node->name);
+        newVariable = new Variable(location, type, node->attributes.isFinal, node->attributes.isInline);
+
+        DataDeclarationLine* dataDeclarationLine = new DataDeclarationLine(node->name, "DEFINE STUFF HERE");
+
+        if (node->attributes.isFinal)
+        {
+            assemblyCode->AddToRoData(dataDeclarationLine);
+        }
+        else
+        {
+            assemblyCode->AddToData(dataDeclarationLine);
+        }
+    }
+
+    codeGenerator->AddVariable(node->name, newVariable);
 }
 
 void SyntaxTreeTraverser::TraverseLocalVarDeclarationNode(LocalVarDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -174,14 +220,17 @@ void SyntaxTreeTraverser::TraverseParameterDeclarationNode(ParameterDeclarationN
     // TODO: Parameter declaration
 }
 
-void SyntaxTreeTraverser::TraversePropertyDeclarationNode(PropertyDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+void SyntaxTreeTraverser::TraversePropertyDeclarationNode(PropertyDeclarationNode* node, StructType* structType, CodeGenerator* codeGenerator,
+                                                          AssemblyCode* assemblyCode)
 {
-    // TODO: Property declaration
+    Type* type = codeGenerator->GetType(node->type.name);
+    structType->AddProperty(node->name, type);
 }
 
 void SyntaxTreeTraverser::TraverseTypeDeclarationNode(TypeDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO: Type declaration
+    StructType* structType = TraverseTypeDefCodeNode(node->typeDefCode, codeGenerator, assemblyCode);
+    codeGenerator->AddType(node->name, structType);
 }
 
 void SyntaxTreeTraverser::TraverseStatementNode(AbstractStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -219,7 +268,7 @@ void SyntaxTreeTraverser::TraverseBodyNode(BodyNode* node, CodeGenerator* codeGe
     // TODO: Body node
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     if (dynamic_cast<BinaryOperatorExpressionNode*>(node) != nullptr)
     {
@@ -239,27 +288,89 @@ IVariableLocation* SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressio
     return TraverseValueNode(dynamic_cast<AbstractValueNode*>(node), codeGenerator, assemblyCode);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
-                                                                             AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                    AssemblyCode* assemblyCode)
 {
     // TODO: Binary operator expression
     return nullptr;
 };
 
-IVariableLocation* SyntaxTreeTraverser::TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
-                                                                            AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                   AssemblyCode* assemblyCode)
 {
-    // TODO: Unary operator expression
-    return nullptr;
+    Variable* variable = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
+
+    if (!node->applyToReference)
+    {
+        Variable* newVariable = codeGenerator->GetNewLocalVariable(variable->type);
+        variable->type->GenerateAssign(newVariable->location, variable->location, assemblyCode);
+        variable = newVariable;
+    }
+
+    switch (node->preUnaryOperator)
+    {
+        case EPreUnaryOperators::PRE_NOT:
+            variable->type->GenerateNot(variable->location, assemblyCode);
+            break;
+        case EPreUnaryOperators::PRE_NEGATE:
+            variable->type->GenerateNeg(variable->location, assemblyCode);
+            break;
+        case EPreUnaryOperators::PRE_INCREMENT:
+            variable->type->GenerateInc(variable->location, assemblyCode);
+            break;
+        case EPreUnaryOperators::PRE_DECREMENT:
+            variable->type->GenerateDec(variable->location, assemblyCode);
+            break;
+    }
+
+    // TODO: Post unary operators
+
+    return variable;
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO: Assignment
-    return nullptr;
+    Variable* value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
+
+    for (Assignment* assignment : node->assignments)
+    {
+        Variable* l_variable = TraverseVariableNode(assignment->L_value, codeGenerator, assemblyCode);
+
+        if (l_variable->isFinal)
+        {
+            Logger.Log("Cannot assign to final variable " + assignment->L_value->ids[0], Logger::ERROR);
+            continue;
+        }
+
+        switch (assignment->assignOperator)
+        {
+            case EAssignOperators::ASSIGN:
+                l_variable->type->GenerateAssign(l_variable->location, value->location, assemblyCode);
+                break;
+            case EAssignOperators::ADD_ASSIGN:
+                l_variable->type->GenerateAdd(l_variable->location, value->location, assemblyCode);
+                break;
+            case EAssignOperators::SUB_ASSIGN:
+                l_variable->type->GenerateSub(l_variable->location, value->location, assemblyCode);
+                break;
+            case EAssignOperators::MUL_ASSIGN:
+                l_variable->type->GenerateMul(l_variable->location, value->location, assemblyCode);
+                break;
+            case EAssignOperators::DIV_ASSIGN:
+                l_variable->type->GenerateDiv(l_variable->location, value->location, assemblyCode);
+                break;
+            case EAssignOperators::MOD_ASSIGN:
+                l_variable->type->GenerateMod(l_variable->location, value->location, assemblyCode);
+                break;
+        }
+
+        value = l_variable;
+    }
+
+    return value;
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     if (dynamic_cast<CallNode*>(node) != nullptr)
     {
@@ -284,32 +395,79 @@ IVariableLocation* SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* nod
     return TraverseAbstractConstValueNode(dynamic_cast<AbstractConstValueNode*>(node), codeGenerator, assemblyCode);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     // TODO Call
     return nullptr;
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator,
-                                                                         AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                AssemblyCode* assemblyCode)
 {
     return TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO Struct
-    return nullptr;
+    StructType* tempStructType = new StructType();
+
+    std::vector<std::pair<Property, Variable*>> propertyAssigns;
+
+    // Generate temporary structtype
+    for (size_t i = 0; i < node->values.size(); i++)
+    {
+        Variable* r_value = TraverseExpressionNode(node->values[i], codeGenerator, assemblyCode);
+        propertyAssigns.push_back({tempStructType->AddProperty("", r_value->type), r_value});
+    }
+
+    Variable* structVariable = codeGenerator->GetNewLocalVariable(tempStructType);
+
+    // Assign the values to the struct
+    for (size_t i = 0; i < propertyAssigns.size(); i++)
+    {
+        std::pair<Property, Variable*> propertyAssign = propertyAssigns[i];
+        Variable* l_value = propertyAssign.first.Apply(structVariable->location);
+        Variable* r_value = propertyAssign.second;
+
+        l_value->type->GenerateAssign(l_value->location, r_value->location, assemblyCode);
+    }
+
+    return structVariable;
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO Variable
-    return nullptr;
+    if (node->ids.size() == 0)
+    {
+        Logger.Log("VariableNode with no ids. This is a mistake of the idiot who made this compiler", Logger::ERROR);
+        return nullptr;
+    }
+
+    if (!codeGenerator->DoesVariableExist(node->ids[0]))
+    {
+        Logger.Log("Variable " + node->ids[0] + " does not exist", Logger::ERROR);
+        return nullptr;
+    }
+
+    Variable* variable = codeGenerator->GetVariable(node->ids[0]);
+
+    for (size_t i = 1; i < node->ids.size(); i++)
+    {
+        StructType* structType = dynamic_cast<StructType*>(variable->type);
+
+        if (structType == nullptr)
+        {
+            Logger.Log("Cannot access property as " + node->ids[i] + " is not a struct", Logger::ERROR);
+            return nullptr;
+        }
+
+        variable = structType->ApplyProperty(node->ids[i], variable->location);
+    }
+
+    return variable;
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator,
-                                                                       AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     if (dynamic_cast<LogicalConstValueNode*>(node) != nullptr)
     {
@@ -329,28 +487,28 @@ IVariableLocation* SyntaxTreeTraverser::TraverseAbstractConstValueNode(AbstractC
     return TraverseStringConstValueNode(dynamic_cast<StringConstValueNode*>(node), codeGenerator, assemblyCode);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator,
-                                                                      AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO: Logical const value
-    return nullptr;
+    Type* type = codeGenerator->GetType("bool");
+    IVariableLocation* location = codeGenerator->ConstructLogicalConstVariableLocation(node->GetValue());
+    return new Variable(location, type, true, true);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO Int const value
-    return nullptr;
+    Type* type = codeGenerator->GetType("int");
+    IVariableLocation* location = codeGenerator->ConstructIntConstVariableLocation(node->GetValue());
+    return new Variable(location, type, true, true);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator,
-                                                                    AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO Float const value
-    return nullptr;
+    Type* type = codeGenerator->GetType("float");
+    IVariableLocation* location = codeGenerator->ConstructFloatConstVaribaleLocation(node->GetValue());
+    return new Variable(location, type, true, true);
 }
 
-IVariableLocation* SyntaxTreeTraverser::TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator,
-                                                                     AssemblyCode* assemblyCode)
+Variable* SyntaxTreeTraverser::TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     // TODO: String const value
     return nullptr;

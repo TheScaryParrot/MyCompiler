@@ -4,7 +4,8 @@ final bool bool1 = true;
 
 inline float float1 = 1.0;
 
-char char1 = 'a';
+//char char1 = 'a';
+
 
 typedef
 {
@@ -14,7 +15,10 @@ typedef
     char charProp;
 } MyType;
 
+
+
 MyType myType1 = {1, true, 1.0, 'a'};
+
 
 final MyType myType2 = {int1, bool1, float1, char1};
 

@@ -2,13 +2,8 @@
 
 #include <string>
 
-#include "../Type.cpp"
-
 class IVariableLocation
 {
-   private:
-    bool isInline;
-
    public:
     virtual std::string GetBase() = 0;
     virtual void SetBase(std::string base) = 0;
@@ -18,13 +13,5 @@ class IVariableLocation
     /// @brief Adds increment to the offset; increment can be negative
     virtual void IncrementOffset(int increment) = 0;
 
-    virtual Type* GetType() = 0;
-    virtual void SetType(Type* type) = 0;
-
-    virtual IVariableLocation* Copy() = 0;
-    /// @brief Construct var location from a base for a relative access (eg. properties)
-    virtual IVariableLocation* ConstructionFromRelAccessBase(IVariableLocation* base) = 0;
-
-    virtual bool IsInline() { return isInline; };
-    virtual void SetIsInline(bool isInline) { this->isInline = isInline; };
+    virtual IVariableLocation* Clone() = 0;
 };

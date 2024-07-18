@@ -4,6 +4,7 @@
 
 #include "../syntaxTree/SyntaxTree.cpp"
 #include "../tokens/TokenList.cpp"
+#include "../utils/Logger.cpp"
 
 #pragma region Nodes
 #include "../syntaxTree/nodes/line/AbstractLineNode.cpp"
