@@ -9,5 +9,7 @@ class ParenthesisExpressionNode : public AbstractValueNode
 
     ParenthesisExpressionNode(AbstractExpressionNode* expression) : AbstractValueNode() { this->expression = expression; }
 
+    ~ParenthesisExpressionNode() { delete expression; }
+
     virtual std::string ToString() override { return "(" + expression->ToString() + ")"; }
 };

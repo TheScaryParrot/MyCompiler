@@ -57,7 +57,26 @@
 static class PredictiveParser
 {
    public:
-    SyntaxTree* Parse(TokenList* tokens);
+    SyntaxTree* Parse(TokenList* tokens)
+    {
+        SyntaxTree* syntaxTree = nullptr;
+
+        if (LookAhead_GlobalCode(tokens))
+        {
+            syntaxTree = new SyntaxTree(Parse_GlobalCode(tokens));
+        }
+        else
+        {
+            syntaxTree = new SyntaxTree(new GlobalCodeNode());
+        }
+
+        if (tokens->HasNext())
+        {
+            std::cerr << "Unexpected token: " + tokens->Peek()->ToString() + "\n Terminating compiler." << std::endl;
+        }
+
+        return syntaxTree;
+    }
 
    private:
     bool LookAhead_GlobalCode(TokenList* tokens);
@@ -222,20 +241,3 @@ static class PredictiveParser
 #pragma endregion
 
 } PredictiveParser;
-
-SyntaxTree* PredictiveParser::Parse(TokenList* tokens)
-{
-    SyntaxTree* syntaxTree = new SyntaxTree();
-
-    if (LookAhead_GlobalCode(tokens))
-    {
-        syntaxTree->SetCode(Parse_GlobalCode(tokens));
-    }
-
-    if (tokens->HasNext())
-    {
-        std::cerr << "Unexpected token: " + tokens->Peek()->ToString() + "\n Terminating compiler." << std::endl;
-    }
-
-    return syntaxTree;
-}

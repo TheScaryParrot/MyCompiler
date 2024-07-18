@@ -15,5 +15,7 @@ class TypeDeclarationNode : public AbstractDeclarationNode
         this->typeDefCode = typeDefCode;
     }
 
+    ~TypeDeclarationNode() { delete typeDefCode; }
+
     virtual std::string ToString() override { return "typedef " + typeDefCode->ToString() + name + ";"; }
 };

@@ -15,6 +15,8 @@ class Assignment
         this->assignOperator = assignOperator;
     }
 
+    ~Assignment() { delete L_value; }
+
     VariableNode* L_value;
     EAssignOperators assignOperator;
 };
@@ -30,7 +32,12 @@ class AssignmentNode : public AbstractExpressionNode
     AbstractExpressionNode* value;
 };
 
-AssignmentNode::~AssignmentNode() { delete value; }
+AssignmentNode::~AssignmentNode()
+{
+    for (auto& assignment : assignments) delete assignment;
+
+    delete value;
+}
 
 std::string AssignmentNode::ToString()
 {

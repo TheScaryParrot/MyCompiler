@@ -19,6 +19,7 @@ void CompileFile(std::string filename)
     SyntaxTree* syntaxTree = PredictiveParser.Parse(tokens);
     delete tokens;
 
+    std::cout << "------Syntax Tree------\n";
     std::cout << syntaxTree->ToString() << std::endl;
 
     // Code generation
@@ -26,7 +27,7 @@ void CompileFile(std::string filename)
     AssemblyCode* assemblyCode = syntaxTreeTraverser.Traverse(syntaxTree);
     delete syntaxTree;
 
-    std::cout << "\n------Generated code------" << std::endl;
+    std::cout << "\n------Generated code------\n";
     std::cout << assemblyCode->ToString() << std::endl;
 
     delete assemblyCode;

@@ -10,13 +10,11 @@ class SyntaxTree
     GlobalCodeNode* code;
 
    public:
-    SyntaxTree() { code = new GlobalCodeNode(); }
-    ~SyntaxTree() { delete code; };
+    SyntaxTree(GlobalCodeNode* code) { this->code = code; }
+    ~SyntaxTree() { delete code; }
 
     void AddCodeLineNode(AbstractDeclarationNode* codeLine) { code->AddDeclaration(codeLine); }
-
-    void SetCode(GlobalCodeNode* code) { this->code = code; }
     GlobalCodeNode* GetCode() { return code; };
 
-    std::string ToString() { return "-----SyntaxTree-----\n" + code->ToString(); }
+    std::string ToString() { return code->ToString(); }
 };
