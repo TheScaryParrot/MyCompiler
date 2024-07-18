@@ -1,20 +1,22 @@
 #pragma once
 
+#include <memory>
+
 #include "types/Type.cpp"
 #include "varLocation/IVariableLocation.cpp"
 
 class Variable
 {
    public:
-    Variable(IVariableLocation* location, Type* type, bool isFinal)
+    Variable(std::shared_ptr<IVariableLocation> location, std::shared_ptr<Type> type, bool isFinal)
     {
         this->location = location;
         this->type = type;
         this->isFinal = isFinal;
     }
 
-    IVariableLocation* location;
-    Type* type;
+    std::shared_ptr<IVariableLocation> location;
+    std::shared_ptr<Type> type;
     bool isFinal;
 
     bool IsInline() { return location->IsInline(); }

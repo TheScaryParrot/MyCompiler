@@ -14,6 +14,14 @@ class EnvironmentLinkedList
     EnvironmentLinkedListElement* head;
 
    public:
+    ~EnvironmentLinkedList()
+    {
+        while (head != nullptr)
+        {
+            PopEnvironment();
+        }
+    }
+
     bool DoesVariableExist(std::string variableName)
     {
         EnvironmentLinkedListElement* current = head;
@@ -30,7 +38,7 @@ class EnvironmentLinkedList
         return false;
     }
 
-    Variable* GetVariable(std::string variableName)
+    std::shared_ptr<Variable> GetVariable(std::string variableName)
     {
         EnvironmentLinkedListElement* current = head;
         while (current != nullptr)
@@ -46,7 +54,7 @@ class EnvironmentLinkedList
         return nullptr;
     }
 
-    void AddVariable(std::string variableName, Variable* variable) { head->environment->AddVariable(variableName, variable); }
+    void AddVariable(std::string variableName, std::shared_ptr<Variable> variable) { head->environment->AddVariable(variableName, variable); }
 
     bool DoesTypeExist(std::string typeName)
     {
@@ -64,7 +72,7 @@ class EnvironmentLinkedList
         return false;
     }
 
-    Type* GetType(std::string typeName)
+    std::shared_ptr<Type> GetType(std::string typeName)
     {
         EnvironmentLinkedListElement* current = head;
         while (current != nullptr)
@@ -80,7 +88,7 @@ class EnvironmentLinkedList
         return nullptr;
     }
 
-    void AddType(std::string typeName, Type* type) { head->environment->AddType(typeName, type); }
+    void AddType(std::string typeName, std::shared_ptr<Type> type) { head->environment->AddType(typeName, type); }
 
     void PushEnvironment(Environment* environment)
     {
@@ -92,11 +100,10 @@ class EnvironmentLinkedList
 
     void PopEnvironment()
     {
-        Environment* environment = head->environment;
         EnvironmentLinkedListElement* newHead = head->next;
 
+        delete head->environment;
         delete head;
-        delete environment;
 
         head = newHead;
     }

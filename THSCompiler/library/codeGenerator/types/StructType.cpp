@@ -11,17 +11,17 @@
 class Property
 {
    public:
-    Type* type;
+    std::shared_ptr<Type> type;
     unsigned int offset;
 
-    Property(Type* type, unsigned int offset)
+    Property(std::shared_ptr<Type> type, unsigned int offset)
     {
         this->type = type;
         this->offset = offset;
     }
     Property() = default;
 
-    Variable* Apply(IVariableLocation* location)
+    std::shared_ptr<Variable> Apply(IVariableLocation* location)
     {
         RegistryPointerVarLocation* newLocation = dynamic_cast<RegistryPointerVarLocation*>(location->Clone());
 
@@ -33,7 +33,7 @@ class Property
 
         newLocation->IncrementOffset(-offset);
 
-        return new Variable(newLocation, type, false);
+        return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(newLocation), type, false));
     }
 };
 
@@ -46,7 +46,7 @@ class StructType : public Type
    public:
     StructType() { size = 0; }
 
-    Property AddProperty(std::string name, Type* type)
+    Property AddProperty(std::string name, std::shared_ptr<Type> type)
     {
         Property property = Property(type, size);
         properties.Insert(name, property);
@@ -56,7 +56,7 @@ class StructType : public Type
 
     Property GetProperty(size_t index) { return properties.At(index).second; }
 
-    Variable* ApplyProperty(std::string name, IVariableLocation* location) { return properties.Get(name).Apply(location); }
+    std::shared_ptr<Variable> ApplyProperty(std::string name, IVariableLocation* location) { return properties.Get(name).Apply(location); }
 
     virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
@@ -64,10 +64,10 @@ class StructType : public Type
         {
             std::string propertyName = properties.At(i).first;
 
-            Variable* destinationProperty = ApplyProperty(propertyName, destination);
-            Variable* sourceProperty = ApplyProperty(propertyName, source);
+            std::shared_ptr<Variable> destinationProperty = ApplyProperty(propertyName, destination);
+            std::shared_ptr<Variable> sourceProperty = ApplyProperty(propertyName, source);
 
-            destinationProperty->type->GenerateAssign(destinationProperty->location, sourceProperty->location, assemblyCode);
+            destinationProperty->type->GenerateAssign(destinationProperty->location.get(), sourceProperty->location.get(), assemblyCode);
         }
     }
 
@@ -135,7 +135,7 @@ class StructType : public Type
             Property thisProperty = this->GetProperty(i);
             Property otherProperty = otherStruct->GetProperty(i);
 
-            if (!thisProperty.type->CanApplyToThis(otherProperty.type)) return false;
+            if (!thisProperty.type->CanApplyToThis(otherProperty.type.get())) return false;
             if (!thisProperty.offset == otherProperty.offset) return false;
         }
 

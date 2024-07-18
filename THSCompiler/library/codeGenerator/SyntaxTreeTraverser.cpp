@@ -41,7 +41,7 @@ class SyntaxTreeTraverser
     void TraverseGlobalCodeNode(GlobalCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseBodyCodeNode(BodyCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseLineNode(AbstractLineNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    StructType* TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<StructType> TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
     void TraverseDeclarationNode(AbstractDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseGlobalVarDeclarationNode(GlobalVarDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
@@ -57,22 +57,25 @@ class SyntaxTreeTraverser
     void TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseBodyNode(BodyNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
-    Variable* TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                   AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                  AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
-    Variable* TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator,
+                                                               AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
-    Variable* TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    Variable* TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    std::shared_ptr<Variable> TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 };
 
 AssemblyCode* SyntaxTreeTraverser::Traverse(SyntaxTree* syntaxTree)
@@ -122,7 +125,8 @@ void SyntaxTreeTraverser::TraverseLineNode(AbstractLineNode* node, CodeGenerator
     }
 }
 
-StructType* SyntaxTreeTraverser::TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<StructType> SyntaxTreeTraverser::TraverseTypeDefCodeNode(TypeDefCodeNode* node, CodeGenerator* codeGenerator,
+                                                                         AssemblyCode* assemblyCode)
 {
     StructType* structType = new StructType();
 
@@ -135,7 +139,7 @@ StructType* SyntaxTreeTraverser::TraverseTypeDefCodeNode(TypeDefCodeNode* node, 
         TraversePropertyDeclarationNode(declaration, structType, codeGenerator, assemblyCode);
     }
 
-    return structType;
+    return std::shared_ptr<StructType>(structType);
 }
 
 void SyntaxTreeTraverser::TraverseDeclarationNode(AbstractDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -169,9 +173,9 @@ void SyntaxTreeTraverser::TraverseGlobalVarDeclarationNode(GlobalVarDeclarationN
         return;
     }
 
-    Type* type = codeGenerator->GetType(node->type.name);
+    std::shared_ptr<Type> type = codeGenerator->GetType(node->type.name);
 
-    Variable* value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
+    std::shared_ptr<Variable> value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
 
     if (!value->IsInline())
     {
@@ -179,16 +183,16 @@ void SyntaxTreeTraverser::TraverseGlobalVarDeclarationNode(GlobalVarDeclarationN
         return;
     }
 
-    Variable* newVariable = nullptr;
+    std::shared_ptr<Variable> newVariable = nullptr;
 
     if (node->attributes.isInline)
     {
-        newVariable = new Variable(value->location, type, node->attributes.isFinal);
+        newVariable.reset(new Variable(value->location, type, node->attributes.isFinal));
     }
     else
     {
-        LabelVarLocation* location = new LabelVarLocation(node->name);
-        newVariable = new Variable(location, type, node->attributes.isFinal);
+        std::shared_ptr<LabelVarLocation> location = std::shared_ptr<LabelVarLocation>(new LabelVarLocation(node->name));
+        newVariable.reset(new Variable(location, type, node->attributes.isFinal));
 
         std::string assemblyDefineString = type->GetAssemblyDefineString() + " ";
 
@@ -234,7 +238,7 @@ void SyntaxTreeTraverser::TraverseParameterDeclarationNode(ParameterDeclarationN
 void SyntaxTreeTraverser::TraversePropertyDeclarationNode(PropertyDeclarationNode* node, StructType* structType, CodeGenerator* codeGenerator,
                                                           AssemblyCode* assemblyCode)
 {
-    Type* type = codeGenerator->GetType(node->type.name);
+    std::shared_ptr<Type> type = codeGenerator->GetType(node->type.name);
     structType->AddProperty(node->name, type);
 }
 
@@ -246,7 +250,7 @@ void SyntaxTreeTraverser::TraverseTypeDeclarationNode(TypeDeclarationNode* node,
         return;
     }
 
-    StructType* structType = TraverseTypeDefCodeNode(node->typeDefCode, codeGenerator, assemblyCode);
+    std::shared_ptr<StructType> structType = TraverseTypeDefCodeNode(node->typeDefCode, codeGenerator, assemblyCode);
     codeGenerator->AddType(node->name, structType);
 }
 
@@ -285,7 +289,8 @@ void SyntaxTreeTraverser::TraverseBodyNode(BodyNode* node, CodeGenerator* codeGe
     // TODO: Body node
 }
 
-Variable* SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                      AssemblyCode* assemblyCode)
 {
     if (dynamic_cast<BinaryOperatorExpressionNode*>(node) != nullptr)
     {
@@ -305,38 +310,38 @@ Variable* SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressionNode* no
     return TraverseValueNode(dynamic_cast<AbstractValueNode*>(node), codeGenerator, assemblyCode);
 }
 
-Variable* SyntaxTreeTraverser::TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
-                                                                    AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                                    AssemblyCode* assemblyCode)
 {
     // TODO: Binary operator expression
     return nullptr;
 };
 
-Variable* SyntaxTreeTraverser::TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
-                                                                   AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseUnaryOperatorExpressionNode(UnaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                                   AssemblyCode* assemblyCode)
 {
-    Variable* variable = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
+    std::shared_ptr<Variable> variable = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
 
     if (!node->applyToReference)
     {
-        Variable* newVariable = codeGenerator->GetNewLocalVariable(variable->type);
-        variable->type->GenerateAssign(newVariable->location, variable->location, assemblyCode);
+        std::shared_ptr<Variable> newVariable = codeGenerator->GetNewLocalVariable(variable->type);
+        variable->type->GenerateAssign(newVariable->location.get(), variable->location.get(), assemblyCode);
         variable = newVariable;
     }
 
     switch (node->preUnaryOperator)
     {
         case EPreUnaryOperators::PRE_NOT:
-            variable->type->GenerateNot(variable->location, assemblyCode);
+            variable->type->GenerateNot(variable->location.get(), assemblyCode);
             break;
         case EPreUnaryOperators::PRE_NEGATE:
-            variable->type->GenerateNeg(variable->location, assemblyCode);
+            variable->type->GenerateNeg(variable->location.get(), assemblyCode);
             break;
         case EPreUnaryOperators::PRE_INCREMENT:
-            variable->type->GenerateInc(variable->location, assemblyCode);
+            variable->type->GenerateInc(variable->location.get(), assemblyCode);
             break;
         case EPreUnaryOperators::PRE_DECREMENT:
-            variable->type->GenerateDec(variable->location, assemblyCode);
+            variable->type->GenerateDec(variable->location.get(), assemblyCode);
             break;
     }
 
@@ -345,13 +350,15 @@ Variable* SyntaxTreeTraverser::TraverseUnaryOperatorExpressionNode(UnaryOperator
     return variable;
 }
 
-Variable* SyntaxTreeTraverser::TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseAssignmentNode(AssignmentNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    Variable* value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
+    std::shared_ptr<Variable> value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
+
+    // TODO: Add inline
 
     for (Assignment* assignment : node->assignments)
     {
-        Variable* l_variable = TraverseVariableNode(assignment->L_value, codeGenerator, assemblyCode);
+        std::shared_ptr<Variable> l_variable = TraverseVariableNode(assignment->L_value, codeGenerator, assemblyCode);
 
         if (l_variable->isFinal)
         {
@@ -362,22 +369,22 @@ Variable* SyntaxTreeTraverser::TraverseAssignmentNode(AssignmentNode* node, Code
         switch (assignment->assignOperator)
         {
             case EAssignOperators::ASSIGN:
-                l_variable->type->GenerateAssign(l_variable->location, value->location, assemblyCode);
+                l_variable->type->GenerateAssign(l_variable->location.get(), value->location.get(), assemblyCode);
                 break;
             case EAssignOperators::ADD_ASSIGN:
-                l_variable->type->GenerateAdd(l_variable->location, value->location, assemblyCode);
+                l_variable->type->GenerateAdd(l_variable->location.get(), value->location.get(), assemblyCode);
                 break;
             case EAssignOperators::SUB_ASSIGN:
-                l_variable->type->GenerateSub(l_variable->location, value->location, assemblyCode);
+                l_variable->type->GenerateSub(l_variable->location.get(), value->location.get(), assemblyCode);
                 break;
             case EAssignOperators::MUL_ASSIGN:
-                l_variable->type->GenerateMul(l_variable->location, value->location, assemblyCode);
+                l_variable->type->GenerateMul(l_variable->location.get(), value->location.get(), assemblyCode);
                 break;
             case EAssignOperators::DIV_ASSIGN:
-                l_variable->type->GenerateDiv(l_variable->location, value->location, assemblyCode);
+                l_variable->type->GenerateDiv(l_variable->location.get(), value->location.get(), assemblyCode);
                 break;
             case EAssignOperators::MOD_ASSIGN:
-                l_variable->type->GenerateMod(l_variable->location, value->location, assemblyCode);
+                l_variable->type->GenerateMod(l_variable->location.get(), value->location.get(), assemblyCode);
                 break;
         }
 
@@ -387,7 +394,7 @@ Variable* SyntaxTreeTraverser::TraverseAssignmentNode(AssignmentNode* node, Code
     return value;
 }
 
-Variable* SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     if (dynamic_cast<CallNode*>(node) != nullptr)
     {
@@ -412,47 +419,47 @@ Variable* SyntaxTreeTraverser::TraverseValueNode(AbstractValueNode* node, CodeGe
     return TraverseAbstractConstValueNode(dynamic_cast<AbstractConstValueNode*>(node), codeGenerator, assemblyCode);
 }
 
-Variable* SyntaxTreeTraverser::TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     // TODO Call
     return nullptr;
 }
 
-Variable* SyntaxTreeTraverser::TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator,
-                                                                AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator,
+                                                                                AssemblyCode* assemblyCode)
 {
     return TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
 }
 
-Variable* SyntaxTreeTraverser::TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseStructNode(StructNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    StructType* tempStructType = new StructType();
+    std::shared_ptr<StructType> tempStructType = std::shared_ptr<StructType>(new StructType());
 
-    std::vector<std::pair<Property, Variable*>> propertyAssigns;
+    std::vector<std::pair<Property, std::shared_ptr<Variable>>> propertyAssigns;
 
     // Generate temporary structtype
     for (size_t i = 0; i < node->values.size(); i++)
     {
-        Variable* r_value = TraverseExpressionNode(node->values[i], codeGenerator, assemblyCode);
+        std::shared_ptr<Variable> r_value = TraverseExpressionNode(node->values[i], codeGenerator, assemblyCode);
         propertyAssigns.push_back({tempStructType->AddProperty("", r_value->type), r_value});
     }
 
-    Variable* structVariable = codeGenerator->GetNewLocalVariable(tempStructType);
+    std::shared_ptr<Variable> structVariable = codeGenerator->GetNewLocalVariable(tempStructType);
 
     // Assign the values to the struct
     for (size_t i = 0; i < propertyAssigns.size(); i++)
     {
-        std::pair<Property, Variable*> propertyAssign = propertyAssigns[i];
-        Variable* l_value = propertyAssign.first.Apply(structVariable->location);
-        Variable* r_value = propertyAssign.second;
+        std::pair<Property, std::shared_ptr<Variable>> propertyAssign = propertyAssigns[i];
+        std::shared_ptr<Variable> l_value = propertyAssign.first.Apply(structVariable->location.get());
+        std::shared_ptr<Variable> r_value = propertyAssign.second;
 
-        l_value->type->GenerateAssign(l_value->location, r_value->location, assemblyCode);
+        l_value->type->GenerateAssign(l_value->location.get(), r_value->location.get(), assemblyCode);
     }
 
     return structVariable;
 }
 
-Variable* SyntaxTreeTraverser::TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseVariableNode(VariableNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     if (node->ids.size() == 0)
     {
@@ -466,11 +473,11 @@ Variable* SyntaxTreeTraverser::TraverseVariableNode(VariableNode* node, CodeGene
         return nullptr;
     }
 
-    Variable* variable = codeGenerator->GetVariable(node->ids[0]);
+    std::shared_ptr<Variable> variable = codeGenerator->GetVariable(node->ids[0]);
 
     for (size_t i = 1; i < node->ids.size(); i++)
     {
-        StructType* structType = dynamic_cast<StructType*>(variable->type);
+        StructType* structType = dynamic_cast<StructType*>(variable->type.get());
 
         if (structType == nullptr)
         {
@@ -478,13 +485,14 @@ Variable* SyntaxTreeTraverser::TraverseVariableNode(VariableNode* node, CodeGene
             return nullptr;
         }
 
-        variable = structType->ApplyProperty(node->ids[i], variable->location);
+        variable = structType->ApplyProperty(node->ids[i], variable->location.get());
     }
 
     return variable;
 }
 
-Variable* SyntaxTreeTraverser::TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseAbstractConstValueNode(AbstractConstValueNode* node, CodeGenerator* codeGenerator,
+                                                                              AssemblyCode* assemblyCode)
 {
     if (dynamic_cast<LogicalConstValueNode*>(node) != nullptr)
     {
@@ -504,28 +512,32 @@ Variable* SyntaxTreeTraverser::TraverseAbstractConstValueNode(AbstractConstValue
     return TraverseStringConstValueNode(dynamic_cast<StringConstValueNode*>(node), codeGenerator, assemblyCode);
 }
 
-Variable* SyntaxTreeTraverser::TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseLogicalConstValueNode(LogicalConstValueNode* node, CodeGenerator* codeGenerator,
+                                                                             AssemblyCode* assemblyCode)
 {
-    Type* type = codeGenerator->GetType("bool");
+    std::shared_ptr<Type> type = codeGenerator->GetType("bool");
     IVariableLocation* location = codeGenerator->ConstructLogicalConstVariableLocation(node->GetValue());
-    return new Variable(location, type, true);
+    return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(location), type, true));
 }
 
-Variable* SyntaxTreeTraverser::TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator,
+                                                                         AssemblyCode* assemblyCode)
 {
-    Type* type = codeGenerator->GetType("int");
+    std::shared_ptr<Type> type = codeGenerator->GetType("int");
     IVariableLocation* location = codeGenerator->ConstructIntConstVariableLocation(node->GetValue());
-    return new Variable(location, type, true);
+    return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(location), type, true));
 }
 
-Variable* SyntaxTreeTraverser::TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator,
+                                                                           AssemblyCode* assemblyCode)
 {
-    Type* type = codeGenerator->GetType("float");
+    std::shared_ptr<Type> type = codeGenerator->GetType("float");
     IVariableLocation* location = codeGenerator->ConstructFloatConstVaribaleLocation(node->GetValue());
-    return new Variable(location, type, true);
+    return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(location), type, true));
 }
 
-Variable* SyntaxTreeTraverser::TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator,
+                                                                            AssemblyCode* assemblyCode)
 {
     // TODO: String const value
     return nullptr;
