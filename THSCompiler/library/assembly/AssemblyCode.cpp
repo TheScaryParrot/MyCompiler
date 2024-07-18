@@ -10,6 +10,24 @@
 class AssemblyCode
 {
    public:
+    ~AssemblyCode()
+    {
+        for (auto& line : text)
+        {
+            delete line;
+        }
+
+        for (auto& line : roData)
+        {
+            delete line;
+        }
+
+        for (auto& line : data)
+        {
+            delete line;
+        }
+    }
+
     void AddLine(IAssemblyLine* line)
     {
         if (line == nullptr) return;
