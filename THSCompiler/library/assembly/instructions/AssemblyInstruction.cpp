@@ -6,13 +6,9 @@ class AssemblyInstruction
 {
    public:
     AssemblyInstruction() = default;
-    AssemblyInstruction(std::string instruction);
-    std::string ToString();
+    AssemblyInstruction(std::string instruction) { this->instruction = instruction; };
+    std::string ToString() { return instruction; };
 
    private:
     std::string instruction;
 };
-
-AssemblyInstruction::AssemblyInstruction(std::string instruction) { this->instruction = instruction; }
-
-std::string AssemblyInstruction::ToString() { return instruction; }

@@ -5,14 +5,10 @@
 class AssemblyLabelLine : public IAssemblyLine
 {
    public:
-    AssemblyLabelLine(std::string label);
+    AssemblyLabelLine(std::string label) { this->label = label; };
 
-    std::string ToString() override;
+    std::string ToString() override { return label + ":"; };
 
    private:
     std::string label;
 };
-
-AssemblyLabelLine::AssemblyLabelLine(std::string label) { this->label = label; }
-
-std::string AssemblyLabelLine::ToString() { return label + ":"; }
