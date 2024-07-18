@@ -6,22 +6,14 @@
 class LabelVarLocation : public IVariableLocation
 {
    private:
-    std::string base;
+    std::string label;
 
    public:
-    LabelVarLocation(std::string base) { this->base = base; }
+    LabelVarLocation(std::string label) { this->label = label; }
 
-    virtual std::string GetBase() { return base; }
-    virtual void SetBase(std::string base) { this->base = base; }
+    virtual bool IsInline() override { return false; }
 
-    virtual int GetOffset()
-    {
-        Logger.Log("LabelVarLocation does not have offset", Logger.ERROR);
-        return 0;
-    }
-    virtual void SetOffset(int offset) { Logger.Log("LabelVarLocation does not have offset", Logger.ERROR); }
-    /// @brief Adds increment to the offset; increment can be negative
-    virtual void IncrementOffset(int increment) { Logger.Log("LabelVarLocation does not have offset", Logger.ERROR); }
+    virtual IVariableLocation* Clone() override { return new LabelVarLocation(label); }
 
-    virtual IVariableLocation* Clone() { return new LabelVarLocation(base); }
+    virtual std::string ToAssemblyString() override { return label; }
 };

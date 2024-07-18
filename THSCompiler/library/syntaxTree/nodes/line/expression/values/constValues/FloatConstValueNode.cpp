@@ -5,12 +5,12 @@
 class FloatConstValueNode : public AbstractConstValueNode
 {
    public:
-    FloatConstValueNode(std::string value) : AbstractConstValueNode() { this->value = value; }
+    FloatConstValueNode(float value) : AbstractConstValueNode() { this->value = value; }
 
-    std::string GetValue() { return this->value; };
+    float GetValue() { return this->value; };
 
-    virtual std::string ToString() override { return GetValue(); }
+    virtual std::string ToString() override { return std::to_string(GetValue()); }
 
    private:
-    std::string value;
+    float value;
 };

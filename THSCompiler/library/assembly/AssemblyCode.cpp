@@ -55,7 +55,7 @@ class AssemblyCode
 
         result += "global main\n";
 
-        result = ".section .text\n";
+        result += ".section .text\n";
         for (auto& line : text)
         {
             result += line->ToString() + "\n";

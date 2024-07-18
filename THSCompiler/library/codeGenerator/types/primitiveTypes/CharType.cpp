@@ -2,7 +2,7 @@
 
 #include "PrimitiveType.cpp"
 
-class IntType : public PrimitiveType
+class CharType : public PrimitiveType
 {
     virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
@@ -54,7 +54,7 @@ class IntType : public PrimitiveType
         // TODO: Add dec instruction
     }
 
-    virtual std::string GetAssemblyDefineString() override { return "dd"; }
+    virtual std::string GetAssemblyDefineString() override { return "db"; }
 
-    virtual unsigned int GetSize() override { return 4; }
+    virtual unsigned int GetSize() override { return 1; }
 };

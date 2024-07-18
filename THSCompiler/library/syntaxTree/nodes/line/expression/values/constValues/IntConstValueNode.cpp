@@ -5,12 +5,12 @@
 class IntConstValueNode : public AbstractConstValueNode
 {
    public:
-    IntConstValueNode(std::string value) : AbstractConstValueNode() { this->value = value; }
+    IntConstValueNode(int value) : AbstractConstValueNode() { this->value = value; }
 
-    std::string GetValue() { return this->value; }
+    int GetValue() { return this->value; }
 
-    virtual std::string ToString() override { return GetValue(); }
+    virtual std::string ToString() override { return std::to_string(GetValue()); }
 
    private:
-    std::string value;
+    int value;
 };

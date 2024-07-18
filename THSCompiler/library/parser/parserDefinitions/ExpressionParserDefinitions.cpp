@@ -380,8 +380,8 @@ AbstractConstValueNode* PredictiveParser::Parse_Const(TokenList* tokens)
 {
     if (LookAhead_LogicalConst(tokens)) return Parse_LogicalConst(tokens);  // Consumtion of token is handled by Parse_LogicalConstant()
 
-    if (tokens->IsPeekOfTokenType(Tokens.CONST_INT_TOKEN)) return new IntConstValueNode(tokens->Next<TokenWithValue>()->GetValue());
-    if (tokens->IsPeekOfTokenType(Tokens.CONST_FLOAT_TOKEN)) return new FloatConstValueNode(tokens->Next<TokenWithValue>()->GetValue());
+    if (tokens->IsPeekOfTokenType(Tokens.CONST_INT_TOKEN)) return new IntConstValueNode(std::stoi(tokens->Next<TokenWithValue>()->GetValue()));
+    if (tokens->IsPeekOfTokenType(Tokens.CONST_FLOAT_TOKEN)) return new FloatConstValueNode(std::stof(tokens->Next<TokenWithValue>()->GetValue()));
 
     return new StringConstValueNode(tokens->Next<TokenWithValue>()->GetValue());
 }

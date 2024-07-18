@@ -2,7 +2,7 @@
 
 #include "PrimitiveType.cpp"
 
-class IntType : public PrimitiveType
+class FloatType : public PrimitiveType
 {
     virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {

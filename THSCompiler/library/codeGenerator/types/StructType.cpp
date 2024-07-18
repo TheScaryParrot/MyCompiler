@@ -5,6 +5,7 @@
 #include "../../utils/Logger.cpp"
 #include "../../utils/Map.cpp"
 #include "../Variable.cpp"
+#include "../varLocation/RegistryPointerVarLocation.cpp"
 #include "Type.cpp"
 
 class Property
@@ -22,10 +23,17 @@ class Property
 
     Variable* Apply(IVariableLocation* location)
     {
-        IVariableLocation* newLocation = location->Clone();
+        RegistryPointerVarLocation* newLocation = dynamic_cast<RegistryPointerVarLocation*>(location->Clone());
+
+        if (newLocation == nullptr)
+        {
+            Logger.Log("Cannot apply property to non-registry pointer location", Logger::ERROR);
+            return nullptr;
+        }
+
         newLocation->IncrementOffset(-offset);
 
-        return new Variable(newLocation, type, false, false);
+        return new Variable(newLocation, type, false);
     }
 };
 
@@ -48,11 +56,7 @@ class StructType : public Type
 
     Property GetProperty(size_t index) { return properties.At(index).second; }
 
-    Variable* ApplyProperty(std::string name, IVariableLocation* location)
-    {
-        Property property = properties.Get(name);
-        return property.Apply(location);
-    }
+    Variable* ApplyProperty(std::string name, IVariableLocation* location) { return properties.Get(name).Apply(location); }
 
     virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
@@ -110,6 +114,12 @@ class StructType : public Type
     virtual void GenerateDec(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot decrement a struct", Logger::ERROR);
+    }
+
+    virtual std::string GetAssemblyDefineString() override
+    {
+        Logger.Log("Cannot define a struct directly", Logger::ERROR);
+        return "";
     }
 
     virtual bool CanApplyToThis(Type* other) override
