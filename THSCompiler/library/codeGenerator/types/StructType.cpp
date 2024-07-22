@@ -171,8 +171,6 @@ class StructType : public Type
             Property thisProperty = this->GetProperty(i);
             Property otherProperty = otherStruct->GetProperty(i);
 
-            std::cout << thisProperty.type->GetSize() << " " << otherProperty.type->GetSize() << "\n";
-
             if (!thisProperty.type->CanApplyToThis(otherProperty.type.get())) return false;
             if (!thisProperty.offset == otherProperty.offset) return false;
         }
