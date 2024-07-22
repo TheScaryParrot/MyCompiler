@@ -54,6 +54,46 @@ class FloatType : public PrimitiveType
         // TODO: Add dec instruction
     }
 
+    virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add and instruction
+    }
+
+    virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add or instruction
+    }
+
+    virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add equal instruction
+    }
+
+    virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add not equal instruction
+    }
+
+    virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add less instruction
+    }
+
+    virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add less equal instruction
+    }
+
+    virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add greater instruction
+    }
+
+    virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add greater equal instruction
+    }
+
     virtual std::string GetAssemblyDefineString() override { return "dd"; }
 
     virtual unsigned int GetSize() override { return 4; }

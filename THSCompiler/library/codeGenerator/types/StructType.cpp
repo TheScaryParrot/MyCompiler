@@ -116,6 +116,46 @@ class StructType : public Type
         Logger.Log("Cannot decrement a struct", Logger::ERROR);
     }
 
+    virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot and two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot or two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot compare two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot compare two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot compare two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot compare two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot compare two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("Cannot compare two structs", Logger::ERROR);
+    }
+
     virtual std::string GetAssemblyDefineString() override
     {
         Logger.Log("Cannot define a struct directly", Logger::ERROR);

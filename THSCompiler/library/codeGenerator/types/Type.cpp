@@ -13,6 +13,16 @@ class Type
     virtual void GenerateDiv(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
     virtual void GenerateMod(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
 
+    virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+    virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+
+    virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+    virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+    virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+    virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+    virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+    virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
+
     virtual void GenerateNot(IVariableLocation* destination, AssemblyCode* assemblyCode) = 0;
     virtual void GenerateNeg(IVariableLocation* destination, AssemblyCode* assemblyCode) = 0;
     virtual void GenerateInc(IVariableLocation* destination, AssemblyCode* assemblyCode) = 0;

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../../../utils/Logger.cpp"
-#include "../IVariableLocation.cpp"
+#include "IConstVarLocation.cpp"
 
-class BoolConstVarLocation : public IVariableLocation
+class BoolConstVarLocation : public IConstVarLocation
 {
    private:
     bool value;
@@ -11,9 +11,7 @@ class BoolConstVarLocation : public IVariableLocation
    public:
     BoolConstVarLocation(bool value) { this->value = value; }
 
-    virtual bool IsInline() { return true; };
+    virtual IVariableLocation* Clone() override { return new BoolConstVarLocation(value); };
 
-    virtual IVariableLocation* Clone() { return new BoolConstVarLocation(value); };
-
-    virtual std::string ToAssemblyString() { return std::to_string(value); };
+    virtual std::string ToAssemblyString() override { return std::to_string(value); };
 };
