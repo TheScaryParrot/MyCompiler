@@ -2,9 +2,11 @@ final inline int int1 = 1;
 
 final bool bool1 = true;
 
-inline float float1 = 1.0;
+inline float float1 = 2.0;
 
-final float float2 = float1;
+final float float2 = float1 * (5.0 + 1.0) / 7.0;
+
+bool bool2 = true && false;
 
 // char char1 = 'a';
 
@@ -14,7 +16,6 @@ typedef
     int intProp;
     bool boolProp;
     float floatProp;
-    char charProp;
 } MyType;
 
 
@@ -23,12 +24,18 @@ typedef
 
 // final MyType myType2 = {int1, bool1, float1, char1};
 
-int main(int argc, char argv)
+bool Hello(bool a, bool b)
+{
+    return a && b;
+}
+
+int main(/*int argc, char argv*/)
 {
     final inline int int1 = 2;
-    // MyType myType3 = {int1, bool1, float1, char1};
+    int int2 = int1;
+    MyType myType3 = {int1, bool1, float1};
 
-    if (myType1.intProp == myType2.intProp)
+    /*if (myType1.intProp == myType2.intProp)
     {
         return 1;
     }
@@ -47,5 +54,7 @@ int main(int argc, char argv)
         myType1.floatProp += 1.0;
     }
 
-    char char2 = myType3.charProp;
+    */
+
+    float float2 = myType3.floatProp;
 }

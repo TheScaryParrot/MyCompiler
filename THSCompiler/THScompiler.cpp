@@ -19,8 +19,8 @@ void CompileFile(std::string filename)
     SyntaxTree* syntaxTree = PredictiveParser.Parse(tokens);
     delete tokens;
 
-    std::cout << "------Syntax Tree------\n";
-    std::cout << syntaxTree->ToString() << std::endl;
+    // std::cout << "------Syntax Tree------\n";
+    // std::cout << syntaxTree->ToString() << std::endl;
 
     // Code generation
     SyntaxTreeTraverser syntaxTreeTraverser = SyntaxTreeTraverser();

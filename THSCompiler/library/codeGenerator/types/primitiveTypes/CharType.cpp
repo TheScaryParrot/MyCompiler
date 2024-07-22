@@ -94,6 +94,11 @@ class CharType : public PrimitiveType
         // TODO: Add greater equal instruction
     }
 
+    virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add push instruction
+    }
+
     virtual std::string GetAssemblyDefineString() override { return "db"; }
 
     virtual unsigned int GetSize() override { return 1; }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../utils/Map.cpp"
+#include "../Function.cpp"
 #include "../Variable.cpp"
 #include "../types/Type.cpp"
 
@@ -8,6 +9,7 @@ class Environment
 {
    private:
     Map<std::string, std::shared_ptr<Variable>> variables;
+    Map<std::string, std::shared_ptr<Function>> functions;
     Map<std::string, std::shared_ptr<Type>> types;
 
    public:
@@ -18,4 +20,8 @@ class Environment
     bool HasType(std::string typeName) { return types.Contains(typeName); }
     std::shared_ptr<Type> GetType(std::string typeName) { return types.Get(typeName); }
     void AddType(std::string typeName, std::shared_ptr<Type> type) { types.Insert(typeName, type); }
+
+    bool HasFunction(std::string functionName) { return functions.Contains(functionName); }
+    std::shared_ptr<Function> GetFunction(std::string functionName) { return functions.Get(functionName); }
+    void AddFunction(std::string functionName, std::shared_ptr<Function> function) { functions.Insert(functionName, function); }
 };

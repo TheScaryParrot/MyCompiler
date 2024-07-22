@@ -55,7 +55,7 @@ class AssemblyCode
 
         result += "global main\n";
 
-        result += ".section .text\n";
+        result += "\n.section .text\n";
         for (auto& line : text)
         {
             result += line->ToString() + "\n";
@@ -63,7 +63,7 @@ class AssemblyCode
 
         if (roData.size() > 0)
         {
-            result += ".section .rodata\n";
+            result += "\n.section .rodata\n";
             for (auto& line : roData)
             {
                 result += line->ToString() + "\n";
@@ -72,7 +72,7 @@ class AssemblyCode
 
         if (data.size() > 0)
         {
-            result += ".section .data\n";
+            result += "\n.section .data\n";
             for (auto& line : data)
             {
                 result += line->ToString() + "\n";

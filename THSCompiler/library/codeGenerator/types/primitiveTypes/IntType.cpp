@@ -6,7 +6,10 @@ class IntType : public PrimitiveType
 {
     virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add mov instruction
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("movd");
+        line->AddArgument(source->ToAssemblyString());
+        line->AddArgument(destination->ToAssemblyString());
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateAdd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
@@ -92,6 +95,13 @@ class IntType : public PrimitiveType
     virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         // TODO: Add greater equal instruction
+    }
+
+    virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("pushd");
+        line->AddArgument(source->ToAssemblyString());
+        assemblyCode->AddLine(line);
     }
 
     virtual std::string GetAssemblyDefineString() override { return "dd"; }

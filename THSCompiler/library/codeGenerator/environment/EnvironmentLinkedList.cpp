@@ -37,7 +37,6 @@ class EnvironmentLinkedList
 
         return false;
     }
-
     std::shared_ptr<Variable> GetVariable(std::string variableName)
     {
         EnvironmentLinkedListElement* current = head;
@@ -53,8 +52,39 @@ class EnvironmentLinkedList
 
         return nullptr;
     }
-
     void AddVariable(std::string variableName, std::shared_ptr<Variable> variable) { head->environment->AddVariable(variableName, variable); }
+
+    bool DoesFunctionExist(std::string functionName)
+    {
+        EnvironmentLinkedListElement* current = head;
+        while (current != nullptr)
+        {
+            if (current->environment->HasFunction(functionName))
+            {
+                return true;
+            }
+
+            current = current->next;
+        }
+
+        return false;
+    }
+    std::shared_ptr<Function> GetFunction(std::string functionName)
+    {
+        EnvironmentLinkedListElement* current = head;
+        while (current != nullptr)
+        {
+            if (current->environment->HasFunction(functionName))
+            {
+                return current->environment->GetFunction(functionName);
+            }
+
+            current = current->next;
+        }
+
+        return nullptr;
+    }
+    void AddFunction(std::string functionName, std::shared_ptr<Function> function) { head->environment->AddFunction(functionName, function); }
 
     bool DoesTypeExist(std::string typeName)
     {
@@ -71,7 +101,6 @@ class EnvironmentLinkedList
 
         return false;
     }
-
     std::shared_ptr<Type> GetType(std::string typeName)
     {
         EnvironmentLinkedListElement* current = head;
@@ -87,7 +116,6 @@ class EnvironmentLinkedList
 
         return nullptr;
     }
-
     void AddType(std::string typeName, std::shared_ptr<Type> type) { head->environment->AddType(typeName, type); }
 
     void PushEnvironment(Environment* environment)

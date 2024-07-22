@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../assembly/AssemblyCode.cpp"
+#include "../assembly/AssemblyLabelLine.cpp"
 #include "../syntaxTree/SyntaxTree.cpp"
 #include "../syntaxTree/nodes/line/declaration/AbstractDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/FuncDeclarationNode.cpp"
@@ -272,12 +273,39 @@ void SyntaxTreeTraverser::TraverseLocalVarDeclarationNode(LocalVarDeclarationNod
 
 void SyntaxTreeTraverser::TraverseFuncDeclarationNode(FuncDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO: Func declaration
+    std::vector<std::shared_ptr<Type>> parameterTypes;
+
+    for (ParameterDeclarationNode* parameter : *node->parameters)
+    {
+        parameterTypes.push_back(codeGenerator->GetType(parameter->type));
+    }
+
+    Function* newFunction = new Function(node->name, parameterTypes, codeGenerator->GetType(node->returnType.name));
+
+    codeGenerator->AddFunction(node->name, std::shared_ptr<Function>(newFunction));
+
+    // Generate assembly code
+    codeGenerator->PushNewEnvironment();
+
+    for (ParameterDeclarationNode* parameter : *node->parameters)
+    {
+        TraverseParameterDeclarationNode(parameter, codeGenerator, assemblyCode);
+    }
+    codeGenerator->ClearParameterCounter();
+
+    assemblyCode->AddLine(new AssemblyLabelLine(node->name));
+
+    TraverseBodyNode(node->body, codeGenerator, assemblyCode);
+    codeGenerator->ClearLocalVariableCounter();
+    codeGenerator->PopEnvironment();
+
+    // TODO: Add return statement if not present
 }
 
 void SyntaxTreeTraverser::TraverseParameterDeclarationNode(ParameterDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO: Parameter declaration
+    Variable* newVariable = codeGenerator->GetNewParameterVariable(codeGenerator->GetType(node->type), node->isFinal, assemblyCode);
+    codeGenerator->AddVariable(node->name, std::shared_ptr<Variable>(newVariable));
 }
 
 void SyntaxTreeTraverser::TraversePropertyDeclarationNode(PropertyDeclarationNode* node, StructType* structType, CodeGenerator* codeGenerator,
@@ -369,17 +397,18 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseBinaryOperatorExpressionN
     }
     else
     {
-        // If is not inline create new local variable to ensure that the first variable isn't overwritten
-        left.reset(codeGenerator->GetNewLocalVariable(firstVariable->type, false, assemblyCode));
+        // If is not inline create new register variable
+        left.reset(codeGenerator->GetNewRegisterVariable(firstVariable->type, false, assemblyCode));
         left->type->GenerateAssign(left->location.get(), firstVariable->location.get(), assemblyCode);  // tempVar = firstVar
     }
 
     for (OperatorExpressionPair* operatorExpression : *node->operatorExpressionPairs)
     {
         std::shared_ptr<Variable> right = TraverseExpressionNode(operatorExpression->expression, codeGenerator, assemblyCode);
-        codeGenerator->ApplyOperatorOnVariables(left, right, operatorExpression->op, assemblyCode);
+        left = codeGenerator->ApplyOperatorOnVariables(left, right, operatorExpression->op, assemblyCode);
     }
 
+    left->isFinal = true;  // Make the result final
     return std::shared_ptr<Variable>(left);
 }
 
@@ -487,7 +516,40 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseValueNode(AbstractValueNo
 
 std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO Call
+    std::vector<std::shared_ptr<Variable>> arguments;
+
+    for (AbstractExpressionNode* argument : node->arguments)
+    {
+        arguments.push_back(TraverseExpressionNode(argument, codeGenerator, assemblyCode));
+    }
+
+    std::shared_ptr<Function> function = codeGenerator->GetFunction(node->functionName);
+
+    // If wrong argument type
+    for (size_t i = 0; i < arguments.size(); i++)
+    {
+        if (!function->parameterTypes[i]->CanApplyToThis(arguments[i]->type.get()))
+        {
+            Logger.Log("Argument " + std::to_string(i) + " of function " + node->functionName + " has wrong type", Logger::ERROR);
+            return nullptr;
+        }
+    }
+
+    unsigned int stackSize = 0;
+
+    // Push arguments to stack in reverse order
+    for (size_t i = arguments.size() - 1; i >= 0; i--)
+    {
+        arguments[i]->type->GenerateStackPush(arguments[i]->location.get(), assemblyCode);
+        stackSize += arguments[i]->type->GetSize();
+    }
+
+    function->GenerateCallInstruction(assemblyCode);
+
+    // Remove arguments from stack
+    codeGenerator->assemblyCodeGenerator.IncrementRSP(stackSize, assemblyCode);
+    // TODO: Return value
+
     return nullptr;
 }
 
@@ -507,7 +569,7 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseStructNode(StructNode* no
     for (size_t i = 0; i < node->values.size(); i++)
     {
         std::shared_ptr<Variable> r_value = TraverseExpressionNode(node->values[i], codeGenerator, assemblyCode);
-        propertyAssigns.push_back({tempStructType->AddProperty("", r_value->type), r_value});
+        propertyAssigns.push_back({tempStructType->AddProperty(std::to_string(i), r_value->type), r_value});
     }
 
     Variable* structVariable = codeGenerator->GetNewLocalVariable(tempStructType, false, assemblyCode);

@@ -75,22 +75,18 @@ class StructType : public Type
     {
         Logger.Log("Cannot add two structs", Logger::ERROR);
     }
-
     virtual void GenerateSub(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot subtract two structs", Logger::ERROR);
     }
-
     virtual void GenerateMul(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot multiply two structs", Logger::ERROR);
     }
-
     virtual void GenerateDiv(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot divide two structs", Logger::ERROR);
     }
-
     virtual void GenerateMod(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot modulo two structs", Logger::ERROR);
@@ -100,17 +96,14 @@ class StructType : public Type
     {
         Logger.Log("Cannot not a struct", Logger::ERROR);
     }
-
     virtual void GenerateNeg(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot negate a struct", Logger::ERROR);
     }
-
     virtual void GenerateInc(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot increment a struct", Logger::ERROR);
     }
-
     virtual void GenerateDec(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot decrement a struct", Logger::ERROR);
@@ -120,40 +113,43 @@ class StructType : public Type
     {
         Logger.Log("Cannot and two structs", Logger::ERROR);
     }
-
     virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot or two structs", Logger::ERROR);
     }
-
     virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-
     virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-
     virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-
     virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-
     virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-
     virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
+    }
+
+    virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
+    {
+        for (size_t i = 0; i < properties.Size(); i++)
+        {
+            std::string propertyName = properties.At(i).first;
+            std::shared_ptr<Variable> property = ApplyProperty(propertyName, source);
+            property->type->GenerateStackPush(property->location.get(), assemblyCode);
+        }
     }
 
     virtual std::string GetAssemblyDefineString() override
@@ -174,6 +170,8 @@ class StructType : public Type
         {
             Property thisProperty = this->GetProperty(i);
             Property otherProperty = otherStruct->GetProperty(i);
+
+            std::cout << thisProperty.type->GetSize() << " " << otherProperty.type->GetSize() << "\n";
 
             if (!thisProperty.type->CanApplyToThis(otherProperty.type.get())) return false;
             if (!thisProperty.offset == otherProperty.offset) return false;

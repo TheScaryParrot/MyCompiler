@@ -27,5 +27,20 @@ class RegistryPointerVarLocation : public IVariableLocation
 
     virtual IVariableLocation* Clone() override { return new RegistryPointerVarLocation(registry, offset); }
 
-    virtual std::string ToAssemblyString() override { return "[" + registry + " + " + std::to_string(offset) + "]"; }
+    virtual std::string ToAssemblyString() override
+    {
+        std::string result = "[" + registry;
+
+        if (offset == 0)
+        {
+            return result + "]";
+        }
+
+        if (offset > 0)
+        {
+            result += "+";
+        }
+
+        return result + std::to_string(offset) + "]";
+    }
 };

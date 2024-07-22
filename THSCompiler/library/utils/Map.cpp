@@ -1,25 +1,56 @@
 #pragma once
 
-#include <map>
+#include <vector>
 
 template <typename Key, typename Value>
 class Map
 {
    private:
-    std::map<Key, Value> map;
+    std::vector<std::pair<Key, Value>> list;
 
    public:
-    void Insert(Key key, Value value) { map[key] = value; }
-    Value Get(Key key) { return map[key]; }
-    bool Contains(Key key) { return map.find(key) != map.end(); }
-    std::pair<Key, Value> At(unsigned int index)
+    void Insert(Key key, Value value)
     {
-        auto it = map.begin();
-        std::advance(it, index);
-        return *it;
-    }
-    size_t Size() { return map.size(); }
+        for (std::pair<Key, Value>& item : list)
+        {
+            if (item.first == key)
+            {
+                item.second = value;
+            }
+        }
 
-    typename std::map<Key, Value>::iterator begin() { return map.begin(); }
-    typename std::map<Key, Value>::iterator end() { return map.end(); }
+        list.push_back(std::make_pair(key, value));
+    }
+
+    Value Get(Key key)
+    {
+        for (auto item : list)
+        {
+            if (item.first == key)
+            {
+                return item.second;
+            }
+        }
+
+        throw std::invalid_argument("Key not found");
+    }
+
+    bool Contains(Key key)
+    {
+        for (auto item : list)
+        {
+            if (item.first == key)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    std::pair<Key, Value> At(size_t index) { return list[index]; }
+    size_t Size() { return list.size(); }
+
+    typename std::vector<std::pair<Key, Value>>::iterator begin() { return list.begin(); }
+    typename std::vector<std::pair<Key, Value>>::iterator end() { return list.end(); }
 };
