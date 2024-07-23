@@ -8,8 +8,8 @@
 static class AssemblyCodeGenerator
 {
    private:
-    int localVariableOffset = 0;
-    int parameterOffset = 4;
+    int localVariableOffset = 8;
+    int parameterOffset = 8;
 
    public:
     void IncrementRSP(int increment, AssemblyCode* assemblyCode)
@@ -53,7 +53,7 @@ static class AssemblyCodeGenerator
         localVariableOffset += size;
         return location;
     }
-    void ClearLocalVariableCounter() { localVariableOffset = 0; }
+    void ClearLocalVariableCounter() { localVariableOffset = 8; }
 
     IVariableLocation* GetNewParameterLocation(unsigned int size, AssemblyCode* assemblyCode)
     {
@@ -61,5 +61,64 @@ static class AssemblyCodeGenerator
         parameterOffset += size;
         return location;
     }
-    void ClearParameterCounter() { parameterOffset = 4; }
+    void ClearParameterCounter() { parameterOffset = 8; }
+
+    /// @brief Adds code that is need at the start of the _start function
+    void AddPreStartBody(AssemblyCode* assemblyCode)
+    {
+        // set rbp to rsp
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov");
+        line->AddArgument("rbp");
+        line->AddArgument("rsp");
+        assemblyCode->AddLine(line);
+    }
+    /// @brief Adds code that is need at the end of the _start function
+    void AddPostStartBody(AssemblyCode* assemblyCode)
+    {
+        // exit syscall
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov");
+        line->AddArgument("eax");
+        line->AddArgument("60");
+        assemblyCode->AddLine(line);
+
+        line = new AssemblyInstructionLine("xor");
+        line->AddArgument("edi");
+        line->AddArgument("edi");
+        assemblyCode->AddLine(line);
+
+        line = new AssemblyInstructionLine("syscall");
+        assemblyCode->AddLine(line);
+    }
+
+    void AddPreCall(AssemblyCode* assemblyCode)
+    {
+        // push rbp
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("push");
+        line->AddArgument("rbp");
+        assemblyCode->AddLine(line);
+    }
+    void AddPostCall(AssemblyCode* assemblyCode)
+    {
+        // pop rbp
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("pop");
+        line->AddArgument("rbp");
+        assemblyCode->AddLine(line);
+    }
+
+    void AddPreBody(AssemblyCode* assemblyCode)
+    {
+        // set rbp to rsp
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov");
+        line->AddArgument("rbp");
+        line->AddArgument("rsp");
+        assemblyCode->AddLine(line);
+    }
+    void AddPostBody(AssemblyCode* assemblyCode)
+    {
+        // forget about local variables
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov");
+        line->AddArgument("rsp");
+        line->AddArgument("rbp");
+        assemblyCode->AddLine(line);
+    }
 } AssemblyCodeGenerator;

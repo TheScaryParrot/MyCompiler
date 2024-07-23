@@ -12,9 +12,9 @@ class BoolType : public PrimitiveType
             source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
         }
 
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov byte");
-        line->AddArgument(destination->ToAssemblyString());
-        line->AddArgument(source->ToAssemblyString());
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
         assemblyCode->AddLine(line);
     }
 
@@ -91,12 +91,10 @@ class BoolType : public PrimitiveType
 
     virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("push byte");
-        line->AddArgument(source->ToAssemblyString());
-        assemblyCode->AddLine(line);
+        // As push requires 32-bit register, we do a direct mov to the stack
+        IVariableLocation* stackVar = AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode);
+        GenerateAssign(stackVar, source, assemblyCode);
     }
-
-    virtual std::string GetAssemblyDefineString() override { return "db"; }
 
     virtual unsigned int GetSize() override { return 1; }
 };

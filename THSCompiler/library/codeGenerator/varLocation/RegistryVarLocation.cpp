@@ -11,18 +11,18 @@ class RegistryVarLocation : public IVariableLocation
    public:
     RegistryVarLocation(std::string registry) { this->registry = registry; }
 
-    virtual bool IsInline() { return false; }
+    virtual bool IsInline() override { return false; }
 
-    virtual IVariableLocation* Clone() { return new RegistryVarLocation(registry); }
+    virtual IVariableLocation* Clone() override { return new RegistryVarLocation(registry); }
 
-    virtual std::string ToAssemblyString() { return registry; }
+    virtual std::string ToAssemblyString() override { return registry; }
     /// @brief Retuns the string used to define the variable in the assembly code
-    virtual std::string ToAssemblyDefineString()
+    virtual std::string ToAssemblyDefineString() override
     {
         Logger.Log("Cannot define RegistryVarLocation in assembly code", Logger::ERROR);
         return "";
     }
 
-    /// @brief Whether a register is required as intermediate storage for the variable when trying to do operations on it (eg. memory dereference)
-    virtual bool RequiresRegister() { return false; }
+    virtual bool RequiresRegister() override { return false; }
+    virtual bool RequiresSizeKeyword() override { return false; }
 };

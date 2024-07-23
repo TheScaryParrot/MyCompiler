@@ -52,4 +52,5 @@ class RegistryPointerVarLocation : public IVariableLocation
     }
 
     virtual bool RequiresRegister() override { return true; }
+    virtual bool RequiresSizeKeyword() override { return true; }
 };

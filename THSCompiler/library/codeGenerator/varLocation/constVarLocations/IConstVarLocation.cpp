@@ -7,6 +7,7 @@ class IConstVarLocation : public IVariableLocation
    public:
     virtual bool IsInline() override { return true; };
     virtual bool RequiresRegister() override { return false; };
+    virtual bool RequiresSizeKeyword() override { return false; };
 
     virtual IConstVarLocation* GenerateAdd(IConstVarLocation* source) = 0;
     virtual IConstVarLocation* GenerateSub(IConstVarLocation* source) = 0;

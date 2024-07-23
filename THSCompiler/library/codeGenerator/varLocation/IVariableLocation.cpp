@@ -15,4 +15,7 @@ class IVariableLocation
 
     /// @brief Whether a register is required as intermediate storage for the variable when trying to do operations on it (eg. memory dereference)
     virtual bool RequiresRegister() = 0;
+
+    /// @brief Whether this location requires a size keyword in the assembly code (eg. DWORD [rbp+1])
+    virtual bool RequiresSizeKeyword() = 0;
 };

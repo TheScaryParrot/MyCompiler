@@ -12,9 +12,9 @@ class FloatType : public PrimitiveType
             source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
         }
 
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov dword");
-        line->AddArgument(destination->ToAssemblyString());
-        line->AddArgument(source->ToAssemblyString());
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
         assemblyCode->AddLine(line);
     }
 
@@ -105,12 +105,10 @@ class FloatType : public PrimitiveType
 
     virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("push dword");
-        line->AddArgument(source->ToAssemblyString());
-        assemblyCode->AddLine(line);
+        // although push is possible (not like in BoolType, see BoolType.cpp), for consistency with the rest of the code, I do this
+        IVariableLocation* stackVar = AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode);
+        GenerateAssign(stackVar, source, assemblyCode);
     }
-
-    virtual std::string GetAssemblyDefineString() override { return "dd"; }
 
     virtual unsigned int GetSize() override { return 4; }
 };

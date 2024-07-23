@@ -34,7 +34,23 @@ class Type
     virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) = 0;
 
     /// @brief Returns the string used in assembly to define this type (eg. db for byte)
-    virtual std::string GetAssemblyDefineString() = 0;
+    std::string GetAssemblyDefineString()
+    {
+        switch (this->GetSize())
+        {
+            case 1:
+                return "db";
+            case 2:
+                return "dw";
+            case 4:
+                return "dd";
+            case 8:
+                return "dq";
+        }
+
+        Logger.Log("Cannot get assembly define string as size is not 1, 2, 4 or 8", Logger::ERROR);
+        return "";
+    }
 
     /// @brief Returns whether the other type can be applied (assign, add, sum) to this one
     /// @param type other type

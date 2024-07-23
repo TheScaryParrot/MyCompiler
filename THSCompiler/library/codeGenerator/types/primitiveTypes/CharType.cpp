@@ -96,10 +96,10 @@ class CharType : public PrimitiveType
 
     virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add push instruction
+        // As push requires 32-bit register, we do a direct mov to the stack
+        IVariableLocation* stackVar = AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode);
+        GenerateAssign(stackVar, source, assemblyCode);
     }
-
-    virtual std::string GetAssemblyDefineString() override { return "db"; }
 
     virtual unsigned int GetSize() override { return 1; }
 };

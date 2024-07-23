@@ -15,7 +15,7 @@ class LabelVarLocation : public IVariableLocation
 
     virtual IVariableLocation* Clone() override { return new LabelVarLocation(label); }
 
-    virtual std::string ToAssemblyString() override { return label; }
+    virtual std::string ToAssemblyString() override { return "[" + label + "]"; }
 
     virtual std::string ToAssemblyDefineString() override
     {
@@ -23,5 +23,6 @@ class LabelVarLocation : public IVariableLocation
         return "";
     }
 
-    virtual bool RequiresRegister() override { return false; }
+    virtual bool RequiresRegister() override { return true; }
+    virtual bool RequiresSizeKeyword() override { return true; }
 };

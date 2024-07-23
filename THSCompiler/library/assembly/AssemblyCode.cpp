@@ -17,6 +17,11 @@ class AssemblyCode
             delete line;
         }
 
+        for (auto& line : bss)
+        {
+            delete line;
+        }
+
         for (auto& line : roData)
         {
             delete line;
@@ -33,6 +38,13 @@ class AssemblyCode
         if (line == nullptr) return;
 
         this->text.push_back(line);
+    }
+
+    void AddToBss(DataDeclarationLine* line)
+    {
+        if (line == nullptr) return;
+
+        this->bss.push_back(line);
     }
 
     void AddToRoData(DataDeclarationLine* line)
@@ -53,12 +65,21 @@ class AssemblyCode
     {
         std::string result = "";
 
-        result += "global main\n";
+        result += "global _start\n";
 
         result += "\nsection .text\n";
         for (auto& line : text)
         {
             result += line->ToString() + "\n";
+        }
+
+        if (bss.size() > 0)
+        {
+            result += "\nsection .bss\n";
+            for (auto& line : bss)
+            {
+                result += line->ToString() + "\n";
+            }
         }
 
         if (data.size() > 0)
@@ -84,6 +105,7 @@ class AssemblyCode
 
    private:
     std::vector<IAssemblyLine*> text = std::vector<IAssemblyLine*>();
+    std::vector<DataDeclarationLine*> bss = std::vector<DataDeclarationLine*>();
     std::vector<DataDeclarationLine*> roData = std::vector<DataDeclarationLine*>();
     std::vector<DataDeclarationLine*> data = std::vector<DataDeclarationLine*>();
 };

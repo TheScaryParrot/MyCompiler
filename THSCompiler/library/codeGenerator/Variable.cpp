@@ -20,4 +20,6 @@ class Variable
     bool isFinal;
 
     bool IsInline() { return location->IsInline(); }
+
+    std::string ToString() { return "Variable: " + std::to_string(type->GetSize()) + " " + location->ToAssemblyString(); }
 };

@@ -152,12 +152,6 @@ class StructType : public Type
         }
     }
 
-    virtual std::string GetAssemblyDefineString() override
-    {
-        Logger.Log("Cannot define a struct directly", Logger::ERROR);
-        return "";
-    }
-
     virtual bool CanApplyToThis(Type* other) override
     {
         StructType* otherStruct = dynamic_cast<StructType*>(other);

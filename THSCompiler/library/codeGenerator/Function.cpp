@@ -21,5 +21,10 @@ class Function
         this->returnType = returnType;
     }
 
-    void GenerateCallInstruction(AssemblyCode* assemblyCode) {}
+    void GenerateCallInstruction(AssemblyCode* assemblyCode)
+    {
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("call");
+        line->AddArgument(label);
+        assemblyCode->AddLine(line);
+    }
 };

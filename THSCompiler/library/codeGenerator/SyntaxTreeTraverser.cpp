@@ -175,54 +175,73 @@ void SyntaxTreeTraverser::TraverseGlobalVarDeclarationNode(GlobalVarDeclarationN
     }
 
     std::shared_ptr<Type> type = codeGenerator->GetType(node->type.name);
-
-    std::shared_ptr<Variable> value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
-
-    // TODO: .bss section if no value given
-
-    if (!value->IsInline())
-    {
-        Logger.Log("Cannot assign a non-inline value to a global variable in global scope", Logger::ERROR);
-        return;
-    }
-
-    if (value->type != type)
-    {
-        Logger.Log("Assign types of global variable " + node->name + " don't match", Logger::ERROR);
-        return;
-    }
-
     Variable* newVariable = nullptr;
 
-    if (node->attributes.isInline)
+    // bss and no inline allowed
+    if (node->value == nullptr)
     {
-        newVariable = new Variable(value->location, type, node->attributes.isFinal);
-    }
-    else
-    {
+        if (node->attributes.isInline)
+        {
+            Logger.Log("Cannot declare inline global variable " + node->name + " without value", Logger::ERROR);
+            return;
+        }
+
         std::shared_ptr<LabelVarLocation> location = std::shared_ptr<LabelVarLocation>(new LabelVarLocation(node->name));
         newVariable = new Variable(location, type, node->attributes.isFinal);
 
-        std::string assemblyDefineString = type->GetAssemblyDefineString() + " ";
+        std::string assemblyReserveString = "resb " + std::to_string(type->GetSize());
+        DataDeclarationLine* dataDeclarationLine = new DataDeclarationLine(node->name, assemblyReserveString);
+        assemblyCode->AddToBss(dataDeclarationLine);
+    }
+    // inline or data/rodata
+    else
+    {
+        std::shared_ptr<Variable> value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
 
-        if (value == nullptr || value->location == nullptr)
+        if (!value->IsInline())
         {
-            assemblyDefineString += "VALUE OR VALUE->LOCATION IS NULLPTR";
+            Logger.Log("Cannot assign a non-inline value to a global variable in global scope", Logger::ERROR);
+            return;
         }
+
+        if (value->type != type)
+        {
+            Logger.Log("Assign types of global variable " + node->name + " don't match", Logger::ERROR);
+            return;
+        }
+
+        // inline
+        if (node->attributes.isInline)
+        {
+            newVariable = new Variable(value->location, type, node->attributes.isFinal);
+        }
+        // data/rodata
         else
         {
-            assemblyDefineString += value->location->ToAssemblyDefineString();
-        }
+            std::shared_ptr<LabelVarLocation> location = std::shared_ptr<LabelVarLocation>(new LabelVarLocation(node->name));
+            newVariable = new Variable(location, type, node->attributes.isFinal);
 
-        DataDeclarationLine* dataDeclarationLine = new DataDeclarationLine(node->name, assemblyDefineString);
+            std::string assemblyDefineString = type->GetAssemblyDefineString() + " ";
 
-        if (node->attributes.isFinal)
-        {
-            assemblyCode->AddToRoData(dataDeclarationLine);
-        }
-        else
-        {
-            assemblyCode->AddToData(dataDeclarationLine);
+            if (value == nullptr || value->location == nullptr)
+            {
+                assemblyDefineString += "VALUE OR VALUE->LOCATION IS NULLPTR";
+            }
+            else
+            {
+                assemblyDefineString += value->location->ToAssemblyDefineString();
+            }
+
+            DataDeclarationLine* dataDeclarationLine = new DataDeclarationLine(node->name, assemblyDefineString);
+
+            if (node->attributes.isFinal)
+            {
+                assemblyCode->AddToRoData(dataDeclarationLine);
+            }
+            else
+            {
+                assemblyCode->AddToData(dataDeclarationLine);
+            }
         }
     }
 
@@ -269,6 +288,8 @@ void SyntaxTreeTraverser::TraverseLocalVarDeclarationNode(LocalVarDeclarationNod
 
 void SyntaxTreeTraverser::TraverseFuncDeclarationNode(FuncDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
+    bool isStartFunction = node->name == "_start";
+
     std::vector<std::shared_ptr<Type>> parameterTypes;
 
     for (ParameterDeclarationNode* parameter : *node->parameters)
@@ -276,7 +297,15 @@ void SyntaxTreeTraverser::TraverseFuncDeclarationNode(FuncDeclarationNode* node,
         parameterTypes.push_back(codeGenerator->GetType(parameter->type));
     }
 
-    Function* newFunction = new Function(node->name, parameterTypes, codeGenerator->GetType(node->returnType.name));
+    std::shared_ptr<Type> returnType = nullptr;
+
+    // if not void
+    if (!node->returnType.IsVoid())
+    {
+        returnType = codeGenerator->GetType(node->returnType.name);
+    }
+
+    Function* newFunction = new Function(node->name, parameterTypes, returnType);
 
     codeGenerator->AddFunction(node->name, std::shared_ptr<Function>(newFunction));
 
@@ -291,11 +320,31 @@ void SyntaxTreeTraverser::TraverseFuncDeclarationNode(FuncDeclarationNode* node,
 
     assemblyCode->AddLine(new AssemblyLabelLine(node->name));
 
+    if (isStartFunction)
+    {
+        AssemblyCodeGenerator.AddPreStartBody(assemblyCode);
+    }
+    else
+    {
+        AssemblyCodeGenerator.AddPreBody(assemblyCode);
+    }
+
     TraverseBodyNode(node->body, codeGenerator, assemblyCode);
+
+    if (isStartFunction)
+    {
+        AssemblyCodeGenerator.AddPostStartBody(assemblyCode);
+    }
+    else
+    {
+        AssemblyCodeGenerator.AddPostBody(assemblyCode);
+    }
+
+    // Add ret always at the end, not perfect but works
+    assemblyCode->AddLine(new AssemblyInstructionLine("ret"));
+
     codeGenerator->ClearLocalVariableCounter();
     codeGenerator->PopEnvironment();
-
-    // TODO: Add return statement if not present
 }
 
 void SyntaxTreeTraverser::TraverseParameterDeclarationNode(ParameterDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -517,7 +566,8 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
 
     for (AbstractExpressionNode* argument : node->arguments)
     {
-        arguments.push_back(TraverseExpressionNode(argument, codeGenerator, assemblyCode));
+        std::shared_ptr<Variable> argumentVariable = TraverseExpressionNode(argument, codeGenerator, assemblyCode);
+        arguments.push_back(argumentVariable);
     }
 
     std::shared_ptr<Function> function = codeGenerator->GetFunction(node->functionName);
@@ -535,19 +585,28 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
     unsigned int stackSize = 0;
 
     // Push arguments to stack in reverse order
-    for (size_t i = arguments.size() - 1; i >= 0; i--)
+    for (int i = arguments.size() - 1; i >= 0; i--)
     {
         arguments[i]->type->GenerateStackPush(arguments[i]->location.get(), assemblyCode);
         stackSize += arguments[i]->type->GetSize();
     }
 
+    AssemblyCodeGenerator.AddPreCall(assemblyCode);
     function->GenerateCallInstruction(assemblyCode);
+    AssemblyCodeGenerator.AddPostCall(assemblyCode);
 
     // Remove arguments from stack
     AssemblyCodeGenerator.IncrementRSP(stackSize, assemblyCode);
-    // TODO: Return value
 
-    return nullptr;
+    // if void
+    if (function->returnType == nullptr)
+    {
+        return nullptr;
+    }
+
+    // return is always stored at the memory location held by rax
+    IVariableLocation* returnLocation = new RegistryPointerVarLocation("rax", 0);
+    return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(returnLocation), function->returnType, true));
 }
 
 std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator,
