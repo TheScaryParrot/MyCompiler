@@ -4,6 +4,8 @@
 
 enum EOperators
 {
+    ASSIGN_OPERATOR,
+
     OR_OPERATOR,
     AND_OPERATOR,
 
@@ -25,6 +27,9 @@ std::string EOperatorsToString(EOperators operatorValue)
 {
     switch (operatorValue)
     {
+        case ASSIGN_OPERATOR:
+            return "=";
+
         case OR_OPERATOR:
             return "||";
         case AND_OPERATOR:

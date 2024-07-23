@@ -16,4 +16,12 @@ class LabelVarLocation : public IVariableLocation
     virtual IVariableLocation* Clone() override { return new LabelVarLocation(label); }
 
     virtual std::string ToAssemblyString() override { return label; }
+
+    virtual std::string ToAssemblyDefineString() override
+    {
+        Logger.Log("Cannot define LabelVarLocation in assembly code", Logger::ERROR);
+        return "";
+    }
+
+    virtual bool RequiresRegister() override { return false; }
 };

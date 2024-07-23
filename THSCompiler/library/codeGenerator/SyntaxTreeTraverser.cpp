@@ -178,6 +178,8 @@ void SyntaxTreeTraverser::TraverseGlobalVarDeclarationNode(GlobalVarDeclarationN
 
     std::shared_ptr<Variable> value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
 
+    // TODO: .bss section if no value given
+
     if (!value->IsInline())
     {
         Logger.Log("Cannot assign a non-inline value to a global variable in global scope", Logger::ERROR);
@@ -209,7 +211,7 @@ void SyntaxTreeTraverser::TraverseGlobalVarDeclarationNode(GlobalVarDeclarationN
         }
         else
         {
-            assemblyDefineString += value->location->ToAssemblyString();
+            assemblyDefineString += value->location->ToAssemblyDefineString();
         }
 
         DataDeclarationLine* dataDeclarationLine = new DataDeclarationLine(node->name, assemblyDefineString);
@@ -234,7 +236,7 @@ void SyntaxTreeTraverser::TraverseLocalVarDeclarationNode(LocalVarDeclarationNod
     std::shared_ptr<Type> type = codeGenerator->GetType(node->type.name);
     std::shared_ptr<Variable> value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
 
-    Variable* newVariable = nullptr;
+    std::shared_ptr<Variable> newVariable = nullptr;
 
     if (isInline)
     {
@@ -250,25 +252,19 @@ void SyntaxTreeTraverser::TraverseLocalVarDeclarationNode(LocalVarDeclarationNod
             return;
         }
 
-        newVariable = new Variable(value->location, type, isFinal);
+        newVariable.reset(new Variable(value->location, type, isFinal));
     }
     else
     {
-        newVariable = codeGenerator->GetNewLocalVariable(type, isFinal, assemblyCode);
+        newVariable.reset(codeGenerator->GetNewLocalVariable(type, isFinal, assemblyCode));
 
         if (value != nullptr)
         {
-            if (!type->CanApplyToThis(value->type.get()))
-            {
-                Logger.Log("Assign types of local variable " + node->name + " don't match", Logger::ERROR);
-                return;
-            }
-
-            type->GenerateAssign(newVariable->location.get(), value->location.get(), assemblyCode);
+            codeGenerator->ApplyBinaryOperatorOnVariables(newVariable, value, EOperators::ASSIGN_OPERATOR, assemblyCode);
         }
     }
 
-    codeGenerator->AddVariable(node->name, std::shared_ptr<Variable>(newVariable));
+    codeGenerator->AddVariable(node->name, newVariable);
 }
 
 void SyntaxTreeTraverser::TraverseFuncDeclarationNode(FuncDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -399,13 +395,13 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseBinaryOperatorExpressionN
     {
         // If is not inline create new register variable
         left.reset(codeGenerator->GetNewRegisterVariable(firstVariable->type, false, assemblyCode));
-        left->type->GenerateAssign(left->location.get(), firstVariable->location.get(), assemblyCode);  // tempVar = firstVar
+        codeGenerator->ApplyBinaryOperatorOnVariables(left, firstVariable, EOperators::ASSIGN_OPERATOR, assemblyCode);
     }
 
     for (OperatorExpressionPair* operatorExpression : *node->operatorExpressionPairs)
     {
         std::shared_ptr<Variable> right = TraverseExpressionNode(operatorExpression->expression, codeGenerator, assemblyCode);
-        left = codeGenerator->ApplyOperatorOnVariables(left, right, operatorExpression->op, assemblyCode);
+        left = codeGenerator->ApplyBinaryOperatorOnVariables(left, right, operatorExpression->op, assemblyCode);
     }
 
     left->isFinal = true;  // Make the result final
@@ -420,7 +416,7 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseUnaryOperatorExpressionNo
     if (!node->applyToReference)
     {
         std::shared_ptr<Variable> newVariable = std::shared_ptr<Variable>(codeGenerator->GetNewLocalVariable(variable->type, false, assemblyCode));
-        variable->type->GenerateAssign(newVariable->location.get(), variable->location.get(), assemblyCode);
+        codeGenerator->ApplyBinaryOperatorOnVariables(newVariable, variable, EOperators::ASSIGN_OPERATOR, assemblyCode);
         variable = newVariable;
     }
 
@@ -449,8 +445,6 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseAssignmentNode(Assignment
 {
     std::shared_ptr<Variable> value = TraverseExpressionNode(node->value, codeGenerator, assemblyCode);
 
-    // TODO: Add inline
-
     for (Assignment* assignment : node->assignments)
     {
         std::shared_ptr<Variable> l_variable = TraverseVariableNode(assignment->L_value, codeGenerator, assemblyCode);
@@ -461,27 +455,30 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseAssignmentNode(Assignment
             continue;
         }
 
+        EOperators op = EOperators::ASSIGN_OPERATOR;
+
         switch (assignment->assignOperator)
         {
             case EAssignOperators::ASSIGN:
-                l_variable->type->GenerateAssign(l_variable->location.get(), value->location.get(), assemblyCode);
                 break;
             case EAssignOperators::ADD_ASSIGN:
-                l_variable->type->GenerateAdd(l_variable->location.get(), value->location.get(), assemblyCode);
+                op = EOperators::ADD_OPERATOR;
                 break;
             case EAssignOperators::SUB_ASSIGN:
-                l_variable->type->GenerateSub(l_variable->location.get(), value->location.get(), assemblyCode);
+                op = EOperators::SUB_OPERATOR;
                 break;
             case EAssignOperators::MUL_ASSIGN:
-                l_variable->type->GenerateMul(l_variable->location.get(), value->location.get(), assemblyCode);
+                op = EOperators::MUL_OPERATOR;
                 break;
             case EAssignOperators::DIV_ASSIGN:
-                l_variable->type->GenerateDiv(l_variable->location.get(), value->location.get(), assemblyCode);
+                op = EOperators::DIV_OPERATOR;
                 break;
             case EAssignOperators::MOD_ASSIGN:
-                l_variable->type->GenerateMod(l_variable->location.get(), value->location.get(), assemblyCode);
+                op = EOperators::MOD_OPERATOR;
                 break;
         }
+
+        codeGenerator->ApplyBinaryOperatorOnVariables(l_variable, value, op, assemblyCode);
 
         value = l_variable;
     }
@@ -547,7 +544,7 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
     function->GenerateCallInstruction(assemblyCode);
 
     // Remove arguments from stack
-    codeGenerator->assemblyCodeGenerator.IncrementRSP(stackSize, assemblyCode);
+    AssemblyCodeGenerator.IncrementRSP(stackSize, assemblyCode);
     // TODO: Return value
 
     return nullptr;

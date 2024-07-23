@@ -1,6 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include "../../assembly/AssemblyCode.cpp"
+#include "../../assembly/AssemblyCodeGenerator.cpp"
 #include "../varLocation/IVariableLocation.cpp"
 
 class Type
@@ -38,4 +41,11 @@ class Type
     virtual bool CanApplyToThis(Type* other) { return this == other; }
 
     virtual unsigned int GetSize() = 0;
+
+    IVariableLocation* ShortSafeIVarlocationOfThisTypeInRegister(IVariableLocation* location, AssemblyCode* assemblyCode)
+    {
+        IVariableLocation* registerVarLocation = AssemblyCodeGenerator.GetNewRegistryVarLocation(this->GetSize(), assemblyCode);
+        this->GenerateAssign(registerVarLocation, location, assemblyCode);
+        return registerVarLocation;
+    }
 };

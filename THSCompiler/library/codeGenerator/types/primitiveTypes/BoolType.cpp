@@ -7,9 +7,14 @@ class BoolType : public PrimitiveType
 {
     virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("movb");
-        line->AddArgument(source->ToAssemblyString());
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov byte");
         line->AddArgument(destination->ToAssemblyString());
+        line->AddArgument(source->ToAssemblyString());
         assemblyCode->AddLine(line);
     }
 
@@ -86,7 +91,7 @@ class BoolType : public PrimitiveType
 
     virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("pushb");
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("push byte");
         line->AddArgument(source->ToAssemblyString());
         assemblyCode->AddLine(line);
     }

@@ -27,7 +27,6 @@ void CompileFile(std::string filename)
     AssemblyCode* assemblyCode = syntaxTreeTraverser.Traverse(syntaxTree);
     delete syntaxTree;
 
-    std::cout << "\n------Generated code------\n";
     std::cout << assemblyCode->ToString() << std::endl;
 
     delete assemblyCode;

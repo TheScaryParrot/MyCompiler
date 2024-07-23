@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../utils/Logger.cpp"
+#include "BoolConstVarLocation.cpp"
 #include "IConstVarLocation.cpp"
 
 class FloatConstVarLocation : public IConstVarLocation
@@ -13,7 +14,8 @@ class FloatConstVarLocation : public IConstVarLocation
 
     virtual IVariableLocation* Clone() override { return new FloatConstVarLocation(value); };
 
-    virtual std::string ToAssemblyString() override { return std::to_string(value); };
+    virtual std::string ToAssemblyString() override { return "__float32__(" + std::to_string(value) + ")"; };
+    virtual std::string ToAssemblyDefineString() override { return std::to_string(value); };
 
     virtual IConstVarLocation* GenerateAdd(IConstVarLocation* source) override
     {

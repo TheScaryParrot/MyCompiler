@@ -27,7 +27,7 @@ class Property
 
         if (newLocation == nullptr)
         {
-            Logger.Log("Cannot apply property to non-registry pointer location", Logger::ERROR);
+            Logger.Log("Cannot apply property to non-registry pointer location " + location->ToAssemblyString(), Logger::ERROR);
             return nullptr;
         }
 

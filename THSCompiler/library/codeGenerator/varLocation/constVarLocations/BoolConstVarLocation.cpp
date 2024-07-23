@@ -14,6 +14,7 @@ class BoolConstVarLocation : public IConstVarLocation
     virtual IVariableLocation* Clone() override { return new BoolConstVarLocation(value); };
 
     virtual std::string ToAssemblyString() override { return std::to_string(value); };
+    virtual std::string ToAssemblyDefineString() override { return std::to_string(value); };
 
     virtual IConstVarLocation* GenerateAdd(IConstVarLocation* source) override
     {

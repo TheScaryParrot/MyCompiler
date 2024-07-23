@@ -10,4 +10,9 @@ class IVariableLocation
     virtual IVariableLocation* Clone() = 0;
 
     virtual std::string ToAssemblyString() = 0;
+    /// @brief Retuns the string used to define the variable in the assembly code
+    virtual std::string ToAssemblyDefineString() = 0;
+
+    /// @brief Whether a register is required as intermediate storage for the variable when trying to do operations on it (eg. memory dereference)
+    virtual bool RequiresRegister() = 0;
 };

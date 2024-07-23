@@ -12,6 +12,7 @@
 #include "types/primitiveTypes/FloatType.cpp"
 #include "types/primitiveTypes/IntType.cpp"
 #include "varLocation/RegistryPointerVarLocation.cpp"
+#include "varLocation/RegistryVarLocation.cpp"
 #include "varLocation/constVarLocations/BoolConstVarLocation.cpp"
 #include "varLocation/constVarLocations/FloatConstVarLocation.cpp"
 #include "varLocation/constVarLocations/IntConstVarLocation.cpp"
@@ -20,9 +21,6 @@ class CodeGenerator
 {
    private:
     EnvironmentLinkedList environmentLinkedList;
-
-    unsigned int localVariableOffset = 0;
-    unsigned int parameterOffset = 4;
 
     void AddPrimitiveTypes()
     {
@@ -33,8 +31,6 @@ class CodeGenerator
     }
 
    public:
-    AssemblyCodeGenerator assemblyCodeGenerator = AssemblyCodeGenerator();
-
     CodeGenerator()
     {
         environmentLinkedList = EnvironmentLinkedList();
@@ -57,30 +53,28 @@ class CodeGenerator
     Variable* GetNewRegisterVariable(std::shared_ptr<Type> type, bool isFinal, AssemblyCode* assemblyCode)
     {
         // TODO: Get free register
-        return new Variable(std::shared_ptr<IVariableLocation>(new RegistryPointerVarLocation("REGISTER", 0)), type, isFinal);
+        IVariableLocation* location = AssemblyCodeGenerator.GetNewRegistryVarLocation(type->GetSize(), assemblyCode);
+        return new Variable(std::shared_ptr<IVariableLocation>(location), type, isFinal);
     }
     Variable* GetNewLocalVariable(std::shared_ptr<Type> type, bool isFinal, AssemblyCode* assemblyCode)
     {
-        assemblyCodeGenerator.DecrementRSP(type->GetSize(), assemblyCode);
-        RegistryPointerVarLocation* location = new RegistryPointerVarLocation("rbp", -localVariableOffset);
-        localVariableOffset += type->GetSize();
+        IVariableLocation* location = AssemblyCodeGenerator.GetNewLocalVarLocation(type->GetSize(), assemblyCode);
         return new Variable(std::shared_ptr<IVariableLocation>(location), type, isFinal);
     }
-    void ClearLocalVariableCounter() { localVariableOffset = 0; }
+    void ClearLocalVariableCounter() { AssemblyCodeGenerator.ClearLocalVariableCounter(); }
+
     Variable* GetNewParameterVariable(std::shared_ptr<Type> type, bool isFinal, AssemblyCode* assemblyCode)
     {
-        // TODO: Offset from rbp
-        IVariableLocation* location = new RegistryPointerVarLocation("rbp", parameterOffset);
-        parameterOffset += type->GetSize();
+        IVariableLocation* location = AssemblyCodeGenerator.GetNewParameterLocation(type->GetSize(), assemblyCode);
         return new Variable(std::shared_ptr<IVariableLocation>(location), type, isFinal);
     }
-    void ClearParameterCounter() { parameterOffset = 4; }
+    void ClearParameterCounter() { AssemblyCodeGenerator.ClearParameterCounter(); }
 
     /// @brief Applies operator on two variables. If both variables are inline then the result is also inline. If only left is inline a new
     /// localVariable will be created and returned.
     /// @return Where the result is stored
-    std::shared_ptr<Variable> ApplyOperatorOnVariables(std::shared_ptr<Variable> left, std::shared_ptr<Variable> right, EOperators op,
-                                                       AssemblyCode* assemblyCode)
+    std::shared_ptr<Variable> ApplyBinaryOperatorOnVariables(std::shared_ptr<Variable> left, std::shared_ptr<Variable> right, EOperators op,
+                                                             AssemblyCode* assemblyCode)
     {
         if (!left->type->CanApplyToThis(right->type.get()))
         {
@@ -88,25 +82,26 @@ class CodeGenerator
             return nullptr;
         }
 
+        IVariableLocation* leftLocation = left->location.get();
+        IVariableLocation* rightLocation = right->location.get();
+
         if (left->IsInline())
         {
             if (right->IsInline())
             {
-                IConstVarLocation* leftConstLocation = dynamic_cast<IConstVarLocation*>(left->location.get());
+                IConstVarLocation* leftConstLocation = dynamic_cast<IConstVarLocation*>(leftLocation);
                 if (leftConstLocation == nullptr)
                 {
-                    Logger.Log(
-                        "Left variable " + right->location->ToAssemblyString() + " is marked as inline but it's variable location is not const",
-                        Logger::ERROR);
+                    Logger.Log("Left variable " + rightLocation->ToAssemblyString() + " is marked as inline but it's variable location is not const",
+                               Logger::ERROR);
                     return nullptr;
                 }
 
-                IConstVarLocation* rightConstLocation = dynamic_cast<IConstVarLocation*>(right->location.get());
+                IConstVarLocation* rightConstLocation = dynamic_cast<IConstVarLocation*>(rightLocation);
                 if (rightConstLocation == nullptr)
                 {
-                    Logger.Log(
-                        "Right variable " + right->location->ToAssemblyString() + " is marked as inline but it's variable location is not const",
-                        Logger::ERROR);
+                    Logger.Log("Right variable " + rightLocation->ToAssemblyString() + " is marked as inline but it's variable location is not const",
+                               Logger::ERROR);
                     return nullptr;
                 }
 
@@ -160,51 +155,54 @@ class CodeGenerator
             else
             {
                 Variable* newLocalVariable = GetNewLocalVariable(left->type, false, assemblyCode);
-                left->type->GenerateAssign(newLocalVariable->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateAssign(newLocalVariable->location.get(), rightLocation, assemblyCode);
                 left = std::shared_ptr<Variable>(newLocalVariable);
             }
         }
 
         switch (op)
         {
+            case EOperators::ASSIGN_OPERATOR:
+                left->type->GenerateAssign(leftLocation, rightLocation, assemblyCode);
+                break;
             case EOperators::ADD_OPERATOR:
-                left->type->GenerateAdd(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateAdd(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::SUB_OPERATOR:
-                left->type->GenerateSub(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateSub(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::MUL_OPERATOR:
-                left->type->GenerateMul(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateMul(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::DIV_OPERATOR:
-                left->type->GenerateDiv(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateDiv(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::MOD_OPERATOR:
-                left->type->GenerateMod(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateMod(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::AND_OPERATOR:
-                left->type->GenerateAnd(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateAnd(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::OR_OPERATOR:
-                left->type->GenerateOr(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateOr(leftLocation, rightLocation, assemblyCode);
                 break;
             case ::EOperators::EQUAL_OPERATOR:
-                left->type->GenerateEqual(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateEqual(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::NOT_EQUAL_OPERATOR:
-                left->type->GenerateNotEqual(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateNotEqual(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::LESS_THAN_OPERATOR:
-                left->type->GenerateLess(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateLess(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::LESS_THAN_OR_EQUAL_OPERATOR:
-                left->type->GenerateLessEqual(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateLessEqual(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::GREATER_THAN_OPERATOR:
-                left->type->GenerateGreater(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateGreater(leftLocation, rightLocation, assemblyCode);
                 break;
             case EOperators::GREATER_THAN_OR_EQUAL_OPERATOR:
-                left->type->GenerateGreaterEqual(left->location.get(), right->location.get(), assemblyCode);
+                left->type->GenerateGreaterEqual(leftLocation, rightLocation, assemblyCode);
                 break;
         }
 

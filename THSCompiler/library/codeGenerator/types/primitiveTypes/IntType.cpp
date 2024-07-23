@@ -1,14 +1,20 @@
 #pragma once
 
+#include "../../../assembly/AssemblyInstructionLine.cpp"
 #include "PrimitiveType.cpp"
 
 class IntType : public PrimitiveType
 {
     virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("movd");
-        line->AddArgument(source->ToAssemblyString());
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov dword");
         line->AddArgument(destination->ToAssemblyString());
+        line->AddArgument(source->ToAssemblyString());
         assemblyCode->AddLine(line);
     }
 
@@ -99,7 +105,7 @@ class IntType : public PrimitiveType
 
     virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        AssemblyInstructionLine* line = new AssemblyInstructionLine("pushd");
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("push dword");
         line->AddArgument(source->ToAssemblyString());
         assemblyCode->AddLine(line);
     }

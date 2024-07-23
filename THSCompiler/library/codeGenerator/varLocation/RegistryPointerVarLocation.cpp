@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../utils/Logger.cpp"
 #include "IVariableLocation.cpp"
 
 class RegistryPointerVarLocation : public IVariableLocation
@@ -43,4 +44,12 @@ class RegistryPointerVarLocation : public IVariableLocation
 
         return result + std::to_string(offset) + "]";
     }
+
+    virtual std::string ToAssemblyDefineString() override
+    {
+        Logger.Log("Cannot define RegistryPointerVarLocation in assembly code", Logger::ERROR);
+        return "";
+    }
+
+    virtual bool RequiresRegister() override { return true; }
 };

@@ -55,25 +55,25 @@ class AssemblyCode
 
         result += "global main\n";
 
-        result += "\n.section .text\n";
+        result += "\nsection .text\n";
         for (auto& line : text)
         {
             result += line->ToString() + "\n";
         }
 
-        if (roData.size() > 0)
+        if (data.size() > 0)
         {
-            result += "\n.section .rodata\n";
-            for (auto& line : roData)
+            result += "\nsection .data\n";
+            for (auto& line : data)
             {
                 result += line->ToString() + "\n";
             }
         }
 
-        if (data.size() > 0)
+        if (roData.size() > 0)
         {
-            result += "\n.section .data\n";
-            for (auto& line : data)
+            result += "\nsection .rodata\n";
+            for (auto& line : roData)
             {
                 result += line->ToString() + "\n";
             }
