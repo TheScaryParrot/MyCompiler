@@ -410,6 +410,31 @@ void SyntaxTreeTraverser::TraverseEmptyStatementNode(EmptyStatementNode* node, C
 
 void SyntaxTreeTraverser::TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
+    if (dynamic_cast<BreakStatementNode*>(node) != nullptr)
+    {
+        TraverseBreakStatementNode(dynamic_cast<BreakStatementNode*>(node), codeGenerator, assemblyCode);
+    }
+
+    if (dynamic_cast<ContinueStatementNode*>(node) != nullptr)
+    {
+        TraverseContinueStatementNode(dynamic_cast<ContinueStatementNode*>(node), codeGenerator, assemblyCode);
+    }
+
+    if (dynamic_cast<ForStatementNode*>(node) != nullptr)
+    {
+        TraverseForStatementNode(dynamic_cast<ForStatementNode*>(node), codeGenerator, assemblyCode);
+    }
+
+    if (dynamic_cast<IfStatementNode*>(node) != nullptr)
+    {
+        TraverseIfStatementNode(dynamic_cast<IfStatementNode*>(node), codeGenerator, assemblyCode);
+    }
+
+    if (dynamic_cast<WhileStatementNode*>(node) != nullptr)
+    {
+        TraverseWhileStatementNode(dynamic_cast<WhileStatementNode*>(node), codeGenerator, assemblyCode);
+    }
+
     if (dynamic_cast<ReturnStatementNode*>(node) != nullptr)
     {
         TraverseReturnNode(dynamic_cast<ReturnStatementNode*>(node), codeGenerator, assemblyCode);
@@ -430,7 +455,31 @@ void SyntaxTreeTraverser::TraverseForStatementNode(ForStatementNode* node, CodeG
 
 void SyntaxTreeTraverser::TraverseIfStatementNode(IfStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) {}
 
-void SyntaxTreeTraverser::TraverseWhileStatementNode(WhileStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) {}
+void SyntaxTreeTraverser::TraverseWhileStatementNode(WhileStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+{
+    codeGenerator->PushNewEnvironment();
+    codeGenerator->SetupLoopJumpLabels();
+
+    assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
+
+    std::shared_ptr<Variable> condition = TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
+
+    // Set zero flag if condition is 0 by using test instruction
+    AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("test");
+    cmpLine->AddArgument(condition->location->ToAssemblyString());
+    cmpLine->AddArgument(condition->location->ToAssemblyString());
+    assemblyCode->AddLine(cmpLine);
+    // Jump if is zero
+    assemblyCode->AddLine(new AssemblyInstructionLine("jz " + codeGenerator->GetBreakLabel()));
+
+    TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
+
+    assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetContinueLabel()));
+
+    assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetBreakLabel()));
+
+    codeGenerator->PopEnvironment(assemblyCode);
+}
 
 void SyntaxTreeTraverser::TraverseReturnNode(ReturnStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {

@@ -11,6 +11,8 @@ static class AssemblyCodeGenerator
     unsigned int* localVariableOffset;
     unsigned int parameterOffset = 16;
 
+    unsigned int jumpLabelCounter = 1;
+
    public:
     void IncrementRSP(int increment, AssemblyCode* assemblyCode)
     {
@@ -135,4 +137,6 @@ static class AssemblyCodeGenerator
         line->AddArgument("rbp");
         assemblyCode->AddLine(line);
     }
+
+    std::string GetNewJumpLabel() { return "JL" + std::to_string(jumpLabelCounter++); }
 } AssemblyCodeGenerator;

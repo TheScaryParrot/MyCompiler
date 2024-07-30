@@ -57,12 +57,16 @@ int _start(/*int argc, char argv*/)
     {
         myType1.intProp = myType3.intProp;
     }
+    */
 
-    while (myType1.boolProp)
+    int whileInt = 10;
+
+    while (whileInt > 0)
     {
-        myType1.boolProp = false;
+        whileInt -= 1;
     }
 
+    /*
     for (int i = 0; i < 10; i++;)
     {
         myType1.floatProp += 1.0;

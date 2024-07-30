@@ -54,43 +54,54 @@ mov byte [rbp-26], al
 mov eax, dword [rbp-18]
 mov dword [rbp-27], eax
 sub rsp, 4
+mov dword [rbp-26], 10
+JL2:
+mov eax, dword [rbp-26]
+cmp eax, 0
+setg al
+movzx eax, al
+test eax, eax
+jz JL1 
+sub dword [rbp-26], 1
+
+; print testmessage
+mov rax, 1
+mov rdi, 1
+mov rsi, testmessage
+mov rdx, testlength
+syscall
+
+jmp JL2 
+JL1:
+sub rsp, 4
 mov eax, dword [rbp-27]
-mov dword [rbp-26], eax
+mov dword [rbp-30], eax
 sub rsp, 1
 mov al, byte [bool2]
-mov byte [rbp-27], al
+mov byte [rbp-31], al
 sub rsp, 1
 mov al, byte [bool1]
-mov byte [rbp-28], al
+mov byte [rbp-32], al
 push rbp
 call Hello
 pop rbp
 add rsp, 2
 sub rsp, 1
 mov al, byte [rax]
-mov byte [rbp-27], al
+mov byte [rbp-31], al
 sub rsp, 4
 mov eax, dword [rbp-4]
-mov dword [rbp-31], eax
+mov dword [rbp-35], eax
 sub rsp, 4
-mov dword [rbp-35], 2
+mov dword [rbp-39], 2
 push rbp
 call Hello2
 pop rbp
 add rsp, 8
 sub rsp, 4
 mov eax, dword [rax]
-mov dword [rbp-31], eax
-
-; print rbp-31
-mov rax, 1
-mov rdi, 1
-mov rsi, rbp
-sub rsi, 31
-mov rdx, 4
-syscall
-
-add rsp, 31
+mov dword [rbp-35], eax
+add rsp, 35
 mov eax, 60
 xor edi, edi
 syscall 
@@ -102,6 +113,9 @@ float3: resb 4
 
 section .data
 bool2: db 0
+
+testmessage: db "Hello, World!", 0xA
+testlength: equ $-testmessage
 
 section .rodata
 bool1: db 1

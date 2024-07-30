@@ -232,6 +232,11 @@ class CodeGenerator
         }
     }
 
-    std::string GetBreakLabel() { return ""; }
-    std::string GetContinueLabel() { return ""; }
+    std::string GetBreakLabel() { return environmentLinkedList.GetJumpLabel("break"); }
+    std::string GetContinueLabel() { return environmentLinkedList.GetJumpLabel("continue"); }
+    void SetupLoopJumpLabels()
+    {
+        environmentLinkedList.AddJumpLabel("break", AssemblyCodeGenerator.GetNewJumpLabel());
+        environmentLinkedList.AddJumpLabel("continue", AssemblyCodeGenerator.GetNewJumpLabel());
+    }
 };
