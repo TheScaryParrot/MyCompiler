@@ -451,7 +451,35 @@ void SyntaxTreeTraverser::TraverseContinueStatementNode(ContinueStatementNode* n
     assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetContinueLabel()));
 }
 
-void SyntaxTreeTraverser::TraverseForStatementNode(ForStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) {}
+void SyntaxTreeTraverser::TraverseForStatementNode(ForStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+{
+    codeGenerator->PushNewEnvironment();
+    codeGenerator->SetupLoopJumpLabels();
+
+    TraverseLocalVarDeclarationNode(node->initialization, codeGenerator, assemblyCode);
+
+    std::string startLabel = AssemblyCodeGenerator.GetNewJumpLabel();
+    assemblyCode->AddLine(new AssemblyLabelLine(startLabel));
+
+    std::shared_ptr<Variable> condition = TraverseExpressionNode(node->condition, codeGenerator, assemblyCode);
+
+    // Set zero flag if condition is 0 by using test instruction
+    AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("test");
+    cmpLine->AddArgument(condition->location->ToAssemblyString());
+    cmpLine->AddArgument(condition->location->ToAssemblyString());
+    assemblyCode->AddLine(cmpLine);
+    // Jump if is zero
+    assemblyCode->AddLine(new AssemblyInstructionLine("jz " + codeGenerator->GetBreakLabel()));
+
+    TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
+    assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
+    TraverseStatementNode(node->increment, codeGenerator, assemblyCode);
+    assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + startLabel));
+
+    assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetBreakLabel()));
+
+    codeGenerator->PopEnvironment(assemblyCode);
+}
 
 void SyntaxTreeTraverser::TraverseIfStatementNode(IfStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) {}
 

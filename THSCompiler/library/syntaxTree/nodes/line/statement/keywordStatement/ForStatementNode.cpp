@@ -7,19 +7,19 @@
 class ForStatementNode : public AbstractKeywordStatementNode
 {
    public:
-    ForStatementNode(AbstractVarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
+    ForStatementNode(LocalVarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
                      AbstractStatementNode* statement);
     ~ForStatementNode();
 
     virtual std::string ToString() override;
 
-    AbstractVarDeclarationNode* initialization;
+    LocalVarDeclarationNode* initialization;
     AbstractExpressionNode* condition;
     AbstractStatementNode* increment;
     AbstractStatementNode* statement;
 };
 
-ForStatementNode::ForStatementNode(AbstractVarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
+ForStatementNode::ForStatementNode(LocalVarDeclarationNode* initialization, AbstractExpressionNode* condition, AbstractStatementNode* increment,
                                    AbstractStatementNode* statement)
     : AbstractKeywordStatementNode()
 {
