@@ -118,6 +118,40 @@ class EnvironmentLinkedList
     }
     void AddType(std::string typeName, std::shared_ptr<Type> type) { head->environment->AddType(typeName, type); }
 
+    bool DoesJumpLabelExist(std::string labelName)
+    {
+        EnvironmentLinkedListElement* current = head;
+        while (current != nullptr)
+        {
+            if (current->environment->HasJumpLabel(labelName))
+            {
+                return true;
+            }
+
+            current = current->next;
+        }
+
+        return false;
+    }
+    std::string GetJumpLabel(std::string labelName)
+    {
+        EnvironmentLinkedListElement* current = head;
+        while (current != nullptr)
+        {
+            if (current->environment->HasJumpLabel(labelName))
+            {
+                return current->environment->GetJumpLabel(labelName);
+            }
+
+            current = current->next;
+        }
+
+        return "";
+    }
+    void AddJumpLabel(std::string labelName, std::string label) { head->environment->AddJumpLabel(labelName, label); }
+
+    unsigned int* GetLocalVariableOffset() { return head->environment->localVariableOffset; }
+
     void PushEnvironment(Environment* environment)
     {
         EnvironmentLinkedListElement* newElement = new EnvironmentLinkedListElement();

@@ -33,8 +33,9 @@ class CodeGenerator
    public:
     CodeGenerator()
     {
-        environmentLinkedList = EnvironmentLinkedList();
-        PushNewEnvironment();
+        this->environmentLinkedList = EnvironmentLinkedList();
+        environmentLinkedList.PushEnvironment(new Environment(0));
+        AssemblyCodeGenerator.SetLocalVariableOffset(environmentLinkedList.GetLocalVariableOffset());
         AddPrimitiveTypes();
     }
 
@@ -61,7 +62,6 @@ class CodeGenerator
         IVariableLocation* location = AssemblyCodeGenerator.GetNewLocalVarLocation(type->GetSize(), assemblyCode);
         return new Variable(std::shared_ptr<IVariableLocation>(location), type, isFinal);
     }
-    void ClearLocalVariableCounter() { AssemblyCodeGenerator.ClearLocalVariableCounter(); }
 
     Variable* GetNewParameterVariable(std::shared_ptr<Type> type, bool isFinal, AssemblyCode* assemblyCode)
     {
@@ -213,6 +213,25 @@ class CodeGenerator
     IVariableLocation* ConstructIntConstVariableLocation(int value) { return new IntConstVarLocation(value); }
     IVariableLocation* ConstructFloatConstVaribaleLocation(float value) { return new FloatConstVarLocation(value); }
 
-    void PushNewEnvironment() { environmentLinkedList.PushEnvironment(new Environment()); }
-    void PopEnvironment() { environmentLinkedList.PopEnvironment(); }
+    void PushNewEnvironment()
+    {
+        environmentLinkedList.PushEnvironment(new Environment(*environmentLinkedList.GetLocalVariableOffset()));
+        AssemblyCodeGenerator.SetLocalVariableOffset(environmentLinkedList.GetLocalVariableOffset());
+    }
+    void PopEnvironment(AssemblyCode* assemblyCode)
+    {
+        unsigned int* oldOffset = environmentLinkedList.GetLocalVariableOffset();
+        environmentLinkedList.PopEnvironment();
+        unsigned int* newOffset = environmentLinkedList.GetLocalVariableOffset();
+        AssemblyCodeGenerator.SetLocalVariableOffset(newOffset);
+
+        if (*oldOffset != *newOffset)
+        {
+            // forget about the variables that are no longer in scope
+            AssemblyCodeGenerator.IncrementRSP(*oldOffset - *newOffset, assemblyCode);
+        }
+    }
+
+    std::string GetBreakLabel() { return ""; }
+    std::string GetContinueLabel() { return ""; }
 };

@@ -8,8 +8,8 @@
 static class AssemblyCodeGenerator
 {
    private:
-    int localVariableOffset = 0;
-    int parameterOffset = 16;
+    unsigned int* localVariableOffset;
+    unsigned int parameterOffset = 16;
 
    public:
     void IncrementRSP(int increment, AssemblyCode* assemblyCode)
@@ -19,7 +19,6 @@ static class AssemblyCodeGenerator
         line->AddArgument(std::to_string(increment));
         assemblyCode->AddLine(line);
     }
-    void ChangeLocalVarOffset(int change) { localVariableOffset += change; }
 
     void DecrementRSP(int decrement, AssemblyCode* assemblyCode)
     {
@@ -50,10 +49,11 @@ static class AssemblyCodeGenerator
     IVariableLocation* GetNewLocalVarLocation(unsigned int size, AssemblyCode* assemblyCode)
     {
         DecrementRSP(size, assemblyCode);
-        localVariableOffset += size;
-        return new RegistryPointerVarLocation("rbp", -localVariableOffset);
+        *localVariableOffset += size;
+        int offset = -(*localVariableOffset);
+        return new RegistryPointerVarLocation("rbp", offset);
     }
-    void ClearLocalVariableCounter() { localVariableOffset = 0; }
+    void SetLocalVariableOffset(unsigned int* localVariableOffset) { this->localVariableOffset = localVariableOffset; }
 
     IVariableLocation* GetNewParameterLocation(unsigned int size, AssemblyCode* assemblyCode)
     {

@@ -26,7 +26,12 @@
 #include "../syntaxTree/nodes/line/statement/AbstractStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/ForStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/WhileStatementNode.cpp"
 #include "../utils/Logger.cpp"
 #include "CodeGenerator.cpp"
 #include "Variable.cpp"
@@ -56,9 +61,14 @@ class SyntaxTreeTraverser
 
     void TraverseStatementNode(AbstractStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseEmptyStatementNode(EmptyStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    void TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseBodyNode(BodyNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseBreakStatementNode(BreakStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseContinueStatementNode(ContinueStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseForStatementNode(ForStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseIfStatementNode(IfStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseReturnNode(ReturnStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseWhileStatementNode(WhileStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
     std::shared_ptr<Variable> TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     std::shared_ptr<Variable> TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
@@ -345,8 +355,7 @@ void SyntaxTreeTraverser::TraverseFuncDeclarationNode(FuncDeclarationNode* node,
     // Add ret always at the end, not perfect but works
     assemblyCode->AddLine(new AssemblyInstructionLine("ret"));
 
-    codeGenerator->ClearLocalVariableCounter();
-    codeGenerator->PopEnvironment();
+    codeGenerator->PopEnvironment(assemblyCode);
 }
 
 void SyntaxTreeTraverser::TraverseParameterDeclarationNode(ParameterDeclarationNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -407,6 +416,22 @@ void SyntaxTreeTraverser::TraverseKeywordStatementNode(AbstractKeywordStatementN
     }
 }
 
+void SyntaxTreeTraverser::TraverseBreakStatementNode(BreakStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+{
+    assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetBreakLabel()));
+}
+
+void SyntaxTreeTraverser::TraverseContinueStatementNode(ContinueStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+{
+    assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetContinueLabel()));
+}
+
+void SyntaxTreeTraverser::TraverseForStatementNode(ForStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) {}
+
+void SyntaxTreeTraverser::TraverseIfStatementNode(IfStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) {}
+
+void SyntaxTreeTraverser::TraverseWhileStatementNode(WhileStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) {}
+
 void SyntaxTreeTraverser::TraverseReturnNode(ReturnStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
     // forget local variables
@@ -431,7 +456,6 @@ void SyntaxTreeTraverser::TraverseReturnNode(ReturnStatementNode* node, CodeGene
 
 void SyntaxTreeTraverser::TraverseBodyNode(BodyNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    codeGenerator->PushNewEnvironment();
     TraverseBodyCodeNode(node->GetCodeBlock(), codeGenerator, assemblyCode);
 }
 
@@ -589,6 +613,9 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseValueNode(AbstractValueNo
 
 std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
+    // Create new environment for arguments
+    codeGenerator->PushNewEnvironment();
+
     std::vector<std::shared_ptr<Variable>> arguments;
 
     for (AbstractExpressionNode* argument : node->arguments)
@@ -609,22 +636,18 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
         }
     }
 
-    unsigned int stackSize = 0;
-
     // Push arguments to stack in reverse order
     for (int i = arguments.size() - 1; i >= 0; i--)
     {
         arguments[i]->type->GenerateStackPush(arguments[i]->location.get(), assemblyCode);
-        stackSize += arguments[i]->type->GetSize();
     }
 
     AssemblyCodeGenerator.AddPreCall(assemblyCode);
     function->GenerateCallInstruction(assemblyCode);
     AssemblyCodeGenerator.AddPostCall(assemblyCode);
 
-    // Remove arguments from stack
-    AssemblyCodeGenerator.IncrementRSP(stackSize, assemblyCode);
-    AssemblyCodeGenerator.ChangeLocalVarOffset(-stackSize);
+    // Pop argument environment
+    codeGenerator->PopEnvironment(assemblyCode);
 
     // if void
     if (function->returnType == nullptr)
