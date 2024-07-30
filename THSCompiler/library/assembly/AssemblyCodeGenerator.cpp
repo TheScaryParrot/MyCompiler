@@ -8,8 +8,8 @@
 static class AssemblyCodeGenerator
 {
    private:
-    int localVariableOffset = 8;
-    int parameterOffset = 8;
+    int localVariableOffset = 0;
+    int parameterOffset = 16;
 
    public:
     void IncrementRSP(int increment, AssemblyCode* assemblyCode)
@@ -19,6 +19,7 @@ static class AssemblyCodeGenerator
         line->AddArgument(std::to_string(increment));
         assemblyCode->AddLine(line);
     }
+    void ChangeLocalVarOffset(int change) { localVariableOffset += change; }
 
     void DecrementRSP(int decrement, AssemblyCode* assemblyCode)
     {
@@ -49,11 +50,10 @@ static class AssemblyCodeGenerator
     IVariableLocation* GetNewLocalVarLocation(unsigned int size, AssemblyCode* assemblyCode)
     {
         DecrementRSP(size, assemblyCode);
-        RegistryPointerVarLocation* location = new RegistryPointerVarLocation("rbp", -localVariableOffset);
         localVariableOffset += size;
-        return location;
+        return new RegistryPointerVarLocation("rbp", -localVariableOffset);
     }
-    void ClearLocalVariableCounter() { localVariableOffset = 8; }
+    void ClearLocalVariableCounter() { localVariableOffset = 0; }
 
     IVariableLocation* GetNewParameterLocation(unsigned int size, AssemblyCode* assemblyCode)
     {
@@ -61,7 +61,21 @@ static class AssemblyCodeGenerator
         parameterOffset += size;
         return location;
     }
-    void ClearParameterCounter() { parameterOffset = 8; }
+    void ClearParameterCounter() { parameterOffset = 16; }
+
+    IVariableLocation* GetReturnLocation(unsigned int size, AssemblyCode* assemblyCode) { return new RegistryPointerVarLocation("rbp", -size); }
+    void MoveReturnLocationToRax(unsigned int returnTypeSize, AssemblyCode* assemblyCode)
+    {
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mov");
+        line->AddArgument("rax");
+        line->AddArgument("rbp");
+        assemblyCode->AddLine(line);
+
+        line = new AssemblyInstructionLine("sub");
+        line->AddArgument("rax");
+        line->AddArgument(std::to_string(returnTypeSize));
+        assemblyCode->AddLine(line);
+    }
 
     /// @brief Adds code that is need at the start of the _start function
     void AddPreStartBody(AssemblyCode* assemblyCode)

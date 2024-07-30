@@ -4,42 +4,89 @@ section .text
 Hello:
 mov rbp, rsp
 sub rsp, 1
-mov al, byte [rbp+8]
-mov byte [rbp-8], al
+mov al, byte [rbp+16]
+mov byte [rbp-1], al
 sub rsp, 1
-mov al, byte [rbp+9]
-mov byte [rbp-9], al
+mov al, byte [rbp+17]
+mov byte [rbp-2], al
+mov rsp, rbp
+mov al, byte [rbp-1]
+mov byte [rbp-1], al
+mov rax, rbp
+sub rax, 1
+ret 
+mov rsp, rbp
+ret 
+Hello2:
+mov rbp, rsp
+sub rsp, 4
+mov eax, dword [rbp+16]
+mov dword [rbp-4], eax
+sub rsp, 4
+mov eax, dword [rbp+20]
+mov dword [rbp-8], eax
+mov rsp, rbp
+mov eax, dword [rbp-4]
+add eax, dword [rbp-8]
+mov dword [rbp-4], eax
+mov rax, rbp
+sub rax, 4
+ret 
 mov rsp, rbp
 ret 
 _start:
 mov rbp, rsp
 sub rsp, 4
-mov dword [rbp-8], 2
+mov dword [rbp-4], 66
 sub rsp, 9
-mov dword [rbp-12], 2
+mov dword [rbp-13], 2
 mov al, byte [bool1]
-mov byte [rbp-16], al
-mov dword [rbp-17], __float32__(2.000000)
+mov byte [rbp-17], al
+mov dword [rbp-18], __float32__(2.000000)
 sub rsp, 9
-mov eax, dword [rbp-12]
-mov dword [rbp-21], eax
-mov al, byte [rbp-16]
-mov byte [rbp-25], al
-mov eax, dword [rbp-17]
-mov dword [rbp-26], eax
+mov eax, dword [rbp-13]
+mov dword [rbp-22], eax
+mov al, byte [rbp-17]
+mov byte [rbp-26], al
+mov eax, dword [rbp-18]
+mov dword [rbp-27], eax
 sub rsp, 4
-mov eax, dword [rbp-26]
-mov dword [rbp-30], eax
+mov eax, dword [rbp-27]
+mov dword [rbp-26], eax
 sub rsp, 1
 mov al, byte [bool2]
-mov byte [rbp-34], al
+mov byte [rbp-27], al
 sub rsp, 1
 mov al, byte [bool1]
-mov byte [rbp-35], al
+mov byte [rbp-28], al
 push rbp
 call Hello
 pop rbp
 add rsp, 2
+sub rsp, 1
+mov al, byte [rax]
+mov byte [rbp-27], al
+sub rsp, 4
+mov eax, dword [rbp-4]
+mov dword [rbp-31], eax
+sub rsp, 4
+mov dword [rbp-35], 2
+push rbp
+call Hello2
+pop rbp
+add rsp, 8
+sub rsp, 4
+mov eax, dword [rax]
+mov dword [rbp-31], eax
+
+; print rbp-31
+mov rax, 1
+mov rdi, 1
+mov rsi, rbp
+sub rsi, 31
+mov rdx, 4
+syscall
+
 mov eax, 60
 xor edi, edi
 syscall 

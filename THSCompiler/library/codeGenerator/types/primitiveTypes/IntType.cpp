@@ -20,7 +20,15 @@ class IntType : public PrimitiveType
 
     virtual void GenerateAdd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add add instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("add");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateSub(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override

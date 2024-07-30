@@ -35,10 +35,18 @@ bool Hello(bool a, bool b)
     return a2 && b2;
 }
 
+int Hello2(int a, int b)
+{
+    int a2 = a;
+    int b2 = b;
+
+    return a2 + b2;
+}
+
 int _start(/*int argc, char argv*/)
 {
     final inline int int1 = 2;
-    int int2 = int1;
+    int int2 = int1 + 64;
     MyType myType3 = {int1, bool1, float1};
 
     /*if (myType1.intProp == myType2.intProp)
@@ -67,4 +75,6 @@ int _start(/*int argc, char argv*/)
     // trying calls
 
     Hello(bool1, bool2);
+
+    Hello2(int1, int2);
 }

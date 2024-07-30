@@ -26,6 +26,7 @@
 #include "../syntaxTree/nodes/line/statement/AbstractStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/EmptyStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
 #include "../utils/Logger.cpp"
 #include "CodeGenerator.cpp"
 #include "Variable.cpp"
@@ -57,6 +58,7 @@ class SyntaxTreeTraverser
     void TraverseEmptyStatementNode(EmptyStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseBodyNode(BodyNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseReturnNode(ReturnStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
     std::shared_ptr<Variable> TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     std::shared_ptr<Variable> TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
@@ -399,7 +401,32 @@ void SyntaxTreeTraverser::TraverseEmptyStatementNode(EmptyStatementNode* node, C
 
 void SyntaxTreeTraverser::TraverseKeywordStatementNode(AbstractKeywordStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO: Keyword statement
+    if (dynamic_cast<ReturnStatementNode*>(node) != nullptr)
+    {
+        TraverseReturnNode(dynamic_cast<ReturnStatementNode*>(node), codeGenerator, assemblyCode);
+    }
+}
+
+void SyntaxTreeTraverser::TraverseReturnNode(ReturnStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+{
+    // forget local variables
+    AssemblyCodeGenerator.AddPostBody(assemblyCode);
+
+    // store return as new local variable
+    if (node->expression != nullptr)
+    {
+        std::shared_ptr<Variable> value = TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
+
+        // store return value to stack
+        IVariableLocation* returnLocation = AssemblyCodeGenerator.GetReturnLocation(value->type->GetSize(), assemblyCode);
+        value->type->GenerateAssign(returnLocation, value->location.get(), assemblyCode);
+
+        // store return location to rax
+        AssemblyCodeGenerator.MoveReturnLocationToRax(value->type->GetSize(), assemblyCode);
+    }
+
+    // return
+    assemblyCode->AddLine(new AssemblyInstructionLine("ret"));
 }
 
 void SyntaxTreeTraverser::TraverseBodyNode(BodyNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -597,6 +624,7 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
 
     // Remove arguments from stack
     AssemblyCodeGenerator.IncrementRSP(stackSize, assemblyCode);
+    AssemblyCodeGenerator.ChangeLocalVarOffset(-stackSize);
 
     // if void
     if (function->returnType == nullptr)
@@ -604,9 +632,14 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
         return nullptr;
     }
 
-    // return is always stored at the memory location held by rax
-    IVariableLocation* returnLocation = new RegistryPointerVarLocation("rax", 0);
-    return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(returnLocation), function->returnType, true));
+    // return is stored on stack at location pointed at by rax
+    IVariableLocation* returnVariable = new RegistryPointerVarLocation("rax", 0);
+    Variable* localVariable = codeGenerator->GetNewLocalVariable(function->returnType, false, assemblyCode);
+
+    // Assign return value to local variable
+    localVariable->type->GenerateAssign(localVariable->location.get(), returnVariable, assemblyCode);
+
+    return std::shared_ptr<Variable>(localVariable);
 }
 
 std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseParentesisExpressionNode(ParenthesisExpressionNode* node, CodeGenerator* codeGenerator,
