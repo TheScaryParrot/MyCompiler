@@ -16,9 +16,9 @@ mov byte [rbp-1], al
 mov rax, rbp
 sub rax, 1
 ret 
+add rsp, 2
 mov rsp, rbp
 ret 
-add rsp, 2
 Hello2:
 mov rbp, rsp
 sub rsp, 4
@@ -34,9 +34,9 @@ mov dword [rbp-4], eax
 mov rax, rbp
 sub rax, 4
 ret 
+add rsp, 8
 mov rsp, rbp
 ret 
-add rsp, 8
 _start:
 mov rbp, rsp
 sub rsp, 4
@@ -90,11 +90,11 @@ sub rsi, 31
 mov rdx, 4
 syscall
 
+add rsp, 31
 mov eax, 60
 xor edi, edi
 syscall 
 ret 
-add rsp, 31
 
 section .bss
 bool3: resb 1

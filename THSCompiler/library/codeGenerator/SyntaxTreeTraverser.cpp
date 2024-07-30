@@ -456,7 +456,9 @@ void SyntaxTreeTraverser::TraverseReturnNode(ReturnStatementNode* node, CodeGene
 
 void SyntaxTreeTraverser::TraverseBodyNode(BodyNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
+    codeGenerator->PushNewEnvironment();
     TraverseBodyCodeNode(node->GetCodeBlock(), codeGenerator, assemblyCode);
+    codeGenerator->PopEnvironment(assemblyCode);
 }
 
 std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator,
