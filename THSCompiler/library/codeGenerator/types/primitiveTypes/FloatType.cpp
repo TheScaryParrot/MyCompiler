@@ -131,32 +131,32 @@ class FloatType : public PrimitiveType
 
     virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add equal instruction
+        GenerateComparison("e", destination, source, assemblyCode);
     }
 
     virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add not equal instruction
+        GenerateComparison("ne", destination, source, assemblyCode);
     }
 
     virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add less instruction
+        GenerateComparison("l", destination, source, assemblyCode);
     }
 
     virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add less equal instruction
+        GenerateComparison("le", destination, source, assemblyCode);
     }
 
     virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add greater instruction
+        GenerateComparison("g", destination, source, assemblyCode);
     }
 
     virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add greater equal instruction
+        GenerateComparison("ge", destination, source, assemblyCode);
     }
 
     virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override

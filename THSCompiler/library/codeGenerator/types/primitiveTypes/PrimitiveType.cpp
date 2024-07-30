@@ -17,6 +17,28 @@ class PrimitiveType : public Type
         return result;
     }
 
+    void GenerateComparison(std::string comparison, IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode)
+    {
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("cmp");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
+
+        line = new AssemblyInstructionLine("set" + comparison);
+        line->AddArgument("al");
+        assemblyCode->AddLine(line);
+
+        line = new AssemblyInstructionLine("movzx");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument("al");
+        assemblyCode->AddLine(line);
+    }
+
    private:
     std::string GetSizeKeyword()
     {
