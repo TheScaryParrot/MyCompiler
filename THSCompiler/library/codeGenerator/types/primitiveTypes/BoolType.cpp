@@ -20,49 +20,67 @@ class BoolType : public PrimitiveType
 
     virtual void GenerateAdd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add add instruction
+        Logger.Log("Cannot add two bools", Logger::ERROR);
     }
     virtual void GenerateSub(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add sub instruction
+        Logger.Log("Cannot subtract two bools", Logger::ERROR);
     }
     virtual void GenerateMul(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add mul instruction
+        Logger.Log("Cannot multiply two bools", Logger::ERROR);
     }
     virtual void GenerateDiv(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add div instruction
+        Logger.Log("Cannot divide two bools", Logger::ERROR);
     }
     virtual void GenerateMod(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add mod instruction
+        Logger.Log("Cannot mod two bools", Logger::ERROR);
     }
 
     virtual void GenerateNot(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add not instruction
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("not");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        assemblyCode->AddLine(line);
     }
     virtual void GenerateNeg(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add neg instruction
+        Logger.Log("Cannot negate a bool", Logger::ERROR);
     }
     virtual void GenerateInc(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add inc instruction
+        Logger.Log("Cannot increment a bool", Logger::ERROR);
     }
     virtual void GenerateDec(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add dec instruction
+        Logger.Log("Cannot decrement a bool", Logger::ERROR);
     }
 
     virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add and instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("and");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
     virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add or instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("or");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
     virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {

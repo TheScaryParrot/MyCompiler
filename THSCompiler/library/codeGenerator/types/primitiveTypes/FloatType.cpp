@@ -20,57 +20,113 @@ class FloatType : public PrimitiveType
 
     virtual void GenerateAdd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add add instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("add");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateSub(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add sub instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("sub");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateMul(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add mul instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("mul");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateDiv(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add div instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("div");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateMod(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add mod instruction
+        Logger.Log("Cannot mod two floats", Logger::ERROR);
     }
 
     virtual void GenerateNot(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add not instruction
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("not");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateNeg(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add neg instruction
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("neg");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateInc(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add inc instruction
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("inc");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateDec(IVariableLocation* destination, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add dec instruction
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("dec");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add and instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("and");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
     {
-        // TODO: Add or instruction
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine("or");
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
     }
 
     virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
