@@ -16,7 +16,7 @@ class Environment
    public:
     unsigned int* localVariableOffset;
     Environment(unsigned int localVariableOffset) { this->localVariableOffset = new unsigned int(localVariableOffset); }
-    ~Environment() {}
+    ~Environment() { delete localVariableOffset; }
 
     bool HasVariable(std::string variableName) { return variables.Contains(variableName); }
     std::shared_ptr<Variable> GetVariable(std::string variableName) { return variables.Get(variableName); }

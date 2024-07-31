@@ -94,14 +94,14 @@ class CodeGenerator
             return nullptr;
         }
 
-        IVariableLocation* leftLocation = left->location.get();
-        IVariableLocation* rightLocation = right->location.get();
+        std::shared_ptr<IVariableLocation> leftLocation = left->location;
+        std::shared_ptr<IVariableLocation> rightLocation = right->location;
 
         if (left->IsInline())
         {
             if (right->IsInline())
             {
-                IConstVarLocation* leftConstLocation = dynamic_cast<IConstVarLocation*>(leftLocation);
+                IConstVarLocation* leftConstLocation = dynamic_cast<IConstVarLocation*>(leftLocation.get());
                 if (leftConstLocation == nullptr)
                 {
                     Logger.Log("Left variable " + rightLocation->ToAssemblyString() + " is marked as inline but it's variable location is not const",
@@ -109,7 +109,7 @@ class CodeGenerator
                     return nullptr;
                 }
 
-                IConstVarLocation* rightConstLocation = dynamic_cast<IConstVarLocation*>(rightLocation);
+                IConstVarLocation* rightConstLocation = dynamic_cast<IConstVarLocation*>(rightLocation.get());
                 if (rightConstLocation == nullptr)
                 {
                     Logger.Log("Right variable " + rightLocation->ToAssemblyString() + " is marked as inline but it's variable location is not const",
@@ -167,7 +167,7 @@ class CodeGenerator
             else
             {
                 Variable* newLocalVariable = GetNewLocalVariable(left->type, false, assemblyCode);
-                left->type->GenerateAssign(newLocalVariable->location.get(), rightLocation, assemblyCode);
+                left->type->GenerateAssign(newLocalVariable->location, rightLocation, assemblyCode);
                 left = std::shared_ptr<Variable>(newLocalVariable);
             }
         }
@@ -232,15 +232,15 @@ class CodeGenerator
     }
     void PopEnvironment(AssemblyCode* assemblyCode)
     {
-        unsigned int* oldOffset = environmentLinkedList.GetLocalVariableOffset();
+        unsigned int oldOffset = *environmentLinkedList.GetLocalVariableOffset();
         environmentLinkedList.PopEnvironment();
         unsigned int* newOffset = environmentLinkedList.GetLocalVariableOffset();
         AssemblyCodeGenerator.SetLocalVariableOffset(newOffset);
 
-        if (*oldOffset != *newOffset)
+        if (oldOffset != *newOffset)
         {
             // forget about the variables that are no longer in scope
-            AssemblyCodeGenerator.IncrementRSP(*oldOffset - *newOffset, assemblyCode);
+            AssemblyCodeGenerator.IncrementRSP(oldOffset - *newOffset, assemblyCode);
         }
     }
 
@@ -256,12 +256,12 @@ class CodeGenerator
     {
         // Set zero flag if condition is 0 by using test instruction
         AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("test");
-        IVariableLocation* secondLocation = condition->location.get();
+        std::shared_ptr<IVariableLocation> secondLocation = condition->location;
 
         if (condition->location->RequiresRegister())
         {
-            secondLocation = AssemblyCodeGenerator.GetNewRegistryVarLocation(condition->type->GetSize(), assemblyCode);
-            condition->type->GenerateAssign(secondLocation, condition->location.get(), assemblyCode);
+            secondLocation.reset(AssemblyCodeGenerator.GetNewRegistryVarLocation(condition->type->GetSize(), assemblyCode));
+            condition->type->GenerateAssign(secondLocation, condition->location, assemblyCode);
         }
 
         cmpLine->AddArgument(condition->location->ToAssemblyString());

@@ -1,7 +1,3 @@
-[ERROR] Function mod does not exist
-[ERROR] Right variable in binaryOperatorExpression is null
-global _start
-
 section .text
 Hello:
 mov rbp, rsp
@@ -43,6 +39,7 @@ extern _print
 global _start
 _start:
 mov rbp, rsp
+extern mod
 sub rsp, 4
 mov eax, 66
 mov dword [rbp-4], eax
@@ -149,30 +146,22 @@ sub rsp, 4
 mov eax, dword [rbp-31]
 mov dword [rbp-38], eax
 sub rsp, 4
-mov eax, dword [rbp-4]
+mov eax, 1000
 mov dword [rbp-42], eax
 sub rsp, 4
-mov eax, 4
-mov dword [rbp-46], eax
-push rbp
-call _print
-pop rbp
-add rsp, 8
-sub rsp, 4
 mov eax, dword [rbp-4]
-mov dword [rbp-42], eax
-sub rsp, 4
-mov eax, 2
 mov dword [rbp-46], eax
 push rbp
-call Hello2
+call mod
 pop rbp
 add rsp, 8
 sub rsp, 4
 mov eax, dword [rax]
 mov dword [rbp-42], eax
-sub rsp, 4
 mov eax, dword [rbp-42]
+mov dword [rbp-4], eax
+sub rsp, 4
+mov eax, dword [rbp-4]
 mov dword [rbp-46], eax
 sub rsp, 4
 mov eax, 4
@@ -180,12 +169,35 @@ mov dword [rbp-50], eax
 push rbp
 call _print
 pop rbp
+add rsp, 8
+sub rsp, 4
+mov eax, dword [rbp-4]
+mov dword [rbp-46], eax
+sub rsp, 4
+mov eax, 2
+mov dword [rbp-50], eax
+push rbp
+call Hello2
+pop rbp
+add rsp, 8
+sub rsp, 4
+mov eax, dword [rax]
+mov dword [rbp-46], eax
+sub rsp, 4
+mov eax, dword [rbp-46]
+mov dword [rbp-50], eax
+sub rsp, 4
+mov eax, 4
+mov dword [rbp-54], eax
+push rbp
+call _print
+pop rbp
 add rsp, 12
+add rsp, 42
 mov eax, 60
 xor edi, edi
 syscall 
 ret 
-add rsp, 38
 
 section .bss
 bool3: resb 1

@@ -4,100 +4,115 @@
 
 class CharType : public PrimitiveType
 {
-    virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAssign(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                AssemblyCode* assemblyCode) override
     {
         // TODO: Add mov instruction
     }
 
-    virtual void GenerateAdd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAdd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         // TODO: Add add instruction
     }
 
-    virtual void GenerateSub(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateSub(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         // TODO: Add sub instruction
     }
 
-    virtual void GenerateMul(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateMul(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         // TODO: Add mul instruction
     }
 
-    virtual void GenerateDiv(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateDiv(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         // TODO: Add div instruction
     }
 
-    virtual void GenerateMod(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateMod(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         // TODO: Add mod instruction
     }
 
-    virtual void GenerateNot(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateNot(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         // TODO: Add not instruction
     }
 
-    virtual void GenerateNeg(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateNeg(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         // TODO: Add neg instruction
     }
 
-    virtual void GenerateInc(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateInc(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         // TODO: Add inc instruction
     }
 
-    virtual void GenerateDec(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateDec(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         // TODO: Add dec instruction
     }
 
-    virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAnd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         // TODO: Add and instruction
     }
 
-    virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateOr(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                            AssemblyCode* assemblyCode) override
     {
         // TODO: Add or instruction
     }
 
-    virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                               AssemblyCode* assemblyCode) override
     {
         // TODO: Add equal instruction
     }
 
-    virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateNotEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                  AssemblyCode* assemblyCode) override
     {
         // TODO: Add not equal instruction
     }
 
-    virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateLess(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                              AssemblyCode* assemblyCode) override
     {
         // TODO: Add less instruction
     }
 
-    virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateLessEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                   AssemblyCode* assemblyCode) override
     {
         // TODO: Add less equal instruction
     }
 
-    virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateGreater(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                 AssemblyCode* assemblyCode) override
     {
         // TODO: Add greater instruction
     }
 
-    virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateGreaterEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                      AssemblyCode* assemblyCode) override
     {
         // TODO: Add greater equal instruction
     }
 
-    virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateStackPush(std::shared_ptr<IVariableLocation> source, AssemblyCode* assemblyCode) override
     {
         // As push requires 32-bit register, we do a direct mov to the stack
-        IVariableLocation* stackVar = AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode);
+        std::shared_ptr<IVariableLocation> stackVar =
+            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode));
         GenerateAssign(stackVar, source, assemblyCode);
     }
 

@@ -5,7 +5,7 @@
 class PrimitiveType : public Type
 {
    protected:
-    std::string ConstructVarLocationAccess(IVariableLocation* location)
+    std::string ConstructVarLocationAccess(std::shared_ptr<IVariableLocation> location)
     {
         std::string result = location->ToAssemblyString();
 
@@ -17,7 +17,8 @@ class PrimitiveType : public Type
         return result;
     }
 
-    void GenerateComparison(std::string comparison, IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode)
+    void GenerateComparison(std::string comparison, std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                            AssemblyCode* assemblyCode)
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {

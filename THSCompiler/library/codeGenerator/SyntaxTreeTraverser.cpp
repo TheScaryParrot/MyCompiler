@@ -570,8 +570,9 @@ void SyntaxTreeTraverser::TraverseReturnNode(ReturnStatementNode* node, CodeGene
         std::shared_ptr<Variable> value = TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
 
         // store return value to stack
-        IVariableLocation* returnLocation = AssemblyCodeGenerator.GetReturnLocation(value->type->GetSize(), assemblyCode);
-        value->type->GenerateAssign(returnLocation, value->location.get(), assemblyCode);
+        std::shared_ptr<IVariableLocation> returnLocation =
+            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetReturnLocation(value->type->GetSize(), assemblyCode));
+        value->type->GenerateAssign(returnLocation, value->location, assemblyCode);
 
         // store return location to rax
         AssemblyCodeGenerator.MoveReturnLocationToRax(value->type->GetSize(), assemblyCode);
@@ -652,16 +653,16 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseUnaryOperatorExpressionNo
     switch (node->preUnaryOperator)
     {
         case EPreUnaryOperators::PRE_NOT:
-            variable->type->GenerateNot(variable->location.get(), assemblyCode);
+            variable->type->GenerateNot(variable->location, assemblyCode);
             break;
         case EPreUnaryOperators::PRE_NEGATE:
-            variable->type->GenerateNeg(variable->location.get(), assemblyCode);
+            variable->type->GenerateNeg(variable->location, assemblyCode);
             break;
         case EPreUnaryOperators::PRE_INCREMENT:
-            variable->type->GenerateInc(variable->location.get(), assemblyCode);
+            variable->type->GenerateInc(variable->location, assemblyCode);
             break;
         case EPreUnaryOperators::PRE_DECREMENT:
-            variable->type->GenerateDec(variable->location.get(), assemblyCode);
+            variable->type->GenerateDec(variable->location, assemblyCode);
             break;
     }
 
@@ -774,7 +775,7 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
     // Push arguments to stack in reverse order
     for (int i = arguments.size() - 1; i >= 0; i--)
     {
-        arguments[i]->type->GenerateStackPush(arguments[i]->location.get(), assemblyCode);
+        arguments[i]->type->GenerateStackPush(arguments[i]->location, assemblyCode);
     }
 
     AssemblyCodeGenerator.AddPreCall(assemblyCode);
@@ -791,11 +792,11 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
     }
 
     // return is stored on stack at location pointed at by rax
-    IVariableLocation* returnVariable = new RegistryPointerVarLocation("rax", 0);
+    std::shared_ptr<IVariableLocation> returnVariable = std::shared_ptr<IVariableLocation>(new RegistryPointerVarLocation("rax", 0));
     Variable* localVariable = codeGenerator->GetNewLocalVariable(function->returnType, false, assemblyCode);
 
     // Assign return value to local variable
-    localVariable->type->GenerateAssign(localVariable->location.get(), returnVariable, assemblyCode);
+    localVariable->type->GenerateAssign(localVariable->location, returnVariable, assemblyCode);
 
     return std::shared_ptr<Variable>(localVariable);
 }
@@ -825,10 +826,10 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseStructNode(StructNode* no
     for (size_t i = 0; i < propertyAssigns.size(); i++)
     {
         std::pair<Property, std::shared_ptr<Variable>> propertyAssign = propertyAssigns[i];
-        std::shared_ptr<Variable> l_value = propertyAssign.first.Apply(structVariable->location.get());
+        std::shared_ptr<Variable> l_value = propertyAssign.first.Apply(structVariable->location);
         std::shared_ptr<Variable> r_value = propertyAssign.second;
 
-        l_value->type->GenerateAssign(l_value->location.get(), r_value->location.get(), assemblyCode);
+        l_value->type->GenerateAssign(l_value->location, r_value->location, assemblyCode);
     }
 
     return std::shared_ptr<Variable>(structVariable);
@@ -860,7 +861,7 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseVariableNode(VariableNode
             return nullptr;
         }
 
-        variable = structType->ApplyProperty(node->ids[i], variable->location.get());
+        variable = structType->ApplyProperty(node->ids[i], variable->location);
     }
 
     return variable;

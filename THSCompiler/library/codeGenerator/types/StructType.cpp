@@ -21,7 +21,7 @@ class Property
     }
     Property() = default;
 
-    std::shared_ptr<Variable> Apply(IVariableLocation* location)
+    std::shared_ptr<Variable> Apply(std::shared_ptr<IVariableLocation> location)
     {
         RegistryPointerVarLocation* newLocation = dynamic_cast<RegistryPointerVarLocation*>(location->Clone());
 
@@ -56,9 +56,13 @@ class StructType : public Type
 
     Property GetProperty(size_t index) { return properties.At(index).second; }
 
-    std::shared_ptr<Variable> ApplyProperty(std::string name, IVariableLocation* location) { return properties.Get(name).Apply(location); }
+    std::shared_ptr<Variable> ApplyProperty(std::string name, std::shared_ptr<IVariableLocation> location)
+    {
+        return properties.Get(name).Apply(location);
+    }
 
-    virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAssign(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                AssemblyCode* assemblyCode) override
     {
         for (size_t i = 0; i < properties.Size(); i++)
         {
@@ -67,88 +71,101 @@ class StructType : public Type
             std::shared_ptr<Variable> destinationProperty = ApplyProperty(propertyName, destination);
             std::shared_ptr<Variable> sourceProperty = ApplyProperty(propertyName, source);
 
-            destinationProperty->type->GenerateAssign(destinationProperty->location.get(), sourceProperty->location.get(), assemblyCode);
+            destinationProperty->type->GenerateAssign(destinationProperty->location, sourceProperty->location, assemblyCode);
         }
     }
 
-    virtual void GenerateAdd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAdd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot add two structs", Logger::ERROR);
     }
-    virtual void GenerateSub(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateSub(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot subtract two structs", Logger::ERROR);
     }
-    virtual void GenerateMul(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateMul(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot multiply two structs", Logger::ERROR);
     }
-    virtual void GenerateDiv(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateDiv(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot divide two structs", Logger::ERROR);
     }
-    virtual void GenerateMod(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateMod(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot modulo two structs", Logger::ERROR);
     }
 
-    virtual void GenerateNot(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateNot(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot not a struct", Logger::ERROR);
     }
-    virtual void GenerateNeg(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateNeg(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot negate a struct", Logger::ERROR);
     }
-    virtual void GenerateInc(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateInc(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot increment a struct", Logger::ERROR);
     }
-    virtual void GenerateDec(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateDec(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot decrement a struct", Logger::ERROR);
     }
 
-    virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAnd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot and two structs", Logger::ERROR);
     }
-    virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateOr(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                            AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot or two structs", Logger::ERROR);
     }
-    virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                               AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-    virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateNotEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                  AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-    virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateLess(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                              AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-    virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateLessEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                   AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-    virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateGreater(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                 AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
-    virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateGreaterEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                      AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot compare two structs", Logger::ERROR);
     }
 
-    virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateStackPush(std::shared_ptr<IVariableLocation> source, AssemblyCode* assemblyCode) override
     {
         for (size_t i = 0; i < properties.Size(); i++)
         {
             std::string propertyName = properties.At(i).first;
             std::shared_ptr<Variable> property = ApplyProperty(propertyName, source);
-            property->type->GenerateStackPush(property->location.get(), assemblyCode);
+            property->type->GenerateStackPush(property->location, assemblyCode);
         }
     }
 

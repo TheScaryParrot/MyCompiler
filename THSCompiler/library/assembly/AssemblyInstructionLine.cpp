@@ -9,6 +9,7 @@ class AssemblyInstructionLine : public IAssemblyLine
 {
    public:
     AssemblyInstructionLine(std::string instruction) { this->instruction = instruction; };
+    virtual ~AssemblyInstructionLine() = default;
 
     void AddArgument(std::string argument) { arguments.push_back(argument); }
 

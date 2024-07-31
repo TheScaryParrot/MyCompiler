@@ -10,6 +10,7 @@ class DataDeclarationLine : public IAssemblyLine
         this->label = label;
         this->assignment = assignment;
     }
+    virtual ~DataDeclarationLine() = default;
 
     virtual std::string ToString() override { return label + ": " + assignment; }
 

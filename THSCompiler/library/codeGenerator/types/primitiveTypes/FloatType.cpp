@@ -5,7 +5,8 @@
 
 class FloatType : public PrimitiveType
 {
-    virtual void GenerateAssign(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAssign(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                AssemblyCode* assemblyCode) override
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
@@ -18,7 +19,8 @@ class FloatType : public PrimitiveType
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateAdd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAdd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
@@ -31,7 +33,8 @@ class FloatType : public PrimitiveType
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateSub(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateSub(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
@@ -44,7 +47,8 @@ class FloatType : public PrimitiveType
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateMul(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateMul(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
@@ -57,7 +61,8 @@ class FloatType : public PrimitiveType
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateDiv(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateDiv(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
@@ -70,40 +75,42 @@ class FloatType : public PrimitiveType
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateMod(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateMod(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         Logger.Log("Cannot mod two floats", Logger::ERROR);
     }
 
-    virtual void GenerateNot(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateNot(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         AssemblyInstructionLine* line = new AssemblyInstructionLine("not");
         line->AddArgument(ConstructVarLocationAccess(destination));
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateNeg(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateNeg(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         AssemblyInstructionLine* line = new AssemblyInstructionLine("neg");
         line->AddArgument(ConstructVarLocationAccess(destination));
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateInc(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateInc(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         AssemblyInstructionLine* line = new AssemblyInstructionLine("inc");
         line->AddArgument(ConstructVarLocationAccess(destination));
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateDec(IVariableLocation* destination, AssemblyCode* assemblyCode) override
+    virtual void GenerateDec(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
     {
         AssemblyInstructionLine* line = new AssemblyInstructionLine("dec");
         line->AddArgument(ConstructVarLocationAccess(destination));
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateAnd(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateAnd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
@@ -116,7 +123,8 @@ class FloatType : public PrimitiveType
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateOr(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateOr(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                            AssemblyCode* assemblyCode) override
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
@@ -129,40 +137,47 @@ class FloatType : public PrimitiveType
         assemblyCode->AddLine(line);
     }
 
-    virtual void GenerateEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                               AssemblyCode* assemblyCode) override
     {
         GenerateComparison("e", destination, source, assemblyCode);
     }
 
-    virtual void GenerateNotEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateNotEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                  AssemblyCode* assemblyCode) override
     {
         GenerateComparison("ne", destination, source, assemblyCode);
     }
 
-    virtual void GenerateLess(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateLess(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                              AssemblyCode* assemblyCode) override
     {
         GenerateComparison("l", destination, source, assemblyCode);
     }
 
-    virtual void GenerateLessEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateLessEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                   AssemblyCode* assemblyCode) override
     {
         GenerateComparison("le", destination, source, assemblyCode);
     }
 
-    virtual void GenerateGreater(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateGreater(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                 AssemblyCode* assemblyCode) override
     {
         GenerateComparison("g", destination, source, assemblyCode);
     }
 
-    virtual void GenerateGreaterEqual(IVariableLocation* destination, IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateGreaterEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                      AssemblyCode* assemblyCode) override
     {
         GenerateComparison("ge", destination, source, assemblyCode);
     }
 
-    virtual void GenerateStackPush(IVariableLocation* source, AssemblyCode* assemblyCode) override
+    virtual void GenerateStackPush(std::shared_ptr<IVariableLocation> source, AssemblyCode* assemblyCode) override
     {
         // although push is possible (not like in BoolType, see BoolType.cpp), for consistency with the rest of the code, I do this
-        IVariableLocation* stackVar = AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode);
+        std::shared_ptr<IVariableLocation> stackVar =
+            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode));
         GenerateAssign(stackVar, source, assemblyCode);
     }
 
