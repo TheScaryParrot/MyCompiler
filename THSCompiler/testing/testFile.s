@@ -40,6 +40,7 @@ ret
 _start:
 mov rbp, rsp
 extern _print
+extern mod
 sub rsp, 4
 mov dword [rbp-4], 66
 sub rsp, 9
@@ -86,41 +87,51 @@ add rsp, 4
 sub rsp, 4
 mov eax, dword [rbp-27]
 mov dword [rbp-34], eax
-sub rsp, 1
-mov al, byte [bool2]
-mov byte [rbp-35], al
-sub rsp, 1
-mov al, byte [bool1]
-mov byte [rbp-36], al
-push rbp
-call Hello
-pop rbp
-add rsp, 2
-sub rsp, 1
-mov al, byte [rax]
-mov byte [rbp-35], al
+sub rsp, 4
+mov dword [rbp-38], 1000
 sub rsp, 4
 mov eax, dword [rbp-4]
-mov dword [rbp-39], eax
+mov dword [rbp-42], eax
+push rbp
+call mod
+pop rbp
+add rsp, 8
 sub rsp, 4
-mov dword [rbp-43], 2
+mov eax, dword [rax]
+mov dword [rbp-38], eax
+mov eax, dword [rbp-38]
+mov dword [rbp-4], eax
+sub rsp, 4
+mov eax, dword [rbp-4]
+mov dword [rbp-42], eax
+sub rsp, 4
+mov dword [rbp-46], 4
+push rbp
+call _print
+pop rbp
+add rsp, 8
+sub rsp, 4
+mov eax, dword [rbp-4]
+mov dword [rbp-42], eax
+sub rsp, 4
+mov dword [rbp-46], 2
 push rbp
 call Hello2
 pop rbp
 add rsp, 8
 sub rsp, 4
 mov eax, dword [rax]
-mov dword [rbp-39], eax
+mov dword [rbp-42], eax
 sub rsp, 4
-mov eax, dword [rbp-39]
-mov dword [rbp-43], eax
+mov eax, dword [rbp-42]
+mov dword [rbp-46], eax
 sub rsp, 4
-mov dword [rbp-47], 4
+mov dword [rbp-50], 4
 push rbp
 call _print
 pop rbp
 add rsp, 12
-add rsp, 35
+add rsp, 38
 mov eax, 60
 xor edi, edi
 syscall 

@@ -1,5 +1,6 @@
 global _print
 
+; void print(int length, int char)
 _print:
 mov rbp, rsp
 
@@ -17,3 +18,4 @@ syscall
 
 mov rsp, rbp
 ret
+

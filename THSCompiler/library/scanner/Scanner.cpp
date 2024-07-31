@@ -198,11 +198,14 @@ TokenList* Scanner::Scan(InputFile* file)
         if (TryAddCharacterGroupToken(file, tokens, Tokens.DOT_TOKEN, character, peekCharacter)) continue;
 
         // --- Equal Operators ---
+
         if (TryAddCharacterGroupToken(file, tokens, Tokens.EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
         if (TryAddCharacterGroupToken(file, tokens, Tokens.NOT_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
+        // less/greater than or equal operators must be checked after less/greater than operators as otherwise they are parsed as two separate tokens
+        if (TryAddCharacterGroupToken(file, tokens, Tokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
+        if (TryAddCharacterGroupToken(file, tokens, Tokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
         if (TryAddCharacterGroupToken(file, tokens, Tokens.GREATER_THAN_OPERATOR_TOKEN, character, peekCharacter)) continue;
         if (TryAddCharacterGroupToken(file, tokens, Tokens.LESS_THAN_OPERATOR_TOKEN, character, peekCharacter)) continue;
-        if (TryAddCharacterGroupToken(file, tokens, Tokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
 
         // --- Assign Operators ---
         if (TryAddCharacterGroupToken(file, tokens, Tokens.ASSIGN_OPERATOR_TOKEN, character, peekCharacter)) continue;

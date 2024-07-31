@@ -130,11 +130,11 @@ EOperators PredictiveParser::Parse_EqualOperator(TokenList* tokens)
 
     if (nextToken->IsThisToken(Tokens.EQUAL_OPERATOR_TOKEN)) return EOperators::EQUAL_OPERATOR;
     if (nextToken->IsThisToken(Tokens.NOT_EQUAL_OPERATOR_TOKEN)) return EOperators::NOT_EQUAL_OPERATOR;
-    if (nextToken->IsThisToken(Tokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN)) return EOperators::LESS_THAN_OPERATOR;
+    if (nextToken->IsThisToken(Tokens.LESS_THAN_OPERATOR_TOKEN)) return EOperators::LESS_THAN_OPERATOR;
     if (nextToken->IsThisToken(Tokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN)) return EOperators::LESS_THAN_OR_EQUAL_OPERATOR;
     if (nextToken->IsThisToken(Tokens.GREATER_THAN_OPERATOR_TOKEN)) return EOperators::GREATER_THAN_OPERATOR;
 
-    return EOperators::LESS_THAN_OPERATOR;
+    return EOperators::GREATER_THAN_OR_EQUAL_OPERATOR;
 }
 
 bool PredictiveParser::LookAhead_SumExpression(TokenList* tokens) { return LookAhead_UnaryExpression(tokens); }
@@ -294,7 +294,10 @@ AbstractValueNode* PredictiveParser::Parse_Value(TokenList* tokens)
 
     if (LookAhead_Variable(tokens)) return Parse_Variable(tokens);
 
-    return Parse_Const(tokens);
+    if (LookAhead_Const(tokens)) return Parse_Const(tokens);
+
+    Logger.Log("Value expected but got: " + tokens->Peek()->ToString(), Logger::ERROR);
+    return nullptr;
 }
 
 bool PredictiveParser::LookAhead_Call(TokenList* tokens)

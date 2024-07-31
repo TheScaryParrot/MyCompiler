@@ -46,6 +46,7 @@ int Hello2(int a, int b)
 int _start(/*int argc, char argv*/)
 {
     extern void _print(int length, int value);
+    extern int mod(int a, int b);
 
     final inline int int1 = 2;
     int int2 = int1 + 64;
@@ -80,7 +81,9 @@ int _start(/*int argc, char argv*/)
 
     // trying calls
 
-    Hello(bool1, bool2);
+    int2 = mod(int2, 1000);
+
+    _print(4, int2);
 
     _print(4, Hello2(int1, int2));
 
