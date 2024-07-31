@@ -1,5 +1,3 @@
-global _start
-
 section .text
 isPrime:
 mov rbp, rsp
@@ -56,6 +54,7 @@ sub rax, 1
 ret 
 mov rsp, rbp
 ret 
+global _start
 _start:
 mov rbp, rsp
 extern _print

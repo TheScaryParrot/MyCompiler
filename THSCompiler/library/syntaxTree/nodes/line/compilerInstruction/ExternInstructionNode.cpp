@@ -2,25 +2,26 @@
 
 #include <vector>
 
-#include "../../declaration/ParameterDeclarationNode.cpp"
-#include "../../declaration/types/FunctionReturnTypeNode.cpp"
-#include "AbstractKeywordStatementNode.cpp"
+#include "../declaration/ParameterDeclarationNode.cpp"
+#include "../declaration/types/FunctionReturnTypeNode.cpp"
+#include "AbstractCompilerInstructionNode.cpp"
 
-class ExternStatementNode : public AbstractKeywordStatementNode
+class ExternInstructionNode : public AbstractCompilerInstructionNode
 {
    public:
     FunctionReturnTypeNode returnType;
     std::string identifier;
     std::vector<ParameterDeclarationNode*>* parameters;
 
-    ExternStatementNode(FunctionReturnTypeNode returnType, std::string identifier, std::vector<ParameterDeclarationNode*>* parameters)
+    ExternInstructionNode(FunctionReturnTypeNode returnType, std::string identifier, std::vector<ParameterDeclarationNode*>* parameters)
+        : AbstractCompilerInstructionNode()
     {
         this->returnType = returnType;
         this->identifier = identifier;
         this->parameters = parameters;
     }
 
-    ~ExternStatementNode()
+    ~ExternInstructionNode()
     {
         for (ParameterDeclarationNode* parameter : *parameters)
         {

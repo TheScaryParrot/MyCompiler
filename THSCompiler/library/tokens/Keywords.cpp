@@ -27,88 +27,79 @@ static class Keywords
 
     std::shared_ptr<AbstractKeywordToken> TYPEDEF_KEYWORD = std::make_shared<AbstractKeywordToken>("typedef");
 
-    std::shared_ptr<AbstractKeywordToken> EXTERN_KEYWORD = std::make_shared<AbstractKeywordToken>("extern");
-
     /// @brief Returns the token for the given keyword. If the keyword is not a keyword, returns nullptr.
-    std::shared_ptr<AbstractKeywordToken> GetKeywordToken(std::string keyword);
+    std::shared_ptr<AbstractKeywordToken> GetKeywordToken(std::string keyword)
+    {
+        if (IF_KEYWORD->IsThisKeyword(keyword))
+        {
+            return IF_KEYWORD;
+        }
+
+        if (ELSE_KEYWORD->IsThisKeyword(keyword))
+        {
+            return ELSE_KEYWORD;
+        }
+
+        if (ELIF_KEYWORD->IsThisKeyword(keyword))
+        {
+            return ELIF_KEYWORD;
+        }
+
+        if (WHILE_KEYWORD->IsThisKeyword(keyword))
+        {
+            return WHILE_KEYWORD;
+        }
+
+        if (FOR_KEYWORD->IsThisKeyword(keyword))
+        {
+            return FOR_KEYWORD;
+        }
+
+        if (BREAK_KEYWORD->IsThisKeyword(keyword))
+        {
+            return BREAK_KEYWORD;
+        }
+
+        if (CONTINUE_KEYWORD->IsThisKeyword(keyword))
+        {
+            return CONTINUE_KEYWORD;
+        }
+
+        if (LOGICAL_TRUE_KEYWORD->IsThisKeyword(keyword))
+        {
+            return LOGICAL_TRUE_KEYWORD;
+        }
+
+        if (LOGICAL_FALSE_KEYWORD->IsThisKeyword(keyword))
+        {
+            return LOGICAL_FALSE_KEYWORD;
+        }
+
+        if (RETURN_KEYWORD->IsThisKeyword(keyword))
+        {
+            return RETURN_KEYWORD;
+        }
+
+        if (VOID_KEYWORD->IsThisKeyword(keyword))
+        {
+            return VOID_KEYWORD;
+        }
+
+        if (FINAL_KEYWORD->IsThisKeyword(keyword))
+        {
+            return FINAL_KEYWORD;
+        }
+
+        if (INLINE_KEYWORD->IsThisKeyword(keyword))
+        {
+            return INLINE_KEYWORD;
+        }
+
+        if (TYPEDEF_KEYWORD->IsThisKeyword(keyword))
+        {
+            return TYPEDEF_KEYWORD;
+        }
+
+        return nullptr;
+    }
 } Keywords;
-
-std::shared_ptr<AbstractKeywordToken> Keywords::GetKeywordToken(std::string keyword)
-{
-    if (IF_KEYWORD->IsThisKeyword(keyword))
-    {
-        return IF_KEYWORD;
-    }
-
-    if (ELSE_KEYWORD->IsThisKeyword(keyword))
-    {
-        return ELSE_KEYWORD;
-    }
-
-    if (ELIF_KEYWORD->IsThisKeyword(keyword))
-    {
-        return ELIF_KEYWORD;
-    }
-
-    if (WHILE_KEYWORD->IsThisKeyword(keyword))
-    {
-        return WHILE_KEYWORD;
-    }
-
-    if (FOR_KEYWORD->IsThisKeyword(keyword))
-    {
-        return FOR_KEYWORD;
-    }
-
-    if (BREAK_KEYWORD->IsThisKeyword(keyword))
-    {
-        return BREAK_KEYWORD;
-    }
-
-    if (CONTINUE_KEYWORD->IsThisKeyword(keyword))
-    {
-        return CONTINUE_KEYWORD;
-    }
-
-    if (LOGICAL_TRUE_KEYWORD->IsThisKeyword(keyword))
-    {
-        return LOGICAL_TRUE_KEYWORD;
-    }
-
-    if (LOGICAL_FALSE_KEYWORD->IsThisKeyword(keyword))
-    {
-        return LOGICAL_FALSE_KEYWORD;
-    }
-
-    if (RETURN_KEYWORD->IsThisKeyword(keyword))
-    {
-        return RETURN_KEYWORD;
-    }
-
-    if (VOID_KEYWORD->IsThisKeyword(keyword))
-    {
-        return VOID_KEYWORD;
-    }
-
-    if (FINAL_KEYWORD->IsThisKeyword(keyword))
-    {
-        return FINAL_KEYWORD;
-    }
-
-    if (INLINE_KEYWORD->IsThisKeyword(keyword))
-    {
-        return INLINE_KEYWORD;
-    }
-
-    if (TYPEDEF_KEYWORD->IsThisKeyword(keyword))
-    {
-        return TYPEDEF_KEYWORD;
-    }
-
-    if (EXTERN_KEYWORD->IsThisKeyword(keyword))
-    {
-        return EXTERN_KEYWORD;
-    }
-
-    return nullptr;
-}

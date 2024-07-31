@@ -46,11 +46,17 @@
 #include "../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ElifStatementNode.cpp"
-#include "../syntaxTree/nodes/line/statement/keywordStatement/ExternStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ForStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/WhileStatementNode.cpp"
+
+#pragma endregion
+
+#pragma region CompilerInstructions
+
+#include "../syntaxTree/nodes/line/compilerInstruction/ExternInstructionNode.cpp"
+#include "../syntaxTree/nodes/line/compilerInstruction/GlobalInstructionNode.cpp"
 
 #pragma endregion
 
@@ -242,10 +248,21 @@ static class PredictiveParser
     bool LookAhead_ContinueStatement(TokenList* tokens);
     ContinueStatementNode* Parse_ContinueStatement(TokenList* tokens);
 
-    bool LookAhead_ExternStatement(TokenList* tokens);
-    ExternStatementNode* Parse_ExternStatement(TokenList* tokens);
-
 #pragma endregion
+#pragma endregion
+
+// ------- Compiler Instructions -------
+#pragma region CompilerInstructions
+
+    bool LookAhead_CompilerInstruction(TokenList* tokens);
+    AbstractCompilerInstructionNode* Parse_CompilerInstruction(TokenList* tokens);
+
+    bool LookAhead_GlobalInstruction(TokenList* tokens);
+    GlobalInstructionNode* Parse_GlobalInstruction(TokenList* tokens);
+
+    bool LookAhead_ExternInstruction(TokenList* tokens);
+    ExternInstructionNode* Parse_ExternInstruction(TokenList* tokens);
+
 #pragma endregion
 
 } PredictiveParser;

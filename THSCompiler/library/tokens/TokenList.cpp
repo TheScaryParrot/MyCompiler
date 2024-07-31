@@ -9,9 +9,6 @@
 class TokenList
 {
    public:
-    TokenList();
-    ~TokenList();
-
     void AddToken(std::shared_ptr<Token> token);
     unsigned int GetSize();
 
@@ -31,24 +28,10 @@ class TokenList
     std::string ToString();
 
    private:
+    // TODO: Make this use a queue instead of a vector
     std::vector<std::shared_ptr<Token>> tokens = std::vector<std::shared_ptr<Token>>();
     unsigned int readIndex = 0;
 };
-
-TokenList::TokenList() {}
-
-TokenList::~TokenList()
-{
-    // Not needed due to shared_ptr
-    /*for (int i = 0; i < tokens.size(); i++) {
-        if (tokens[i] == nullptr) {
-            continue;
-        }
-
-        delete tokens[i];
-        tokens[i] = nullptr;
-    }*/
-}
 
 void TokenList::AddToken(std::shared_ptr<Token> token) { tokens.push_back(token); }
 

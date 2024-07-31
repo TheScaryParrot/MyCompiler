@@ -21,7 +21,7 @@ static class Logger
             return;
         }
 
-        std::cout << ConstructLogMessage(message, type) << "\n";
+        std::cout << ConstructLogMessage(message, type) << std::endl;
     }
 
     void SetDebug(bool debug) { IsDebug = debug; };

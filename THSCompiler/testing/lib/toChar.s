@@ -1,6 +1,5 @@
-global intToChar
-
 section .text
+global intToChar
 intToChar:
 mov rbp, rsp
 mov rsp, rbp

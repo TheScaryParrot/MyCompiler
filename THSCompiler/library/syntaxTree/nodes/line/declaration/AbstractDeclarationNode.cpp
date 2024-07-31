@@ -6,9 +6,6 @@ class AbstractDeclarationNode : public AbstractLineNode
 {
    public:
     AbstractDeclarationNode();
-    virtual ~AbstractDeclarationNode();
 };
 
 AbstractDeclarationNode::AbstractDeclarationNode() : AbstractLineNode() {}
-
-AbstractDeclarationNode::~AbstractDeclarationNode() {}

@@ -4,6 +4,7 @@
 
 #include "../InputFile.cpp"
 #include "../tokens/CharacterGroupToken.cpp"
+#include "../tokens/CompilerInstructions.cpp"
 #include "../tokens/Keywords.cpp"
 #include "../tokens/TokenList.cpp"
 #include "../tokens/TokenWithValue.cpp"
@@ -186,12 +187,20 @@ TokenList* Scanner::Scan(InputFile* file)
             if (keywordToken != nullptr)
             {
                 tokens->AddToken(keywordToken);
-            }
-            else
-            {
-                tokens->AddToken(std::shared_ptr<TokenWithValue>(Tokens.CONST_IDENTIFIER_TOKEN->Clone(identifierString)));
+                continue;
             }
 
+            // Check whether the identifier is a compiler instruction
+            std::shared_ptr<AbstractCompilerInstructionToken> compilerInstructionToken =
+                CompilerInstructions.GetCompilerInstructionToken(identifierString);
+
+            if (compilerInstructionToken != nullptr)
+            {
+                tokens->AddToken(compilerInstructionToken);
+                continue;
+            }
+
+            tokens->AddToken(std::shared_ptr<TokenWithValue>(Tokens.CONST_IDENTIFIER_TOKEN->Clone(identifierString)));
             continue;
         }
 

@@ -76,6 +76,18 @@ class CodeGenerator
     std::shared_ptr<Variable> ApplyBinaryOperatorOnVariables(std::shared_ptr<Variable> left, std::shared_ptr<Variable> right, EOperators op,
                                                              AssemblyCode* assemblyCode)
     {
+        if (left == nullptr)
+        {
+            Logger.Log("Left variable in binaryOperatorExpression is null", Logger::ERROR);
+            return nullptr;
+        }
+
+        if (right == nullptr)
+        {
+            Logger.Log("Right variable in binaryOperatorExpression is null", Logger::ERROR);
+            return nullptr;
+        }
+
         if (!left->type->CanApplyToThis(right->type.get()))
         {
             Logger.Log("Cannot apply operation in binaryOperatorExpression", Logger::ERROR);

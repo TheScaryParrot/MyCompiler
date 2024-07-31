@@ -12,6 +12,7 @@ bool isPrime(int n)
     return true;
 }
 
+global _start;
 int _start()
 {
     extern void _print(int length, int value);

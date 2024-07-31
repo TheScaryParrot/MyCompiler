@@ -13,7 +13,6 @@ class SyntaxTree
     SyntaxTree(GlobalCodeNode* code) { this->code = code; }
     ~SyntaxTree() { delete code; }
 
-    void AddCodeLineNode(AbstractDeclarationNode* codeLine) { code->AddDeclaration(codeLine); }
     GlobalCodeNode* GetCode() { return code; };
 
     std::string ToString() { return code->ToString(); }

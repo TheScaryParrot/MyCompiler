@@ -43,9 +43,11 @@ int Hello2(int a, int b)
     return a2 + b2;
 }
 
+extern void _print(int length, int value);
+
+global _start;
 int _start(/*int argc, char argv*/)
 {
-    extern void _print(int length, int value);
     extern int mod(int a, int b);
 
     final inline int int1 = 2;

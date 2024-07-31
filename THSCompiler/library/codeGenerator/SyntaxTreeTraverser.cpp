@@ -3,6 +3,8 @@
 #include "../assembly/AssemblyCode.cpp"
 #include "../assembly/AssemblyLabelLine.cpp"
 #include "../syntaxTree/SyntaxTree.cpp"
+#include "../syntaxTree/nodes/line/compilerInstruction/ExternInstructionNode.cpp"
+#include "../syntaxTree/nodes/line/compilerInstruction/GlobalInstructionNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/AbstractDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/FuncDeclarationNode.cpp"
 #include "../syntaxTree/nodes/line/declaration/GlobalVarDeclarationNode.cpp"
@@ -28,7 +30,6 @@
 #include "../syntaxTree/nodes/line/statement/keywordStatement/AbstractKeywordStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
-#include "../syntaxTree/nodes/line/statement/keywordStatement/ExternStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ForStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
@@ -70,7 +71,6 @@ class SyntaxTreeTraverser
     void TraverseIfStatementNode(IfStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseReturnNode(ReturnStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     void TraverseWhileStatementNode(WhileStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
-    void TraverseExternStatementNode(ExternStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 
     std::shared_ptr<Variable> TraverseExpressionNode(AbstractExpressionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     std::shared_ptr<Variable> TraverseBinaryOperatorExpressionNode(BinaryOperatorExpressionNode* node, CodeGenerator* codeGenerator,
@@ -91,6 +91,10 @@ class SyntaxTreeTraverser
     std::shared_ptr<Variable> TraverseIntConstValueNode(IntConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     std::shared_ptr<Variable> TraverseFloatConstValueNode(FloatConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
     std::shared_ptr<Variable> TraverseStringConstValueNode(StringConstValueNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+
+    void TraverseCompilerInstructionNode(AbstractCompilerInstructionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseExternInstructionNode(ExternInstructionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
+    void TraverseGlobalInstructionNode(GlobalInstructionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode);
 };
 
 AssemblyCode* SyntaxTreeTraverser::Traverse(SyntaxTree* syntaxTree)
@@ -107,11 +111,19 @@ void SyntaxTreeTraverser::TraverseGlobalCodeNode(GlobalCodeNode* node, CodeGener
 {
     for (unsigned int i = 0; i < node->GetLineCount(); i++)
     {
-        AbstractDeclarationNode* declaration = node->GetLine(i);
+        AbstractLineNode* line = node->GetLine(i);
 
-        if (declaration == nullptr) continue;
+        if (line == nullptr) continue;
 
-        TraverseDeclarationNode(declaration, codeGenerator, assemblyCode);
+        if (dynamic_cast<AbstractDeclarationNode*>(line) != nullptr)
+        {
+            TraverseDeclarationNode(dynamic_cast<AbstractDeclarationNode*>(line), codeGenerator, assemblyCode);
+        }
+
+        if (dynamic_cast<AbstractCompilerInstructionNode*>(line) != nullptr)
+        {
+            TraverseCompilerInstructionNode(dynamic_cast<AbstractCompilerInstructionNode*>(line), codeGenerator, assemblyCode);
+        }
     }
 }
 
@@ -137,6 +149,11 @@ void SyntaxTreeTraverser::TraverseLineNode(AbstractLineNode* node, CodeGenerator
     if (dynamic_cast<AbstractStatementNode*>(node) != nullptr)
     {
         TraverseStatementNode(dynamic_cast<AbstractStatementNode*>(node), codeGenerator, assemblyCode);
+    }
+
+    if (dynamic_cast<AbstractCompilerInstructionNode*>(node) != nullptr)
+    {
+        TraverseCompilerInstructionNode(dynamic_cast<AbstractCompilerInstructionNode*>(node), codeGenerator, assemblyCode);
     }
 }
 
@@ -441,11 +458,6 @@ void SyntaxTreeTraverser::TraverseKeywordStatementNode(AbstractKeywordStatementN
     {
         TraverseReturnNode(dynamic_cast<ReturnStatementNode*>(node), codeGenerator, assemblyCode);
     }
-
-    if (dynamic_cast<ExternStatementNode*>(node) != nullptr)
-    {
-        TraverseExternStatementNode(dynamic_cast<ExternStatementNode*>(node), codeGenerator, assemblyCode);
-    }
 }
 
 void SyntaxTreeTraverser::TraverseBreakStatementNode(BreakStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -545,36 +557,6 @@ void SyntaxTreeTraverser::TraverseWhileStatementNode(WhileStatementNode* node, C
     assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetBreakLabel()));
 
     codeGenerator->PopEnvironment(assemblyCode);
-}
-
-void SyntaxTreeTraverser::TraverseExternStatementNode(ExternStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
-{
-    // extern keyword just adds the function to environment
-    // and writes extern IDENTIFIER in assembly code
-    // implementation is added in linking phase
-
-    std::vector<std::shared_ptr<Type>> parameterTypes;
-
-    for (ParameterDeclarationNode* parameter : *node->parameters)
-    {
-        parameterTypes.push_back(codeGenerator->GetType(parameter->type));
-    }
-
-    std::shared_ptr<Type> returnType = nullptr;
-
-    // if not void
-    if (!node->returnType.IsVoid())
-    {
-        returnType = codeGenerator->GetType(node->returnType.name);
-    }
-
-    Function* newFunction = new Function(node->identifier, parameterTypes, returnType);
-
-    codeGenerator->AddFunction(node->identifier, std::shared_ptr<Function>(newFunction));
-
-    AssemblyInstructionLine* externLine = new AssemblyInstructionLine("extern");
-    externLine->AddArgument(node->identifier);
-    assemblyCode->AddLine(externLine);
 }
 
 void SyntaxTreeTraverser::TraverseReturnNode(ReturnStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -763,6 +745,14 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
     // Create new environment for arguments
     codeGenerator->PushNewEnvironment();
 
+    std::shared_ptr<Function> function = codeGenerator->GetFunction(node->functionName);
+
+    if (function == nullptr)
+    {
+        Logger.Log("Function " + node->functionName + " does not exist", Logger::ERROR);
+        return nullptr;
+    }
+
     std::vector<std::shared_ptr<Variable>> arguments;
 
     for (AbstractExpressionNode* argument : node->arguments)
@@ -770,8 +760,6 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseCallNode(CallNode* node, 
         std::shared_ptr<Variable> argumentVariable = TraverseExpressionNode(argument, codeGenerator, assemblyCode);
         arguments.push_back(argumentVariable);
     }
-
-    std::shared_ptr<Function> function = codeGenerator->GetFunction(node->functionName);
 
     // If wrong argument type
     for (size_t i = 0; i < arguments.size(); i++)
@@ -928,4 +916,55 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseStringConstValueNode(Stri
 {
     // TODO: String const value
     return nullptr;
+}
+
+void SyntaxTreeTraverser::TraverseCompilerInstructionNode(AbstractCompilerInstructionNode* node, CodeGenerator* codeGenerator,
+                                                          AssemblyCode* assemblyCode)
+{
+    if (dynamic_cast<ExternInstructionNode*>(node) != nullptr)
+    {
+        TraverseExternInstructionNode(dynamic_cast<ExternInstructionNode*>(node), codeGenerator, assemblyCode);
+    }
+
+    if (dynamic_cast<GlobalInstructionNode*>(node) != nullptr)
+    {
+        TraverseGlobalInstructionNode(dynamic_cast<GlobalInstructionNode*>(node), codeGenerator, assemblyCode);
+    }
+}
+
+void SyntaxTreeTraverser::TraverseExternInstructionNode(ExternInstructionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+{
+    // extern keyword just adds the function to environment
+    // and writes extern IDENTIFIER in assembly code
+    // implementation is added in linking phase
+
+    std::vector<std::shared_ptr<Type>> parameterTypes;
+
+    for (ParameterDeclarationNode* parameter : *node->parameters)
+    {
+        parameterTypes.push_back(codeGenerator->GetType(parameter->type));
+    }
+
+    std::shared_ptr<Type> returnType = nullptr;
+
+    // if not void
+    if (!node->returnType.IsVoid())
+    {
+        returnType = codeGenerator->GetType(node->returnType.name);
+    }
+
+    Function* newFunction = new Function(node->identifier, parameterTypes, returnType);
+
+    codeGenerator->AddFunction(node->identifier, std::shared_ptr<Function>(newFunction));
+
+    AssemblyInstructionLine* externLine = new AssemblyInstructionLine("extern");
+    externLine->AddArgument(node->identifier);
+    assemblyCode->AddLine(externLine);
+}
+
+void SyntaxTreeTraverser::TraverseGlobalInstructionNode(GlobalInstructionNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+{
+    AssemblyInstructionLine* globalLine = new AssemblyInstructionLine("global");
+    globalLine->AddArgument(node->identifier);
+    assemblyCode->AddLine(globalLine);
 }

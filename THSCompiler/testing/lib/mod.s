@@ -1,6 +1,5 @@
-global mod
-
 section .text
+global mod
 mod:
 mov rbp, rsp
 JL2:

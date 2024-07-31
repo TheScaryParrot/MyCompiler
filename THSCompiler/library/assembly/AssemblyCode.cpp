@@ -65,9 +65,7 @@ class AssemblyCode
     {
         std::string result = "";
 
-        result += "global _start\n";
-
-        result += "\nsection .text\n";
+        result += "section .text\n";
         for (auto& line : text)
         {
             result += line->ToString() + "\n";

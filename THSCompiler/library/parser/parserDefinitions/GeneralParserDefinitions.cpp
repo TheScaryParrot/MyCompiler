@@ -2,14 +2,26 @@
 
 #include "../PredictiveParser.hpp"
 
-bool PredictiveParser::LookAhead_GlobalCode(TokenList* tokens) { return LookAhead_Declaration(tokens); }
+bool PredictiveParser::LookAhead_GlobalCode(TokenList* tokens) { return LookAhead_Declaration(tokens) || LookAhead_CompilerInstruction(tokens); }
 GlobalCodeNode* PredictiveParser::Parse_GlobalCode(TokenList* tokens)
 {
     GlobalCodeNode* globalCodeNode = new GlobalCodeNode();
 
-    while (LookAhead_Declaration(tokens))
+    while (true)
     {
-        globalCodeNode->AddDeclaration(Parse_Declaration(tokens));
+        if (LookAhead_Declaration(tokens))
+        {
+            globalCodeNode->AddLineNode(Parse_Declaration(tokens));
+            continue;
+        }
+
+        if (LookAhead_CompilerInstruction(tokens))
+        {
+            globalCodeNode->AddLineNode(Parse_CompilerInstruction(tokens));
+            continue;
+        }
+
+        break;
     }
 
     return globalCodeNode;
@@ -28,7 +40,10 @@ BodyCodeNode* PredictiveParser::Parse_BodyCode(TokenList* tokens)
     return bodyCodeNode;
 }
 
-bool PredictiveParser::LookAhead_Line(TokenList* tokens) { return LookAhead_VarDeclaration(tokens) || LookAhead_Statement(tokens); }
+bool PredictiveParser::LookAhead_Line(TokenList* tokens)
+{
+    return LookAhead_VarDeclaration(tokens) || LookAhead_Statement(tokens) || LookAhead_CompilerInstruction(tokens);
+}
 AbstractLineNode* PredictiveParser::Parse_Line(TokenList* tokens)
 {
     if (LookAhead_VarDeclaration(tokens))
@@ -36,7 +51,12 @@ AbstractLineNode* PredictiveParser::Parse_Line(TokenList* tokens)
         return Parse_VarDeclaration(tokens, true);
     }
 
-    return Parse_Statement(tokens);
+    if (LookAhead_Statement(tokens))
+    {
+        return Parse_Statement(tokens);
+    }
+
+    return Parse_CompilerInstruction(tokens);
 }
 
 bool PredictiveParser::LookAhead_TypeDefCode(TokenList* tokens) { return LookAhead_PropertyDeclaration(tokens); }

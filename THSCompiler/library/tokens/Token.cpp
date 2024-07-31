@@ -8,24 +8,14 @@
 class Token
 {
    public:
-    Token(std::string tokenName);
-    virtual ~Token();
+    Token(std::string tokenName) { this->tokenName = tokenName; }
 
-    virtual bool IsThisToken(std::shared_ptr<Token> other);
-    virtual bool IsKeyword();  // returns false
+    virtual bool IsThisToken(std::shared_ptr<Token> other) { return this->tokenName == other->tokenName; }
+    virtual bool IsInstruction() { return false; }
+    virtual bool IsCompilerInstruction() { return false; }
 
-    virtual std::string ToString();
+    virtual std::string ToString() { return tokenName; }
 
    protected:
     std::string tokenName;
 };
-
-Token::Token(std::string tokenName) { this->tokenName = tokenName; }
-
-Token::~Token() {}
-
-bool Token::IsThisToken(std::shared_ptr<Token> other) { return this->tokenName == other->tokenName; }
-
-bool Token::IsKeyword() { return false; }
-
-std::string Token::ToString() { return tokenName; }
