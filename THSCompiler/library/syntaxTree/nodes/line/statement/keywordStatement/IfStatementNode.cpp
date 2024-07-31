@@ -9,8 +9,8 @@
 class IfStatementNode : public AbstractKeywordStatementNode
 {
    public:
-    IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement,
-                    std::vector<ElifStatementNode*>* elifStatements, AbstractStatementNode* elseStatement);
+    IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement, std::vector<ElifStatementNode*> elifStatements,
+                    AbstractStatementNode* elseStatement);
     ~IfStatementNode();
 
     virtual std::string ToString() override;
@@ -18,13 +18,13 @@ class IfStatementNode : public AbstractKeywordStatementNode
     AbstractExpressionNode* expression;
     AbstractStatementNode* statement;
 
-    std::vector<ElifStatementNode*>* elifStatements;
+    std::vector<ElifStatementNode*> elifStatements;
 
     AbstractStatementNode* elseStatement;
 };
 
-IfStatementNode::IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement,
-                                 std::vector<ElifStatementNode*>* elifStatements, AbstractStatementNode* elseStatement)
+IfStatementNode::IfStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement, std::vector<ElifStatementNode*> elifStatements,
+                                 AbstractStatementNode* elseStatement)
     : AbstractKeywordStatementNode()
 {
     this->expression = expression;
@@ -38,13 +38,9 @@ IfStatementNode::~IfStatementNode()
     delete expression;
     delete statement;
 
-    if (elifStatements != nullptr)
+    for (ElifStatementNode* elifStatement : elifStatements)
     {
-        for (ElifStatementNode* elifStatement : *elifStatements)
-        {
-            delete elifStatement;
-        }
-        delete elifStatements;
+        delete elifStatement;
     }
 
     delete elseStatement;
@@ -57,12 +53,9 @@ std::string IfStatementNode::ToString()
     result += expression->ToString() + ")\n";
     result += statement->ToString();
 
-    if (elifStatements != nullptr)
+    for (ElifStatementNode* elifStatement : elifStatements)
     {
-        for (ElifStatementNode* elifStatement : *elifStatements)
-        {
-            result += elifStatement->ToString();
-        }
+        result += elifStatement->ToString();
     }
 
     if (elseStatement != nullptr)

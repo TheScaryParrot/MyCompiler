@@ -50,17 +50,21 @@ int _start(/*int argc, char argv*/)
 
     final inline int int1 = 2;
     int int2 = int1 + 64;
+    int int3 = 2;
     MyType myType3 = {int1, bool1, float1};
 
-    /*if (myType1.intProp == myType2.intProp)
+    if (int3 == int2)
     {
-        return 1;
+        _print(4, 65);
+    }
+    elif(int3 < int2)
+    {
+        _print(4, 66);
     }
     else
     {
-        myType1.intProp = myType3.intProp;
+        _print(4, 67);
     }
-    */
 
     int whileInt = 10;
 

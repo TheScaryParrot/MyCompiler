@@ -469,14 +469,7 @@ void SyntaxTreeTraverser::TraverseForStatementNode(ForStatementNode* node, CodeG
     assemblyCode->AddLine(new AssemblyLabelLine(startLabel));
 
     std::shared_ptr<Variable> condition = TraverseExpressionNode(node->condition, codeGenerator, assemblyCode);
-
-    // Set zero flag if condition is 0 by using test instruction
-    AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("test");
-    cmpLine->AddArgument(condition->location->ToAssemblyString());
-    cmpLine->AddArgument(condition->location->ToAssemblyString());
-    assemblyCode->AddLine(cmpLine);
-    // Jump if is zero
-    assemblyCode->AddLine(new AssemblyInstructionLine("jz " + codeGenerator->GetBreakLabel()));
+    codeGenerator->GenerateConditionalJump(condition->location.get(), codeGenerator->GetBreakLabel(), assemblyCode);
 
     TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
     assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
@@ -490,7 +483,51 @@ void SyntaxTreeTraverser::TraverseForStatementNode(ForStatementNode* node, CodeG
 
 void SyntaxTreeTraverser::TraverseIfStatementNode(IfStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
 {
-    // TODO: IF STATEMENT
+    std::string endLabel = AssemblyCodeGenerator.GetNewJumpLabel();
+
+    std::vector<std::string> elseLabels;
+
+    for (ElifStatementNode* elif : node->elifStatements)
+    {
+        elseLabels.push_back(AssemblyCodeGenerator.GetNewJumpLabel());
+    }
+
+    if (node->elseStatement != nullptr)
+    {
+        elseLabels.push_back(AssemblyCodeGenerator.GetNewJumpLabel());
+    }
+
+    elseLabels.push_back(endLabel);
+
+    std::shared_ptr<Variable> condition = TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
+    codeGenerator->GenerateConditionalJump(condition->location.get(), elseLabels[0], assemblyCode);
+
+    TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
+    assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + endLabel));
+
+    unsigned int elseCounter = 0;
+
+    for (ElifStatementNode* elif : node->elifStatements)
+    {
+        assemblyCode->AddLine(new AssemblyLabelLine(elseLabels[elseCounter]));
+
+        std::shared_ptr<Variable> elifCondition = TraverseExpressionNode(elif->expression, codeGenerator, assemblyCode);
+        codeGenerator->GenerateConditionalJump(elifCondition->location.get(), elseLabels[elseCounter + 1], assemblyCode);
+
+        TraverseStatementNode(elif->statement, codeGenerator, assemblyCode);
+        assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + endLabel));
+
+        elseCounter++;
+    }
+
+    if (node->elseStatement != nullptr)
+    {
+        assemblyCode->AddLine(new AssemblyLabelLine(elseLabels[elseCounter]));
+
+        TraverseStatementNode(node->elseStatement, codeGenerator, assemblyCode);
+    }
+
+    assemblyCode->AddLine(new AssemblyLabelLine(endLabel));
 }
 
 void SyntaxTreeTraverser::TraverseWhileStatementNode(WhileStatementNode* node, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
@@ -501,19 +538,10 @@ void SyntaxTreeTraverser::TraverseWhileStatementNode(WhileStatementNode* node, C
     assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
 
     std::shared_ptr<Variable> condition = TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
-
-    // Set zero flag if condition is 0 by using test instruction
-    AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("test");
-    cmpLine->AddArgument(condition->location->ToAssemblyString());
-    cmpLine->AddArgument(condition->location->ToAssemblyString());
-    assemblyCode->AddLine(cmpLine);
-    // Jump if is zero
-    assemblyCode->AddLine(new AssemblyInstructionLine("jz " + codeGenerator->GetBreakLabel()));
+    codeGenerator->GenerateConditionalJump(condition->location.get(), codeGenerator->GetBreakLabel(), assemblyCode);
 
     TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
-
     assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetContinueLabel()));
-
     assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetBreakLabel()));
 
     codeGenerator->PopEnvironment(assemblyCode);

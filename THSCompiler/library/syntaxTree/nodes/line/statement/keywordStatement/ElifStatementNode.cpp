@@ -11,13 +11,11 @@ class ElifStatementNode : public AbstractKeywordStatementNode
 
     virtual std::string ToString() override;
 
-   private:
     AbstractExpressionNode* expression;
     AbstractStatementNode* statement;
 };
 
-ElifStatementNode::ElifStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement)
-    : AbstractKeywordStatementNode()
+ElifStatementNode::ElifStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement) : AbstractKeywordStatementNode()
 {
     this->expression = expression;
     this->statement = statement;

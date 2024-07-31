@@ -57,13 +57,11 @@ IfStatementNode* PredictiveParser::Parse_IfStatement(TokenList* tokens)
 
     AbstractStatementNode* statement = Parse_Statement(tokens);
 
-    std::vector<ElifStatementNode*>* elifStatements = nullptr;
+    std::vector<ElifStatementNode*> elifStatements;
 
     while (LookAhead_ElifStatement(tokens) == true)
     {
-        if (elifStatements == nullptr) elifStatements = new std::vector<ElifStatementNode*>();
-
-        elifStatements->push_back(Parse_ElifStatement(tokens));
+        elifStatements.push_back(Parse_ElifStatement(tokens));
     }
 
     AbstractStatementNode* elseStatement = nullptr;
