@@ -45,6 +45,8 @@ int Hello2(int a, int b)
 
 int _start(/*int argc, char argv*/)
 {
+    extern void _print(int length, int value);
+
     final inline int int1 = 2;
     int int2 = int1 + 64;
     MyType myType3 = {int1, bool1, float1};
@@ -80,5 +82,7 @@ int _start(/*int argc, char argv*/)
 
     Hello(bool1, bool2);
 
-    Hello2(int1, int2);
+    _print(4, Hello2(int1, int2));
+
+
 }

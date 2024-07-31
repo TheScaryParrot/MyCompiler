@@ -46,6 +46,7 @@
 #include "../syntaxTree/nodes/line/statement/keywordStatement/BreakStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ContinueStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ElifStatementNode.cpp"
+#include "../syntaxTree/nodes/line/statement/keywordStatement/ExternStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ForStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/IfStatementNode.cpp"
 #include "../syntaxTree/nodes/line/statement/keywordStatement/ReturnStatementNode.cpp"
@@ -104,6 +105,9 @@ static class PredictiveParser
 
     bool LookAhead_FuncDeclaration(TokenList* tokens);
     FuncDeclarationNode* Parse_FuncDeclaration(TokenList* tokens);
+
+    bool LookAhead_FunctionReturnType(TokenList* tokens);
+    FunctionReturnTypeNode Parse_FunctionReturnType(TokenList* tokens);
 
     bool LookAhead_VarDeclarationAttributes(TokenList* tokens);
     VarDeclarationAttributes Parse_VarDeclarationAttributes(TokenList* tokens);
@@ -237,6 +241,9 @@ static class PredictiveParser
 
     bool LookAhead_ContinueStatement(TokenList* tokens);
     ContinueStatementNode* Parse_ContinueStatement(TokenList* tokens);
+
+    bool LookAhead_ExternStatement(TokenList* tokens);
+    ExternStatementNode* Parse_ExternStatement(TokenList* tokens);
 
 #pragma endregion
 #pragma endregion

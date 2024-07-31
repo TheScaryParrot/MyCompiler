@@ -62,17 +62,7 @@ bool PredictiveParser::LookAhead_FuncDeclaration(TokenList* tokens)
 }
 FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 {
-    FunctionReturnTypeNode returnType;
-
-    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD))
-    {
-        tokens->Next();  // Consume VOID
-        returnType = FunctionReturnTypeNode("void");
-    }
-    else
-    {
-        returnType = FunctionReturnTypeNode(tokens->Next<TokenWithValue>()->GetValue());
-    }
+    FunctionReturnTypeNode returnType = Parse_FunctionReturnType(tokens);
 
     std::string name = tokens->Next<TokenWithValue>()->GetValue();
 
@@ -85,6 +75,22 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
     BodyNode* body = Parse_Body(tokens);
 
     return new FuncDeclarationNode(returnType, name, parameters, body);
+}
+
+bool LookAhead_FunctionReturnType(TokenList* tokens)
+{
+    // VOID | ID
+    return tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD) || tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN);
+}
+FunctionReturnTypeNode PredictiveParser::Parse_FunctionReturnType(TokenList* tokens)
+{
+    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD))
+    {
+        tokens->Next();  // Consume VOID
+        return FunctionReturnTypeNode("void");
+    }
+
+    return FunctionReturnTypeNode(tokens->Next<TokenWithValue>()->GetValue());
 }
 
 bool PredictiveParser::LookAhead_VarDeclarationAttributes(TokenList* tokens)

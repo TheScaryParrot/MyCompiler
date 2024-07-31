@@ -15,4 +15,4 @@ BreakStatementNode::BreakStatementNode() : AbstractKeywordStatementNode() {}
 
 BreakStatementNode::~BreakStatementNode() {}
 
-std::string BreakStatementNode::ToString() { return "continue"; }
+std::string BreakStatementNode::ToString() { return "break"; }

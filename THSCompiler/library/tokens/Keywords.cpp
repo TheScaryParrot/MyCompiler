@@ -27,6 +27,8 @@ static class Keywords
 
     std::shared_ptr<AbstractKeywordToken> TYPEDEF_KEYWORD = std::make_shared<AbstractKeywordToken>("typedef");
 
+    std::shared_ptr<AbstractKeywordToken> EXTERN_KEYWORD = std::make_shared<AbstractKeywordToken>("extern");
+
     /// @brief Returns the token for the given keyword. If the keyword is not a keyword, returns nullptr.
     std::shared_ptr<AbstractKeywordToken> GetKeywordToken(std::string keyword);
 } Keywords;
@@ -101,6 +103,11 @@ std::shared_ptr<AbstractKeywordToken> Keywords::GetKeywordToken(std::string keyw
     if (TYPEDEF_KEYWORD->IsThisKeyword(keyword))
     {
         return TYPEDEF_KEYWORD;
+    }
+
+    if (EXTERN_KEYWORD->IsThisKeyword(keyword))
+    {
+        return EXTERN_KEYWORD;
     }
 
     return nullptr;

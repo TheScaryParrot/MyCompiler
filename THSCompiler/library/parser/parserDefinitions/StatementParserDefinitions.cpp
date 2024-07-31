@@ -28,7 +28,7 @@ AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 bool PredictiveParser::LookAhead_KeywordStatement(TokenList* tokens)
 {
     return LookAhead_IfStatement(tokens) || LookAhead_ReturnStatement(tokens) || LookAhead_WhileStatement(tokens) || LookAhead_ForStatement(tokens) ||
-           LookAhead_BreakStatement(tokens) || LookAhead_ContinueStatement(tokens);
+           LookAhead_BreakStatement(tokens) || LookAhead_ContinueStatement(tokens) || LookAhead_ExternStatement(tokens);
 }
 AbstractKeywordStatementNode* PredictiveParser::Parse_KeywordStatement(TokenList* tokens)
 {
@@ -39,8 +39,11 @@ AbstractKeywordStatementNode* PredictiveParser::Parse_KeywordStatement(TokenList
     if (token->IsThisToken(Keywords.WHILE_KEYWORD)) return Parse_WhileStatement(tokens);
     if (token->IsThisToken(Keywords.FOR_KEYWORD)) return Parse_ForStatement(tokens);
     if (token->IsThisToken(Keywords.BREAK_KEYWORD)) return Parse_BreakStatement(tokens);
+    if (token->IsThisToken(Keywords.CONTINUE_KEYWORD)) return Parse_ContinueStatement(tokens);
+    if (token->IsThisToken(Keywords.EXTERN_KEYWORD)) return Parse_ExternStatement(tokens);
 
-    return Parse_ContinueStatement(tokens);
+    Logger.Log("Unknown keyword statement: " + token->ToString(), Logger::ERROR);
+    return nullptr;
 }
 
 bool PredictiveParser::LookAhead_IfStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.IF_KEYWORD); }
@@ -158,4 +161,21 @@ ContinueStatementNode* PredictiveParser::Parse_ContinueStatement(TokenList* toke
 {
     tokens->Next();  // Consume STATEMENT_END_TOKEN
     return new ContinueStatementNode();
+}
+
+bool PredictiveParser::LookAhead_ExternStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.EXTERN_KEYWORD); }
+ExternStatementNode* PredictiveParser::Parse_ExternStatement(TokenList* tokens)
+{
+    FunctionReturnTypeNode returnType = Parse_FunctionReturnType(tokens);
+
+    std::string identifier = tokens->Next<TokenWithValue>()->GetValue();
+
+    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
+
+    std::vector<ParameterDeclarationNode*>* parameters = Parse_Params(tokens);
+
+    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
+    tokens->Next();  // Consume STATEMENT_END_TOKEN
+
+    return new ExternStatementNode(returnType, identifier, parameters);
 }

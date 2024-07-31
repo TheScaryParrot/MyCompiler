@@ -39,6 +39,7 @@ mov rsp, rbp
 ret 
 _start:
 mov rbp, rsp
+extern _print
 sub rsp, 4
 mov dword [rbp-4], 66
 sub rsp, 9
@@ -76,15 +77,6 @@ setl al
 movzx eax, al
 test eax, eax
 jz JL3 
-
-
-; print test message
-mov rax, 1
-mov rdi, 1
-mov rsi, testmessage
-mov rdx, testlength
-syscall
-
 add dword [rbp-30], __float32__(1.000000)
 JL4:
 add dword [rbp-34], 2
@@ -119,7 +111,16 @@ add rsp, 8
 sub rsp, 4
 mov eax, dword [rax]
 mov dword [rbp-39], eax
-add rsp, 39
+sub rsp, 4
+mov eax, dword [rbp-39]
+mov dword [rbp-43], eax
+sub rsp, 4
+mov dword [rbp-47], 4
+push rbp
+call _print
+pop rbp
+add rsp, 12
+add rsp, 35
 mov eax, 60
 xor edi, edi
 syscall 
@@ -131,9 +132,6 @@ float3: resb 4
 
 section .data
 bool2: db 0
-
-testmessage: db "Hello, World!", 0
-testlength: equ $-testmessage
 
 section .rodata
 bool1: db 1
