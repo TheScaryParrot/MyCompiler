@@ -469,7 +469,7 @@ void SyntaxTreeTraverser::TraverseForStatementNode(ForStatementNode* node, CodeG
     assemblyCode->AddLine(new AssemblyLabelLine(startLabel));
 
     std::shared_ptr<Variable> condition = TraverseExpressionNode(node->condition, codeGenerator, assemblyCode);
-    codeGenerator->GenerateConditionalJump(condition->location.get(), codeGenerator->GetBreakLabel(), assemblyCode);
+    codeGenerator->GenerateConditionalJump(condition, codeGenerator->GetBreakLabel(), assemblyCode);
 
     TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
     assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
@@ -500,7 +500,7 @@ void SyntaxTreeTraverser::TraverseIfStatementNode(IfStatementNode* node, CodeGen
     elseLabels.push_back(endLabel);
 
     std::shared_ptr<Variable> condition = TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
-    codeGenerator->GenerateConditionalJump(condition->location.get(), elseLabels[0], assemblyCode);
+    codeGenerator->GenerateConditionalJump(condition, elseLabels[0], assemblyCode);
 
     TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
     assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + endLabel));
@@ -512,7 +512,7 @@ void SyntaxTreeTraverser::TraverseIfStatementNode(IfStatementNode* node, CodeGen
         assemblyCode->AddLine(new AssemblyLabelLine(elseLabels[elseCounter]));
 
         std::shared_ptr<Variable> elifCondition = TraverseExpressionNode(elif->expression, codeGenerator, assemblyCode);
-        codeGenerator->GenerateConditionalJump(elifCondition->location.get(), elseLabels[elseCounter + 1], assemblyCode);
+        codeGenerator->GenerateConditionalJump(elifCondition, elseLabels[elseCounter + 1], assemblyCode);
 
         TraverseStatementNode(elif->statement, codeGenerator, assemblyCode);
         assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + endLabel));
@@ -538,7 +538,7 @@ void SyntaxTreeTraverser::TraverseWhileStatementNode(WhileStatementNode* node, C
     assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
 
     std::shared_ptr<Variable> condition = TraverseExpressionNode(node->expression, codeGenerator, assemblyCode);
-    codeGenerator->GenerateConditionalJump(condition->location.get(), codeGenerator->GetBreakLabel(), assemblyCode);
+    codeGenerator->GenerateConditionalJump(condition, codeGenerator->GetBreakLabel(), assemblyCode);
 
     TraverseStatementNode(node->statement, codeGenerator, assemblyCode);
     assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetContinueLabel()));

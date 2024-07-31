@@ -240,12 +240,20 @@ class CodeGenerator
         environmentLinkedList.AddJumpLabel("continue", AssemblyCodeGenerator.GetNewJumpLabel());
     }
 
-    void GenerateConditionalJump(IVariableLocation* conditionLocation, std::string jumpIfFalseLabel, AssemblyCode* assemblyCode)
+    void GenerateConditionalJump(std::shared_ptr<Variable> condition, std::string jumpIfFalseLabel, AssemblyCode* assemblyCode)
     {
         // Set zero flag if condition is 0 by using test instruction
         AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("test");
-        cmpLine->AddArgument(conditionLocation->ToAssemblyString());
-        cmpLine->AddArgument(conditionLocation->ToAssemblyString());
+        IVariableLocation* secondLocation = condition->location.get();
+
+        if (condition->location->RequiresRegister())
+        {
+            secondLocation = AssemblyCodeGenerator.GetNewRegistryVarLocation(condition->type->GetSize(), assemblyCode);
+            condition->type->GenerateAssign(secondLocation, condition->location.get(), assemblyCode);
+        }
+
+        cmpLine->AddArgument(condition->location->ToAssemblyString());
+        cmpLine->AddArgument(secondLocation->ToAssemblyString());
         assemblyCode->AddLine(cmpLine);
         // Jump if is zero
         assemblyCode->AddLine(new AssemblyInstructionLine("jz " + jumpIfFalseLabel));

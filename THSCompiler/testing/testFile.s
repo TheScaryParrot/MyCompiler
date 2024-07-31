@@ -21,20 +21,6 @@ mov rsp, rbp
 ret 
 Hello2:
 mov rbp, rsp
-mov eax, dword [rbp+16]
-cmp eax, dword [rbp+20]
-sete al
-movzx eax, al
-test eax, eax
-jz JL1 
-mov rsp, rbp
-mov eax, 65
-mov dword [rbp-4], eax
-mov rax, rbp
-sub rax, 4
-ret 
-jmp JL1 
-JL1:
 sub rsp, 4
 mov eax, dword [rbp+16]
 mov dword [rbp-4], eax
@@ -80,21 +66,7 @@ cmp eax, dword [rbp-4]
 sete al
 movzx eax, al
 test eax, eax
-jz JL3 
-mov rsp, rbp
-mov eax, 1
-mov dword [rbp-4], eax
-mov rax, rbp
-sub rax, 4
-ret 
-jmp JL2 
-JL3:
-mov eax, dword [rbp-8]
-cmp eax, dword [rbp-4]
-setl al
-movzx eax, al
-test eax, eax
-jz JL4 
+jz JL2 
 sub rsp, 4
 mov eax, 65
 mov dword [rbp-30], eax
@@ -105,8 +77,14 @@ push rbp
 call _print
 pop rbp
 add rsp, 8
-jmp JL2 
-JL4:
+jmp JL1 
+JL2:
+mov eax, dword [rbp-8]
+cmp eax, dword [rbp-4]
+setl al
+movzx eax, al
+test eax, eax
+jz JL3 
 sub rsp, 4
 mov eax, 66
 mov dword [rbp-30], eax
@@ -117,41 +95,53 @@ push rbp
 call _print
 pop rbp
 add rsp, 8
-JL2:
+jmp JL1 
+JL3:
+sub rsp, 4
+mov eax, 67
+mov dword [rbp-30], eax
+sub rsp, 4
+mov eax, 4
+mov dword [rbp-34], eax
+push rbp
+call _print
+pop rbp
+add rsp, 8
+JL1:
 sub rsp, 4
 mov eax, 10
 mov dword [rbp-30], eax
-JL6:
+JL5:
 mov eax, dword [rbp-30]
 cmp eax, 0
 setg al
 movzx eax, al
 test eax, eax
-jz JL5 
+jz JL4 
 mov eax, 1
 sub dword [rbp-30], eax
-jmp JL6 
-JL5:
+jmp JL5 
+JL4:
 sub rsp, 4
 mov eax, __float32__(3.000000)
 mov dword [rbp-34], eax
 sub rsp, 4
 mov eax, 0
 mov dword [rbp-38], eax
-JL9:
+JL8:
 mov eax, dword [rbp-38]
 cmp eax, 10
 setl al
 movzx eax, al
 test eax, eax
-jz JL7 
+jz JL6 
 mov eax, __float32__(1.000000)
 add dword [rbp-34], eax
-JL8:
+JL7:
 mov eax, 2
 add dword [rbp-38], eax
-jmp JL9 
-JL7:
+jmp JL8 
+JL6:
 add rsp, 4
 sub rsp, 4
 mov eax, dword [rbp-31]
@@ -182,7 +172,7 @@ call _print
 pop rbp
 add rsp, 8
 sub rsp, 4
-mov eax, 2
+mov eax, dword [rbp-4]
 mov dword [rbp-46], eax
 sub rsp, 4
 mov eax, 2
