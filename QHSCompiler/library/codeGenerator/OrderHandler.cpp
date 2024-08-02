@@ -12,18 +12,51 @@
 class OrderHandler
 {
    public:
-    OrderHandler();
-    OrderHandler(InputFile* file);
+    OrderHandler() = default;
+    OrderHandler(InputFile* file) { this->file = file; }
 
-    Order GetCurrentOrder();
+    Order GetCurrentOrder() { return currentOrder; }
 
     /// @brief Advances next order; order can be retrieved from GetCurrentOrder()
-    void NextOrder();
+    void NextOrder()
+    {
+        if (stackedOrderQueues.IsEmpty())
+        {
+            currentOrder = scanner.ScanOrder(file);
+            return;
+        }
 
-    void PutInFront(Order order);
-    void PutInFront(OrderQueue queue);
+        OrderQueue* queue = stackedOrderQueues.Top();
+        Order order = queue->Dequeue();
 
-    bool IsDone();
+        if (queue->IsEmpty())
+        {
+            delete stackedOrderQueues.Pop();
+        }
+
+        currentOrder = order;
+    }
+
+    void PutInFront(Order order)
+    {
+        OrderQueue* newQueue = new OrderQueue();
+        newQueue->Enqueue(order);
+
+        stackedOrderQueues.Push(newQueue);
+    }
+    void PutInFront(OrderQueue queue)
+    {
+        if (queue.IsEmpty())
+        {
+            return;
+        }
+
+        OrderQueue* newQueue = new OrderQueue(queue);
+
+        stackedOrderQueues.Push(newQueue);
+    }
+
+    bool IsDone() { return stackedOrderQueues.IsEmpty() && file->IsEndOfFile(); }
 
    private:
     Order currentOrder = Order::Empty();
@@ -33,55 +66,3 @@ class OrderHandler
 
     Stack<OrderQueue*> stackedOrderQueues;
 };
-
-OrderHandler::OrderHandler() {}
-
-OrderHandler::OrderHandler(InputFile* file)
-{
-    this->file = file;
-    this->scanner = Scanner();
-    this->stackedOrderQueues = Stack<OrderQueue*>();
-}
-
-Order OrderHandler::GetCurrentOrder() { return currentOrder; }
-
-void OrderHandler::NextOrder()
-{
-    if (stackedOrderQueues.IsEmpty())
-    {
-        currentOrder = scanner.ScanOrder(file);
-        return;
-    }
-
-    OrderQueue* queue = stackedOrderQueues.Top();
-    Order order = queue->Dequeue();
-
-    if (queue->IsEmpty())
-    {
-        delete stackedOrderQueues.Pop();
-    }
-
-    currentOrder = order;
-}
-
-void OrderHandler::PutInFront(Order order)
-{
-    OrderQueue* newQueue = new OrderQueue();
-    newQueue->Enqueue(order);
-
-    stackedOrderQueues.Push(newQueue);
-}
-
-void OrderHandler::PutInFront(OrderQueue queue)
-{
-    if (queue.IsEmpty())
-    {
-        return;
-    }
-
-    OrderQueue* newQueue = new OrderQueue(queue);
-
-    stackedOrderQueues.Push(newQueue);
-}
-
-bool OrderHandler::IsDone() { return stackedOrderQueues.IsEmpty() && file->IsEndOfFile(); }
