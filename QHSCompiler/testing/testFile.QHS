@@ -40,7 +40,7 @@
 #assignNextIdentifier
 ]
 
-[ ] [ ]
+
 
 #pushNewOrderQueue
 #enterOrderQueue
@@ -55,7 +55,7 @@
 #makeNextOrderOrderQueueProof {
 
 
-[ ] [ ]
+
 
 #pushNewOrderQueue
 #enterOrderQueue
@@ -68,38 +68,38 @@
 
 #makeNextOrderOrderQueueProof }
 
-[ ] [ ] { #assignNextIdentifierToOneOrder } #assignNextIdentifier ->
-[ ] [ ] { #assignNextIdentifier } #assignNextIdentifier >>
+{ #assignNextIdentifierToOneOrder } #assignNextIdentifier ->
+{ #assignNextIdentifier } #assignNextIdentifier >>
 
-[ ] [ ] { #pushNextOrderToOrderQueue #enterOrderQueue } >> (
+{ #pushNextOrderToOrderQueue #enterOrderQueue } >> (
 #makeNextOrderOrderQueueProof (
-[ ] [ ] { #pushNextOrderToOrderQueue #exitOrderQueue } >> )
+{ #pushNextOrderToOrderQueue #exitOrderQueue } >> )
 #makeNextOrderOrderQueueProof )
 
 
-[ ] [ ] { #enterComment } >> /*
-[ ] [ ] { #exitComment } >> */
+{ #enterComment } >> /*
+{ #exitComment } >> */
 #makeNextOrderCommentProof */
 
-[ ] [ ] { "
+{ "
 " #clearOrderQueue }  >> ;
 
-[ ] [ ] { #debug } >> debug ;
+{ #debug } >> debug ;
 
 /*
 debug
 debug */
 
 
-[ ] [ ] { #putInFrontFromOrderQueue } >> $ ;
+{ #putInFrontFromOrderQueue } >> $ ;
 
 
 /* swapping */
 
 
-[ ] [ ] 
+
 { 
-    [ ] [ ] -> second
+    -> second
     ( second )
 } >> swap ;
 
@@ -107,24 +107,26 @@ debug */
 
 $ $ */
 
-[ ] [ ] {
+{
 "global _start
-
-section .text
-
 _start:
-"} >> startCode ;
+mov rbp, rsp
+"} >> start ;
 
-[ ] [ ] { "section .rodata" } >> rodata ;
+{ "section .rodata" } >> rodata ;
+{ "section .data" } >> data ;
+{ "section .bss" } >> bss ;
 
-[ ] [ ] { "mov rax, 60
+{ "section .text" } >> text ;
+
+{ "mov rax, 60
 mov rdi, 0
 syscall " } >> exit ;
 
-[ ] [ ]
+
 {
-    [ ] [ ] -> message
-    [ ] [ ] -> messageLength
+    -> message
+    -> messageLength
     "mov rax, 1
 mov rdi, 1
 mov rsi, " message
@@ -132,30 +134,84 @@ mov rsi, " message
 mov rdx, " messageLength
 "
 syscall"
+} >> rawPrint ;
+
+{
+    -> message
+    -> length
+
+    "sub rsp, " length ;
+    "mov rax, " message ;
+    "mov [rsp], rax" ;
+
+    ( "rsp " length ) rawPrint ;
+
+    "add rsp, " length ;
 } >> print ;
 
-[ ] [ ] 
 {
-    [ ] [ ] -> name
-    [ ] [ ] -> assignCode
+    print ;
+
+    ( "0xa" "1" ) print ;
+
+} >> println ;
+
+{
+    -> name
+    #makeNextOrderOrderQueueProof name /* make order queue proof so that it is resolved in { name } */
+
+    -> assignCode
     name ": " assignCode ;
-} >> globalVar
+    { name } >>
+} >> roDataVar 
+
+/* local var */
+{
+    -> value
+    -> size
+    -> newLocalVarOffset
+    #makeNextOrderOrderQueueProof newLocalVarOffset
+
+    "sub rsp, " size ;
+    "mov rax, " value ;
+    { "[rbp-" newLocalVarOffset "]" } >> address ;
+    #makeNextOrderOrderQueueProof address ;
+    "mov " address ", rax" ;
+
+    { address } >>
+} >> localVar ;
+
+{ "4" } >> int ;
+{ "1" } >> bool ;
 
 /* actually coding */
 
 rodata ;
 
-[ ] [ ] { "wordToGuess" } >> wordToGuess ;
-( wordToGuess "db 'moin', 0xa" ) globalVar ;
+( "wordToGuess" "db 'moin', 0xa" ) roDataVar wordToGuess ;
 
-[ ] [ ] { "wordLength" } >> wordLength ;
-( wordLength "equ $ - wordToGuess" ) globalVar ;
+( "wordLength" "equ $ - wordToGuess" ) roDataVar wordLength ;
+
+data ;
+
+bss ;
+
+text ;
+start ;
+
+( wordToGuess wordLength ) rawPrint ;
+
+{ ( wordToGuess wordLength ) rawPrint ; } >> printWord ;
+
+printWord ;
 
 
-startCode ;
+( "65" int "4" ) localVar num ;
 
-( wordToGuess wordLength ) print ;
+( num "4" ) println ;
 
 
 exit ;
+
+
 
