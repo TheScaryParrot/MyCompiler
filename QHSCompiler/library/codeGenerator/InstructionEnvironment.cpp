@@ -7,200 +7,196 @@
 class InstructionEnvironment : private Environment
 {
    public:
-    InstructionEnvironment();
+    InstructionEnvironment()
+    {
+        this->AddCallable("enterComment", new Callable([](ICodeGenerator* generator)
+                                                       { generator->PushMode(ICodeGenerator::EModes::COMMENT); }));
 
-    void ExecuteInstruction(std::string name, ICodeGenerator* codeGenerator);
-    Callable* GetInstruction(std::string name);
-};
-
-InstructionEnvironment::InstructionEnvironment()
-{
-    this->AddCallable("enterComment", new Callable([](ICodeGenerator* generator)
-                                                   { generator->PushMode(ICodeGenerator::EModes::COMMENT); }));
-
-    this->AddCallable("exitComment", new Callable(
-                                         [](ICodeGenerator* generator)
-                                         {
-                                             if (!generator->IsInMode(ICodeGenerator::EModes::COMMENT))
-                                             {
-                                                 Logger.Log("Trying to exit comment mode while not in comment mode",
-                                                            Logger::ERROR);
-                                                 return;
-                                             }
-                                             generator->PopMode();
-                                         }));
-
-    this->AddCallable("enterOrderQueue", new Callable(
+        this->AddCallable("exitComment", new Callable(
                                              [](ICodeGenerator* generator)
                                              {
-                                                 Logger.Log("Entering order queue mode", Logger::DEBUG);
-
-                                                 // If is already in OrderQueue Mode, push the current order
-                                                 // (enterOrderQueue)
-                                                 if (generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
+                                                 if (!generator->IsInMode(ICodeGenerator::EModes::COMMENT))
                                                  {
-                                                     generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
+                                                     Logger.Log("Trying to exit comment mode while not in comment mode",
+                                                                Logger::ERROR);
+                                                     return;
                                                  }
-
-                                                 generator->IncrementOrderQueueDepth();
+                                                 generator->PopMode();
                                              }));
 
-    this->AddCallable("exitOrderQueue", new Callable(
-                                            [](ICodeGenerator* generator)
-                                            {
-                                                Logger.Log("Exiting order queue mode", Logger::DEBUG);
+        this->AddCallable("enterOrderQueue", new Callable(
+                                                 [](ICodeGenerator* generator)
+                                                 {
+                                                     Logger.Log("Entering order queue mode", Logger::DEBUG);
 
-                                                generator->DecrementOrderQueueDepth();
+                                                     // If is already in OrderQueue Mode, push the current order
+                                                     // (enterOrderQueue)
+                                                     if (generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
+                                                     {
+                                                         generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
+                                                     }
 
-                                                // If is still in OrderQueue Mode, push the current orQueue //
-                                                // (exitOrderStack) to the order queue
-                                                if (generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
+                                                     generator->IncrementOrderQueueDepth();
+                                                 }));
+
+        this->AddCallable("exitOrderQueue", new Callable(
+                                                [](ICodeGenerator* generator)
                                                 {
-                                                    generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
-                                                }
-                                            }));
+                                                    Logger.Log("Exiting order queue mode", Logger::DEBUG);
 
-    this->AddCallable("pushNewOrderQueue",
-                      new Callable([](ICodeGenerator* generator) { generator->PushNewOrderQueue(); }));
+                                                    generator->DecrementOrderQueueDepth();
 
-    this->AddCallable(
-        "pushNextOrderToOrderQueue",
-        new Callable([](ICodeGenerator* generator) { generator->EnqueueInOrderQueue(generator->GetNextOrder()); }));
+                                                    // If is still in OrderQueue Mode, push the current orQueue //
+                                                    // (exitOrderStack) to the order queue
+                                                    if (generator->IsInMode(ICodeGenerator::EModes::ORDER_QUEUE))
+                                                    {
+                                                        generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
+                                                    }
+                                                }));
 
-    this->AddCallable("clearOrderQueue", new Callable([](ICodeGenerator* generator) { generator->ClearOrderQueue(); }));
+        this->AddCallable("pushNewOrderQueue",
+                          new Callable([](ICodeGenerator* generator) { generator->PushNewOrderQueue(); }));
 
-    this->AddCallable("putInFrontFromOrderQueue", new Callable(
-                                                      [](ICodeGenerator* generator)
-                                                      {
-                                                          Logger.Log("Executing from order queue", Logger::DEBUG);
-                                                          generator->PutInFrontFromOrderQueue();
-                                                      }));
+        this->AddCallable(
+            "pushNextOrderToOrderQueue",
+            new Callable([](ICodeGenerator* generator) { generator->EnqueueInOrderQueue(generator->GetNextOrder()); }));
 
-    this->AddCallable("enterTypeStack", new Callable(
-                                            [](ICodeGenerator* generator)
-                                            {
-                                                Logger.Log(
-                                                    "Type stack is depricated: #enterTypeStack should not be used",
-                                                    Logger::WARNING);
-                                                // generator->NewTypeStack();
-                                                // generator->PushMode(ICodeGenerator::EModes::TYPE_STACK);
-                                            }));
+        this->AddCallable("clearOrderQueue",
+                          new Callable([](ICodeGenerator* generator) { generator->ClearOrderQueue(); }));
 
-    this->AddCallable("exitTypeStack", new Callable(
-                                           [](ICodeGenerator* generator)
-                                           {
-                                               /*if (!generator->IsInMode(ICodeGenerator::EModes::TYPE_STACK))
+        this->AddCallable("putInFrontFromOrderQueue", new Callable(
+                                                          [](ICodeGenerator* generator)
+                                                          {
+                                                              Logger.Log("Executing from order queue", Logger::DEBUG);
+                                                              generator->PutInFrontFromOrderQueue();
+                                                          }));
+
+        this->AddCallable("enterTypeStack", new Callable(
+                                                [](ICodeGenerator* generator)
+                                                {
+                                                    Logger.Log(
+                                                        "Type stack is depricated: #enterTypeStack should not be used",
+                                                        Logger::WARNING);
+                                                    // generator->NewTypeStack();
+                                                    // generator->PushMode(ICodeGenerator::EModes::TYPE_STACK);
+                                                }));
+
+        this->AddCallable("exitTypeStack", new Callable(
+                                               [](ICodeGenerator* generator)
                                                {
+                                                   /*if (!generator->IsInMode(ICodeGenerator::EModes::TYPE_STACK))
+                                                   {
+                                                       Logger.Log(
+                                                           "Trying to exit type stack mode while not in type stack
+                                                   mode", Logger::ERROR); return;
+                                                   }*/
+
                                                    Logger.Log(
-                                                       "Trying to exit type stack mode while not in type stack mode",
-                                                       Logger::ERROR);
-                                                   return;
-                                               }*/
+                                                       "Type stack is depricated: #exitTypeStack should not be used",
+                                                       Logger::DEBUG);
 
-                                               Logger.Log("Type stack is depricated: #exitTypeStack should not be used",
-                                                          Logger::DEBUG);
+                                                   // generator->PopMode();
+                                               }));
 
-                                               // generator->PopMode();
-                                           }));
-
-    this->AddCallable(
-        "assignNextIdentifier",
-        new Callable(
-            [](ICodeGenerator* generator)
-            {
-                Order nextOrder = generator->GetNextOrder();
-
-                if (nextOrder.GetType() != Order::EOrderTypes::Identifier)
+        this->AddCallable(
+            "assignNextIdentifier",
+            new Callable(
+                [](ICodeGenerator* generator)
                 {
-                    Logger.Log("Tried assigning next identifier but next order is not identifier . Skipping assign",
-                               Logger::ERROR);
+                    Order nextOrder = generator->GetNextOrder();
 
-                    return;
-                }
+                    if (nextOrder.GetType() != Order::EOrderTypes::Identifier)
+                    {
+                        Logger.Log("Tried assigning next identifier but next order is not identifier . Skipping assign",
+                                   Logger::ERROR);
 
-                Logger.Log("Assigning next order '" + nextOrder.ToString() + "'", Logger::DEBUG);
+                        return;
+                    }
 
-                OrderQueue* code = generator->PopOrderQueue();
+                    Logger.Log("Assigning next order '" + nextOrder.ToString() + "'", Logger::DEBUG);
 
-                Identifier* callable = new Identifier(*code);
+                    OrderQueue* code = generator->PopOrderQueue();
 
-                generator->AddIdentifier(nextOrder.GetName(), callable);
-            }));
+                    Identifier* callable = new Identifier(*code);
 
-    this->AddCallable(
-        "assignNextIdentifierToOneOrder",
-        new Callable(
-            [](ICodeGenerator* generator)
-            {
-                Order nextOrder = generator->GetNextOrder();
+                    generator->AddIdentifier(nextOrder.GetName(), callable);
+                }));
 
-                if (nextOrder.GetType() != Order::EOrderTypes::Identifier)
+        this->AddCallable(
+            "assignNextIdentifierToOneOrder",
+            new Callable(
+                [](ICodeGenerator* generator)
                 {
-                    Logger.Log("Tried assigning next identifier but next order is not identifier . Skipping assign",
-                               Logger::ERROR);
+                    Order nextOrder = generator->GetNextOrder();
 
-                    return;
-                }
+                    if (nextOrder.GetType() != Order::EOrderTypes::Identifier)
+                    {
+                        Logger.Log("Tried assigning next identifier but next order is not identifier . Skipping assign",
+                                   Logger::ERROR);
 
-                Logger.Log("Assigning next order '" + nextOrder.ToString() + "'", Logger::DEBUG);
+                        return;
+                    }
 
-                OrderQueue code = OrderQueue();
-                code.Enqueue(generator->DequeueFromOrderQueue());
+                    Logger.Log("Assigning next order '" + nextOrder.ToString() + "'", Logger::DEBUG);
 
-                Identifier* callable = new Identifier(code);
+                    OrderQueue code = OrderQueue();
+                    code.Enqueue(generator->DequeueFromOrderQueue());
 
-                generator->AddIdentifier(nextOrder.GetName(), callable);
-            }));
+                    Identifier* callable = new Identifier(code);
 
-    this->AddCallable("makeNextOrderOrderQueueProof",
-                      new Callable(
-                          [](ICodeGenerator* generator)
-                          {
-                              Order nextOrder = generator->GetNextOrder();
+                    generator->AddIdentifier(nextOrder.GetName(), callable);
+                }));
 
-                              Logger.Log("Making next identifier order queue proof '" + nextOrder.ToString() + "'",
-                                         Logger::DEBUG);
+        this->AddCallable("makeNextOrderOrderQueueProof",
+                          new Callable(
+                              [](ICodeGenerator* generator)
+                              {
+                                  Order nextOrder = generator->GetNextOrder();
 
-                              Callable* callable = generator->GetCallable(nextOrder);
+                                  Logger.Log("Making next identifier order queue proof '" + nextOrder.ToString() + "'",
+                                             Logger::DEBUG);
 
-                              callable->SetCodeStackProof(true);
-                          }));
+                                  Callable* callable = generator->GetCallable(nextOrder);
 
-    this->AddCallable("makeNextOrderCommentProof",
-                      new Callable(
-                          [](ICodeGenerator* generator)
-                          {
-                              Order nextOrder = generator->GetNextOrder();
+                                  callable->SetCodeStackProof(true);
+                              }));
 
-                              Logger.Log("Making next identifier comment proof '" + nextOrder.ToString() + "'",
-                                         Logger::DEBUG);
+        this->AddCallable("makeNextOrderCommentProof",
+                          new Callable(
+                              [](ICodeGenerator* generator)
+                              {
+                                  Order nextOrder = generator->GetNextOrder();
 
-                              Callable* callable = generator->GetCallable(nextOrder);
+                                  Logger.Log("Making next identifier comment proof '" + nextOrder.ToString() + "'",
+                                             Logger::DEBUG);
 
-                              callable->SetCommentProof(true);
-                          }));
+                                  Callable* callable = generator->GetCallable(nextOrder);
 
-    this->AddCallable("debug",
-                      new Callable([](ICodeGenerator* generator) { Logger.Log("DEBUG PRINT", Logger::INFO); }));
+                                  callable->SetCommentProof(true);
+                              }));
 
-    this->AddCallable("debugStatus",
-                      new Callable(
-                          [](ICodeGenerator* generator)
-                          {
-                              Logger.Log("---DEBUG STATUS", Logger::DEBUG);
-                              Logger.Log("---Current order: " + generator->GetCurrentOrder().ToString(), Logger::DEBUG);
-                              Logger.Log("---Next order: " + generator->GetNextOrder().ToString(), Logger::DEBUG);
-                              Logger.Log("---Current mode: " + std::to_string(generator->GetCurrentMode()),
-                                         Logger::DEBUG);
-                          }));
+        this->AddCallable("debug",
+                          new Callable([](ICodeGenerator* generator) { Logger.Log("DEBUG PRINT", Logger::INFO); }));
 
-    this->AddCallable("activateDebugMode", new Callable([](ICodeGenerator* generator) { Logger.SetDebug(true); }));
-    this->AddCallable("deactivateDebugMode", new Callable([](ICodeGenerator* generator) { Logger.SetDebug(false); }));
+        this->AddCallable(
+            "debugStatus",
+            new Callable(
+                [](ICodeGenerator* generator)
+                {
+                    Logger.Log("---DEBUG STATUS", Logger::DEBUG);
+                    Logger.Log("---Current order: " + generator->GetCurrentOrder().ToString(), Logger::DEBUG);
+                    Logger.Log("---Next order: " + generator->GetNextOrder().ToString(), Logger::DEBUG);
+                    Logger.Log("---Current mode: " + std::to_string(generator->GetCurrentMode()), Logger::DEBUG);
+                }));
+
+        this->AddCallable("activateDebugMode", new Callable([](ICodeGenerator* generator) { Logger.SetDebug(true); }));
+        this->AddCallable("deactivateDebugMode",
+                          new Callable([](ICodeGenerator* generator) { Logger.SetDebug(false); }));
+    };
+
+    void ExecuteInstruction(std::string name, ICodeGenerator* codeGenerator)
+    {
+        this->ExecuteCallable(name, codeGenerator);
+    }
+    Callable* GetInstruction(std::string name) { return this->GetCallable(name); }
 };
-
-void InstructionEnvironment::ExecuteInstruction(std::string name, ICodeGenerator* codeGenerator)
-{
-    this->ExecuteCallable(name, codeGenerator);
-}
-
-Callable* InstructionEnvironment::GetInstruction(std::string name) { return this->GetCallable(name); }
