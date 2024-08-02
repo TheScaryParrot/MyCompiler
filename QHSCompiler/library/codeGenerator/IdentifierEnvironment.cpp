@@ -6,19 +6,7 @@
 class IdentifierEnvironment : Environment
 {
    public:
-    void AddIdentifier(std::string name, Identifier* identifier);
-    Identifier* GetIdentifier(std::string name);
-    void ExecuteIdentifier(std::string name, ICodeGenerator* codeGenerator);
+    void AddIdentifier(std::string name, Identifier* identifier) { this->AddCallable(name, identifier); }
+    Identifier* GetIdentifier(std::string name) { return (Identifier*)this->GetCallable(name); }
+    void ExecuteIdentifier(std::string name, ICodeGenerator* codeGenerator) { ExecuteCallable(name, codeGenerator); }
 };
-
-void IdentifierEnvironment::AddIdentifier(std::string name, Identifier* identifier)
-{
-    this->AddCallable(name, identifier);
-}
-
-Identifier* IdentifierEnvironment::GetIdentifier(std::string name) { return (Identifier*)this->GetCallable(name); }
-
-void IdentifierEnvironment::ExecuteIdentifier(std::string name, ICodeGenerator* codeGenerator)
-{
-    this->ExecuteCallable(name, codeGenerator);
-}

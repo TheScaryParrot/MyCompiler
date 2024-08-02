@@ -6,32 +6,22 @@
 class OrderQueueStackHandler
 {
    public:
-    void PushNewOrderQueue();
-    void EnqueueOrder(Order order);
+    void PushNewOrderQueue() { orderQueueStack.Push(new OrderQueue()); }
+    void EnqueueOrder(Order order)
+    {
+        if (orderQueueStack.IsEmpty())
+        {
+            PushNewOrderQueue();
+        }
 
-    Order DequeueOrder();
-    OrderQueue* PopOrderQueue();
+        orderQueueStack.Top()->Enqueue(order);
+    }
 
-    void ClearAllOrderQueues();
+    Order DequeueOrder() { return orderQueueStack.Top()->Dequeue(); }
+    OrderQueue* PopOrderQueue() { return orderQueueStack.Pop(); }
+
+    void ClearAllOrderQueues() { orderQueueStack = Stack<OrderQueue*>(); }
 
    private:
     Stack<OrderQueue*> orderQueueStack = Stack<OrderQueue*>();
 };
-
-void OrderQueueStackHandler::PushNewOrderQueue() { orderQueueStack.Push(new OrderQueue()); }
-
-void OrderQueueStackHandler::EnqueueOrder(Order order)
-{
-    if (orderQueueStack.IsEmpty())
-    {
-        PushNewOrderQueue();
-    }
-
-    orderQueueStack.Top()->Enqueue(order);
-}
-
-Order OrderQueueStackHandler::DequeueOrder() { return orderQueueStack.Top()->Dequeue(); }
-
-OrderQueue* OrderQueueStackHandler::PopOrderQueue() { return orderQueueStack.Pop(); }
-
-void OrderQueueStackHandler::ClearAllOrderQueues() { orderQueueStack = Stack<OrderQueue*>(); }
