@@ -79,25 +79,28 @@ InstructionEnvironment::InstructionEnvironment()
     this->AddCallable("enterTypeStack", new Callable(
                                             [](ICodeGenerator* generator)
                                             {
-                                                Logger.Log("Entering type stack mode", Logger::DEBUG);
-                                                generator->NewTypeStack();
-                                                generator->PushMode(ICodeGenerator::EModes::TYPE_STACK);
+                                                Logger.Log(
+                                                    "Type stack is depricated: #enterTypeStack should not be used",
+                                                    Logger::WARNING);
+                                                // generator->NewTypeStack();
+                                                // generator->PushMode(ICodeGenerator::EModes::TYPE_STACK);
                                             }));
 
     this->AddCallable("exitTypeStack", new Callable(
                                            [](ICodeGenerator* generator)
                                            {
-                                               if (!generator->IsInMode(ICodeGenerator::EModes::TYPE_STACK))
+                                               /*if (!generator->IsInMode(ICodeGenerator::EModes::TYPE_STACK))
                                                {
                                                    Logger.Log(
                                                        "Trying to exit type stack mode while not in type stack mode",
                                                        Logger::ERROR);
                                                    return;
-                                               }
+                                               }*/
 
-                                               Logger.Log("Exiting type stack mode", Logger::DEBUG);
+                                               Logger.Log("Type stack is depricated: #exitTypeStack should not be used",
+                                                          Logger::DEBUG);
 
-                                               generator->PopMode();
+                                               // generator->PopMode();
                                            }));
 
     this->AddCallable(
@@ -117,11 +120,9 @@ InstructionEnvironment::InstructionEnvironment()
 
                 Logger.Log("Assigning next order '" + nextOrder.ToString() + "'", Logger::DEBUG);
 
-                std::vector<Type*> popTypes = generator->PopTypeStack();
-                std::vector<Type*> pushTypes = generator->PopTypeStack();
                 OrderQueue* code = generator->PopOrderQueue();
 
-                Identifier* callable = new Identifier(pushTypes, popTypes, *code);
+                Identifier* callable = new Identifier(*code);
 
                 generator->AddIdentifier(nextOrder.GetName(), callable);
             }));
@@ -143,12 +144,10 @@ InstructionEnvironment::InstructionEnvironment()
 
                 Logger.Log("Assigning next order '" + nextOrder.ToString() + "'", Logger::DEBUG);
 
-                std::vector<Type*> popTypes = generator->PopTypeStack();
-                std::vector<Type*> pushTypes = generator->PopTypeStack();
                 OrderQueue code = OrderQueue();
                 code.Enqueue(generator->DequeueFromOrderQueue());
 
-                Identifier* callable = new Identifier(pushTypes, popTypes, code);
+                Identifier* callable = new Identifier(code);
 
                 generator->AddIdentifier(nextOrder.GetName(), callable);
             }));

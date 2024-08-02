@@ -38,9 +38,6 @@ class CodeGenerator : public ICodeGenerator
     virtual void ClearOrderQueue() override;
     virtual void PutInFrontFromOrderQueue() override;
 
-    virtual void NewTypeStack() override;
-    virtual std::vector<Type*> PopTypeStack() override;
-
     virtual void AddIdentifier(std::string name, Identifier* identifier) override;
 
    private:
@@ -54,8 +51,6 @@ class CodeGenerator : public ICodeGenerator
     Stack<EModes> modeStack = Stack<EModes>();
 
     OrderQueueStackHandler orderQueueStack = OrderQueueStackHandler();
-
-    TypeStackHandler typeStack = TypeStackHandler();
 
     IdentifierEnvironment identifierEnvironment = IdentifierEnvironment();
 
@@ -195,10 +190,6 @@ OrderQueue* CodeGenerator::PopOrderQueue() { return orderQueueStack.PopOrderQueu
 void CodeGenerator::PutInFrontFromOrderQueue() { orderHandler.PutInFront(orderQueueStack.DequeueOrder()); }
 
 void CodeGenerator::ClearOrderQueue() { orderQueueStack.ClearAllOrderQueues(); }
-
-void CodeGenerator::NewTypeStack() { typeStack.NewStack(); }
-
-std::vector<Type*> CodeGenerator::PopTypeStack() { return typeStack.PopStack(); }
 
 void CodeGenerator::AddIdentifier(std::string name, Identifier* identifier)
 {

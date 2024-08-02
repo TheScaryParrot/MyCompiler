@@ -16,7 +16,6 @@ class ICodeGenerator
     {
         EXECUTE,
         ORDER_QUEUE,
-        TYPE_STACK,
         COMMENT
     };
 
@@ -40,9 +39,6 @@ class ICodeGenerator
     virtual OrderQueue* PopOrderQueue() = 0;
     virtual void ClearOrderQueue() = 0;
     virtual void PutInFrontFromOrderQueue() = 0;
-
-    virtual void NewTypeStack() = 0;
-    virtual std::vector<Type*> PopTypeStack() = 0;
 
     virtual void AddIdentifier(std::string name, Identifier* identifier) = 0;
 };
