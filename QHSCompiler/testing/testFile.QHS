@@ -11,36 +11,6 @@
 #exitComment
 
 
-#enterTypeStack
-#exitTypeStack
-
-#enterTypeStack
-#exitTypeStack
-
-#pushNewOrderQueue
-#enterOrderQueue
-#enterTypeStack
-#exitOrderQueue
-
-#assignNextIdentifier
-[
-
-
-#enterTypeStack
-#exitTypeStack
-
-#enterTypeStack
-#exitTypeStack
-
-#pushNewOrderQueue
-#enterOrderQueue
-#exitTypeStack
-#exitOrderQueue
-
-#assignNextIdentifier
-]
-
-
 
 #pushNewOrderQueue
 #enterOrderQueue

@@ -1,7 +1,3 @@
-[WARNING] Type stack is depricated: #enterTypeStack should not be used
-[WARNING] Type stack is depricated: #enterTypeStack should not be used
-[WARNING] Type stack is depricated: #enterTypeStack should not be used
-[WARNING] Type stack is depricated: #enterTypeStack should not be used
 
 section .rodata
 wordToGuess: db 'moin', 0xa
