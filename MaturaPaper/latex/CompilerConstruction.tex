@@ -1,72 +1,113 @@
-\documentclass[]{article}
-\title{Compiler Construction}
-\author{Fabio Stalder}
-\date{2024}
+%based on https://informatik.mygymer.ch/base/?page=latex%2Fa-ma%2F
+\documentclass[parskip=full]{scrreprt}
+\input{config.tex}
 
-\renewcommand{\labelenumii}{\theenumii}
-\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+% Schmale Seitenränder festlegen
+\KOMAoption{DIV}{15}
+
+% Text auf Titelseite festlegen
+\subject{Maturaarbeit}
+\title{Compiler Construction}
+\author{Fabio Stalder\vspace{1cm}\\
+Betreut durch \\
+Thomas Jampen}
+\publishers{\includegraphics{resources/logo}\vspace{1cm}\\
+Gymnasium Kirchenfeld\\
+Abteilung MN}
+
+% selbst definierte Kopf- und Fusszeile
+\lohead{Maturaarbeit}
+%\rohead{\theauthor}
+\cofoot{\thepage}
+
+% Zeilenabstand festlegen
+\singlespacing
+%\onehalfspacing
+%\doublespacing
+
+% Trennlinie für Kopfzeile
+\KOMAoption{headsepline}{off} % oder on
+
+% Trennlinie für Fusszeile
+\KOMAoption{footsepline}{on} % oder on
+
+%\renewcommand{\labelenumii}{\theenumii}
+%\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
 
 \begin{document}
+
 \maketitle
-\begin{abstract}
-    Abstract Here
-\end{abstract}
-\begin{enumerate}
-    \item what is a compiler
-          \begin{enumerate}
-              \item general idea
-              \item how to implement
-          \end{enumerate}
-    \item my different approach (QHS)
-          \begin{enumerate}
-              \item define lots of macros, use lots of macros. W
-              \item write direct assembly code
-              \item only few responsibilities for Compiler
-          \end{enumerate}
-    \item approach for comparison
-          \begin{enumerate}
-              \item 3 compilers THS, QHS and gcc
-              \item required features
-                    \begin{enumerate}
-                        \item output as assembly
-                        \item C like syntax
-                        \item basic OOP features
-                        \item every type defined as a class
-                    \end{enumerate}
-              \item comparison
-                    \begin{enumerate}
-                        \item ease of use
-                        \item speed of compilation
-                        \item speed of assembly output
-                        \item customizability, freedom and possibility for extension
-                        \item error handling (required skill as a programmer)
-                    \end{enumerate}
-          \end{enumerate}
-    \item building the compilers
-          \begin{enumerate}
-              \item written in C++
-              \item THS compiler
-                    \begin{enumerate}
-                        \item compiler instructions in code
-                        \item switch to assembly code in lexer
-                        \item the Assign function problem (args for Assign function are set by calling Assign function)
-                    \end{enumerate}
-              \item QHS compiler
-                    \begin{enumerate}
-                        \item super simple lexer
-                        \item no parser
-                        \item compiler instructions
-                              \begin{enumerate}
-                                  \item orderStack
-                                  \item typeStack
-                                  \item defining identifiers
-                              \end{enumerate}
-                        \item preambel defining all the stuff
-                              \begin{enumerate}
-                                  \item simple shortcuts (braces, semicolons)
-                                  \item more complicated stuff (classes, functions)
-                              \end{enumerate}
-                    \end{enumerate}
-          \end{enumerate}
-\end{enumerate}
+
+\tableofcontents
+
+
+\iffalse
+    \begin{enumerate}
+        \item what is a compiler
+              \begin{enumerate}
+                  \item general idea
+                  \item how to implement
+              \end{enumerate}
+        \item my different approach (QHS)
+              \begin{enumerate}
+                  \item define lots of macros, use lots of macros. W
+                  \item write direct assembly code
+                  \item only few responsibilities for Compiler
+              \end{enumerate}
+        \item approach for comparison
+              \begin{enumerate}
+                  \item 3 compilers THS, QHS and gcc
+                  \item required features
+                        \begin{enumerate}
+                            \item output as assembly
+                            \item C like syntax
+                            \item variables
+                            \item functions
+                        \end{enumerate}
+                  \item comparison
+                        \begin{enumerate}
+                            \item ease of use
+                            \item speed of compilation
+                            \item speed of assembly output
+                            \item customizability, freedom and possibility for extension
+                            \item error handling (required skill as a programmer)
+                        \end{enumerate}
+              \end{enumerate}
+        \item building the compilers
+              \begin{enumerate}
+                  \item written in C++
+                  \item THS compiler
+                        \begin{enumerate}
+                            \item compiler instructions in code
+                            \item switch to assembly code in lexer
+                            \item the Assign function problem (args for Assign function are set by calling Assign function)
+                        \end{enumerate}
+                  \item QHS compiler
+                        \begin{enumerate}
+                            \item super simple lexer
+                            \item no parser
+                            \item compiler instructions
+                                  \begin{enumerate}
+                                      \item orderStack
+                                      \item typeStack
+                                      \item defining identifiers
+                                  \end{enumerate}
+                            \item preambel defining all the stuff
+                                  \begin{enumerate}
+                                      \item simple shortcuts (braces, semicolons)
+                                      \item more complicated stuff (classes, functions)
+                                  \end{enumerate}
+                        \end{enumerate}
+              \end{enumerate}
+    \end{enumerate}
+\fi
+
+
+
+\listoffigures
+
+% bibliography
+\bibliographystyle{plain}
+\bibliography{bib/refs}
+
 \end{document}
