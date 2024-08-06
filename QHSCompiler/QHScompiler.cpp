@@ -1,15 +1,15 @@
 #include <iostream>
 
 #include "library/InputFile.cpp"
-#include "library/codeGenerator/CodeGenerator.cpp"
+#include "library/codeGenerator/Generator.cpp"
 
 void CompileFile(std::string filename)
 {
     InputFile* file = new InputFile(filename);
 
-    CodeGenerator codeGenerator = CodeGenerator();
+    Generator generator = Generator(file);
 
-    AssemblyCode* assemblyCode = codeGenerator.Generate(file);
+    AssemblyCode* assemblyCode = generator.Generate();
 
     delete file;
 

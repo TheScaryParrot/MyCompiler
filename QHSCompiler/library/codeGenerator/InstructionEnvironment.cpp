@@ -7,12 +7,12 @@
 class InstructionEnvironment : private Environment
 {
    public:
-    InstructionEnvironment()
-    {
-        this->AddCallable("enterComment", new Callable([](ICodeGenerator* generator)
-                                                       { generator->PushMode(ICodeGenerator::EModes::COMMENT); }));
+    InstructionEnvironment() {
+        /*
+        this->AddCallable("enterComment", new ICallable([](ICodeGenerator* generator)
+                                                        { generator->PushMode(ICodeGenerator::EModes::COMMENT); }));
 
-        this->AddCallable("exitComment", new Callable(
+        this->AddCallable("exitComment", new ICallable(
                                              [](ICodeGenerator* generator)
                                              {
                                                  if (!generator->IsInMode(ICodeGenerator::EModes::COMMENT))
@@ -91,7 +91,7 @@ class InstructionEnvironment : private Environment
                                                    mode", Logger::ERROR); return;
                                                    }*/
 
-                                                   Logger.Log(
+        /*Logger.Log(
                                                        "Type stack is depricated: #exitTypeStack should not be used",
                                                        Logger::DEBUG);
 
@@ -192,11 +192,9 @@ class InstructionEnvironment : private Environment
         this->AddCallable("activateDebugMode", new Callable([](ICodeGenerator* generator) { Logger.SetDebug(true); }));
         this->AddCallable("deactivateDebugMode",
                           new Callable([](ICodeGenerator* generator) { Logger.SetDebug(false); }));
+
+                          */
     };
 
-    void ExecuteInstruction(std::string name, ICodeGenerator* codeGenerator)
-    {
-        this->ExecuteCallable(name, codeGenerator);
-    }
-    Callable* GetInstruction(std::string name) { return this->GetCallable(name); }
+    ICallable* GetInstruction(std::string name) { return this->GetCallable(name); }
 };

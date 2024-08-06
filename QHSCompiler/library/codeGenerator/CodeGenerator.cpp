@@ -5,55 +5,38 @@
 
 #include "../assembly/AssemblyCode.cpp"
 #include "../utils/Logger.cpp"
-#include "Callable.cpp"
 #include "Environment.cpp"
-#include "IdentifierEnvironment.cpp"
-#include "InstructionEnvironment.cpp"
 #include "OrderHandler.cpp"
 #include "OrderQueueStackHandler.cpp"
-#include "TypeStackHandler.cpp"
 
-class CodeGenerator : public ICodeGenerator
+static class CodeGenerator
 {
    public:
-    AssemblyCode* Generate(InputFile* file)
+    void Init() {}
+
+    enum EModes
     {
-        this->orderHandler = OrderHandler(file);
-        this->modeStack.Push(EModes::EXECUTE);
-        this->assemblyCode = new AssemblyCode();
+        EXECUTE,
+        ORDER_QUEUE,
+        COMMENT
+    };
 
-        while (!orderHandler.IsDone())
-        {
-            HandleOrder(GetNextOrder());
-        }
-
-        return assemblyCode;
-    }
-
-    virtual Order GetCurrentOrder() override { return orderHandler.GetCurrentOrder(); }
-    virtual Order GetNextOrder() override
-    {
-        orderHandler.NextOrder();
-        return orderHandler.GetCurrentOrder();
-    }
-    virtual void ExecuteNextOrder() override { HandleOrder(GetNextOrder()); }
-    virtual Callable* GetCallable(Order& order) override
+    ICallable* GetCallable(Order& order)
     {
         if (order.GetType() != Order::EOrderTypes::Identifier)
         {
-            return instructionEnvironment.GetInstruction(order.GetName());
+            return instructionEnvironment.GetCallable(order.GetName());
         }
 
-        return identifierEnvironment.GetIdentifier(order.GetName());
+        return identifierEnvironment.GetCallable(order.GetName());
     }
 
-    virtual void PushMode(EModes mode) override { modeStack.Push(mode); }
-    virtual void PopMode() override { modeStack.Pop(); }
-    virtual EModes GetCurrentMode() override { return modeStack.Top(); }
+    void PushMode(EModes mode) { modeStack.Push(mode); }
+    void PopMode() { modeStack.Pop(); }
+    EModes GetCurrentMode() { return modeStack.Top(); }
+    bool IsInMode(EModes mode) { return GetCurrentMode() == mode; }
 
-    virtual void PutInFront(OrderQueue orders) override { orderHandler.PutInFront(orders); }
-
-    virtual void IncrementOrderQueueDepth() override
+    void IncrementOrderQueueDepth()
     {
         orderQueueDepthCounter++;
 
@@ -62,7 +45,7 @@ class CodeGenerator : public ICodeGenerator
             PushMode(EModes::ORDER_QUEUE);
         }
     }
-    virtual void DecrementOrderQueueDepth() override
+    void DecrementOrderQueueDepth()
     {
         orderQueueDepthCounter--;
 
@@ -71,88 +54,27 @@ class CodeGenerator : public ICodeGenerator
             PopMode();
         }
     }
-    virtual void PushNewOrderQueue() override { orderQueueStack.PushNewOrderQueue(); }
-    virtual Order DequeueFromOrderQueue() override { return orderQueueStack.DequeueOrder(); }
-    virtual void EnqueueInOrderQueue(Order order) override { orderQueueStack.EnqueueOrder(order); }
-    virtual OrderQueue* PopOrderQueue() override { return orderQueueStack.PopOrderQueue(); }
-    virtual void ClearOrderQueue() override { orderQueueStack.ClearAllOrderQueues(); }
-    virtual void PutInFrontFromOrderQueue() override { orderHandler.PutInFront(orderQueueStack.DequeueOrder()); }
+    void PushNewOrderQueue() { orderQueueStack.PushNewOrderQueue(); }
+    Order DequeueFromOrderQueue() { return orderQueueStack.DequeueOrder(); }
+    void EnqueueInOrderQueue(Order order) { orderQueueStack.EnqueueOrder(order); }
+    OrderQueue* PopOrderQueue() { return orderQueueStack.PopOrderQueue(); }
+    void ClearOrderQueue() { orderQueueStack.ClearAllOrderQueues(); }
+    void PutInFrontFromOrderQueue() { OrderHandler.PutInFront(orderQueueStack.DequeueOrder()); }
 
-    virtual void AddIdentifier(std::string name, Identifier* identifier) override
+    void AddInstruction(std::string name, ICallable* instruction)
     {
-        identifierEnvironment.AddIdentifier(name, identifier);
+        instructionEnvironment.AddCallable(name, instruction);
     }
+    void AddIdentifier(std::string name, ICallable* identifier) { identifierEnvironment.AddCallable(name, identifier); }
 
    private:
-    OrderHandler orderHandler;
-
-    void HandleOrder(Order order)
-    {
-        if (order.GetType() == Order::EOrderTypes::DirectCode)
-        {
-            HandleDirectCode(order);
-            return;
-        }
-
-        Callable* callable = this->GetCallable(order);
-
-        if (callable == nullptr)
-        {
-            if (IsInMode(EModes::ORDER_QUEUE))
-            {
-                EnqueueInOrderQueue(order);
-                return;
-            }
-
-            if (IsInMode(EModes::COMMENT))
-            {
-                return;
-            }
-
-            Logger.Log("No callable found for order: " + order.GetName(), Logger::ERROR);
-
-            return;
-        }
-
-        if (IsInMode(EModes::ORDER_QUEUE) && !callable->IsCodeStackProof())
-        {
-            EnqueueInOrderQueue(order);
-            return;
-        }
-
-        if (IsInMode(EModes::COMMENT) && !callable->IsCommentProof())
-        {
-            return;
-        }
-
-        callable->Execute(this);
-    }
-
-    void HandleDirectCode(Order order)
-    {
-        if (IsInMode(EModes::ORDER_QUEUE))
-        {
-            EnqueueInOrderQueue(order);
-            return;
-        }
-
-        if (IsInMode(EModes::COMMENT))
-        {
-            return;
-        }
-
-        this->assemblyCode->AddCode(order.GetName());
-    }
-
     unsigned int orderQueueDepthCounter = 0;
 
     Stack<EModes> modeStack = Stack<EModes>();
 
     OrderQueueStackHandler orderQueueStack = OrderQueueStackHandler();
 
-    IdentifierEnvironment identifierEnvironment = IdentifierEnvironment();
+    Environment identifierEnvironment = Environment();
 
-    InstructionEnvironment instructionEnvironment = InstructionEnvironment();
-
-    AssemblyCode* assemblyCode;
-};
+    Environment instructionEnvironment = Environment();
+} CodeGenerator;

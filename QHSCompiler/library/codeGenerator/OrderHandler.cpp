@@ -9,40 +9,48 @@
 #include "../utils/Stack.cpp"
 #include "OrderQueue.cpp"
 
-class OrderHandler
+static class OrderHandler
 {
    public:
+    void Init(InputFile* file) { this->scanner = new Scanner(file); }
     OrderHandler() = default;
-    OrderHandler(InputFile* file) { this->file = file; }
+    ~OrderHandler() { delete scanner; }
 
     Order GetCurrentOrder() { return currentOrder; }
-
     /// @brief Advances next order; order can be retrieved from GetCurrentOrder()
-    void NextOrder()
+    Order GetNextOrder()
     {
-        if (stackedOrderQueues.IsEmpty())
+        if (orderStackDepth >= orderQueues.size())
         {
-            currentOrder = scanner.ScanOrder(file);
-            return;
+            currentOrder = scanner->ScanOrder();
+            return currentOrder;
         }
 
-        OrderQueue* queue = stackedOrderQueues.Top();
+        auto queueIterator = orderQueues.begin() + orderStackDepth;
+        OrderQueue* queue = *queueIterator;
         Order order = queue->Dequeue();
 
         if (queue->IsEmpty())
         {
-            delete stackedOrderQueues.Pop();
+            orderQueues.erase(queueIterator);
+
+            if (queue != nullptr) delete queue;
         }
 
         currentOrder = order;
+        return currentOrder;
     }
+
+    void IncrementOrderStackDepth() { orderStackDepth++; }
+
+    void DecreaseOrderStackDepth() { orderStackDepth--; }
 
     void PutInFront(Order order)
     {
         OrderQueue* newQueue = new OrderQueue();
         newQueue->Enqueue(order);
 
-        stackedOrderQueues.Push(newQueue);
+        orderQueues.insert(orderQueues.begin() + orderStackDepth, newQueue);
     }
     void PutInFront(OrderQueue queue)
     {
@@ -53,16 +61,17 @@ class OrderHandler
 
         OrderQueue* newQueue = new OrderQueue(queue);
 
-        stackedOrderQueues.Push(newQueue);
+        orderQueues.insert(orderQueues.begin() + orderStackDepth, newQueue);
     }
 
-    bool IsDone() { return stackedOrderQueues.IsEmpty() && file->IsEndOfFile(); }
+    bool IsDone() { return orderQueues.empty() && scanner->IsDone(); }
 
    private:
+    Scanner* scanner;
+
+    unsigned int orderStackDepth = 0;
+
+    std::vector<OrderQueue*> orderQueues;
+
     Order currentOrder = Order::Empty();
-
-    Scanner scanner;
-    InputFile* file;
-
-    Stack<OrderQueue*> stackedOrderQueues;
-};
+} OrderHandler;

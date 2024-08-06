@@ -4,24 +4,37 @@
 #include <vector>
 
 #include "../utils/Queue.cpp"
-#include "ICodeGenerator.cpp"
+#include "CodeGenerator.cpp"
+#include "ICallable.cpp"
 
-class Callable
+class Callable : public ICallable
 {
    public:
-    Callable(std::function<void(ICodeGenerator*)>) { SetFunction(call); }
+    Callable()
+    {
+        executeFunction = []() {};
+        getFunction = [this]() { return this; };
+    }
 
-    void SetFunction(std::function<void(ICodeGenerator*)> call) { this->call = call; }
-    void Execute(ICodeGenerator* codeGenerator) { call(codeGenerator); }
+    virtual void SetExecuteFunction(std::function<void()> executeFunction) override
+    {
+        this->executeFunction = executeFunction;
+    }
+    virtual void Execute() override { executeFunction(); }
 
-    void SetCodeStackProof(bool value) { isCodeStackProof = value; }
-    bool IsCodeStackProof() { return isCodeStackProof; }
+    virtual void SetGetFunction(std::function<ICallable*()> getFunction) override { this->getFunction = getFunction; }
+    virtual ICallable* Get() override { return getFunction(); }
 
-    void SetCommentProof(bool value) { isCommentProof = value; }
-    bool IsCommentProof() { return isCommentProof; }
+    virtual void SetCodeStackProof(bool codeStackProof) override { isCodeStackProof = codeStackProof; }
+    virtual bool IsCodeStackProof() override { return isCodeStackProof; }
+
+    virtual void SetCommentProof(bool commentProof) override { isCommentProof = commentProof; }
+    virtual bool IsCommentProof() override { return isCommentProof; }
 
    private:
-    std::function<void(ICodeGenerator*)> call;
+    std::function<void()> executeFunction;
+    std::function<ICallable*()> getFunction;
+
     bool isCodeStackProof = false;
     bool isCommentProof = false;
 };

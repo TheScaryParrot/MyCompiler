@@ -47,8 +47,8 @@
 #makeNextOrderOrderQueueProof )
 
 
-{ #enterComment } >> /*
-{ #exitComment } >> */
+{ #pushNextOrderToOrderQueue #enterComment } >> /*
+{ #pushNextOrderToOrderQueue #exitComment } >> */
 #makeNextOrderCommentProof */
 
 { "

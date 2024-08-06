@@ -5,8 +5,7 @@
 #include <string>
 
 #include "../utils/Logger.cpp"
-#include "Callable.cpp"
-#include "ICodeGenerator.cpp"
+#include "ICallable.cpp"
 
 class Environment
 {
@@ -19,8 +18,8 @@ class Environment
         }
     }
 
-    void AddCallable(std::string name, Callable* callable) { callables[name] = callable; }
-    Callable* GetCallable(std::string name)
+    void AddCallable(std::string name, ICallable* callable) { callables[name] = callable; }
+    ICallable* GetCallable(std::string name)
     {
         if (callables.find(name) == callables.end())
         {
@@ -29,18 +28,7 @@ class Environment
 
         return callables[name];
     }
-    void ExecuteCallable(std::string name, ICodeGenerator* codeGenerator)
-    {
-        Callable* callable = GetCallable(name);
-
-        if (callable == nullptr)
-        {
-            return;
-        }
-
-        callable->Execute(codeGenerator);
-    }
 
    private:
-    std::map<std::string, Callable*> callables;
+    std::map<std::string, ICallable*> callables;
 };
