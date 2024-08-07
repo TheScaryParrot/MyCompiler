@@ -1,0 +1,25 @@
+\chapter{Schreiben der Compiler}
+
+\section{THS Compiler}
+Der THS Compiler folgt dem theoretischen Aufbau eines Compilers und besteht aus Lexer, Parser und Code Generator. Als Parser wird ein Predictive Descent Parser verwendet.
+Der Code Generator arbeitet auf dem Abstract Syntax Tree mithilfe eines Visitor Patterns. Die Semantic Analysis wird während der Code Generation durchgeführt. Geschrieben ist der Compiler in C++ und liefert x86 Assembly nach NASM Syntax.
+
+\section{QHS Compiler}
+Der QHS Compiler beginnt wie ein theoretischer Compiler mit Lexical Analysis. Die Syntax Analysis wird jedoch übersprungen. Genauso wie der THS Compiler ist auch der QHS Compiler in C++ geschrieben und
+generiert x86 Assembly nach NASM Syntax.
+
+\subsection{Lexical Analysis}
+Der QHS Compiler Lexer Unterscheidet nur zwischen 4 Tokens: Whitespaces, Identifiers, Instructions und LiteralCode. \textbf{Die} Lexical Grammar von THS definiert die Tokens wie folgt:
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l|l}
+    \textless{}whitespace\textgreater{}    & SPACE | NEWLINE | TAB                                           \\ \hline
+    \textless{}identiferChar\textgreater{} & {[}\textasciicircum \# " \textless{}whitespace\textgreater{}{]} \\ \hline
+    \textless{}identifier\textgreater{}    & \textless{}identiferChar\textgreater{}*                         \\ \hline
+    \textless{}instruction\textgreater{}   & \# \textless{}identiferChar\textgreater{}*                      \\ \hline
+    \textless{}literalCode\textgreater{}   & ".*"                                                         
+    \end{tabular}
+\end{table}
+
+\subsection{Code Generation}
