@@ -21,14 +21,14 @@ In dieser Arbeit werde ich mich nur auf die im unteren Schema dargestellten Schr
     \label{fig:mountain-edited}
 \end{figure}
 
-\section{Scanning}
+\section{Lexical Analysis}
 Meist werden Programme so geschrieben, dass wir Menschen es lesen und verstehen können. Dafür verwendet man Buchstaben und Zahlen, Zeichen, wie +, *, oder Klammern, und Whitespaces, wie Leerzeichen oder Absätze.
-Diese Zeichen sind jedoch für den Computer unverständlich. Der erste Schritt beim compilieren ist daher das Scannen. Dies wird von einem Teil des Compilers, dem Lexer, durchgeführt.
+Diese Zeichen sind jedoch für den Computer unverständlich. Der erste Schritt beim compilieren ist daher die Lexical Analysis. Dies wird von einem Teil des Compilers, dem Lexer, durchgeführt.
 Die Aufgabe dieses Lexers ist es den Input File zu scannen und die gescannten Zeichen in sogenannte Tokens zu verwandeln. Diese Tokens sind Datenstrukturen, die der Compiler kennt und mit denen er weiterarbeiten kann.
 
 Als Beispiel:
 
-\begin{lstlisting}[language=C, label=ex:preScan, caption=C code vor dem Scannen]
+\begin{lstlisting}[language=C, label=ex:preLex, caption=C code vor Lexical Analysis]
 
 int foo()
 {
@@ -44,7 +44,7 @@ int foo()
 
 Würde hierbei zu einem Array von Token Objekten umgewandelt werden:
 
-\begin{lstlisting}[label=ex:postScan, caption=Tokens nach dem Scannen]
+\begin{lstlisting}[label=ex:postLex, caption=Tokens nach Lexical Analysis]
 KeywordToken (keyword="int")
 IdentifierToken (id="foo")
 LParenthesisToken
@@ -58,12 +58,12 @@ LiteralIntToken (value=0)
 \end{lstlisting}
 
 Der Lexer legt hierbei fest welche Zeichen die Input-Programmiersprache enthalten darf und welche Bedeutung ihnen Zugesprochen wird. So ist zum Beispiel im Lexer festgelegt, dass ein + Zeichen als Addition interpretiert wird.
-Genauso wie im Listing \ref{ex:postScan} 'if' als KeywordToken gescannt wird, lässt sich im Lexer auch bestimmen, dass ein Wort wie 'print' als Keyword angesehen werden soll.
+Genauso wie im Listing \ref{ex:postLex} 'if' als KeywordToken gesehen wird, lässt sich im Lexer auch bestimmen, dass ein Wort wie 'print' als Keyword angesehen werden soll.
 
-\section{Parsing}
+\section{Syntax Analysis}
 Nun versteht der Compiler was mit den Zeichen im Input File gemeint ist, jedoch fehlt noch etwas bis tatsächlich in einer andere Programmiersprache übersetzt werden kann. Und das ist Verständnis für Syntax.
 Die meisten High-Level Programmiersprachen weisen Syntaxregeln auf. Diese beinhalten, wie Funktionen und Variablen definiert werden oder mit welchen Punktvorstrich-Regeln Expressions evaluiert werden.
-Die beim Scanning gefundenen Tokens werden nun ineinander verschachtelt und in einen sogenannten Abstract Syntax Tree (AST) überführt.
+Die bei der Lexical Analysis gefundenen Tokens werden nun ineinander verschachtelt und in einen sogenannten Abstract Syntax Tree (AST) überführt.
 
 \begin{figure}[h!]
     \centering
