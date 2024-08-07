@@ -5,30 +5,18 @@
 class InputFile
 {
    public:
-    InputFile(std::string filename);
-    ~InputFile();
+    InputFile(std::string filename) { file.open(filename); }
+    ~InputFile() { file.close(); }
 
     /// @brief Reads the next character from the file. And advances the file pointer.
-    char ReadNext();
+    char ReadNext() { return file.get(); }
 
     /// @brief Peeks the next character from the file. Doesnt advance the file pointer.
-    char PeekNext();
+    char PeekNext() { return file.peek(); }
 
-    bool IsEndOfFile();
-    bool IsGood();
+    bool IsEndOfFile() { return file.eof(); }
+    bool IsGood() { return file.good(); }
 
    private:
     std::ifstream file;
 };
-
-InputFile::InputFile(std::string filename) { file.open(filename); }
-
-InputFile::~InputFile() { file.close(); }
-
-char InputFile::ReadNext() { return file.get(); }
-
-char InputFile::PeekNext() { return file.peek(); }
-
-bool InputFile::IsEndOfFile() { return file.eof(); }
-
-bool InputFile::IsGood() { return file.good(); }
