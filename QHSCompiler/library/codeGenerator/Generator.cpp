@@ -178,6 +178,45 @@ class Generator
             });
         CodeGenerator.AddInstruction("executeNextInEncounterPhase", executeNextInEncounterPhase);
 
+        ICallable* forceExecuteNextOrderInEncounterPhase = new Callable();
+        forceExecuteNextOrderInEncounterPhase->SetExecuteFunction(
+            []()
+            {
+                Logger.Log(
+                    "#forceExecuteNextInEncounterPhase should never be executed as it's Encounter() "
+                    "function "
+                    "should make another order the currentOrder",
+                    Logger::ERROR);
+            });
+        forceExecuteNextOrderInEncounterPhase->SetEncounterFunction(
+            []()
+            {
+                Order nextOrder = CodeGenerator.GetNextOrder(false);
+                CodeGenerator.HandleOrder(nextOrder, false);
+                CodeGenerator.GetNextOrder();  // As Order has been executed in Encounter, advance one more
+            });
+        forceExecuteNextOrderInEncounterPhase->SetOrderQueueProof(true);
+        CodeGenerator.AddInstruction("forceExecuteNextOrderInEncounterPhase", forceExecuteNextOrderInEncounterPhase);
+
+        ICallable* escapedForceExecuteNextOrderInEncounterPhase = new Callable();
+        escapedForceExecuteNextOrderInEncounterPhase->SetExecuteFunction(
+            []()
+            {
+                Logger.Log(
+                    "#escapedForceExecuteNextOrderInEncounterPhase should never be executed as it's Encounter() "
+                    "function "
+                    "should make #forceExecuteNextOrderInEncounterPhase the currentOrder",
+                    Logger::ERROR);
+            });
+        escapedForceExecuteNextOrderInEncounterPhase->SetEncounterFunction(
+            []() {
+                CodeGenerator.SetCurrentOrder(
+                    Order("forceExecuteNextOrderInEncounterPhase", Order::CompilerInstruction));
+            });
+        escapedForceExecuteNextOrderInEncounterPhase->SetOrderQueueProof(true);
+        CodeGenerator.AddInstruction("escapedForceExecuteNextOrderInEncounterPhase",
+                                     escapedForceExecuteNextOrderInEncounterPhase);
+
         ICallable* assignNextIdentifier = new Callable();
         assignNextIdentifier->SetExecuteFunction(
             []()
@@ -206,6 +245,8 @@ class Generator
                 Callable* callable = new Callable();
                 callable->SetExecuteFunction([code]() { CodeGenerator.PutInFront(*code); });
                 CodeGenerator.AddIdentifier(nextOrder.GetName(), callable);
+
+                Logger.Log("New identifier code: \n" + code->ToString(), Logger::DEBUG);
             });
         CodeGenerator.AddInstruction("assignNextIdentifier", assignNextIdentifier);
 
@@ -276,6 +317,16 @@ class Generator
                 callable->SetCommentProof(true);
             });
         CodeGenerator.AddInstruction("makeNextOrderCommentProof", makeNextOrderCommentProof);
+
+        ICallable* putInFrontNextOrderAsDirectCode = new Callable();
+        putInFrontNextOrderAsDirectCode->SetExecuteFunction(
+            []()
+            {
+                Order nextOrder = CodeGenerator.GetNextOrder();
+                Order directCode = Order(nextOrder.GetName(), Order::DirectCode);
+                CodeGenerator.PutInFront(directCode);
+            });
+        CodeGenerator.AddInstruction("putInFrontNextOrderAsDirectCode", putInFrontNextOrderAsDirectCode);
 
         ICallable* debug = new Callable();
         debug->SetExecuteFunction([]() { Logger.Log("DEBUG PRINT", Logger::DEBUG); });

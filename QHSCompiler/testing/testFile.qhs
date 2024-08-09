@@ -53,8 +53,16 @@ debug */
 
 { #pushNextOrderToOrderQueue #escapedReplaceWithOneOrderHandlerStackDepthDeeper } >> @ ;
 
+{
+    /* result in #pushNextOrderToOrderQueue ! in order queue */
+    { #pushNextOrderToOrderQueue #pushNextOrderToOrderQueue #pushNextOrderToOrderQueue ! @ } >> 
+} >> lateArg>> ;
+#makeNextOrderOrderQueueProof lateArg>> ;
+
+{ >> #executeNextInEncounterPhase } >> >>executeOnce ;
+
 { #pushNextOrderToOrderQueue #forceExecuteNextOrder } >> ! ;
-#makeNextOrderOrderQueueProof ! 
+#makeNextOrderOrderQueueProof ! ;
 
 /* swapping */
 
@@ -73,15 +81,82 @@ $ $ */
     "mov rbp, rsp" ;
 } >> start ;
 
-{ "section .rodata" } >> rodata ;
-{ "section .data" } >> data ;
-{ "section .bss" } >> bss ;
+/* variables */
+{
+    -> assignCode ;
 
-{ "section .text" } >> text ;
+    lateArg>> name ;
 
-{ "mov rax, 60
-mov rdi, 0
-syscall " } >> exit ;
+    /* assigns what is stored in name to the direct code of what is stored in name */
+    { #pushNextOrderToOrderQueue ! #putInFrontNextOrderAsDirectCode #pushNextOrderToOrderQueue #escapedForceExecuteNextOrderInEncounterPhase name } >>executeOnce name ;
+
+    name ": " assignCode ;
+} >> roDataVar
+
+{
+    -> assignCode ;
+
+    lateArg>> name ;
+
+    /* assigns whast is stored in name to the direct code of what is stored in name */
+    { #pushNextOrderToOrderQueue ! #putInFrontNextOrderAsDirectCode #pushNextOrderToOrderQueue #escapedForceExecuteNextOrderInEncounterPhase name } >>executeOnce name ;
+
+    name ": " assignCode ;
+} >> dataVar ;
+
+{
+    
+    lateArg>> size ;
+    lateArg>> name ;
+    /* assigns what is stored in name to the direct code of what is stored in name */
+    { #pushNextOrderToOrderQueue ! #putInFrontNextOrderAsDirectCode #pushNextOrderToOrderQueue #escapedForceExecuteNextOrderInEncounterPhase name } >>executeOnce name ;
+
+    name ": resb " size ;
+
+} >> bssVar ;
+
+{
+    -> newLocalVarOffset ;
+
+    lateArg>> size ;
+    lateArg>> name ;
+    lateArg>> value ;
+
+    "sub rsp, " size ;
+    "mov rax, " value ;
+    { "[rbp-" #pushNextOrderToOrderQueue ! newLocalVarOffset "]" } >> address ;
+    "mov " address ", rax" ;
+
+    { #pushNextOrderToOrderQueue ! address } >>executeOnce name ;
+} >> localVar ;
+
+/* sections */
+{ 
+    "section .rodata" ; 
+    { roDataVar } >> var ;
+} >> rodata ;
+
+{ 
+    "section .data" ; 
+    { dataVar } >> var ;
+} >> data ;
+
+{ 
+    "section .bss" ;
+    { bssVar } >> var ;
+} >> bss ;
+
+{
+    "section .text"
+    { localVar } >> var ;
+} >> text ;
+
+/* syscalls */
+{
+    "mov rax, 60" ;
+    "mov rdi, 0" ;
+    "syscall" ;
+} >> exit ;
 
 
 {
@@ -114,30 +189,6 @@ syscall " } >> exit ;
 
 } >> println ;
 
-{
-    -> name
-    #makeNextOrderOrderQueueProof name /* make order queue proof so that it is resolved in { name } */
-
-    -> assignCode
-    name ": " assignCode ;
-    { name } >>
-} >> roDataVar 
-
-/* local var */
-{
-    -> newLocalVarOffset ;
-
-    { #pushNextOrderToOrderQueue ! @ } >> size ;
-    { #pushNextOrderToOrderQueue ! @ } >> name ;
-    { #pushNextOrderToOrderQueue ! @ } >> value ;
-
-    "sub rsp, " size ;
-    "mov rax, " value ;
-    { "[rbp-" #pushNextOrderToOrderQueue ! newLocalVarOffset "]" } >> address ;
-    "mov " address ", rax" ;
-
-    { #pushNextOrderToOrderQueue ! address } >> #executeNextInEncounterPhase name ;
-} >> localVar ;
 
 /* types */
 { "4" } >> int ;
@@ -145,18 +196,27 @@ syscall " } >> exit ;
 
 /* actually coding */
 
+/* rodata */
 rodata ;
 
-( "wordToGuess" "db 'moin', 0xa" ) roDataVar wordToGuess ;
+( "db 'moin', 0xa" ) var wordToGuess ;
 
-( "wordLength" "equ $ - wordToGuess" ) roDataVar wordLength ;
+( "equ $ - wordToGuess" ) var wordLength ;
 
+/* data */
 data ;
 
+( "dd 67" ) var testDataInt ;
+
+/* bss */
 bss ;
 
+var int testBssInt ;
+
+/* text */
 text ;
 start ;
+
 
 ( wordToGuess wordLength ) rawPrint ;
 
@@ -164,12 +224,15 @@ start ;
 
 printWord ;
 
+{ var int } >> intVar ;
 
-( "4" ) localVar  int num "65" ; 
+( "4" ) intVar num "65" ; 
+/* ( "8" ) localVar int num2 "66" ; */
 
 ( num "4" ) println ;
+/* ( num2 "4" ) println ; */
 
-
+( testDataInt "4" ) rawPrint ;
 
 exit ;
 

@@ -3,7 +3,9 @@ section .rodata
 wordToGuess: db 'moin', 0xa
 wordLength: equ $ - wordToGuess
 section .data
+testDataInt: dd 67
 section .bss
+testBssInt: resb 4
 section .text
 global _start
 _start:
@@ -39,7 +41,12 @@ mov rsi, rsp
 mov rdx, 1
 syscall
 add rsp, 1
+mov rax, 1
+mov rdi, 1
+mov rsi, testDataInt
+mov rdx, 4
+syscall
 mov rax, 60
 mov rdi, 0
-syscall 
+syscall
 
