@@ -45,6 +45,9 @@ std::string Order::ToString()
         case EOrderTypes::CompilerInstruction:
             result += " (Compiler Instruction)";
             break;
+        case EOrderTypes::DirectCode:
+            result += " (Direct Code)";
+            break;
     }
 
     return result;
