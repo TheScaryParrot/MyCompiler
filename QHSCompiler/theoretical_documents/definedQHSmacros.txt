@@ -1,0 +1,8 @@
+-> assignNextIdentiferToOne (assigns next identifer to the top of current OrderQueue)
+>> assignNextIdentifer (assigns next identifer to whole current OrderQueue)
+/* enterComment
+*/ exitComment
+; "\n" and clearOrderQueue (used at the end of line, pay attention to not use when giving macro arguments using OrderQueue as the Argument would be cleared)
+debug debugPrint (print a debug message using Logger)
+$ putInFrontFromOrderQueue
+! replaceWithOneOrderHandlerStackDepthDeeper (this is replaced by the Order which is one orderStack deeper, but attention do not use after >> or -> is the identifer ! will be reassigned)

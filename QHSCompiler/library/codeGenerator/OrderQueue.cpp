@@ -12,6 +12,21 @@ class OrderQueue
     bool IsEmpty() { return this->queue.IsEmpty(); }
     void Clear() { this->queue.Clear(); }
 
+    std::string ToString()
+    {
+        Queue<Order> tempQueue = this->queue;
+
+        std::string str = "";
+
+        while (!tempQueue.IsEmpty())
+        {
+            Order order = tempQueue.Dequeue();
+            str += order.ToString() + "\n";
+        }
+
+        return str;
+    }
+
    private:
     Queue<Order> queue;
 };

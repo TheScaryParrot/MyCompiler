@@ -13,7 +13,7 @@ class Callable : public ICallable
     Callable()
     {
         executeFunction = []() {};
-        getFunction = [this]() { return this; };
+        encounterFunction = []() {};
     }
 
     virtual void SetExecuteFunction(std::function<void()> executeFunction) override
@@ -22,18 +22,21 @@ class Callable : public ICallable
     }
     virtual void Execute() override { executeFunction(); }
 
-    virtual void SetGetFunction(std::function<ICallable*()> getFunction) override { this->getFunction = getFunction; }
-    virtual ICallable* Get() override { return getFunction(); }
+    virtual void SetEncounterFunction(std::function<void()> encounterFunction) override
+    {
+        this->encounterFunction = encounterFunction;
+    }
+    virtual void Encounter() override { return encounterFunction(); }
 
-    virtual void SetCodeStackProof(bool codeStackProof) override { isCodeStackProof = codeStackProof; }
-    virtual bool IsCodeStackProof() override { return isCodeStackProof; }
+    virtual void SetOrderQueueProof(bool codeStackProof) override { isCodeStackProof = codeStackProof; }
+    virtual bool IsOrderQueueProof() override { return isCodeStackProof; }
 
     virtual void SetCommentProof(bool commentProof) override { isCommentProof = commentProof; }
     virtual bool IsCommentProof() override { return isCommentProof; }
 
    private:
     std::function<void()> executeFunction;
-    std::function<ICallable*()> getFunction;
+    std::function<void()> encounterFunction;
 
     bool isCodeStackProof = false;
     bool isCommentProof = false;

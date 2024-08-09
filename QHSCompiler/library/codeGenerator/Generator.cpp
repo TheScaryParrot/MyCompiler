@@ -2,27 +2,24 @@
 
 #include "Callable.cpp"
 #include "CodeGenerator.cpp"
-#include "OrderHandler.cpp"
 
 class Generator
 {
    public:
     Generator(InputFile* file)
     {
-        CodeGenerator.Init();
-        OrderHandler.Init(file);
+        this->assemblyCode = new AssemblyCode();
+        CodeGenerator.Init(file, assemblyCode);
         InitInstructions();
     }
 
     AssemblyCode* Generate()
     {
         CodeGenerator.PushMode(CodeGenerator::EModes::EXECUTE);
-        this->assemblyCode = new AssemblyCode();
 
-        while (!OrderHandler.IsDone())
+        while (!CodeGenerator.IsDone())
         {
-            Order order = OrderHandler.GetNextOrder();
-            HandleOrder(order);
+            CodeGenerator.HandleOrder(CodeGenerator.GetNextOrder(), true);
         }
 
         return assemblyCode;
@@ -35,7 +32,7 @@ class Generator
     {
         ICallable* enterComment = new Callable();
         enterComment->SetExecuteFunction([]() { CodeGenerator.PushMode(CodeGenerator::EModes::COMMENT); });
-        enterComment->SetCodeStackProof(true);
+        enterComment->SetOrderQueueProof(true);
         CodeGenerator.AddInstruction("enterComment", enterComment);
 
         ICallable* exitComment = new Callable();
@@ -49,7 +46,8 @@ class Generator
                 }
                 CodeGenerator.PopMode();
             });
-        exitComment->SetCodeStackProof(true);
+        exitComment->SetOrderQueueProof(true);
+        exitComment->SetCommentProof(true);
         CodeGenerator.AddInstruction("exitComment", exitComment);
 
         ICallable* enterOrderQueue = new Callable();
@@ -62,12 +60,12 @@ class Generator
                 // (enterOrderQueue)
                 if (CodeGenerator.IsInMode(CodeGenerator::EModes::ORDER_QUEUE))
                 {
-                    CodeGenerator.EnqueueInOrderQueue(OrderHandler.GetCurrentOrder());
+                    CodeGenerator.EnqueueInOrderQueue(CodeGenerator.GetCurrentOrder());
                 }
 
                 CodeGenerator.IncrementOrderQueueDepth();
             });
-        enterOrderQueue->SetCodeStackProof(true);
+        enterOrderQueue->SetOrderQueueProof(true);
         CodeGenerator.AddInstruction("enterOrderQueue", enterOrderQueue);
 
         ICallable* exitOrderQueue = new Callable();
@@ -82,10 +80,10 @@ class Generator
                 // (exitOrderStack) to the order queue
                 if (CodeGenerator.IsInMode(CodeGenerator::EModes::ORDER_QUEUE))
                 {
-                    CodeGenerator.EnqueueInOrderQueue(OrderHandler.GetCurrentOrder());
+                    CodeGenerator.EnqueueInOrderQueue(CodeGenerator.GetCurrentOrder());
                 }
             });
-        exitOrderQueue->SetCodeStackProof(true);
+        exitOrderQueue->SetOrderQueueProof(true);
         CodeGenerator.AddInstruction("exitOrderQueue", exitOrderQueue);
 
         ICallable* pushNewOrderQueue = new Callable();
@@ -94,11 +92,8 @@ class Generator
 
         ICallable* pushNextOrderToOrderQueue = new Callable();
         pushNextOrderToOrderQueue->SetExecuteFunction(
-            []()
-            {
-                Order nextOrder = OrderHandler.GetNextOrder();
-                CodeGenerator.EnqueueInOrderQueue(nextOrder);
-            });
+            []() { CodeGenerator.EnqueueInOrderQueue(CodeGenerator.GetNextOrder()); });
+        pushNextOrderToOrderQueue->SetOrderQueueProof(true);
         CodeGenerator.AddInstruction("pushNextOrderToOrderQueue", pushNextOrderToOrderQueue);
 
         ICallable* clearOrderQueue = new Callable();
@@ -114,11 +109,80 @@ class Generator
             });
         CodeGenerator.AddInstruction("putInFrontFromOrderQueue", putInFrontFromOrderQueue);
 
+        ICallable* replaceWithOneOrderHandlerStackDepthDeeper = new Callable();
+        replaceWithOneOrderHandlerStackDepthDeeper->SetExecuteFunction(
+            []()
+            {
+                Logger.Log(
+                    "#replaceWithOneOrderHandlerStackDepthDeeper should never be executed as it's Encounter() "
+                    "function "
+                    "should make another order the currentOrder",
+                    Logger::ERROR);
+            });
+        replaceWithOneOrderHandlerStackDepthDeeper->SetEncounterFunction(
+            []()
+            {
+                CodeGenerator.IncrementOrderHandlerStackDepth();
+                Logger.Log("Replaced with: " + CodeGenerator.GetNextOrder().ToString(), Logger::DEBUG);
+                CodeGenerator.DecreaseOrderHandlerStackDepth();
+            });
+        replaceWithOneOrderHandlerStackDepthDeeper->SetOrderQueueProof(true);
+        CodeGenerator.AddInstruction("replaceWithOneOrderHandlerStackDepthDeeper",
+                                     replaceWithOneOrderHandlerStackDepthDeeper);
+
+        ICallable* escapedReplaceWithOneOrderHandlerStackDepthDeeper = new Callable();
+        escapedReplaceWithOneOrderHandlerStackDepthDeeper->SetExecuteFunction(
+            []()
+            {
+                Logger.Log(
+                    "#escapedReplaceWithOneOrderHandlerStackDepthDeeper should never be executed as it's Encounter() "
+                    "function "
+                    "should make #replaceWithOneOrderHandlerStackDepthDeeper the currentOrder",
+                    Logger::ERROR);
+            });
+        escapedReplaceWithOneOrderHandlerStackDepthDeeper->SetEncounterFunction(
+            []() {
+                CodeGenerator.SetCurrentOrder(
+                    Order("replaceWithOneOrderHandlerStackDepthDeeper", Order::CompilerInstruction));
+            });
+        escapedReplaceWithOneOrderHandlerStackDepthDeeper->SetOrderQueueProof(true);
+        CodeGenerator.AddInstruction("escapedReplaceWithOneOrderHandlerStackDepthDeeper",
+                                     escapedReplaceWithOneOrderHandlerStackDepthDeeper);
+
+        ICallable* forceExecuteNextOrder = new Callable();
+        forceExecuteNextOrder->SetExecuteFunction(
+            []()
+            {
+                Order nextOrder = CodeGenerator.GetNextOrder(false);
+                CodeGenerator.HandleOrder(nextOrder, false);
+            });
+        forceExecuteNextOrder->SetOrderQueueProof(true);
+        CodeGenerator.AddInstruction("forceExecuteNextOrder", forceExecuteNextOrder);
+
+        ICallable* executeNextInEncounterPhase = new Callable();
+        executeNextInEncounterPhase->SetExecuteFunction(
+            []()
+            {
+                Logger.Log(
+                    "#executeNextInEncounterPhase should never be executed as it's Encounter() "
+                    "function "
+                    "should make another order the currentOrder",
+                    Logger::ERROR);
+            });
+        executeNextInEncounterPhase->SetEncounterFunction(
+            []()
+            {
+                Order nextOrder = CodeGenerator.GetNextOrder();
+                CodeGenerator.HandleOrder(nextOrder, false);
+                CodeGenerator.GetNextOrder();  // As Order has been executed in Encounter, advance one more
+            });
+        CodeGenerator.AddInstruction("executeNextInEncounterPhase", executeNextInEncounterPhase);
+
         ICallable* assignNextIdentifier = new Callable();
         assignNextIdentifier->SetExecuteFunction(
             []()
             {
-                Order nextOrder = OrderHandler.GetNextOrder();
+                Order nextOrder = CodeGenerator.GetNextOrder();
 
                 if (nextOrder.GetType() != Order::EOrderTypes::Identifier)
                 {
@@ -140,7 +204,7 @@ class Generator
                 }
 
                 Callable* callable = new Callable();
-                callable->SetExecuteFunction([code]() { OrderHandler.PutInFront(*code); });
+                callable->SetExecuteFunction([code]() { CodeGenerator.PutInFront(*code); });
                 CodeGenerator.AddIdentifier(nextOrder.GetName(), callable);
             });
         CodeGenerator.AddInstruction("assignNextIdentifier", assignNextIdentifier);
@@ -149,7 +213,7 @@ class Generator
         assignNextIdentifierToOneOrder->SetExecuteFunction(
             []()
             {
-                Order nextOrder = OrderHandler.GetNextOrder();
+                Order nextOrder = CodeGenerator.GetNextOrder();
 
                 if (nextOrder.GetType() != Order::EOrderTypes::Identifier)
                 {
@@ -165,7 +229,7 @@ class Generator
                 code.Enqueue(CodeGenerator.DequeueFromOrderQueue());
 
                 Callable* callable = new Callable();
-                callable->SetExecuteFunction([code]() { OrderHandler.PutInFront(code); });
+                callable->SetExecuteFunction([code]() { CodeGenerator.PutInFront(code); });
                 CodeGenerator.AddIdentifier(nextOrder.GetName(), callable);
             });
         CodeGenerator.AddInstruction("assignNextIdentifierToOneOrder", assignNextIdentifierToOneOrder);
@@ -174,7 +238,7 @@ class Generator
         makeNextOrderOrderQueueProof->SetExecuteFunction(
             []()
             {
-                Order nextOrder = OrderHandler.GetNextOrder();
+                Order nextOrder = CodeGenerator.GetNextOrder();
 
                 Logger.Log("Making next identifier order queue proof '" + nextOrder.ToString() + "'", Logger::DEBUG);
 
@@ -188,7 +252,7 @@ class Generator
                     return;
                 }
 
-                callable->SetCodeStackProof(true);
+                callable->SetOrderQueueProof(true);
             });
         CodeGenerator.AddInstruction("makeNextOrderOrderQueueProof", makeNextOrderOrderQueueProof);
 
@@ -196,7 +260,7 @@ class Generator
         makeNextOrderCommentProof->SetExecuteFunction(
             []()
             {
-                Order nextOrder = OrderHandler.GetNextOrder();
+                Order nextOrder = CodeGenerator.GetNextOrder();
 
                 Logger.Log("Making next identifier comment proof '" + nextOrder.ToString() + "'", Logger::DEBUG);
 
@@ -222,8 +286,7 @@ class Generator
             []()
             {
                 Logger.Log("---DEBUG STATUS", Logger::DEBUG);
-                Logger.Log("---Current order: " + OrderHandler.GetCurrentOrder().ToString(), Logger::DEBUG);
-                Logger.Log("---Next order: " + OrderHandler.GetNextOrder().ToString(), Logger::DEBUG);
+                Logger.Log("---Current order: " + CodeGenerator.GetCurrentOrder().ToString(), Logger::DEBUG);
                 Logger.Log("---Current mode: " + std::to_string(CodeGenerator.GetCurrentMode()), Logger::DEBUG);
             });
         CodeGenerator.AddInstruction("debugStatus", debugStatus);
@@ -235,64 +298,5 @@ class Generator
         ICallable* deactivateDebugMode = new Callable();
         deactivateDebugMode->SetExecuteFunction([]() { Logger.SetDebug(false); });
         CodeGenerator.AddInstruction("deactivateDebugMode", deactivateDebugMode);
-    }
-
-    void HandleOrder(Order order)
-    {
-        if (order.GetType() == Order::EOrderTypes::DirectCode)
-        {
-            HandleDirectCode(order);
-            return;
-        }
-
-        ICallable* callable = CodeGenerator.GetCallable(order);
-
-        if (callable == nullptr)
-        {
-            if (CodeGenerator.IsInMode(CodeGenerator::EModes::ORDER_QUEUE))
-            {
-                CodeGenerator.EnqueueInOrderQueue(order);
-                return;
-            }
-
-            if (CodeGenerator.IsInMode(CodeGenerator::EModes::COMMENT))
-            {
-                return;
-            }
-
-            Logger.Log("No callable found for order: " + order.GetName(), Logger::ERROR);
-
-            return;
-        }
-
-        if (CodeGenerator.IsInMode(CodeGenerator::EModes::ORDER_QUEUE) && !callable->IsCodeStackProof())
-        {
-            CodeGenerator.EnqueueInOrderQueue(order);
-            return;
-        }
-
-        if (CodeGenerator.IsInMode(CodeGenerator::EModes::COMMENT) && !callable->IsCommentProof())
-        {
-            return;
-        }
-
-        callable = callable->Get();
-        callable->Execute();
-    }
-
-    void HandleDirectCode(Order order)
-    {
-        if (CodeGenerator.IsInMode(CodeGenerator::EModes::ORDER_QUEUE))
-        {
-            CodeGenerator.EnqueueInOrderQueue(order);
-            return;
-        }
-
-        if (CodeGenerator.IsInMode(CodeGenerator::EModes::COMMENT))
-        {
-            return;
-        }
-
-        this->assemblyCode->AddCode(order.GetName());
     }
 };

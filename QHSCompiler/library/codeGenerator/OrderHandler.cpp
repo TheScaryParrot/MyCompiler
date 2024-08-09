@@ -5,25 +5,23 @@
 #include "../InputFile.cpp"
 #include "../Order.cpp"
 #include "../scanner/Scanner.cpp"
+#include "../utils/Logger.cpp"
 #include "../utils/Queue.cpp"
 #include "../utils/Stack.cpp"
 #include "OrderQueue.cpp"
 
-static class OrderHandler
+class OrderHandler
 {
    public:
-    void Init(InputFile* file) { this->scanner = new Scanner(file); }
-    OrderHandler() = default;
+    OrderHandler(InputFile* file) { this->scanner = new Scanner(file); }
     ~OrderHandler() { delete scanner; }
 
-    Order GetCurrentOrder() { return currentOrder; }
     /// @brief Advances next order; order can be retrieved from GetCurrentOrder()
     Order GetNextOrder()
     {
         if (orderStackDepth >= orderQueues.size())
         {
-            currentOrder = scanner->ScanOrder();
-            return currentOrder;
+            return scanner->ScanOrder();
         }
 
         auto queueIterator = orderQueues.begin() + orderStackDepth;
@@ -37,13 +35,20 @@ static class OrderHandler
             if (queue != nullptr) delete queue;
         }
 
-        currentOrder = order;
-        return currentOrder;
+        return order;
     }
 
-    void IncrementOrderStackDepth() { orderStackDepth++; }
+    void IncrementOrderStackDepth()
+    {
+        Logger.Log("Incrementing order stack depth", Logger::DEBUG);
+        orderStackDepth++;
+    }
 
-    void DecreaseOrderStackDepth() { orderStackDepth--; }
+    void DecreaseOrderStackDepth()
+    {
+        Logger.Log("Decrementing order stack depth", Logger::DEBUG);
+        orderStackDepth--;
+    }
 
     void PutInFront(Order order)
     {
@@ -72,6 +77,4 @@ static class OrderHandler
     unsigned int orderStackDepth = 0;
 
     std::vector<OrderQueue*> orderQueues;
-
-    Order currentOrder = Order::Empty();
-} OrderHandler;
+};
