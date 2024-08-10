@@ -125,7 +125,7 @@ static class CodeGenerator
     void PutInFront(Order order) { orderHandler->PutInFront(order); }
     void PutInFront(OrderQueue orderQueue) { orderHandler->PutInFront(orderQueue); }
 
-    void IncrementOrderQueueDepth()
+    void IncrementOrderQueueMode()
     {
         orderQueueDepthCounter++;
 
@@ -134,7 +134,7 @@ static class CodeGenerator
             PushMode(EModes::ORDER_QUEUE);
         }
     }
-    void DecrementOrderQueueDepth()
+    void DecrementOrderQueueMode()
     {
         orderQueueDepthCounter--;
 

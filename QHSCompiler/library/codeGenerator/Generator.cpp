@@ -63,7 +63,7 @@ class Generator
                     CodeGenerator.EnqueueInOrderQueue(CodeGenerator.GetCurrentOrder());
                 }
 
-                CodeGenerator.IncrementOrderQueueDepth();
+                CodeGenerator.IncrementOrderQueueMode();
             });
         enterOrderQueue->SetOrderQueueProof(true);
         CodeGenerator.AddInstruction("enterOrderQueue", enterOrderQueue);
@@ -74,7 +74,7 @@ class Generator
             {
                 Logger.Log("Exiting order queue mode", Logger::DEBUG);
 
-                CodeGenerator.DecrementOrderQueueDepth();
+                CodeGenerator.DecrementOrderQueueMode();
 
                 // If is still in OrderQueue Mode, push the current orQueue //
                 // (exitOrderStack) to the order queue
