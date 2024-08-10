@@ -10,11 +10,11 @@ section .text
 Hello:
 mov rbp, rsp
 sub rsp, 4
-mov rax, 68
-mov [rbp-4], rax
+mov eax, 68
+mov [rbp-4], eax
 sub rsp, 4
-mov rax, [rbp-4]
-mov [rsp], rax
+mov eax, dword [rbp-4]
+mov [rsp], eax
 mov rax, 1
 mov rdi, 1
 mov rsi, rsp 
@@ -22,8 +22,8 @@ mov rdx, 4
 syscall
 add rsp, 4
 sub rsp, 1
-mov rax, 0xa
-mov [rsp], rax
+mov al, 0xa
+mov [rsp], al
 mov rax, 1
 mov rdi, 1
 mov rsi, rsp 
@@ -46,11 +46,14 @@ mov rsi, wordToGuess
 mov rdx, wordLength
 syscall
 sub rsp, 4
-mov rax, 65
-mov [rbp-4], rax
+mov eax, 65
+mov [rbp-4], eax
 sub rsp, 4
-mov rax, [rbp-4]
-mov [rsp], rax
+mov eax, 66
+mov [rbp-8], eax
+sub rsp, 4
+mov eax, dword [rbp-4]
+mov [rsp], eax
 mov rax, 1
 mov rdi, 1
 mov rsi, rsp 
@@ -58,8 +61,26 @@ mov rdx, 4
 syscall
 add rsp, 4
 sub rsp, 1
-mov rax, 0xa
-mov [rsp], rax
+mov al, 0xa
+mov [rsp], al
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp 
+mov rdx, 1
+syscall
+add rsp, 1
+sub rsp, 4
+mov eax, dword [rbp-8]
+mov [rsp], eax
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp 
+mov rdx, 4
+syscall
+add rsp, 4
+sub rsp, 1
+mov al, 0xa
+mov [rsp], al
 mov rax, 1
 mov rdi, 1
 mov rsi, rsp 

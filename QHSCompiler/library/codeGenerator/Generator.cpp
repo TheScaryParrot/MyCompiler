@@ -217,6 +217,38 @@ class Generator
         CodeGenerator.AddInstruction("escapedForceExecuteNextOrderInEncounterPhase",
                                      escapedForceExecuteNextOrderInEncounterPhase);
 
+        ICallable* executeDirectCodeFromOrderQueueAsIdentifer = new Callable();
+        executeDirectCodeFromOrderQueueAsIdentifer->SetExecuteFunction(
+            []()
+            {
+                Order orderqueuePop = CodeGenerator.DequeueFromOrderQueue();
+
+                if (orderqueuePop.GetType() != Order::DirectCode)
+                {
+                    Logger.Log("Tried executeDirectCodeFromOrderQueueAsIdentifer but next order " +
+                                   orderqueuePop.GetName() + " is not direct code",
+                               Logger::ERROR);
+                    return;
+                }
+
+                Logger.Log("Executing direct code from order queue: " + orderqueuePop.GetName() + " as callable",
+                           Logger::DEBUG);
+
+                Order identiferOrder = Order(orderqueuePop.GetName(), Order::Identifier);
+
+                ICallable* callable = CodeGenerator.GetCallable(identiferOrder);
+
+                if (callable == nullptr)
+                {
+                    Logger.Log("No callable found for order: " + orderqueuePop.GetName(), Logger::ERROR);
+                    return;
+                }
+
+                callable->Execute();
+            });
+        CodeGenerator.AddInstruction("executeDirectCodeFromOrderQueueAsIdentifer",
+                                     executeDirectCodeFromOrderQueueAsIdentifer);
+
         ICallable* assignNextIdentifier = new Callable();
         assignNextIdentifier->SetExecuteFunction(
             []()

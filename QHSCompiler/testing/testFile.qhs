@@ -64,6 +64,14 @@ debug */
 { #pushNextOrderToOrderQueue #forceExecuteNextOrder } >> ! ;
 #makeNextOrderOrderQueueProof ! ;
 
+{
+    /* TODO: Add this */
+} >> saveIdentifier ;
+
+{
+    /* TODO: Add this */
+} >> restoreIdentifier ;
+
 /* swapping */
 
 { 
@@ -81,27 +89,119 @@ $ $ */
     "mov rbp, rsp" ;
 } >> start ;
 
-/* variables */
-{
-    -> assignCode ;
+/* ------------------ data handling ------------------ */
+/* types */
+{ "4" } >> int ;
+{ var ! int } >> intVar ;
 
+{ "1" } >> bool ;
+{ var ! bool } >> boolVar ;
+
+{ "not good 1" } >> 1 ;
+{ "not good 2" } >> 2 ;
+{ "not good 4" } >> 4 ;
+{ "not good 8" } >> 8 ;
+
+{
+    -> size
+
+    { #pushNextOrderToOrderQueue ! 1 } >> _1 
+    { #pushNextOrderToOrderQueue ! 2 } >> _2 
+    { #pushNextOrderToOrderQueue ! 4 } >> _4 
+    { #pushNextOrderToOrderQueue ! 8 } >> _8 
+
+    { "byte" } >> 1
+    { "word" } >> 2
+    { "dword" } >> 4
+    { "qword" } >> 8
+
+    { #pushNextOrderToOrderQueue ! size } #executeDirectCodeFromOrderQueueAsIdentifer
+
+    { #pushNextOrderToOrderQueue ! _1 } >> 1 
+    { #pushNextOrderToOrderQueue ! _2 } >> 2 
+    { #pushNextOrderToOrderQueue ! _4 } >> 4 
+    { #pushNextOrderToOrderQueue ! _8 } >> 8 
+
+} >> getSizeSpecifier ;
+
+{
+    -> size
+
+    { #pushNextOrderToOrderQueue ! 1 } >> _1 
+    { #pushNextOrderToOrderQueue ! 2 } >> _2 
+    { #pushNextOrderToOrderQueue ! 4 } >> _4 
+    { #pushNextOrderToOrderQueue ! 8 } >> _8 
+
+    { "al" } >> 1
+    { "ax" } >> 2
+    { "eax" } >> 4
+    { "rax" } >> 8
+
+    { #pushNextOrderToOrderQueue ! size } #executeDirectCodeFromOrderQueueAsIdentifer
+
+    { #pushNextOrderToOrderQueue ! _1 } >> 1 
+    { #pushNextOrderToOrderQueue ! _2 } >> 2 
+    { #pushNextOrderToOrderQueue ! _4 } >> 4 
+    { #pushNextOrderToOrderQueue ! _8 } >> 8 
+} >> getRegisterA ;
+
+{
+    -> size
+
+    { #pushNextOrderToOrderQueue ! 1 } >> _1 
+    { #pushNextOrderToOrderQueue ! 2 } >> _2 
+    { #pushNextOrderToOrderQueue ! 4 } >> _4 
+    { #pushNextOrderToOrderQueue ! 8 } >> _8 
+
+    { "db" } >> 1
+    { "dw" } >> 2
+    { "dd" } >> 4
+    { "dq" } >> 8
+
+    { #pushNextOrderToOrderQueue ! size } #executeDirectCodeFromOrderQueueAsIdentifer
+
+    { #pushNextOrderToOrderQueue ! _1 } >> 1 
+    { #pushNextOrderToOrderQueue ! _2 } >> 2 
+    { #pushNextOrderToOrderQueue ! _4 } >> 4 
+    { #pushNextOrderToOrderQueue ! _8 } >> 8 
+} >> getDefineSpecifier ;
+
+/* ------------------ variables ------------------ */
+{
+    -> defineCode ;
+    
     lateArg>> name ;
 
     /* assigns what is stored in name to the direct code of what is stored in name */
     { #pushNextOrderToOrderQueue ! #putInFrontNextOrderAsDirectCode #pushNextOrderToOrderQueue #escapedForceExecuteNextOrderInEncounterPhase name } >>executeOnce name ;
 
-    name ": " assignCode ;
-} >> roDataVar
+    name ": " defineCode ;
+} >> varFromDefineCode ;
 
 {
-    -> assignCode ;
-
+    lateArg>> size ;
     lateArg>> name ;
+    lateArg>> value ;
+
+    { ( #pushNextOrderToOrderQueue ! size ) getDefineSpecifier } >> defineSpecifier ;
 
     /* assigns whast is stored in name to the direct code of what is stored in name */
     { #pushNextOrderToOrderQueue ! #putInFrontNextOrderAsDirectCode #pushNextOrderToOrderQueue #escapedForceExecuteNextOrderInEncounterPhase name } >>executeOnce name ;
 
-    name ": " assignCode ;
+    name ": " defineSpecifier " " value ;
+} >> roDataVar
+
+{
+    lateArg>> size ;
+    lateArg>> name ;
+    lateArg>> value ;
+
+    { ( #pushNextOrderToOrderQueue ! size ) getDefineSpecifier } >> defineSpecifier ;
+
+    /* assigns whast is stored in name to the direct code of what is stored in name */
+    { #pushNextOrderToOrderQueue ! #putInFrontNextOrderAsDirectCode #pushNextOrderToOrderQueue #escapedForceExecuteNextOrderInEncounterPhase name } >>executeOnce name ;
+
+    name ": " defineSpecifier " " value ;
 } >> dataVar ;
 
 {
@@ -122,15 +222,18 @@ $ $ */
     lateArg>> name ;
     lateArg>> value ;
 
-    "sub rsp, " size ;
-    "mov rax, " value ;
+    { ( #pushNextOrderToOrderQueue ! size ) getRegisterA } >> register ;
+    { ( #pushNextOrderToOrderQueue ! size ) getSizeSpecifier } >> sizeSpecifier ;
     { "[rbp-" #pushNextOrderToOrderQueue ! newLocalVarOffset "]" } >> address ;
-    "mov " address ", rax" ;
 
-    { #pushNextOrderToOrderQueue ! address } >>executeOnce name ;
+    "sub rsp, " size ;
+    "mov " register ", " value ;
+    "mov " address ", " register ;
+
+    { #pushNextOrderToOrderQueue ! sizeSpecifier " " #pushNextOrderToOrderQueue ! address } >>executeOnce name ;
 } >> localVar ;
 
-/* functions */
+/* ------------------ functions  ------------------ */
 {
     "mov rbp, rsp" ;
 } >> funcBodyPreamble ;
@@ -162,7 +265,12 @@ $ $ */
 
 } >> func ;
 
-/* sections */
+{
+    "mov rsp, rbp" ;
+    "ret" ;
+} >> return ;
+
+/* ------------------ sections ------------------ */
 { 
     "section .rodata" ; 
     { roDataVar } >> var ;
@@ -183,7 +291,7 @@ $ $ */
     { localVar } >> var ;
 } >> text ;
 
-/* syscalls */
+/* ------------------ syscalls ------------------ */
 {
     "mov rax, 60" ;
     "mov rdi, 0" ;
@@ -205,9 +313,11 @@ $ $ */
     -> message
     -> length
 
+    { ( #pushNextOrderToOrderQueue ! length ) getRegisterA } >> register ;
+
     "sub rsp, " length ;
-    "mov rax, " message ;
-    "mov [rsp], rax" ;
+    "mov " register ", " message ;
+    "mov [rsp], " register ;
 
     ( "rsp " length ) rawPrint ;
 
@@ -222,28 +332,24 @@ $ $ */
 } >> println ;
 
 
-/* types */
-{ "4" } >> int ;
-{ "1" } >> bool ;
-
-/* actually coding */
+/* ------------------ actually coding ------------------ */
 
 /* rodata */
 rodata ;
 
-( "db 'moin', 0xa" ) var wordToGuess ;
+( "db 'moin', 0xa" ) varFromDefineCode wordToGuess ;
 
-( "equ $ - wordToGuess" ) var wordLength ;
+( "equ $ - wordToGuess" ) varFromDefineCode wordLength ;
 
 /* data */
 data ;
 
-( "dd 67" ) var testDataInt ;
+intVar testDataInt "67" ;
 
 /* bss */
 bss ;
 
-var int testBssInt ;
+intVar testBssInt ;
 
 /* text */
 text ;
@@ -252,11 +358,10 @@ text ;
 
 func Hello ;
 
-( "4" ) var int a "68" ;
+( "4" ) intVar a "68" ;
 ( a "4" ) println ;
 
-"mov rsp, rbp" ;
-"ret" ;
+return ;
 
 /* start */
 start ;
@@ -264,17 +369,15 @@ start ;
 
 ( wordToGuess wordLength ) rawPrint ;
 
-{ ( wordToGuess wordLength ) rawPrint ; } >> printWord ;
+{ ( wordToGuess wordLength ) rawPrint } >> printWord ;
 
 printWord ;
 
-{ var int } >> intVar ;
-
 ( "4" ) intVar num "65" ; 
-/* ( "8" ) localVar int num2 "66" ; */
+( "8" ) intVar num2 "66" ;
 
 ( num "4" ) println ;
-/* ( num2 "4" ) println ; */
+( num2 "4" ) println ;
 
 ( testDataInt "4" ) rawPrint ;
 

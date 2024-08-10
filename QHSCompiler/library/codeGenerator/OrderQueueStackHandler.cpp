@@ -17,7 +17,17 @@ class OrderQueueStackHandler
         orderQueueStack.Top()->Enqueue(order);
     }
 
-    Order DequeueOrder() { return orderQueueStack.Top()->Dequeue(); }
+    Order DequeueOrder()
+    {
+        Order order = orderQueueStack.Top()->Dequeue();
+
+        if (orderQueueStack.Top()->IsEmpty())
+        {
+            delete orderQueueStack.Pop();
+        }
+
+        return order;
+    }
     OrderQueue* PopOrderQueue() { return orderQueueStack.Pop(); }
 
     void ClearAllOrderQueues() { orderQueueStack = Stack<OrderQueue*>(); }
