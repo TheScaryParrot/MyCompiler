@@ -30,6 +30,8 @@ class Generator
 
     void InitInstructions()
     {
+#pragma region Comment
+
         ICallable* enterComment = new Callable();
         enterComment->SetExecuteFunction([]() { CodeGenerator.PushMode(CodeGenerator::EModes::COMMENT); });
         enterComment->SetOrderQueueProof(true);
@@ -50,6 +52,8 @@ class Generator
         exitComment->SetCommentProof(true);
         CodeGenerator.AddInstruction("exitComment", exitComment);
 
+#pragma endregion
+#pragma region OrderQueue
         ICallable* enterOrderQueue = new Callable();
         enterOrderQueue->SetExecuteFunction(
             []()
@@ -108,6 +112,8 @@ class Generator
                 CodeGenerator.PutInFrontFromOrderQueue();
             });
         CodeGenerator.AddInstruction("putInFrontFromOrderQueue", putInFrontFromOrderQueue);
+
+#pragma endregion
 
         ICallable* replaceWithOneOrderHandlerStackDepthDeeper = new Callable();
         replaceWithOneOrderHandlerStackDepthDeeper->SetExecuteFunction(
@@ -249,6 +255,8 @@ class Generator
         CodeGenerator.AddInstruction("executeDirectCodeFromOrderQueueAsIdentifer",
                                      executeDirectCodeFromOrderQueueAsIdentifer);
 
+#pragma region New Orders
+
         ICallable* assignNextIdentifier = new Callable();
         assignNextIdentifier->SetExecuteFunction(
             []()
@@ -350,6 +358,136 @@ class Generator
             });
         CodeGenerator.AddInstruction("makeNextOrderCommentProof", makeNextOrderCommentProof);
 
+#pragma endregion
+
+#pragma region GeneratorVars
+
+        // Expects generator var name as Dequeue of OrderQueue as DirectCode
+        ICallable* getIntGeneratorVar = new Callable();
+        getIntGeneratorVar->SetExecuteFunction(
+            []()
+            {
+                Order nameOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (nameOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log("Tried getIntGeneratorVar but order from OrderQueue is not direct code", Logger::ERROR);
+                    return;
+                }
+
+                std::string generatorVarName = nameOrder.GetName();
+                int value = CodeGenerator.GetIntGeneratorVar(generatorVarName);
+                CodeGenerator.PutInFront(Order(std::to_string(value), Order::DirectCode));
+            });
+        CodeGenerator.AddInstruction("getIntGeneratorVar", getIntGeneratorVar);
+
+        // Expects generator var name first and value second as Dequeue of OrderQueue as DirectCode
+        ICallable* setIntGeneratorVar = new Callable();
+        setIntGeneratorVar->SetExecuteFunction(
+            []()
+            {
+                Order nameOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (nameOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log("Tried setIntGeneratorVar but first order (name) from OrderQueue is not direct code",
+                               Logger::ERROR);
+                    return;
+                }
+
+                Order valueOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (valueOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log("Tried setIntGeneratorVar but second order (value) from OrderQueue is not direct code",
+                               Logger::ERROR);
+                    return;
+                }
+
+                std::string generatorVarName = nameOrder.GetName();
+                int value = std::stoi(valueOrder.GetName());
+                CodeGenerator.SetIntGeneratorVar(generatorVarName, value);
+            });
+        CodeGenerator.AddInstruction("setIntGeneratorVar", setIntGeneratorVar);
+
+        // Expects generator var name first and change second as Dequeue of OrderQueue as DirectCode
+        ICallable* changeIntGeneratorVar = new Callable();
+        changeIntGeneratorVar->SetExecuteFunction(
+            []()
+            {
+                Order nameOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (nameOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log("Tried changeIntGeneratorVar but first order (name) from OrderQueue is not direct code",
+                               Logger::ERROR);
+                    return;
+                }
+
+                Order changeOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (changeOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log(
+                        "Tried changeIntGeneratorVar but second order (change) from OrderQueue is not direct code",
+                        Logger::ERROR);
+                    return;
+                }
+
+                std::string generatorVarName = nameOrder.GetName();
+                int change = std::stoi(changeOrder.GetName());
+
+                int value = CodeGenerator.GetIntGeneratorVar(generatorVarName);
+                value += change;
+
+                CodeGenerator.SetIntGeneratorVar(generatorVarName, value);
+            });
+        CodeGenerator.AddInstruction("changeIntGeneratorVar", changeIntGeneratorVar);
+
+        // Expects generator var name as Dequeue of OrderQueue as DirectCode
+        ICallable* getStringGeneratorVar = new Callable();
+        getStringGeneratorVar->SetExecuteFunction(
+            []()
+            {
+                Order nameOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (nameOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log("Tried getStringGeneratorVar but order from OrderQueue is not direct code",
+                               Logger::ERROR);
+                    return;
+                }
+
+                std::string generatorVarName = nameOrder.GetName();
+                std::string value = CodeGenerator.GetStringGeneratorVar(generatorVarName);
+                CodeGenerator.PutInFront(Order(value, Order::DirectCode));
+            });
+        CodeGenerator.AddInstruction("getStringGeneratorVar", getStringGeneratorVar);
+
+        // Expects generator var name first and value second as Dequeue of OrderQueue as DirectCode
+        ICallable* setStringGeneratorVar = new Callable();
+        setStringGeneratorVar->SetExecuteFunction(
+            []()
+            {
+                Order nameOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (nameOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log("Tried setStringGeneratorVar but first order (name) from OrderQueue is not direct code",
+                               Logger::ERROR);
+                    return;
+                }
+
+                Order valueOrder = CodeGenerator.DequeueFromOrderQueue();
+                if (valueOrder.GetType() != Order::DirectCode)
+                {
+                    Logger.Log(
+                        "Tried setStringGeneratorVar but second order (value) from OrderQueue is not direct code",
+                        Logger::ERROR);
+                    return;
+                }
+
+                std::string generatorVarName = nameOrder.GetName();
+                std::string value = valueOrder.GetName();
+                CodeGenerator.SetStringGeneratorVar(generatorVarName, value);
+            });
+        CodeGenerator.AddInstruction("setStringGeneratorVar", setStringGeneratorVar);
+
+#pragma endregion
+
         ICallable* putInFrontNextOrderAsDirectCode = new Callable();
         putInFrontNextOrderAsDirectCode->SetExecuteFunction(
             []()
@@ -359,6 +497,8 @@ class Generator
                 CodeGenerator.PutInFront(directCode);
             });
         CodeGenerator.AddInstruction("putInFrontNextOrderAsDirectCode", putInFrontNextOrderAsDirectCode);
+
+#pragma region Debug
 
         ICallable* debug = new Callable();
         debug->SetExecuteFunction([]() { Logger.Log("DEBUG PRINT", Logger::DEBUG); });
@@ -381,5 +521,7 @@ class Generator
         ICallable* deactivateDebugMode = new Callable();
         deactivateDebugMode->SetExecuteFunction([]() { Logger.SetDebug(false); });
         CodeGenerator.AddInstruction("deactivateDebugMode", deactivateDebugMode);
+
+#pragma endregion
     }
 };

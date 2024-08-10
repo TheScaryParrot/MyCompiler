@@ -5,6 +5,7 @@
 
 #include "../assembly/AssemblyCode.cpp"
 #include "../utils/Logger.cpp"
+#include "../utils/Map.cpp"
 #include "Environment.cpp"
 #include "OrderHandler.cpp"
 #include "OrderQueueStackHandler.cpp"
@@ -156,19 +157,45 @@ static class CodeGenerator
     }
     void AddIdentifier(std::string name, ICallable* identifier) { identifierEnvironment.AddCallable(name, identifier); }
 
+    int GetIntGeneratorVar(std::string name)
+    {
+        if (!intGeneratorVars.Contains(name))
+        {
+            Logger.Log("No int generator variable found with name: " + name, Logger::ERROR);
+            return 0;
+        }
+
+        return intGeneratorVars.Get(name);
+    }
+    void SetIntGeneratorVar(std::string name, int value) { intGeneratorVars.Set(name, value); }
+
+    std::string GetStringGeneratorVar(std::string name)
+    {
+        if (!stringGeneratorVars.Contains(name))
+        {
+            Logger.Log("No string generator variable found with name: " + name, Logger::ERROR);
+            return "";
+        }
+
+        return stringGeneratorVars.Get(name);
+    }
+    void SetStringGeneratorVar(std::string name, std::string value) { stringGeneratorVars.Set(name, value); }
+
    private:
     AssemblyCode* assemblyCode;
 
-    unsigned int orderQueueDepthCounter = 0;
-
     Stack<EModes> modeStack = Stack<EModes>();
 
+    unsigned int orderQueueDepthCounter = 0;
     OrderQueueStackHandler orderQueueStack = OrderQueueStackHandler();
 
     Environment identifierEnvironment = Environment();
-
     Environment instructionEnvironment = Environment();
 
     OrderHandler* orderHandler;
     Order currentOrder = Order::Empty();
+
+    Map<std::string, int> intGeneratorVars;
+    Map<std::string, std::string> stringGeneratorVars;
+
 } CodeGenerator;

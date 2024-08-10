@@ -84,6 +84,7 @@ debug */
 $ $ */
 
 {
+    resetRBPoffset ;
     "global _start" ;
     "_start:" ;
     "mov rbp, rsp" ;
@@ -216,15 +217,17 @@ $ $ */
 } >> bssVar ;
 
 {
-    -> newLocalVarOffset ;
-
     lateArg>> size ;
     lateArg>> name ;
     lateArg>> value ;
 
     { ( #pushNextOrderToOrderQueue ! size ) getRegisterA } >> register ;
     { ( #pushNextOrderToOrderQueue ! size ) getSizeSpecifier } >> sizeSpecifier ;
-    { "[rbp-" #pushNextOrderToOrderQueue ! newLocalVarOffset "]" } >> address ;
+
+    { "rbpOffset" #pushNextOrderToOrderQueue ! size } #changeIntGeneratorVar
+    { "rbpOffset" } ( #pushNextOrderToOrderQueue ! #getIntGeneratorVar ) >> currentRBPoffset
+    ( "rbp-" #pushNextOrderToOrderQueue ! currentRBPoffset ) >> newRBPvar
+    { "[" #pushNextOrderToOrderQueue ! newRBPvar "]" } >> address ;
 
     "sub rsp, " size ;
     "mov " register ", " value ;
@@ -234,6 +237,8 @@ $ $ */
 } >> localVar ;
 
 /* ------------------ functions  ------------------ */
+{ { "rbpOffset" "0" } #setIntGeneratorVar } >> resetRBPoffset ;
+
 {
     "mov rbp, rsp" ;
 } >> funcBodyPreamble ;
@@ -258,6 +263,8 @@ $ $ */
         "call " directFuncName ;
         ! funcCallPostamble ;
     } >>executeOnce name ;
+
+    resetRBPoffset ;
 
     directFuncName ":" ;
 
@@ -358,8 +365,8 @@ text ;
 
 func Hello ;
 
-( "4" ) intVar a "68" ;
-( a "4" ) println ;
+intVar a "68" ;
+( a ! int ) println ;
 
 return ;
 
@@ -373,13 +380,13 @@ start ;
 
 printWord ;
 
-( "4" ) intVar num "65" ; 
-( "8" ) intVar num2 "66" ;
+intVar num "65" ; 
+intVar num2 "66" ;
 
-( num "4" ) println ;
-( num2 "4" ) println ;
+( num ! int ) println ;
+( num2 ! int ) println ;
 
-( testDataInt "4" ) rawPrint ;
+( testDataInt ! int ) rawPrint ;
 
 Hello ;
 
