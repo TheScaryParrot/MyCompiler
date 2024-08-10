@@ -7,6 +7,31 @@ testDataInt: dd 67
 section .bss
 testBssInt: resb 4
 section .text
+Hello:
+mov rbp, rsp
+sub rsp, 4
+mov rax, 68
+mov [rbp-4], rax
+sub rsp, 4
+mov rax, [rbp-4]
+mov [rsp], rax
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp 
+mov rdx, 4
+syscall
+add rsp, 4
+sub rsp, 1
+mov rax, 0xa
+mov [rsp], rax
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp 
+mov rdx, 1
+syscall
+add rsp, 1
+mov rsp, rbp
+ret
 global _start
 _start:
 mov rbp, rsp
@@ -46,7 +71,9 @@ mov rdi, 1
 mov rsi, testDataInt
 mov rdx, 4
 syscall
+push rbp
+call Hello
+pop rbp
 mov rax, 60
 mov rdi, 0
 syscall
-

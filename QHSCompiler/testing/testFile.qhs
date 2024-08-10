@@ -130,6 +130,38 @@ $ $ */
     { #pushNextOrderToOrderQueue ! address } >>executeOnce name ;
 } >> localVar ;
 
+/* functions */
+{
+    "mov rbp, rsp" ;
+} >> funcBodyPreamble ;
+
+{
+    "push rbp" ;
+} >> funcCallPreamble ;
+
+{
+    "pop rbp" ;
+} >> funcCallPostamble ;
+
+{
+    lateArg>> name ;
+
+    /* assigns what is stored in name to the direct code of what is stored in name */
+    { #pushNextOrderToOrderQueue ! #putInFrontNextOrderAsDirectCode #pushNextOrderToOrderQueue #escapedForceExecuteNextOrderInEncounterPhase name } >> directFuncName ;
+
+    /* assign call to the identifer in latearg name */
+    { 
+        ! funcCallPreamble ;
+        "call " directFuncName ;
+        ! funcCallPostamble ;
+    } >>executeOnce name ;
+
+    directFuncName ":" ;
+
+    funcBodyPreamble ;
+
+} >> func ;
+
 /* sections */
 { 
     "section .rodata" ; 
@@ -215,6 +247,18 @@ var int testBssInt ;
 
 /* text */
 text ;
+
+/* functions */
+
+func Hello ;
+
+( "4" ) var int a "68" ;
+( a "4" ) println ;
+
+"mov rsp, rbp" ;
+"ret" ;
+
+/* start */
 start ;
 
 
@@ -233,6 +277,8 @@ printWord ;
 /* ( num2 "4" ) println ; */
 
 ( testDataInt "4" ) rawPrint ;
+
+Hello ;
 
 exit ;
 
