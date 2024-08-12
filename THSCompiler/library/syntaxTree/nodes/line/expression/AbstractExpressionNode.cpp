@@ -8,6 +8,8 @@ class AbstractExpressionNode : public AbstractStatementNode
    public:
     AbstractExpressionNode();
     virtual ~AbstractExpressionNode();
+
+    virtual bool RequiresAXRegister() = 0;
 };
 
 AbstractExpressionNode::AbstractExpressionNode() : AbstractStatementNode() {}

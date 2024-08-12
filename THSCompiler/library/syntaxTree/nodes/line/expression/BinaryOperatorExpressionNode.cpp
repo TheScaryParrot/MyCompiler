@@ -8,48 +8,36 @@
 class BinaryOperatorExpressionNode : public AbstractExpressionNode
 {
    public:
-    BinaryOperatorExpressionNode(AbstractExpressionNode* firstExpression,
-                                 std::vector<OperatorExpressionPair*>* OperatorValuePairs = nullptr);
-    ~BinaryOperatorExpressionNode();
-
-    virtual std::string ToString() override;
-
-    AbstractExpressionNode* firstExpression;
-    std::vector<OperatorExpressionPair*>* operatorExpressionPairs;
-};
-
-BinaryOperatorExpressionNode::BinaryOperatorExpressionNode(
-    AbstractExpressionNode* firstExpression, std::vector<OperatorExpressionPair*>* operatorExpressionPairs)
-    : AbstractExpressionNode()
-{
-    this->firstExpression = firstExpression;
-    this->operatorExpressionPairs = operatorExpressionPairs;
-}
-
-BinaryOperatorExpressionNode::~BinaryOperatorExpressionNode()
-{
-    delete firstExpression;
-
-    for (OperatorExpressionPair* pair : *operatorExpressionPairs)
+    BinaryOperatorExpressionNode(AbstractExpressionNode* firstExpression, std::vector<OperatorExpressionPair*> operatorExpressionPairs)
+        : AbstractExpressionNode()
     {
-        delete pair;
+        this->firstExpression = firstExpression;
+        this->operatorExpressionPairs = operatorExpressionPairs;
     }
-    delete operatorExpressionPairs;
-}
-
-std::string BinaryOperatorExpressionNode::ToString()
-{
-    std::string result = firstExpression->ToString();
-
-    if (operatorExpressionPairs == nullptr)
+    ~BinaryOperatorExpressionNode()
     {
+        delete firstExpression;
+
+        for (OperatorExpressionPair* pair : operatorExpressionPairs)
+        {
+            delete pair;
+        }
+    }
+
+    virtual bool RequiresAXRegister() override { return true; }
+
+    virtual std::string ToString() override
+    {
+        std::string result = firstExpression->ToString();
+
+        for (OperatorExpressionPair* pair : operatorExpressionPairs)
+        {
+            result += pair->ToString();
+        }
+
         return result;
     }
 
-    for (OperatorExpressionPair* pair : *operatorExpressionPairs)
-    {
-        result += pair->ToString();
-    }
-
-    return result;
-}
+    AbstractExpressionNode* firstExpression;
+    std::vector<OperatorExpressionPair*> operatorExpressionPairs;
+};

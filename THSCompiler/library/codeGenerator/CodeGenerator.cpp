@@ -12,7 +12,6 @@
 #include "types/primitiveTypes/FloatType.cpp"
 #include "types/primitiveTypes/IntType.cpp"
 #include "varLocation/RegistryPointerVarLocation.cpp"
-#include "varLocation/RegistryVarLocation.cpp"
 #include "varLocation/constVarLocations/BoolConstVarLocation.cpp"
 #include "varLocation/constVarLocations/FloatConstVarLocation.cpp"
 #include "varLocation/constVarLocations/IntConstVarLocation.cpp"
@@ -51,10 +50,9 @@ class CodeGenerator
     std::shared_ptr<Type> GetType(std::string typeName) { return environmentLinkedList.GetType(typeName); }
     void AddType(std::string typeName, std::shared_ptr<Type> type) { environmentLinkedList.AddType(typeName, type); }
 
-    Variable* GetNewRegisterVariable(std::shared_ptr<Type> type, bool isFinal, AssemblyCode* assemblyCode)
+    Variable* GetAXRegisterVariable(std::shared_ptr<Type> type, bool isFinal, AssemblyCode* assemblyCode)
     {
-        // TODO: Get free register
-        IVariableLocation* location = AssemblyCodeGenerator.GetNewRegistryVarLocation(type->GetSize(), assemblyCode);
+        IVariableLocation* location = AssemblyCodeGenerator.GetNewAXRegisterVarLocation(type->GetSize(), assemblyCode);
         return new Variable(std::shared_ptr<IVariableLocation>(location), type, isFinal);
     }
     Variable* GetNewLocalVariable(std::shared_ptr<Type> type, bool isFinal, AssemblyCode* assemblyCode)
@@ -166,9 +164,20 @@ class CodeGenerator
             }
             else
             {
-                Variable* newLocalVariable = GetNewLocalVariable(left->type, false, assemblyCode);
-                left->type->GenerateAssign(newLocalVariable->location, rightLocation, assemblyCode);
-                left = std::shared_ptr<Variable>(newLocalVariable);
+                // If the right location is AX safe it in DX and left in AX. This ensures 1. AX is not overriden, 2. that always AX and never DX is
+                // returned as the result
+                if (right->location->IsAXregister())
+                {
+                    std::shared_ptr<IVariableLocation> dxRegister =
+                        std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewDXRegisterVarLocation(right->type->GetSize(), assemblyCode));
+                    right->type->GenerateAssign(dxRegister, right->location, assemblyCode);
+                    rightLocation = dxRegister;
+                }
+
+                Variable* axRegister = GetAXRegisterVariable(left->type, false, assemblyCode);
+                left->type->GenerateAssign(axRegister->location, leftLocation, assemblyCode);
+                left = std::shared_ptr<Variable>(axRegister);
+                leftLocation = left->location;
             }
         }
 
@@ -260,7 +269,7 @@ class CodeGenerator
 
         if (condition->location->RequiresRegister())
         {
-            secondLocation.reset(AssemblyCodeGenerator.GetNewRegistryVarLocation(condition->type->GetSize(), assemblyCode));
+            secondLocation.reset(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(condition->type->GetSize(), assemblyCode));
             condition->type->GenerateAssign(secondLocation, condition->location, assemblyCode);
         }
 

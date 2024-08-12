@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../codeGenerator/varLocation/AXRegisterVarLocation.cpp"
 #include "../codeGenerator/varLocation/RegistryPointerVarLocation.cpp"
-#include "../codeGenerator/varLocation/RegistryVarLocation.cpp"
 #include "AssemblyCode.cpp"
 #include "AssemblyInstructionLine.cpp"
 
@@ -30,18 +30,36 @@ static class AssemblyCodeGenerator
         assemblyCode->AddLine(line);
     }
 
-    IVariableLocation* GetNewRegistryVarLocation(unsigned int size, AssemblyCode* assemblyCode)
+    IVariableLocation* GetNewAXRegisterVarLocation(unsigned int size, AssemblyCode* assemblyCode)
     {
         switch (size)
         {
             case 1:
-                return new RegistryVarLocation("al");
+                return new AXRegisterVarLocation("al");
             case 2:
-                return new RegistryVarLocation("ax");
+                return new AXRegisterVarLocation("ax");
             case 4:
-                return new RegistryVarLocation("eax");
+                return new AXRegisterVarLocation("eax");
             case 8:
-                return new RegistryVarLocation("rax");
+                return new AXRegisterVarLocation("rax");
+        }
+
+        Logger.Log("Invalid size for registry variable location " + std::to_string(size), Logger::ERROR);
+        return nullptr;
+    }
+
+    IVariableLocation* GetNewDXRegisterVarLocation(unsigned int size, AssemblyCode* assemblyCode)
+    {
+        switch (size)
+        {
+            case 1:
+                return new AXRegisterVarLocation("dl");
+            case 2:
+                return new AXRegisterVarLocation("dx");
+            case 4:
+                return new AXRegisterVarLocation("edx");
+            case 8:
+                return new AXRegisterVarLocation("rdx");
         }
 
         Logger.Log("Invalid size for registry variable location " + std::to_string(size), Logger::ERROR);

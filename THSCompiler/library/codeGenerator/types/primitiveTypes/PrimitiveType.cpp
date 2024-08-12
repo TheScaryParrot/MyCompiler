@@ -4,6 +4,119 @@
 
 class PrimitiveType : public Type
 {
+   public:
+    virtual void GenerateAssign(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualBinaryOperation(destination, source, "mov", assemblyCode);
+    }
+
+    virtual void GenerateAdd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualBinaryOperation(destination, source, "add", assemblyCode);
+    }
+
+    virtual void GenerateSub(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualBinaryOperation(destination, source, "sub", assemblyCode);
+    }
+
+    virtual void GenerateMul(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
+    {
+        GenerateBinaryOperationOnAXregister(destination, source, "mul", assemblyCode);
+    }
+
+    virtual void GenerateDiv(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
+    {
+        GenerateBinaryOperationOnAXregister(destination, source, "div", assemblyCode);
+    }
+
+    virtual void GenerateMod(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
+    {
+        // TODO: Add mod instruction
+    }
+
+    virtual void GenerateNot(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualUnaryOperation(destination, "not", assemblyCode);
+    }
+
+    virtual void GenerateNeg(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualUnaryOperation(destination, "neg", assemblyCode);
+    }
+
+    virtual void GenerateInc(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualUnaryOperation(destination, "inc", assemblyCode);
+    }
+
+    virtual void GenerateDec(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualUnaryOperation(destination, "dec", assemblyCode);
+    }
+
+    virtual void GenerateAnd(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                             AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualBinaryOperation(destination, source, "and", assemblyCode);
+    }
+
+    virtual void GenerateOr(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                            AssemblyCode* assemblyCode) override
+    {
+        GenerateUsualBinaryOperation(destination, source, "or", assemblyCode);
+    }
+
+    virtual void GenerateEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                               AssemblyCode* assemblyCode) override
+    {
+        GenerateComparison("e", destination, source, assemblyCode);
+    }
+
+    virtual void GenerateNotEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                  AssemblyCode* assemblyCode) override
+    {
+        GenerateComparison("ne", destination, source, assemblyCode);
+    }
+
+    virtual void GenerateLess(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                              AssemblyCode* assemblyCode) override
+    {
+        GenerateComparison("l", destination, source, assemblyCode);
+    }
+
+    virtual void GenerateLessEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                   AssemblyCode* assemblyCode) override
+    {
+        GenerateComparison("le", destination, source, assemblyCode);
+    }
+
+    virtual void GenerateGreater(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                 AssemblyCode* assemblyCode) override
+    {
+        GenerateComparison("g", destination, source, assemblyCode);
+    }
+
+    virtual void GenerateGreaterEqual(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                      AssemblyCode* assemblyCode) override
+    {
+        GenerateComparison("ge", destination, source, assemblyCode);
+    }
+
+    virtual void GenerateStackPush(std::shared_ptr<IVariableLocation> source, AssemblyCode* assemblyCode) override
+    {
+        // although push is possible (not like in BoolType, see BoolType.cpp), for consistency with the rest of the code, I do this
+        std::shared_ptr<IVariableLocation> stackVar =
+            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode));
+        GenerateAssign(stackVar, source, assemblyCode);
+    }
+
    protected:
     std::string ConstructVarLocationAccess(std::shared_ptr<IVariableLocation> location)
     {
@@ -41,6 +154,50 @@ class PrimitiveType : public Type
     }
 
    private:
+    void GenerateUsualBinaryOperation(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                      std::string operation, AssemblyCode* assemblyCode)
+    {
+        if (destination->RequiresRegister() && source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+        }
+
+        AssemblyInstructionLine* line = new AssemblyInstructionLine(operation);
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        line->AddArgument(ConstructVarLocationAccess(source));
+        assemblyCode->AddLine(line);
+    }
+
+    /// @brief Generates a binary operation that is applied to the AX register; like mul or div
+    void GenerateBinaryOperationOnAXregister(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
+                                             std::string operation, AssemblyCode* assemblyCode)
+    {
+        if (destination->IsAXregister())
+        {
+            if (source->RequiresRegister())
+            {
+                source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+            }
+
+            GenerateUsualUnaryOperation(source, operation, assemblyCode);
+            return;
+        }
+
+        std::shared_ptr<IVariableLocation> axRegister =
+            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(this->GetSize(), assemblyCode));
+
+        GenerateAssign(axRegister, destination, assemblyCode);
+        GenerateUsualUnaryOperation(source, operation, assemblyCode);
+        GenerateAssign(destination, axRegister, assemblyCode);
+    }
+
+    void GenerateUsualUnaryOperation(std::shared_ptr<IVariableLocation> destination, std::string operation, AssemblyCode* assemblyCode)
+    {
+        AssemblyInstructionLine* line = new AssemblyInstructionLine(operation);
+        line->AddArgument(ConstructVarLocationAccess(destination));
+        assemblyCode->AddLine(line);
+    }
+
     std::string GetSizeKeyword()
     {
         switch (this->GetSize())

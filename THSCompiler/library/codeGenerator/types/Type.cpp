@@ -75,8 +75,9 @@ class Type
     std::shared_ptr<IVariableLocation> ShortSafeIVarlocationOfThisTypeInRegister(std::shared_ptr<IVariableLocation> location,
                                                                                  AssemblyCode* assemblyCode)
     {
+        // Uses DX register (as AX might be used for operations)
         std::shared_ptr<IVariableLocation> registerVarLocation =
-            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewRegistryVarLocation(this->GetSize(), assemblyCode));
+            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewDXRegisterVarLocation(this->GetSize(), assemblyCode));
         this->GenerateAssign(registerVarLocation, location, assemblyCode);
         return registerVarLocation;
     }

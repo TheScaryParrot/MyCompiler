@@ -22,6 +22,8 @@ class CallNode : public AbstractValueNode
         }
     }
 
+    virtual bool RequiresAXRegister() override { return true; }
+
     virtual std::string ToString() override
     {
         std::string result = functionName + "(";

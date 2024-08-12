@@ -615,6 +615,8 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseBinaryOperatorExpressionN
 {
     std::shared_ptr<Variable> firstVariable = TraverseExpressionNode(node->firstExpression, codeGenerator, assemblyCode);
 
+    auto operatorExpressionIterator = node->operatorExpressionPairs.begin();
+
     std::shared_ptr<Variable> left = nullptr;
 
     if (firstVariable->IsInline())
@@ -623,15 +625,44 @@ std::shared_ptr<Variable> SyntaxTreeTraverser::TraverseBinaryOperatorExpressionN
     }
     else
     {
-        // If is not inline create new register variable
-        left.reset(codeGenerator->GetNewRegisterVariable(firstVariable->type, false, assemblyCode));
+        // Assign first to AX register
+        left = std::shared_ptr<Variable>(codeGenerator->GetAXRegisterVariable(firstVariable->type, false, assemblyCode));
         codeGenerator->ApplyBinaryOperatorOnVariables(left, firstVariable, EOperators::ASSIGN_OPERATOR, assemblyCode);
     }
 
-    for (OperatorExpressionPair* operatorExpression : *node->operatorExpressionPairs)
+    while (operatorExpressionIterator != node->operatorExpressionPairs.end())
     {
-        std::shared_ptr<Variable> right = TraverseExpressionNode(operatorExpression->expression, codeGenerator, assemblyCode);
+        OperatorExpressionPair* operatorExpression = *operatorExpressionIterator;
+        AbstractExpressionNode* expression = operatorExpression->expression;
+        bool requiresAXRegister = expression->RequiresAXRegister() && left->location->IsAXregister();
+        std::shared_ptr<Variable> stackLocation = nullptr;
+
+        if (requiresAXRegister)
+        {
+            // Push left to stack
+            stackLocation = std::shared_ptr<Variable>(codeGenerator->GetNewLocalVariable(left->type, false, assemblyCode));
+            codeGenerator->ApplyBinaryOperatorOnVariables(stackLocation, left, EOperators::ASSIGN_OPERATOR, assemblyCode);
+        }
+
+        std::shared_ptr<Variable> right = TraverseExpressionNode(expression, codeGenerator, assemblyCode);
+
+        if (requiresAXRegister)
+        {
+            if (right->location->IsAXregister())
+            {
+                // Safes the result (AX register) in DX register
+                std::shared_ptr<IVariableLocation> DXregister =
+                    std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewDXRegisterVarLocation(right->type->GetSize(), assemblyCode));
+                right->type->GenerateAssign(DXregister, right->location, assemblyCode);
+                right = std::shared_ptr<Variable>(new Variable(DXregister, right->type, right->isFinal));
+            }
+
+            // Pop left from stack
+            codeGenerator->ApplyBinaryOperatorOnVariables(left, stackLocation, EOperators::ASSIGN_OPERATOR, assemblyCode);
+        }
+
         left = codeGenerator->ApplyBinaryOperatorOnVariables(left, right, operatorExpression->op, assemblyCode);
+        operatorExpressionIterator++;
     }
 
     left->isFinal = true;  // Make the result final

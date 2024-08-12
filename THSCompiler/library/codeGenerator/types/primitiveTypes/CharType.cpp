@@ -108,13 +108,5 @@ class CharType : public PrimitiveType
         // TODO: Add greater equal instruction
     }
 
-    virtual void GenerateStackPush(std::shared_ptr<IVariableLocation> source, AssemblyCode* assemblyCode) override
-    {
-        // As push requires 32-bit register, we do a direct mov to the stack
-        std::shared_ptr<IVariableLocation> stackVar =
-            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewLocalVarLocation(this->GetSize(), assemblyCode));
-        GenerateAssign(stackVar, source, assemblyCode);
-    }
-
     virtual unsigned int GetSize() override { return 1; }
 };

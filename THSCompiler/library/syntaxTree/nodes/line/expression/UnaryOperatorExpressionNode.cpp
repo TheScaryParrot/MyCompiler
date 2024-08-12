@@ -17,6 +17,8 @@ class UnaryOperatorExpressionNode : public AbstractExpressionNode
 
     ~UnaryOperatorExpressionNode() { delete value; }
 
+    virtual bool RequiresAXRegister() override { return false; }
+
     virtual std::string ToString() override
     {
         return EPreUnaryOperatorsToString(preUnaryOperator) + value->ToString() + EPostUnaryOperatorsToString(postUnaryOperator);

@@ -8,6 +8,7 @@ final float float2 = float1 * (5.0 + 1.0) / 7.0;
 
 bool bool2 = true && false;
 
+
 bool bool3;
 float float3;
 
@@ -49,7 +50,7 @@ int _start(/*int argc, char argv*/)
     extern int mod(int a, int b);
 
     final inline int int1 = 2;
-    int int2 = int1 + 64;
+    int int2 = 2 + 64;
     int int3 = 2;
     MyType myType3 = {int1, bool1, float1};
 
@@ -89,4 +90,14 @@ int _start(/*int argc, char argv*/)
     _print(4, int2);
 
     _print(4, Hello2(int1, int2));
+
+    int int4_1 = 3;
+    int int4_2 = 2;
+    int int4_3 = 2;
+
+    // testing complex expressions
+    
+    int int4 = int4_1 * 5 + (2 * int4_2 - 4) - 1 * (int4_3 + 1); // 12
+    int4 += 53; // 65 -> A
+    _print(4, int4);
 }

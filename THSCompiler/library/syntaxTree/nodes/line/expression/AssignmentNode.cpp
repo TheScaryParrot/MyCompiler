@@ -24,29 +24,27 @@ class Assignment
 class AssignmentNode : public AbstractExpressionNode
 {
    public:
-    virtual ~AssignmentNode();
+    virtual ~AssignmentNode()
+    {
+        for (auto& assignment : assignments) delete assignment;
 
-    virtual std::string ToString() override;
+        delete value;
+    }
+
+    virtual bool RequiresAXRegister() override { return true; }
+
+    virtual std::string ToString() override
+    {
+        std::string result = "";
+
+        for (Assignment* assignment : assignments)
+        {
+            result += assignment->L_value->ToString() + " " + EAssignOperatorsToString(assignment->assignOperator) + " ";
+        }
+
+        return result + value->ToString();
+    }
 
     std::vector<Assignment*> assignments;
     AbstractExpressionNode* value;
 };
-
-AssignmentNode::~AssignmentNode()
-{
-    for (auto& assignment : assignments) delete assignment;
-
-    delete value;
-}
-
-std::string AssignmentNode::ToString()
-{
-    std::string result = "";
-
-    for (Assignment* assignment : assignments)
-    {
-        result += assignment->L_value->ToString() + " " + EAssignOperatorsToString(assignment->assignOperator) + " ";
-    }
-
-    return result + value->ToString();
-}

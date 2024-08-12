@@ -11,5 +11,7 @@ class ParenthesisExpressionNode : public AbstractValueNode
 
     ~ParenthesisExpressionNode() { delete expression; }
 
+    virtual bool RequiresAXRegister() override { return expression->RequiresAXRegister(); }
+
     virtual std::string ToString() override { return "(" + expression->ToString() + ")"; }
 };

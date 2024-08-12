@@ -1,1 +1,2 @@
 learn assembly: https://www.cs.princeton.edu/courses/archive/spr11/cos217/lectures/
+expression evaluation: https://docs.lib.purdue.edu/cgi/viewcontent.cgi?article=1388&context=cstech

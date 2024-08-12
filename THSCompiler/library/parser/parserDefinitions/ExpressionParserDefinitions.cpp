@@ -67,12 +67,12 @@ AbstractExpressionNode* PredictiveParser::Parse_OrExpression(TokenList* tokens)
 
     if (!tokens->IsPeekOfTokenType(Tokens.OR_OPERATOR_TOKEN)) return firstExpression;  // No OR_OPERATOR found
 
-    std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
+    std::vector<OperatorExpressionPair*> operatorValuePairs = std::vector<OperatorExpressionPair*>();
 
     while (tokens->IsPeekOfTokenType(Tokens.OR_OPERATOR_TOKEN))
     {
         tokens->Next();  // Consume OR_OPERATOR
-        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::OR_OPERATOR, Parse_AndExpression(tokens)));
+        operatorValuePairs.push_back(new OperatorExpressionPair(EOperators::OR_OPERATOR, Parse_AndExpression(tokens)));
     }
 
     return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -85,12 +85,12 @@ AbstractExpressionNode* PredictiveParser::Parse_AndExpression(TokenList* tokens)
 
     if (!tokens->IsPeekOfTokenType(Tokens.AND_OPERATOR_TOKEN)) return firstExpression;  // No AND_OPERATOR found
 
-    std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
+    std::vector<OperatorExpressionPair*> operatorValuePairs = std::vector<OperatorExpressionPair*>();
 
     while (tokens->IsPeekOfTokenType(Tokens.AND_OPERATOR_TOKEN))
     {
         tokens->Next();  // Consume AND_OPERATOR
-        operatorValuePairs->push_back(new OperatorExpressionPair(EOperators::AND_OPERATOR, Parse_EqualExpression(tokens)));
+        operatorValuePairs.push_back(new OperatorExpressionPair(EOperators::AND_OPERATOR, Parse_EqualExpression(tokens)));
     }
 
     return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -103,13 +103,13 @@ AbstractExpressionNode* PredictiveParser::Parse_EqualExpression(TokenList* token
 
     if (!LookAhead_EqualOperator(tokens)) return firstExpression;  // No EqualOperator found
 
-    std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
+    std::vector<OperatorExpressionPair*> operatorValuePairs = std::vector<OperatorExpressionPair*>();
 
     while (LookAhead_EqualOperator(tokens))
     {
         EOperators op = Parse_EqualOperator(tokens);  // Ensure EqualOperator is parsed ahead of Parse_SumExpression. Complier sometimes does weird
                                                       // stuff: https://en.cppreference.com/w/c/language/eval_order
-        operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_SumExpression(tokens)));
+        operatorValuePairs.push_back(new OperatorExpressionPair(op, Parse_SumExpression(tokens)));
     }
 
     return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -144,13 +144,13 @@ AbstractExpressionNode* PredictiveParser::Parse_SumExpression(TokenList* tokens)
 
     if (!LookAhead_SumOperator(tokens)) return firstExpression;  // No SumOperator found
 
-    std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
+    std::vector<OperatorExpressionPair*> operatorValuePairs = std::vector<OperatorExpressionPair*>();
 
     while (LookAhead_SumOperator(tokens))
     {
         EOperators op = Parse_SumOperator(tokens);  // Ensure SumOperator is parsed ahead of MulExpression. Complier sometimes
                                                     // does weird stuff: https://en.cppreference.com/w/c/language/eval_order
-        operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_MulExpression(tokens)));
+        operatorValuePairs.push_back(new OperatorExpressionPair(op, Parse_MulExpression(tokens)));
     }
 
     return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
@@ -176,13 +176,13 @@ AbstractExpressionNode* PredictiveParser::Parse_MulExpression(TokenList* tokens)
 
     if (!LookAhead_MulOperator(tokens)) return firstExpression;  // No MulOperator found
 
-    std::vector<OperatorExpressionPair*>* operatorValuePairs = new std::vector<OperatorExpressionPair*>();
+    std::vector<OperatorExpressionPair*> operatorValuePairs = std::vector<OperatorExpressionPair*>();
 
     while (LookAhead_MulOperator(tokens))
     {
         EOperators op = Parse_MulOperator(tokens);  // Ensure MulOperator is parsed ahead of UnaryExpression. Complier sometimes
                                                     // does weird stuff: https://en.cppreference.com/w/c/language/eval_order
-        operatorValuePairs->push_back(new OperatorExpressionPair(op, Parse_UnaryExpression(tokens)));
+        operatorValuePairs.push_back(new OperatorExpressionPair(op, Parse_UnaryExpression(tokens)));
     }
 
     return new BinaryOperatorExpressionNode(firstExpression, operatorValuePairs);
