@@ -1,5 +1,5 @@
-#include "../../tokens/CompilerInstructions.cpp"
 #include "../../tokens/TokenWithValue.cpp"
+#include "../../tokens/Tokens.cpp"
 #include "../PredictiveParser.hpp"
 
 bool PredictiveParser::LookAhead_CompilerInstruction(TokenList* tokens)
@@ -10,17 +10,17 @@ bool PredictiveParser::LookAhead_CompilerInstruction(TokenList* tokens)
 }
 AbstractCompilerInstructionNode* PredictiveParser::Parse_CompilerInstruction(TokenList* tokens)
 {
-    std::shared_ptr<Token> token = tokens->Next();  // Consume compiler instruction
+    Token* token = tokens->Next();  // Consume compiler instruction
 
-    if (token->IsThisToken(CompilerInstructions.EXTERN_INSTRUCTION)) return Parse_ExternInstruction(tokens);
+    if (token->IsThisToken(Tokens.EXTERN_INSTRUCTION)) return Parse_ExternInstruction(tokens);
 
-    if (token->IsThisToken(CompilerInstructions.GLOBAL_INSTRUCTION)) return Parse_GlobalInstruction(tokens);
+    if (token->IsThisToken(Tokens.GLOBAL_INSTRUCTION)) return Parse_GlobalInstruction(tokens);
 
     Logger.Log("Unknown compiler instruction: " + token->ToString(), Logger::ERROR);
     return nullptr;
 }
 
-bool PredictiveParser::LookAhead_ExternInstruction(TokenList* tokens) { return tokens->Peek()->IsThisToken(CompilerInstructions.EXTERN_INSTRUCTION); }
+bool PredictiveParser::LookAhead_ExternInstruction(TokenList* tokens) { return tokens->Peek()->IsThisToken(Tokens.EXTERN_INSTRUCTION); }
 ExternInstructionNode* PredictiveParser::Parse_ExternInstruction(TokenList* tokens)
 {
     FunctionReturnTypeNode returnType = Parse_FunctionReturnType(tokens);
@@ -37,7 +37,7 @@ ExternInstructionNode* PredictiveParser::Parse_ExternInstruction(TokenList* toke
     return new ExternInstructionNode(returnType, identifier, parameters);
 }
 
-bool PredictiveParser::LookAhead_GlobalInstruction(TokenList* tokens) { return tokens->Peek()->IsThisToken(CompilerInstructions.GLOBAL_INSTRUCTION); }
+bool PredictiveParser::LookAhead_GlobalInstruction(TokenList* tokens) { return tokens->Peek()->IsThisToken(Tokens.GLOBAL_INSTRUCTION); }
 GlobalInstructionNode* PredictiveParser::Parse_GlobalInstruction(TokenList* tokens)
 {
     std::string identifier = tokens->Next<TokenWithValue>()->GetValue();

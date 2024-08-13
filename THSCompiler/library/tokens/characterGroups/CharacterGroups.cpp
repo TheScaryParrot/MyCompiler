@@ -7,10 +7,9 @@
 static class CharacterGroups
 {
    public:
-    CharacterGroups();
-    ~CharacterGroups();
-
-    CharacterGroup WHITESPACES = CharacterGroup(std::vector<TwoChar>{' ', '\n', '\t', '\r'});
+    // Newline is differenciated from whitespace to allow the scanner to count lines
+    CharacterGroup NEWLINE = CharacterGroup(std::vector<TwoChar>{'\n'});
+    CharacterGroup WHITESPACES = CharacterGroup(std::vector<TwoChar>{' ', '\t', '\r'});
     CharacterGroup STATEMENT_END = CharacterGroup(std::vector<TwoChar>{';'});
 
     CharacterGroup LOWER_ALPHABET = CharacterGroup(std::vector<TwoChar>{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -70,7 +69,3 @@ static class CharacterGroups
     CharacterGroup DOT = CharacterGroup(std::vector<TwoChar>{'.'});
 
 } CharacterGroups;
-
-CharacterGroups::CharacterGroups() {}
-
-CharacterGroups::~CharacterGroups() {}

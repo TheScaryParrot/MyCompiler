@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../tokens/Keywords.cpp"
 #include "../../tokens/Tokens.cpp"
 #include "../PredictiveParser.hpp"
 
@@ -53,7 +52,7 @@ AbstractVarDeclarationNode* PredictiveParser::Parse_VarDeclaration(TokenList* to
 bool PredictiveParser::LookAhead_FuncDeclaration(TokenList* tokens)
 {
     // VOID
-    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD)) return true;
+    if (tokens->IsPeekOfTokenType(Tokens.VOID_KEYWORD)) return true;
 
     // ID ID (
     return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) &&     // ID
@@ -80,11 +79,11 @@ FuncDeclarationNode* PredictiveParser::Parse_FuncDeclaration(TokenList* tokens)
 bool LookAhead_FunctionReturnType(TokenList* tokens)
 {
     // VOID | ID
-    return tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD) || tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN);
+    return tokens->IsPeekOfTokenType(Tokens.VOID_KEYWORD) || tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN);
 }
 FunctionReturnTypeNode PredictiveParser::Parse_FunctionReturnType(TokenList* tokens)
 {
-    if (tokens->IsPeekOfTokenType(Keywords.VOID_KEYWORD))
+    if (tokens->IsPeekOfTokenType(Tokens.VOID_KEYWORD))
     {
         tokens->Next();  // Consume VOID
         return FunctionReturnTypeNode("void");
@@ -115,7 +114,7 @@ VarDeclarationAttributes PredictiveParser::Parse_VarDeclarationAttributes(TokenL
     return attributes;
 }
 
-bool PredictiveParser::LookAhead_TypeDeclaration(TokenList* tokens) { return tokens->IsPeekOfTokenType(Keywords.TYPEDEF_KEYWORD); }
+bool PredictiveParser::LookAhead_TypeDeclaration(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.TYPEDEF_KEYWORD); }
 TypeDeclarationNode* PredictiveParser::Parse_TypeDeclaration(TokenList* tokens)
 {
     tokens->Next();  // Consume TYPEDEF_KEYWORD
@@ -176,7 +175,7 @@ std::vector<ParameterDeclarationNode*>* PredictiveParser::Parse_Params(TokenList
 bool PredictiveParser::LookAhead_ParamDeclaration(TokenList* tokens)
 {
     // <final> | ID ID
-    if (tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD)) return true;
+    if (tokens->IsPeekOfTokenType(Tokens.FINAL_KEYWORD)) return true;
 
     return tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN) && tokens->IsPeekOfTokenType(Tokens.CONST_IDENTIFIER_TOKEN, 1);
 }
@@ -184,7 +183,7 @@ ParameterDeclarationNode* PredictiveParser::Parse_ParamDeclaration(TokenList* to
 {
     bool isFinal = false;
 
-    if (tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD))
+    if (tokens->IsPeekOfTokenType(Tokens.FINAL_KEYWORD))
     {
         isFinal = true;
         tokens->Next();  // Consume FINAL
@@ -219,7 +218,7 @@ BodyNode* PredictiveParser::Parse_Body(TokenList* tokens)
 bool PredictiveParser::LookAhead_FinalAttribute(TokenList* tokens)
 {
     // FINAL
-    return tokens->IsPeekOfTokenType(Keywords.FINAL_KEYWORD);
+    return tokens->IsPeekOfTokenType(Tokens.FINAL_KEYWORD);
 }
 bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens)
 {
@@ -230,7 +229,7 @@ bool PredictiveParser::Parse_FinalAttribute(TokenList* tokens)
 bool PredictiveParser::LookAhead_InlineAttribute(TokenList* tokens)
 {
     // INLINE
-    return tokens->IsPeekOfTokenType(Keywords.INLINE_KEYWORD);
+    return tokens->IsPeekOfTokenType(Tokens.INLINE_KEYWORD);
 }
 bool PredictiveParser::Parse_InlineAttribute(TokenList* tokens)
 {

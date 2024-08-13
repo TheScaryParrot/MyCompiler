@@ -5,21 +5,16 @@
 class CharacterGroupToken : public Token
 {
    public:
-    CharacterGroupToken(std::string tokenName, CharacterGroup& characterGroup);
-    ~CharacterGroupToken();
+    CharacterGroupToken(std::string tokenName, unsigned int line, CharacterGroup& characterGroup) : Token(tokenName, line)
+    {
+        this->characterGroup = characterGroup;
+    }
 
-    unsigned int Match(char first, char second);
+    unsigned int Match(char first, char second) { return characterGroup.Match(first, second); }
+
+    CharacterGroupToken* New(unsigned int line) { return new CharacterGroupToken(this->tokenName, line, this->characterGroup); }
 
    private:
     // TODO: Use more efficient way to store characterGroup (pointer or reference)
     CharacterGroup characterGroup;
 };
-
-CharacterGroupToken::CharacterGroupToken(std::string tokenName, CharacterGroup& characterGroup) : Token(tokenName)
-{
-    this->characterGroup = characterGroup;
-}
-
-CharacterGroupToken::~CharacterGroupToken() {}
-
-unsigned int CharacterGroupToken::Match(char first, char second) { return characterGroup.Match(first, second); }

@@ -7,13 +7,13 @@
 class TokenWithValue : public Token
 {
    public:
-    TokenWithValue(std::string tokenName, std::string value) : Token(tokenName) { this->value = value; };
-
-    virtual std::string ToString() override { return Token::ToString() + ": " + value; };
+    TokenWithValue(std::string tokenName, unsigned int line, std::string value) : Token(tokenName, line) { this->value = value; };
 
     std::string GetValue() { return value; };
 
-    TokenWithValue* Clone(std::string value) { return new TokenWithValue(this->tokenName, value); };
+    TokenWithValue* New(std::string value, unsigned int line) { return new TokenWithValue(this->tokenName, line, value); };
+
+    virtual std::string ToString() override { return Token::ToString() + ": " + value; };
 
    private:
     std::string value;

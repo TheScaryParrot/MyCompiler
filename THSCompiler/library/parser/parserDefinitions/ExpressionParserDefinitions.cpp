@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../tokens/Keywords.cpp"
 #include "../../tokens/Tokens.cpp"
 #include "../PredictiveParser.hpp"
 
@@ -38,7 +37,7 @@ AbstractExpressionNode* PredictiveParser::Parse_AssignmentExpression(TokenList* 
 
 bool PredictiveParser::LookAhead_AssignOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Peek();
+    Token* nextToken = tokens->Peek();
 
     return nextToken->IsThisToken(Tokens.ASSIGN_OPERATOR_TOKEN) ||      // ASSIGN_OPERATOR
            nextToken->IsThisToken(Tokens.ADD_ASSIGN_OPERATOR_TOKEN) ||  // ADD_ASSIGN_OPERATOR
@@ -49,7 +48,7 @@ bool PredictiveParser::LookAhead_AssignOperator(TokenList* tokens)
 }
 EAssignOperators PredictiveParser::Parse_AssignOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume AssignOperator
+    Token* nextToken = tokens->Next();  // Consume AssignOperator
 
     if (nextToken->IsThisToken(Tokens.ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ASSIGN;
     if (nextToken->IsThisToken(Tokens.ADD_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::ADD_ASSIGN;
@@ -126,7 +125,7 @@ bool PredictiveParser::LookAhead_EqualOperator(TokenList* tokens)
 }
 EOperators PredictiveParser::Parse_EqualOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Next();
+    Token* nextToken = tokens->Next();
 
     if (nextToken->IsThisToken(Tokens.EQUAL_OPERATOR_TOKEN)) return EOperators::EQUAL_OPERATOR;
     if (nextToken->IsThisToken(Tokens.NOT_EQUAL_OPERATOR_TOKEN)) return EOperators::NOT_EQUAL_OPERATOR;
@@ -162,7 +161,7 @@ bool PredictiveParser::LookAhead_SumOperator(TokenList* tokens)
 }
 EOperators PredictiveParser::Parse_SumOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume SumOperator
+    Token* nextToken = tokens->Next();  // Consume SumOperator
 
     if (nextToken->IsThisToken(Tokens.ADD_OPERATOR_TOKEN)) return EOperators::ADD_OPERATOR;
 
@@ -195,7 +194,7 @@ bool PredictiveParser::LookAhead_MulOperator(TokenList* tokens)
 }
 EOperators PredictiveParser::Parse_MulOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume MulOperator
+    Token* nextToken = tokens->Next();  // Consume MulOperator
 
     if (nextToken->IsThisToken(Tokens.MUL_OPERATOR_TOKEN)) return EOperators::MUL_OPERATOR;
     if (nextToken->IsThisToken(Tokens.DIV_OPERATOR_TOKEN)) return EOperators::DIV_OPERATOR;
@@ -246,7 +245,7 @@ AbstractExpressionNode* PredictiveParser::Parse_UnaryExpression(TokenList* token
 bool PredictiveParser::LookAhead_PreUnaryOperator(TokenList* tokens)
 {
     // NEGATE | NOT | INCREMENT | DECREMENT
-    std::shared_ptr<Token> next = tokens->Peek();
+    Token* next = tokens->Peek();
 
     return next->IsThisToken(Tokens.NEGATE_OPERATOR_TOKEN) ||     // NEGATE
            next->IsThisToken(Tokens.NOT_OPERATOR_TOKEN) ||        // NOT
@@ -255,7 +254,7 @@ bool PredictiveParser::LookAhead_PreUnaryOperator(TokenList* tokens)
 }
 EPreUnaryOperators PredictiveParser::Parse_PreUnaryOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume UnaryOperator
+    Token* nextToken = tokens->Next();  // Consume UnaryOperator
 
     if (nextToken->IsThisToken(Tokens.NEGATE_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_NEGATE;
     if (nextToken->IsThisToken(Tokens.NOT_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_NOT;
@@ -271,7 +270,7 @@ bool PredictiveParser::LookAhead_PostUnaryOperator(TokenList* tokens)
 }
 EPostUnaryOperators PredictiveParser::Parse_PostUnaryOperator(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume UnaryOperator
+    Token* nextToken = tokens->Next();  // Consume UnaryOperator
 
     if (nextToken->IsThisToken(Tokens.INCREMENT_OPERATOR_TOKEN)) return EPostUnaryOperators::POST_INCREMENT;
 
@@ -392,13 +391,13 @@ AbstractConstValueNode* PredictiveParser::Parse_Const(TokenList* tokens)
 bool PredictiveParser::LookAhead_LogicalConst(TokenList* tokens)
 {
     // TRUE | FALSE
-    return tokens->IsPeekOfTokenType(Keywords.LOGICAL_TRUE_KEYWORD) || tokens->IsPeekOfTokenType(Keywords.LOGICAL_FALSE_KEYWORD);
+    return tokens->IsPeekOfTokenType(Tokens.LOGICAL_TRUE_KEYWORD) || tokens->IsPeekOfTokenType(Tokens.LOGICAL_FALSE_KEYWORD);
 }
 LogicalConstValueNode* PredictiveParser::Parse_LogicalConst(TokenList* tokens)
 {
-    std::shared_ptr<Token> nextToken = tokens->Next();  // Consume LogicalConstant
+    Token* nextToken = tokens->Next();  // Consume LogicalConstant
 
-    if (nextToken->IsThisToken(Keywords.LOGICAL_TRUE_KEYWORD)) return new LogicalConstValueNode(true);
+    if (nextToken->IsThisToken(Tokens.LOGICAL_TRUE_KEYWORD)) return new LogicalConstValueNode(true);
 
     return new LogicalConstValueNode(false);
 }
