@@ -55,8 +55,10 @@ EAssignOperators PredictiveParser::Parse_AssignOperator(TokenList* tokens)
     if (nextToken->IsThisToken(Tokens.SUB_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::SUB_ASSIGN;
     if (nextToken->IsThisToken(Tokens.MUL_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::MUL_ASSIGN;
     if (nextToken->IsThisToken(Tokens.DIV_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::DIV_ASSIGN;
+    if (nextToken->IsThisToken(Tokens.MOD_ASSIGN_OPERATOR_TOKEN)) return EAssignOperators::MOD_ASSIGN;
 
-    return EAssignOperators::MOD_ASSIGN;
+    Logger.Log("AssignOperator expected but got: " + nextToken->ToString() + " using =", Logger::ERROR);
+    return EAssignOperators::ASSIGN;
 }
 
 bool PredictiveParser::LookAhead_OrExpression(TokenList* tokens) { return LookAhead_UnaryExpression(tokens); }
@@ -70,6 +72,7 @@ AbstractExpressionNode* PredictiveParser::Parse_OrExpression(TokenList* tokens)
 
     while (tokens->IsPeekOfTokenType(Tokens.OR_OPERATOR_TOKEN))
     {
+        // Directly consume OR_OPERATOR as IsPeekOfTokenType has been checked
         tokens->Next();  // Consume OR_OPERATOR
         operatorValuePairs.push_back(new OperatorExpressionPair(EOperators::OR_OPERATOR, Parse_AndExpression(tokens)));
     }
@@ -88,6 +91,7 @@ AbstractExpressionNode* PredictiveParser::Parse_AndExpression(TokenList* tokens)
 
     while (tokens->IsPeekOfTokenType(Tokens.AND_OPERATOR_TOKEN))
     {
+        // Directly consume AND_OPERATOR as IsPeekOfTokenType has been checked
         tokens->Next();  // Consume AND_OPERATOR
         operatorValuePairs.push_back(new OperatorExpressionPair(EOperators::AND_OPERATOR, Parse_EqualExpression(tokens)));
     }
@@ -132,8 +136,10 @@ EOperators PredictiveParser::Parse_EqualOperator(TokenList* tokens)
     if (nextToken->IsThisToken(Tokens.LESS_THAN_OPERATOR_TOKEN)) return EOperators::LESS_THAN_OPERATOR;
     if (nextToken->IsThisToken(Tokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN)) return EOperators::LESS_THAN_OR_EQUAL_OPERATOR;
     if (nextToken->IsThisToken(Tokens.GREATER_THAN_OPERATOR_TOKEN)) return EOperators::GREATER_THAN_OPERATOR;
+    if (nextToken->IsThisToken(Tokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN)) return EOperators::GREATER_THAN_OR_EQUAL_OPERATOR;
 
-    return EOperators::GREATER_THAN_OR_EQUAL_OPERATOR;
+    Logger.Log("EqualOperator expected but got: " + nextToken->ToString() + " using ==", Logger::ERROR);
+    return EOperators::EQUAL_OPERATOR;
 }
 
 bool PredictiveParser::LookAhead_SumExpression(TokenList* tokens) { return LookAhead_UnaryExpression(tokens); }
@@ -164,8 +170,10 @@ EOperators PredictiveParser::Parse_SumOperator(TokenList* tokens)
     Token* nextToken = tokens->Next();  // Consume SumOperator
 
     if (nextToken->IsThisToken(Tokens.ADD_OPERATOR_TOKEN)) return EOperators::ADD_OPERATOR;
+    if (nextToken->IsThisToken(Tokens.SUB_OPERATOR_TOKEN)) return EOperators::SUB_OPERATOR;
 
-    return EOperators::SUB_OPERATOR;
+    Logger.Log("SumOperator expected but got: " + nextToken->ToString() + " using +", Logger::ERROR);
+    return EOperators::ADD_OPERATOR;
 }
 
 bool PredictiveParser::LookAhead_MulExpression(TokenList* tokens) { return LookAhead_UnaryExpression(tokens); }
@@ -198,8 +206,10 @@ EOperators PredictiveParser::Parse_MulOperator(TokenList* tokens)
 
     if (nextToken->IsThisToken(Tokens.MUL_OPERATOR_TOKEN)) return EOperators::MUL_OPERATOR;
     if (nextToken->IsThisToken(Tokens.DIV_OPERATOR_TOKEN)) return EOperators::DIV_OPERATOR;
+    if (nextToken->IsThisToken(Tokens.MOD_OPERATOR_TOKEN)) return EOperators::MOD_OPERATOR;
 
-    return EOperators::MOD_OPERATOR;
+    Logger.Log("MulOperator expected but got: " + nextToken->ToString() + " using *", Logger::ERROR);
+    return EOperators::MUL_OPERATOR;
 }
 
 bool PredictiveParser::LookAhead_UnaryExpression(TokenList* tokens)
@@ -259,8 +269,10 @@ EPreUnaryOperators PredictiveParser::Parse_PreUnaryOperator(TokenList* tokens)
     if (nextToken->IsThisToken(Tokens.NEGATE_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_NEGATE;
     if (nextToken->IsThisToken(Tokens.NOT_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_NOT;
     if (nextToken->IsThisToken(Tokens.INCREMENT_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_INCREMENT;
+    if (nextToken->IsThisToken(Tokens.DECREMENT_OPERATOR_TOKEN)) return EPreUnaryOperators::PRE_DECREMENT;
 
-    return EPreUnaryOperators::PRE_DECREMENT;
+    Logger.Log("PreUnaryOperator expected but got: " + nextToken->ToString() + " using PRE_NEGATE", Logger::ERROR);
+    return EPreUnaryOperators::PRE_NEGATE;
 }
 
 bool PredictiveParser::LookAhead_PostUnaryOperator(TokenList* tokens)
@@ -273,8 +285,10 @@ EPostUnaryOperators PredictiveParser::Parse_PostUnaryOperator(TokenList* tokens)
     Token* nextToken = tokens->Next();  // Consume UnaryOperator
 
     if (nextToken->IsThisToken(Tokens.INCREMENT_OPERATOR_TOKEN)) return EPostUnaryOperators::POST_INCREMENT;
+    if (nextToken->IsThisToken(Tokens.DECREMENT_OPERATOR_TOKEN)) return EPostUnaryOperators::POST_DECREMENT;
 
-    return EPostUnaryOperators::POST_DECREMENT;
+    Logger.Log("PostUnaryOperator expected but got: " + nextToken->ToString() + " using POST_INCREMENT", Logger::ERROR);
+    return EPostUnaryOperators::POST_INCREMENT;
 }
 
 bool PredictiveParser::LookAhead_Value(TokenList* tokens)
@@ -306,10 +320,10 @@ bool PredictiveParser::LookAhead_Call(TokenList* tokens)
 }
 CallNode* PredictiveParser::Parse_Call(TokenList* tokens)
 {
-    std::string functionName = tokens->Next<TokenWithValue>()->GetValue();
-    tokens->Next();  // Consume PARENTHESIS_OPEN
+    std::string functionName = ConsumeNext(tokens, Tokens.CONST_IDENTIFIER_TOKEN)->GetValue();
+    ConsumeNext(tokens, Tokens.PARENTHESIS_OPEN_TOKEN);  // Consume PARENTHESIS_OPEN
     std::vector<AbstractExpressionNode*> arguments = Parse_Arguments(tokens);
-    tokens->Next();  // Consume PARENTHESIS_CLOSE
+    ConsumeNext(tokens, Tokens.PARENTHESIS_CLOSE_TOKEN);  // Consume PARENTHESIS_CLOSE
 
     return new CallNode(functionName, arguments);
 }
@@ -321,9 +335,9 @@ bool PredictiveParser::LookAhead_Parenthesis_Expression(TokenList* tokens)
 }
 ParenthesisExpressionNode* PredictiveParser::Parse_Parenthesis_Expression(TokenList* tokens)
 {
-    tokens->Next();  // Consume PARENTHESIS_OPEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_OPEN_TOKEN);  // Consume PARENTHESIS_OPEN
     AbstractExpressionNode* expression = Parse_Expression(tokens);
-    tokens->Next();  // Consume PARENTHESIS_CLOSE
+    ConsumeNext(tokens, Tokens.PARENTHESIS_CLOSE_TOKEN);  // Consume PARENTHESIS_CLOSE
 
     return new ParenthesisExpressionNode(expression);
 }
@@ -335,7 +349,7 @@ bool PredictiveParser::LookAhead_Struct(TokenList* tokens)
 }
 StructNode* PredictiveParser::Parse_Struct(TokenList* tokens)
 {
-    tokens->Next();  // Consume BRACES_OPEN
+    ConsumeNext(tokens, Tokens.BRACES_OPEN_TOKEN);  // Consume BRACES_OPEN
 
     std::vector<AbstractExpressionNode*> properties = std::vector<AbstractExpressionNode*>();
 
@@ -345,10 +359,10 @@ StructNode* PredictiveParser::Parse_Struct(TokenList* tokens)
 
         if (tokens->IsPeekOfTokenType(Tokens.BRACES_CLOSE_TOKEN)) break;
 
-        tokens->Next();  // Consume SEPERATOR
+        ConsumeNext(tokens, Tokens.SEPERATOR_TOKEN);  // Consume SEPERATOR
     }
 
-    tokens->Next();  // Consume BRACES_CLOSE
+    ConsumeNext(tokens, Tokens.BRACES_CLOSE_TOKEN);  // Consume BRACES_CLOSE
 
     return new StructNode(properties);
 }
@@ -361,12 +375,12 @@ bool PredictiveParser::LookAhead_Variable(TokenList* tokens)
 VariableNode* PredictiveParser::Parse_Variable(TokenList* tokens)
 {
     std::vector<std::string> ids;
-    ids.push_back(tokens->Next<TokenWithValue>()->GetValue());
+    ids.push_back(ConsumeNext(tokens, Tokens.CONST_IDENTIFIER_TOKEN)->GetValue());
 
     while (tokens->IsPeekOfTokenType(Tokens.DOT_TOKEN))
     {
         tokens->Next();  // Consume DOT
-        ids.push_back(tokens->Next<TokenWithValue>()->GetValue());
+        ids.push_back(ConsumeNext(tokens, Tokens.CONST_IDENTIFIER_TOKEN)->GetValue());
     }
 
     return new VariableNode(ids);
@@ -382,10 +396,15 @@ AbstractConstValueNode* PredictiveParser::Parse_Const(TokenList* tokens)
 {
     if (LookAhead_LogicalConst(tokens)) return Parse_LogicalConst(tokens);  // Consumtion of token is handled by Parse_LogicalConstant()
 
-    if (tokens->IsPeekOfTokenType(Tokens.CONST_INT_TOKEN)) return new IntConstValueNode(std::stoi(tokens->Next<TokenWithValue>()->GetValue()));
-    if (tokens->IsPeekOfTokenType(Tokens.CONST_FLOAT_TOKEN)) return new FloatConstValueNode(std::stof(tokens->Next<TokenWithValue>()->GetValue()));
+    if (tokens->IsPeekOfTokenType(Tokens.CONST_INT_TOKEN))
+        return new IntConstValueNode(std::stoi(ConsumeNext(tokens, Tokens.CONST_INT_TOKEN)->GetValue()));
+    if (tokens->IsPeekOfTokenType(Tokens.CONST_FLOAT_TOKEN))
+        return new FloatConstValueNode(std::stof(ConsumeNext(tokens, Tokens.CONST_FLOAT_TOKEN)->GetValue()));
+    if (tokens->IsPeekOfTokenType(Tokens.CONST_STRING_TOKEN))
+        return new StringConstValueNode(ConsumeNext(tokens, Tokens.CONST_STRING_TOKEN)->GetValue());
 
-    return new StringConstValueNode(tokens->Next<TokenWithValue>()->GetValue());
+    Logger.Log("Const expected but got: " + tokens->Peek()->ToString(), Logger::ERROR);
+    return nullptr;
 }
 
 bool PredictiveParser::LookAhead_LogicalConst(TokenList* tokens)
@@ -398,7 +417,9 @@ LogicalConstValueNode* PredictiveParser::Parse_LogicalConst(TokenList* tokens)
     Token* nextToken = tokens->Next();  // Consume LogicalConstant
 
     if (nextToken->IsThisToken(Tokens.LOGICAL_TRUE_KEYWORD)) return new LogicalConstValueNode(true);
+    if (nextToken->IsThisToken(Tokens.LOGICAL_FALSE_KEYWORD)) return new LogicalConstValueNode(false);
 
+    Logger.Log("LogicalConst expected but got: " + nextToken->ToString() + " using false", Logger::ERROR);
     return new LogicalConstValueNode(false);
 }
 
@@ -417,7 +438,7 @@ std::vector<AbstractExpressionNode*> PredictiveParser::Parse_Arguments(TokenList
 
         while (tokens->IsPeekOfTokenType(Tokens.SEPERATOR_TOKEN))
         {
-            tokens->Next();  // Consume SEPERATOR
+            ConsumeNext(tokens, Tokens.SEPERATOR_TOKEN);  // Consume SEPERATOR
             arguments.push_back(Parse_Expression(tokens));
         }
     }

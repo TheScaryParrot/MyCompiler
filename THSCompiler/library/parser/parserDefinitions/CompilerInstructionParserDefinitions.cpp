@@ -25,14 +25,14 @@ ExternInstructionNode* PredictiveParser::Parse_ExternInstruction(TokenList* toke
 {
     FunctionReturnTypeNode returnType = Parse_FunctionReturnType(tokens);
 
-    std::string identifier = tokens->Next<TokenWithValue>()->GetValue();
+    std::string identifier = ConsumeNext(tokens, Tokens.CONST_IDENTIFIER_TOKEN)->GetValue();
 
-    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_OPEN_TOKEN);  // Consume OPEN_PARENTHESIS_TOKEN
 
     std::vector<ParameterDeclarationNode*>* parameters = Parse_Params(tokens);
 
-    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
-    tokens->Next();  // Consume STATEMENT_END_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_CLOSE_TOKEN);  // Consume CLOSE_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.STATEMENT_END_TOKEN);      // Consume STATEMENT_END_TOKEN
 
     return new ExternInstructionNode(returnType, identifier, parameters);
 }
@@ -40,8 +40,8 @@ ExternInstructionNode* PredictiveParser::Parse_ExternInstruction(TokenList* toke
 bool PredictiveParser::LookAhead_GlobalInstruction(TokenList* tokens) { return tokens->Peek()->IsThisToken(Tokens.GLOBAL_INSTRUCTION); }
 GlobalInstructionNode* PredictiveParser::Parse_GlobalInstruction(TokenList* tokens)
 {
-    std::string identifier = tokens->Next<TokenWithValue>()->GetValue();
-    tokens->Next();  // Consume STATEMENT_END_TOKEN
+    std::string identifier = ConsumeNext(tokens, Tokens.CONST_IDENTIFIER_TOKEN)->GetValue();
+    ConsumeNext(tokens, Tokens.STATEMENT_END_TOKEN);  // Consume STATEMENT_END_TOKEN
 
     return new GlobalInstructionNode(identifier);
 }

@@ -20,7 +20,7 @@ class CompilerInstructionToken : public Token
 
     CompilerInstructionToken* New(unsigned int line) { return new CompilerInstructionToken(this->instruction, line); }
 
-    virtual std::string ToString() override { return Token::ToString() + ":" + this->instruction; }
+    virtual std::string ToString() override { return Token::ToString() + " " + this->instruction; }
 
    private:
     std::string instruction;

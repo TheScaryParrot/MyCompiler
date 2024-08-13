@@ -20,7 +20,12 @@ class Token
 
     unsigned int GetLine() { return line; }
 
-    virtual std::string ToString() { return tokenName; }
+    virtual std::string ToString()
+    {
+        if (line == 0) return tokenName;
+
+        return "(" + std::to_string(line) + ")" + tokenName;
+    }
 
    protected:
     std::string tokenName;

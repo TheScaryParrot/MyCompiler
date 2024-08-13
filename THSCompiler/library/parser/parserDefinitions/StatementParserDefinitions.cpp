@@ -12,6 +12,7 @@ AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
 {
     if (tokens->IsPeekOfTokenType(Tokens.STATEMENT_END_TOKEN))
     {
+        // Directly consuming as IsPeekOfTokenType has already checked for this token
         tokens->Next();  // Consume STATEMENT_END_TOKEN
         return new EmptyStatementNode();
     }
@@ -20,7 +21,7 @@ AbstractStatementNode* PredictiveParser::Parse_Statement(TokenList* tokens)
     if (tokens->Peek()->IsInstruction()) return Parse_KeywordStatement(tokens);
 
     AbstractExpressionNode* expressionNode = Parse_Expression(tokens);
-    tokens->Next();  // Consume STATEMENT_END_TOKEN
+    ConsumeNext(tokens, Tokens.STATEMENT_END_TOKEN);  // Consume STATEMENT_END_TOKEN
     return expressionNode;
 }
 
@@ -47,11 +48,11 @@ AbstractKeywordStatementNode* PredictiveParser::Parse_KeywordStatement(TokenList
 bool PredictiveParser::LookAhead_IfStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.IF_KEYWORD); }
 IfStatementNode* PredictiveParser::Parse_IfStatement(TokenList* tokens)
 {
-    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_OPEN_TOKEN);  // Consume OPEN_PARENTHESIS_TOKEN
 
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_CLOSE_TOKEN);  // Consume CLOSE_PARENTHESIS_TOKEN
 
     AbstractStatementNode* statement = Parse_Statement(tokens);
 
@@ -75,12 +76,12 @@ IfStatementNode* PredictiveParser::Parse_IfStatement(TokenList* tokens)
 bool PredictiveParser::LookAhead_ElifStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.ELIF_KEYWORD); }
 ElifStatementNode* PredictiveParser::Parse_ElifStatement(TokenList* tokens)
 {
-    tokens->Next();  // Consume ELIF_KEYWORD
-    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.ELIF_KEYWORD);            // Consume ELIF_KEYWORD
+    ConsumeNext(tokens, Tokens.PARENTHESIS_OPEN_TOKEN);  // Consume OPEN_PARENTHESIS_TOKEN
 
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_CLOSE_TOKEN);  // Consume CLOSE_PARENTHESIS_TOKEN
 
     AbstractStatementNode* statement = Parse_Statement(tokens);
 
@@ -90,7 +91,7 @@ ElifStatementNode* PredictiveParser::Parse_ElifStatement(TokenList* tokens)
 bool PredictiveParser::LookAhead_ElseStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.ELSE_KEYWORD); }
 AbstractStatementNode* PredictiveParser::Parse_ElseStatement(TokenList* tokens)
 {
-    tokens->Next();  // Consume ELSE_KEYWORD
+    ConsumeNext(tokens, Tokens.ELSE_KEYWORD);  // Consume ELSE_KEYWORD
 
     return Parse_Statement(tokens);
 }
@@ -100,13 +101,14 @@ ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
 {
     if (tokens->IsPeekOfTokenType(Tokens.STATEMENT_END_TOKEN))
     {
+        // Directly consuming as IsPeekOfTokenType has already checked for this token
         tokens->Next();  // Consume STATEMENT_END_TOKEN
         return new ReturnStatementNode(nullptr);
     }
 
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next();  // Consume STATEMENT_END_TOKEN
+    ConsumeNext(tokens, Tokens.STATEMENT_END_TOKEN);  // Consume STATEMENT_END_TOKEN
 
     return new ReturnStatementNode(expression);
 }
@@ -114,11 +116,11 @@ ReturnStatementNode* PredictiveParser::Parse_ReturnStatement(TokenList* tokens)
 bool PredictiveParser::LookAhead_WhileStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.WHILE_KEYWORD); }
 WhileStatementNode* PredictiveParser::Parse_WhileStatement(TokenList* tokens)
 {
-    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_OPEN_TOKEN);  // Consume OPEN_PARENTHESIS_TOKEN
 
     AbstractExpressionNode* expression = Parse_Expression(tokens);
 
-    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_CLOSE_TOKEN);  // Consume CLOSE_PARENTHESIS_TOKEN
 
     return new WhileStatementNode(expression, Parse_Statement(tokens));
 }
@@ -126,21 +128,21 @@ WhileStatementNode* PredictiveParser::Parse_WhileStatement(TokenList* tokens)
 bool PredictiveParser::LookAhead_ForStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.FOR_KEYWORD); }
 ForStatementNode* PredictiveParser::Parse_ForStatement(TokenList* tokens)
 {
-    tokens->Next();  // Consume OPEN_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_OPEN_TOKEN);  // Consume OPEN_PARENTHESIS_TOKEN
 
     LocalVarDeclarationNode* initialization = dynamic_cast<LocalVarDeclarationNode*>(Parse_VarDeclaration(tokens, true));
 
     if (initialization == nullptr)
     {
-        Logger.Log("For loop initialization must be a local variable declaration", Logger::ERROR);
+        Logger.Log("For-Loop initialization must be a local variable declaration", Logger::ERROR);
     }
 
     AbstractExpressionNode* condition = Parse_Expression(tokens);
-    tokens->Next();  // Consume STATEMENT_END_TOKEN (Parse_Expression does not consume STATEMENT_END_TOKEN)
+    ConsumeNext(tokens, Tokens.STATEMENT_END_TOKEN);  // Consume STATEMENT_END_TOKEN (Parse_Expression does not consume STATEMENT_END_TOKEN)
 
     AbstractStatementNode* increment = Parse_Statement(tokens);
 
-    tokens->Next();  // Consume CLOSE_PARENTHESIS_TOKEN
+    ConsumeNext(tokens, Tokens.PARENTHESIS_CLOSE_TOKEN);  // Consume CLOSE_PARENTHESIS_TOKEN
 
     return new ForStatementNode(initialization, condition, increment, Parse_Statement(tokens));
 }
@@ -148,13 +150,13 @@ ForStatementNode* PredictiveParser::Parse_ForStatement(TokenList* tokens)
 bool PredictiveParser::LookAhead_BreakStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.BREAK_KEYWORD); }
 BreakStatementNode* PredictiveParser::Parse_BreakStatement(TokenList* tokens)
 {
-    tokens->Next();  // Consume STATEMENT_END_TOKEN
+    ConsumeNext(tokens, Tokens.STATEMENT_END_TOKEN);  // Consume STATEMENT_END_TOKEN
     return new BreakStatementNode();
 }
 
 bool PredictiveParser::LookAhead_ContinueStatement(TokenList* tokens) { return tokens->IsPeekOfTokenType(Tokens.CONTINUE_KEYWORD); }
 ContinueStatementNode* PredictiveParser::Parse_ContinueStatement(TokenList* tokens)
 {
-    tokens->Next();  // Consume STATEMENT_END_TOKEN
+    ConsumeNext(tokens, Tokens.STATEMENT_END_TOKEN);  // Consume STATEMENT_END_TOKEN
     return new ContinueStatementNode();
 }

@@ -20,7 +20,7 @@ class KeywordToken : public Token
 
     KeywordToken* New(unsigned int line) { return new KeywordToken(this->keyword, line); }
 
-    virtual std::string ToString() override { return Token::ToString() + ":" + this->keyword; }
+    virtual std::string ToString() override { return Token::ToString() + " " + this->keyword; }
 
    private:
     std::string keyword;

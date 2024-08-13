@@ -7,7 +7,7 @@ GlobalCodeNode* PredictiveParser::Parse_GlobalCode(TokenList* tokens)
 {
     GlobalCodeNode* globalCodeNode = new GlobalCodeNode();
 
-    while (true)
+    while (tokens->HasNext())
     {
         if (LookAhead_Declaration(tokens))
         {
@@ -21,7 +21,8 @@ GlobalCodeNode* PredictiveParser::Parse_GlobalCode(TokenList* tokens)
             continue;
         }
 
-        break;
+        // Unexpected token is consumed, parsing continues
+        Logger.Log("Unexpected token: " + tokens->Next()->ToString(), Logger::ERROR);
     }
 
     return globalCodeNode;

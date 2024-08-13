@@ -8,7 +8,6 @@ final float float2 = float1 * (5.0 + 1.0) / 7.0;
 
 bool bool2 = true && false;
 
-
 bool bool3;
 float float3;
 
@@ -58,10 +57,7 @@ int _start(/*int argc, char argv*/)
     {
         _print(4, 66);
     }
-    elif (int3 < int2)
-    {
-        _print(4, 67);
-    }
+    elif (int3 < int2) { _print(4, 67); }
     else
     {
         _print(4, 68);
@@ -96,8 +92,8 @@ int _start(/*int argc, char argv*/)
     int int4_3 = 2;
 
     // testing complex expressions
-    
-    int int4 = int4_1 * 5 + (2 * int4_2 - 4) - 1 * (int4_3 + 1); // 12
-    int4 += 53; // 65 -> A
+
+    int int4 = int4_1 * 5 + (2 * int4_2 - 4) - 1 * (int4_3 + 1);  // 12
+    int4 += 53;                                                   // 65 -> A
     _print(4, int4);
 }

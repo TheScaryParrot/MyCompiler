@@ -13,7 +13,7 @@ class TokenWithValue : public Token
 
     TokenWithValue* New(std::string value, unsigned int line) { return new TokenWithValue(this->tokenName, line, value); };
 
-    virtual std::string ToString() override { return Token::ToString() + ": " + value; };
+    virtual std::string ToString() override { return Token::ToString() + " " + value; };
 
    private:
     std::string value;
