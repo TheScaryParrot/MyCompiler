@@ -1,2 +1,3 @@
 learn assembly: https://www.cs.princeton.edu/courses/archive/spr11/cos217/lectures/
 expression evaluation: https://docs.lib.purdue.edu/cgi/viewcontent.cgi?article=1388&context=cstech
+(TAKE A LOOK AT THIS) macro expansion as code generation: https://en.wikipedia.org/wiki/Instruction_selection
