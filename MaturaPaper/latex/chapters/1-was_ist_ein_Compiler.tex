@@ -28,7 +28,7 @@ Die Aufgabe dieses Lexers ist es den Input File zu scannen und die gescannten Ze
 
 Als Beispiel:
 
-\begin{lstlisting}[language=C, label=ex:preLex, caption=C code vor Lexical Analysis]
+\begin{lstlisting}[language=C, label=eg:preLex, caption=C code vor Lexical Analysis]
 
 int foo()
 {
@@ -44,7 +44,7 @@ int foo()
 
 Würde hierbei zu einem Array von Token Objekten umgewandelt werden:
 
-\begin{lstlisting}[label=ex:postLex, caption=Tokens nach Lexical Analysis]
+\begin{lstlisting}[label=eg:postLex, caption=Tokens nach Lexical Analysis]
 KeywordToken (keyword="int")
 IdentifierToken (id="foo")
 LParenthesisToken
@@ -58,7 +58,7 @@ LiteralIntToken (value=0)
 \end{lstlisting}
 
 Der Lexer legt hierbei fest welche Zeichen die Input-Programmiersprache enthalten darf und welche Bedeutung ihnen Zugesprochen wird. So ist zum Beispiel im Lexer festgelegt, dass ein + Zeichen als Addition interpretiert wird.
-Genauso wie im Listing \ref{ex:postLex} 'if' als KeywordToken gesehen wird, lässt sich im Lexer auch bestimmen, dass ein Wort wie 'print' als Keyword angesehen werden soll.
+Genauso wie im Listing \ref{eg:postLex} 'if' als KeywordToken gesehen wird, lässt sich im Lexer auch bestimmen, dass ein Wort wie 'print' als Keyword angesehen werden soll.
 
 \section{Syntax Analysis}
 Nun versteht der Compiler was mit den Zeichen im Input File gemeint ist, jedoch fehlt noch etwas bis tatsächlich in einer andere Programmiersprache übersetzt werden kann. Und das ist Verständnis für Syntax.
