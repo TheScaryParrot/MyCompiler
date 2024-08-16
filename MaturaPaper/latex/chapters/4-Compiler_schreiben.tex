@@ -17,7 +17,7 @@ Jedoch unterscheiden sich beide Compiler stark in der Funktionsweise. Der Compil
 
 TALK ABOUT ORDERS AND THE MEANING OF IDENTIFIERS, INSTRUCTIONS AND LITERAL CODE
 
-\subsection{Fetch}
+\subsection{Fetch} \label{sec:qhs-fetch}
 Der QHS-Zyklus beginnt mit dem ersten Fetch. Dabei wird die erste Order aus dem Inputfile extrahiert. Eine Order weist einen der drei Typen Identifier, Instruction oder Literal-Code auf. Diese sind mit folgenden RegEx definiert.
 
 \begin{table}[h]
@@ -65,6 +65,21 @@ Bestimmte Instructions und Identifiers können jedoch Order-Stack-Proof, also im
 Dies ist zum Beispiel besonders bei der Instruction, die den Order-Stack wieder deaktiviert, wichtig. Da diese sonst nicht ausgeführt und somit der Order-Stack niemehr deaktiviert wird.
 LiteralCode kann nicht Code-Stack-Proof sein.
 
+MAYBE CODESTACK FIGURE
+
 Ist der Order-Stack deaktiviert oder die Order Code-Stack-Proof wird diese an den letzen Schritt Execute weitergegeben.
 
 \subsection{Execute} \label{sec:qhs-execute}
+Execute ist der letzte Schritt des Zyklus. Und hier wird nun auch endlich der tatsächliche Assembly Code generiert. Je nach Typ der Order, Identifier, Instruction oder Literal-Code, läuft Execute sehr unterschiedlich ab.
+
+\subsubsection{Identifier}
+Ein Identifier ist eine Zusammenfassung von mehreren Orders. Wenn nun ein Identifier in den Execute Schritt kommt, werden die Orders auf den Fetch-Stack aus Abschnitt \ref{sec:qhs-fetch} gepushed.
+Beim nächsten Fetch werden nun die zum Identifier gehörenden Orders zurückgegeben. Um Grunde wird der Identifier in seine Orders überführt.
+
+\subsubsection{Literal-Code}
+Literal-Code ist der Weg wie der QHS-Compiler Assembly Code generiert. Dieser ist sehr simpel. Wenn Literal-Code in den Execute Schritt gelangt, wird alles was zwischen den " Zeichen steht in das Output-Dokument geschrieben.
+
+\subsubsection{Instructions}
+Instructions sind die komplexeste Order für den Execute Schritt. Für jede Instruction ist im QHS-Compiler eine Funktion definiert, die ausgeführt wird, wenn diese Instruction in den Execute Schritt gelangt.
+Diese Funktionen können Variabeln im QHS-Compiler speichern, den Order-Stack aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
+
