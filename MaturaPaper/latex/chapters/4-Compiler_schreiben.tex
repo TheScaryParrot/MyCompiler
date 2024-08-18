@@ -1,10 +1,8 @@
-\chapter{Schreiben der Compiler}
-
-\section{THS Compiler}
+\chapter{THS Compiler}
 Der THS Compiler folgt dem theoretischen Aufbau eines Compilers und besteht aus Lexer, Parser und Code Generator. Als Parser wird ein Predictive Descent Parser verwendet.
 Der Code Generator arbeitet auf dem Abstract Syntax Tree mithilfe eines Visitor Patterns. Die Semantic Analysis wird während der Code Generation durchgeführt. Geschrieben ist der Compiler in C++ und liefert x86 Assembly nach NASM Syntax.
 
-\section{QHS Compiler}
+\chapter{QHS Compiler}
 Genauso wie der THS Compiler ist auch der QHS Compiler in C++ geschrieben und generiert x86 Assembly nach NASM Syntax.
 Jedoch unterscheiden sich beide Compiler stark in der Funktionsweise. Der Compilation von QHS steht ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
 
@@ -17,7 +15,7 @@ Jedoch unterscheiden sich beide Compiler stark in der Funktionsweise. Der Compil
 
 TALK ABOUT ORDERS AND THE MEANING OF IDENTIFIERS, INSTRUCTIONS AND LITERAL CODE
 
-\subsection{Fetch} \label{sec:qhs-fetch}
+\section{Fetch} \label{sec:qhs-fetch}
 Der QHS-Zyklus beginnt mit dem ersten Fetch. Dabei wird die erste Order aus dem Inputfile extrahiert. Eine Order weist einen der drei Typen Identifier, Instruction oder Literal-Code auf. Diese sind mit folgenden RegEx definiert.
 
 \begin{table}[h]
@@ -50,7 +48,7 @@ Dieser Fetch-Stack folgt Last-In First-Out und \textbf{auf ihn} kann während je
 Wenn eine Liste an Orders komplett gefetched wurde, wird diese vom Stack gelöscht. Der Inputfile befindet sich auf dem letzten Platz des Fetch-Stacks und wird somit nur verwendet, wenn der Stack ansonsten komplett leer ist.
 Die Compilation wird beendet, sobald keine Order mehr auf dem Fetch-Stack übrig ist.
 
-\subsection{Decode} \label{sec:qhs-decode}
+\section{Decode} \label{sec:qhs-decode}
 Nachdem eine Order gefetched wurde, wird diese an Decode weitergegeben. \textbf{Während Decode werden zwei Aufgaben durchgeführt}.
 Als erstes geht es darum Orders des Typen Identifier ihrer jeweiligen Definition zuzuortnen, sowie auf undefinierte Identifier hinzuweisen und diese zu überspringen.
 
@@ -69,17 +67,36 @@ MAYBE CODESTACK FIGURE
 
 Ist der Order-Stack deaktiviert oder die Order Code-Stack-Proof wird diese an den letzen Schritt Execute weitergegeben.
 
-\subsection{Execute} \label{sec:qhs-execute}
+\section{Execute} \label{sec:qhs-execute}
 Execute ist der letzte Schritt des Zyklus. Und hier wird nun auch endlich der tatsächliche Assembly Code generiert. Je nach Typ der Order, Identifier, Instruction oder Literal-Code, läuft Execute sehr unterschiedlich ab.
 
-\subsubsection{Identifier}
+\subsection{Identifier}
 Ein Identifier ist eine Zusammenfassung von mehreren Orders. Wenn nun ein Identifier in den Execute Schritt kommt, werden die Orders auf den Fetch-Stack aus Abschnitt \ref{sec:qhs-fetch} gepushed.
 Beim nächsten Fetch werden nun die zum Identifier gehörenden Orders zurückgegeben. Um Grunde wird der Identifier in seine Orders überführt.
 
-\subsubsection{Literal-Code}
+\subsection{Literal-Code}
 Literal-Code ist der Weg wie der QHS-Compiler Assembly Code generiert. Dieser ist sehr simpel. Wenn Literal-Code in den Execute Schritt gelangt, wird alles was zwischen den " Zeichen steht in das Output-Dokument geschrieben.
 
-\subsubsection{Instructions}
+\subsection{Instructions}
 Instructions sind die komplexeste Order für den Execute Schritt. Für jede Instruction ist im QHS-Compiler eine Funktion definiert, die ausgeführt wird, wenn diese Instruction in den Execute Schritt gelangt.
 Diese Funktionen können Variabeln im QHS-Compiler speichern, den Order-Stack aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l|l}
+    \textbf{\#enterOrderStack}   & Aktiviert den Order-Stack                                                                                                                                                                                                             \\ \hline
+    \textbf{\#exitOrderStack}    & Deaktiviert den Order-Stack                                                                                                                                                                                                           \\ \hline
+    \textbf{\#newOrderStackList} & Pushed eine leere Liste auf den Order-Stack                                                                                                                                                                                           \\ \hline
+    \textbf{\#assignIdentifier}  & \begin{tabular}[c]{@{}l@{}}Popt die oberste Liste an Orders vom Order-Stack.\\
+        Das erste Element der Liste muss ein Identifier sein.
+        \\ Der Rest der Orders der Liste wird als Definition für diesen Identifier festgelegt.\end{tabular} \\ \hline
+    \textbf{\#force}             & \begin{tabular}[c]{@{}l@{}} Die nächste Order wird nach Fetch sofort an Execute weitergegeben. \\
+        Überspringt Decode und somit den Order-Stack                                                                                                                       \end{tabular} \\ \hline
+    \textbf{\#forceNoFetch}      & Die nächste Order wird sofot an Execute weitergegeben. Fetch wird hierbei übersprungen.                                                                                                                                               \\ \hline
+    \textbf{\#orderStackPush}    & \begin{tabular}[c]{@{}l@{}} Die nächste Order wird sofort auf die oberste Liste des Order-Stacks gepushed.
+        \\ Auch wenn diese Order-Stack-Proof ist. Execute wird übersprungen.                                                                                            \end{tabular} \\ \hline
+    \textbf{\#orderStackTop}     & Wird mit der obersten Order des Order-Stacks ersetzt                                                                                                                                                                                  \\ \hline
+    \textbf{\#deepFetch}         & Wird mit der ersten Order der zweit obersten Liste an Order auf dem Fetch-Stack ersetzt                                                                                                                                                                                                                                 
+    \end{tabular}
+\end{table}
 
