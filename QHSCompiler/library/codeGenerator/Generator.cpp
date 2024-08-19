@@ -2,6 +2,8 @@
 
 #include "Callable.cpp"
 #include "CodeGenerator.cpp"
+#include "decode/DecodeHandler.cpp"
+#include "fetch/FetchHandler.cpp"
 
 class Generator
 {
@@ -10,7 +12,7 @@ class Generator
     {
         this->assemblyCode = new AssemblyCode();
         CodeGenerator.Init(file, assemblyCode);
-        InitInstructions();
+        // InitInstructions();
     }
 
     AssemblyCode* Generate()
@@ -19,16 +21,23 @@ class Generator
 
         while (!CodeGenerator.IsDone())
         {
-            CodeGenerator.HandleOrder(CodeGenerator.GetNextOrder(), true);
+            Order order = fetchHandler->Fetch();
+
+            if (decodeHandler->Decode(order)) continue;
+
+            CodeGenerator.HandleOrder(order, false);
         }
 
         return assemblyCode;
     }
 
    private:
+    FetchHandler* fetchHandler;
+    DecodeHandler* decodeHandler;
+
     AssemblyCode* assemblyCode;
 
-    void InitInstructions()
+    /*void InitInstructions()
     {
 #pragma region Comment
 
@@ -523,5 +532,5 @@ class Generator
         CodeGenerator.AddInstruction("deactivateDebugMode", deactivateDebugMode);
 
 #pragma endregion
-    }
+    }*/
 };

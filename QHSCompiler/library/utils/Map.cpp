@@ -9,6 +9,8 @@ class Map
     std::map<Key, Value> map;
 
    public:
+    Map(std::map<Key, Value> map) { this->map = map; }
+
     void Set(Key key, Value value) { map[key] = value; }
 
     Value Get(Key key) { return map[key]; }

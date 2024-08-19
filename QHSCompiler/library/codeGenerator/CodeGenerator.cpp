@@ -30,25 +30,6 @@ static class CodeGenerator
         COMMENT
     };
 
-    bool IsDone() { return fetchHandler->IsDone(); }
-    Order GetNextOrder(bool checkForMode = true)
-    {
-        Order newOrder = fetchHandler->Fetch();
-        currentOrder = newOrder;
-
-        // If the order has a callable and is not in OrderQueue or Comment, call ICallable::Encounter()
-        if (newOrder.GetType() == Order::EOrderTypes::DirectCode) return currentOrder;
-
-        ICallable* callable = GetCallable(newOrder);
-        if (callable == nullptr) return currentOrder;
-
-        if (IsInMode(EModes::COMMENT) && checkForMode && !callable->IsCommentProof()) return currentOrder;
-        if (IsInMode(EModes::ORDER_QUEUE) && checkForMode && !callable->IsOrderQueueProof()) return currentOrder;
-
-        callable->Encounter();
-        return currentOrder;
-    }
-    Order GetCurrentOrder() { return currentOrder; }
     void SetCurrentOrder(Order order) { currentOrder = order; }
     void IncrementFetchDepth() { fetchHandler->IncrementFetcherDepth(); }
     void DecrementFetchDepth() { fetchHandler->DecrementFetcherDepth(); }
@@ -111,16 +92,6 @@ static class CodeGenerator
         this->assemblyCode->AddCode(order.GetName());
     }
 
-    ICallable* GetCallable(Order& order)
-    {
-        if (order.GetType() != Order::EOrderTypes::Identifier)
-        {
-            return instructionEnvironment.GetCallable(order.GetName());
-        }
-
-        return identifierEnvironment.GetCallable(order.GetName());
-    }
-
     void PushMode(EModes mode) { modeStack.Push(mode); }
     void PopMode() { modeStack.Pop(); }
     EModes GetCurrentMode() { return modeStack.Top(); }
@@ -163,12 +134,6 @@ static class CodeGenerator
     void ClearOrderQueue() { orderQueueStack.ClearAllOrderQueues(); }
     void PutInFrontFromOrderQueue() { this->PutInFront(orderQueueStack.DequeueOrder()); }
 
-    void AddInstruction(std::string name, ICallable* instruction)
-    {
-        instructionEnvironment.AddCallable(name, instruction);
-    }
-    void AddIdentifier(std::string name, ICallable* identifier) { identifierEnvironment.AddCallable(name, identifier); }
-
     int GetIntGeneratorVar(std::string name)
     {
         if (!intGeneratorVars.Contains(name))
@@ -200,9 +165,6 @@ static class CodeGenerator
 
     unsigned int orderQueueDepthCounter = 0;
     OrderQueueStackHandler orderQueueStack = OrderQueueStackHandler();
-
-    Environment identifierEnvironment = Environment();
-    Environment instructionEnvironment = Environment();
 
     FetchHandler* fetchHandler;
     Order currentOrder = Order::Empty();
