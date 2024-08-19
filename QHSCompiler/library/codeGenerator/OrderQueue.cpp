@@ -6,6 +6,9 @@
 class OrderQueue
 {
    public:
+    OrderQueue() = default;
+    OrderQueue(Order order) { this->queue.Enqueue(order); }
+
     void Enqueue(Order order) { this->queue.Enqueue(order); }
     Order Dequeue() { return this->queue.Dequeue(); }
     Order Front() { return this->queue.Front(); }

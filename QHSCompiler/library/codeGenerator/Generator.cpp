@@ -128,9 +128,9 @@ class Generator
         replaceWithOneOrderHandlerStackDepthDeeper->SetEncounterFunction(
             []()
             {
-                CodeGenerator.IncrementOrderHandlerStackDepth();
+                CodeGenerator.IncrementFetchDepth();
                 Logger.Log("Replaced with: " + CodeGenerator.GetNextOrder().ToString(), Logger::DEBUG);
-                CodeGenerator.DecreaseOrderHandlerStackDepth();
+                CodeGenerator.DecrementFetchDepth();
             });
         replaceWithOneOrderHandlerStackDepthDeeper->SetOrderQueueProof(true);
         CodeGenerator.AddInstruction("replaceWithOneOrderHandlerStackDepthDeeper",

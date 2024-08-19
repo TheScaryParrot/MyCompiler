@@ -7,18 +7,21 @@
 #include "../utils/Logger.cpp"
 #include "../utils/Map.cpp"
 #include "Environment.cpp"
-#include "OrderHandler.cpp"
 #include "OrderQueueStackHandler.cpp"
+#include "fetch/FetchHandler.cpp"
+#include "fetch/InputFileFetcher.cpp"
+#include "fetch/OrderQueueFetcher.cpp"
 
 static class CodeGenerator
 {
    public:
     void Init(InputFile* file, AssemblyCode* assemblyCode)
     {
-        this->orderHandler = new OrderHandler(file);
+        this->fetchHandler = new FetchHandler();
+        this->fetchHandler->PutInFront(new InputFileFetcher(file));
         this->assemblyCode = assemblyCode;
     }
-    ~CodeGenerator() { delete orderHandler; }
+    ~CodeGenerator() { delete fetchHandler; }
 
     enum EModes
     {
@@ -27,10 +30,10 @@ static class CodeGenerator
         COMMENT
     };
 
-    bool IsDone() { return orderHandler->IsDone(); }
+    bool IsDone() { return fetchHandler->IsDone(); }
     Order GetNextOrder(bool checkForMode = true)
     {
-        Order newOrder = orderHandler->GetNextOrder();
+        Order newOrder = fetchHandler->Fetch();
         currentOrder = newOrder;
 
         // If the order has a callable and is not in OrderQueue or Comment, call ICallable::Encounter()
@@ -47,8 +50,8 @@ static class CodeGenerator
     }
     Order GetCurrentOrder() { return currentOrder; }
     void SetCurrentOrder(Order order) { currentOrder = order; }
-    void IncrementOrderHandlerStackDepth() { orderHandler->IncrementOrderStackDepth(); }
-    void DecreaseOrderHandlerStackDepth() { orderHandler->DecreaseOrderStackDepth(); }
+    void IncrementFetchDepth() { fetchHandler->IncrementFetcherDepth(); }
+    void DecrementFetchDepth() { fetchHandler->DecrementFetcherDepth(); }
 
     void HandleOrder(Order order, bool checkForMode)
     {
@@ -123,8 +126,17 @@ static class CodeGenerator
     EModes GetCurrentMode() { return modeStack.Top(); }
     bool IsInMode(EModes mode) { return GetCurrentMode() == mode; }
 
-    void PutInFront(Order order) { orderHandler->PutInFront(order); }
-    void PutInFront(OrderQueue orderQueue) { orderHandler->PutInFront(orderQueue); }
+    void PutInFront(Order order)
+    {
+        OrderQueueFetcher* fetcher = new OrderQueueFetcher(new OrderQueue(order));
+        fetchHandler->PutInFront(fetcher);
+    }
+
+    void PutInFront(OrderQueue orderQueue)
+    {
+        OrderQueueFetcher* fetcher = new OrderQueueFetcher(new OrderQueue(orderQueue));
+        fetchHandler->PutInFront(fetcher);
+    }
 
     void IncrementOrderQueueMode()
     {
@@ -149,7 +161,7 @@ static class CodeGenerator
     void EnqueueInOrderQueue(Order order) { orderQueueStack.EnqueueOrder(order); }
     OrderQueue* PopOrderQueue() { return orderQueueStack.PopOrderQueue(); }
     void ClearOrderQueue() { orderQueueStack.ClearAllOrderQueues(); }
-    void PutInFrontFromOrderQueue() { orderHandler->PutInFront(orderQueueStack.DequeueOrder()); }
+    void PutInFrontFromOrderQueue() { this->PutInFront(orderQueueStack.DequeueOrder()); }
 
     void AddInstruction(std::string name, ICallable* instruction)
     {
@@ -192,7 +204,7 @@ static class CodeGenerator
     Environment identifierEnvironment = Environment();
     Environment instructionEnvironment = Environment();
 
-    OrderHandler* orderHandler;
+    FetchHandler* fetchHandler;
     Order currentOrder = Order::Empty();
 
     Map<std::string, int> intGeneratorVars;
