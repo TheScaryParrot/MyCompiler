@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "../../InputFile.cpp"
-#include "../../Order.cpp"
 #include "IOrderFetcher.cpp"
 
 class CharacterGroup
@@ -50,6 +49,7 @@ class InputFileFetcher : public IOrderFetcher
 
         this->file = file;
     }
+    ~InputFileFetcher() { delete file; }
 
     virtual Order Next() override
     {
@@ -69,7 +69,7 @@ class InputFileFetcher : public IOrderFetcher
         {
             file->ReadNext();
             character = file->PeekNext();
-            type = Order::DirectCode;
+            type = Order::LiteralCode;
 
             while (!file->IsEndOfFile() && !directCode.IsCharacterInGroup(character))
             {
@@ -86,7 +86,7 @@ class InputFileFetcher : public IOrderFetcher
         {
             file->ReadNext();
             character = file->PeekNext();
-            type = Order::CompilerInstruction;
+            type = Order::Instruction;
         }
 
         while (!file->IsEndOfFile() && !whitespace.IsCharacterInGroup(character) &&

@@ -2,19 +2,21 @@
 
 #include <vector>
 
-#include "../../Order.cpp"
 #include "../../utils/Logger.cpp"
+#include "../AbstractGenerator.cpp"
+#include "../instructions/InstructionHandler.cpp"
 #include "IOrderFetcher.cpp"
 
 class FetchHandler
 {
    public:
-    Order Fetch()
+    void Fetch(AbstractGenerator* generator)
     {
         if (fetcherDepth >= fetcherQueue.size())
         {
             Logger.Log("FetchDepth is greater than fetcherQueue size", Logger::ERROR);
-            return Order::Empty();
+            generator->SetCurrentOrder(Order::Empty());
+            return;
         }
 
         auto queueIterator = fetcherQueue.begin() + fetcherDepth;
@@ -28,7 +30,15 @@ class FetchHandler
             if (fetcher != nullptr) delete fetcher;
         }
 
-        return order;
+        /*if (order.GetType() == Order::Instruction)
+        {
+            Instruction* instruction = InstructionHandler.GetInstruction(order.GetName());
+            if (instruction != nullptr) instruction->Fetch(generator, order);
+        }*/
+
+        generator->SetCurrentOrder(order);
+        generator->IncrementPhase();
+        return;
     }
 
     void IncrementFetcherDepth()
@@ -45,10 +55,7 @@ class FetchHandler
 
     void PutInFront(IOrderFetcher* fetcher)
     {
-        if (fetcher->IsEmpty())
-        {
-            return;
-        }
+        if (fetcher->IsEmpty()) return;
 
         fetcherQueue.insert(fetcherQueue.begin() + fetcherDepth, fetcher);
     }

@@ -1,29 +1,42 @@
 #pragma once
 
-#include "../Order.cpp"
-#include "../utils/Queue.cpp"
+#include <vector>
+
+#include "Order.cpp"
 
 class OrderQueue
 {
    public:
     OrderQueue() = default;
-    OrderQueue(Order order) { this->queue.Enqueue(order); }
+    OrderQueue(Order order) { this->Enqueue(order); }
 
-    void Enqueue(Order order) { this->queue.Enqueue(order); }
-    Order Dequeue() { return this->queue.Dequeue(); }
-    Order Front() { return this->queue.Front(); }
-    bool IsEmpty() { return this->queue.IsEmpty(); }
-    void Clear() { this->queue.Clear(); }
+    void Enqueue(Order order) { this->queue.push_back(order); }
+    void EnqueueInFront(Order order) { queue.insert(queue.begin(), order); }
+    Order Dequeue()
+    {
+        if (IsEmpty()) return Order::Empty();
+
+        Order order = this->queue.front();
+        this->queue.erase(queue.begin());
+        return order;
+    }
+    Order Front() { return this->queue.front(); }
+    bool IsEmpty() { return this->queue.empty(); }
+    void Clear()
+    {
+        while (!IsEmpty()) Dequeue();
+    }
 
     std::string ToString()
     {
-        Queue<Order> tempQueue = this->queue;
+        std::vector<Order> tempQueue = this->queue;
 
         std::string str = "";
 
-        while (!tempQueue.IsEmpty())
+        while (!tempQueue.empty())
         {
-            Order order = tempQueue.Dequeue();
+            Order order = tempQueue.front();
+            tempQueue.erase(queue.begin());
             str += order.ToString() + "\n";
         }
 
@@ -31,5 +44,5 @@ class OrderQueue
     }
 
    private:
-    Queue<Order> queue;
+    std::vector<Order> queue;
 };

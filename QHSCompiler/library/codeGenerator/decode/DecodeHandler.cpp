@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../AbstractGenerator.cpp"
 #include "../Order.cpp"
 #include "../OrderQueue.cpp"
 #include "../identifiers/IdentifierHandler.cpp"
@@ -17,9 +18,10 @@ class DecodeHandler
     DecodeHandler() { this->queue = new OrderQueue(); }
     ~DecodeHandler() { delete this->queue; }
 
-    /// @brief Returns whether the order should be skipped
-    bool Decode(Order order)
+    void Decode(AbstractGenerator* generator)
     {
+        Order order = generator->GetCurrentOrder();
+
         bool isCommentProof = false;
         bool isOrderQueueProof = false;
 
@@ -33,7 +35,7 @@ class DecodeHandler
                 isOrderQueueProof = identifier->IsOrderQueueProof();
             }
         }
-        else if (order.GetType() == Order::CompilerInstruction)
+        else if (order.GetType() == Order::Instruction)
         {
             Instruction* instruction = InstructionHandler.GetInstruction(order.GetName());
 
@@ -44,13 +46,47 @@ class DecodeHandler
             }
         }
 
-        // Returns true when in comment (and not proof) or in order queue (and not proof)
-        return !isCommentProof && this->isInComment || !isOrderQueueProof && this->orderQueueDepthCounter > 0;
+        if (isInComment && !isCommentProof)
+        {
+            generator->RestartCycle();  // Returns to beginning of GeneratorPhases loop
+            return;
+        }
+
+        if (orderQueueDepthCounter > 0 && !isOrderQueueProof)
+        {
+            queue->Enqueue(order);
+            generator->RestartCycle();  // Returns to beginning of GeneratorPhases loop
+            return;
+        }
+
+        generator->IncrementPhase();
     }
 
     void IncrementOrderQueueDepthCounter() { this->orderQueueDepthCounter++; }
     void DecrementOrderQueueDepthCounter() { this->orderQueueDepthCounter--; }
+    bool IsOrderQueueActive() { return this->orderQueueDepthCounter > 0; }
 
     void EnterComment() { this->isInComment = true; }
     void ExitComment() { this->isInComment = false; }
+
+    Order DequeueFromOrderQueue()
+    {
+        if (queue->IsEmpty())
+        {
+            Logger.Log("Cannot dequeue, OrderQueue is empty!", Logger.ERROR);
+            return Order::Empty();
+        }
+
+        return queue->Dequeue();
+    }
+
+    void EnqueueInOrderQueue(Order order) { queue->Enqueue(order); }
+    void EnqueueInOrderQueueFront(Order order) { queue->EnqueueInFront(order); }
+
+    OrderQueue* DequeueWholeOrderQueue()
+    {
+        OrderQueue* tmp = queue;
+        this->queue = new OrderQueue();
+        return tmp;
+    }
 };
