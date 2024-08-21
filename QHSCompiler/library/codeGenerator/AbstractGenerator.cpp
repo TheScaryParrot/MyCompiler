@@ -62,6 +62,7 @@ class AbstractGenerator
     virtual Order DequeueFromOrderQueue() = 0;
     virtual void EnqueueInOrderQueue(Order order) = 0;
     virtual void EnqueueInOrderQueueFront(Order order) = 0;
+    virtual OrderQueue GetOrderQueueCopy() = 0;
     virtual OrderQueue* DequeueWholeOrderQueue() = 0;
 
     int GetIntGeneratorVar(std::string name)

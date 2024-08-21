@@ -46,9 +46,15 @@ class DecodeHandler
             }
         }
 
-        if (isInComment && !isCommentProof)
+        if (isInComment)
         {
-            generator->RestartCycle();  // Returns to beginning of GeneratorPhases loop
+            if (isCommentProof)
+            {
+                generator->IncrementPhase();  // Continues to execute
+                return;
+            }
+
+            generator->RestartCycle();  // Skips instruction
             return;
         }
 
@@ -82,7 +88,7 @@ class DecodeHandler
 
     void EnqueueInOrderQueue(Order order) { queue->Enqueue(order); }
     void EnqueueInOrderQueueFront(Order order) { queue->EnqueueInFront(order); }
-
+    OrderQueue GetOrderQueueCopy() { return *queue; }
     OrderQueue* DequeueWholeOrderQueue()
     {
         OrderQueue* tmp = queue;

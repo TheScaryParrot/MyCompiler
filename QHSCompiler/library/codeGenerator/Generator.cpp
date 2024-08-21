@@ -19,8 +19,6 @@ class Generator : public AbstractGenerator
 
         while (!fetchHandler.IsDone() && phaseCounter < 100000)
         {
-            std::cout << "Phase: " << GetCurrentPhase() << " CurrentOrder: " << GetCurrentOrder().ToString()
-                      << std::endl;
             ExecuteCurrentPhase();
             phaseCounter++;
         }
@@ -77,6 +75,7 @@ class Generator : public AbstractGenerator
     virtual Order DequeueFromOrderQueue() override { return decodeHandler.DequeueFromOrderQueue(); }
     virtual void EnqueueInOrderQueue(Order order) override { decodeHandler.EnqueueInOrderQueue(order); }
     virtual void EnqueueInOrderQueueFront(Order order) override { decodeHandler.EnqueueInOrderQueueFront(order); }
+    virtual OrderQueue GetOrderQueueCopy() override { return decodeHandler.GetOrderQueueCopy(); }
     virtual OrderQueue* DequeueWholeOrderQueue() override { return decodeHandler.DequeueWholeOrderQueue(); }
 
    private:

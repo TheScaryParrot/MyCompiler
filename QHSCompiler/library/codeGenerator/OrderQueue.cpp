@@ -29,14 +29,10 @@ class OrderQueue
 
     std::string ToString()
     {
-        std::vector<Order> tempQueue = this->queue;
-
         std::string str = "";
 
-        while (!tempQueue.empty())
+        for (Order order : queue)
         {
-            Order order = tempQueue.front();
-            tempQueue.erase(queue.begin());
             str += order.ToString() + "\n";
         }
 

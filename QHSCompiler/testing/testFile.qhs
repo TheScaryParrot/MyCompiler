@@ -47,16 +47,15 @@ debug */
 
 /* { $ #putInFrontFromOrderQueue } >> $ ; */
 
-{ @ } { @ #orderQueueTop } >> ;
-
 { ! } { #orderEnqueue #force } >> ;
 { ! } #makeOrderQueueProof ;
 
 { lateArg>> } {
     /* result in #orderEnqueue ! in order queue */
-    { #orderEnqueue #orderEnqueue #orderEnqueue ! @ } >> 
+    { #orderEnqueue #orderEnqueue #orderEnqueue ! #deepFetch } >> 
 } >> ;
 { lateArg>> } #makeOrderQueueProof ;
+
 
 /* { >> #executeNextInEncounterPhase } >> >>executeOnce ; */
 
@@ -82,10 +81,10 @@ debug */
 
     #pushEnv
 
-    { "byte" } >> 1
-    { "word" } >> 2
-    { "dword" } >> 4
-    { "qword" } >> 8
+    { 1 "byte" } >>
+    { 2 "word" } >>
+    { 4 "dword" } >>
+    { 8 "qword" } >>
 
     { #orderEnqueue ! size } #literalToIdentifier
 
@@ -136,7 +135,7 @@ debug */
 
     /* assigns what is stored in name to the direct code of what is stored in name */
     { #orderEnqueue ! name }
-    { #orderEnqueue ! #orderToLiteralCode #orderEnqueue ! name } >> ;
+    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
 
     name ": " defineCode ; 
 } >> ;
@@ -148,11 +147,11 @@ debug */
     { value } lateArg>> ;
 
     { defineSpecifier }
-    { { #orderEnqueue ! size } getDefineSpecifier } >> ;
+    { { #orderEnqueue ! size } getDefineSpecifier }  >> ;
 
     /* assigns whast is stored in name to the direct code of what is stored in name */
     { #orderEnqueue ! name }
-    { #orderEnqueue ! #orderToLiteralCode #orderEnqueue ! name } >> ;
+    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
 
     name ": " defineSpecifier " " value ;
 } >> ;
@@ -163,11 +162,12 @@ debug */
     { name } lateArg>> ;
     { value } lateArg>> ;
 
-    { { #orderEnqueue ! size } getDefineSpecifier } >> defineSpecifier ;
+    { defineSpecifier }
+    { { #orderEnqueue ! size } getDefineSpecifier } >> ;
 
     /* assigns whast is stored in name to the direct code of what is stored in name */
     { #orderEnqueue ! name }
-    { #orderEnqueue ! #orderToLiteralCode #orderEnqueue ! name } >> ;
+    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
 
     name ": " defineSpecifier " " value ;
 } >> ;
@@ -179,7 +179,7 @@ debug */
 
     /* assigns what is stored in name to the direct code of what is stored in name */
     { #orderEnqueue ! name }
-    { #orderEnqueue ! #orderToLiteralCode #orderEnqueue ! name } >> ;
+    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
 
     name ": resb " size ;
 
@@ -194,8 +194,8 @@ debug */
     { register } { { #orderEnqueue ! size } getRegisterA } >> ;
     { sizeSpecifier } { { #orderEnqueue ! size } getSizeSpecifier } >> ;
 
-    { "rbpOffset" #orderEnqueue ! size } #changeIntGeneratorVar
-    { currentRBPoffset } { "rbpOffset" #orderEnqueue ! #getIntGeneratorVar } >> ;
+    { "rbpOffset" #orderEnqueue ! size } #changeIntVar ;
+    { "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar } >> ;
     { newRBPvar } { "rbp-" #orderEnqueue ! currentRBPoffset } >> ;
     { address } { "[" #orderEnqueue ! newRBPvar "]" } >> ;
 
@@ -208,7 +208,7 @@ debug */
 } >> ;
 
 /* ------------------ functions  ------------------ */
-{ resetRBPoffset } { { "rbpOffset" "0" } #setIntGeneratorVar } >> ;
+{ resetRBPoffset } { { "rbpOffset" "0" } #setIntVar } >> ;
 
 { funcBodyPreamble }
 {
@@ -230,8 +230,8 @@ debug */
     { name } lateArg>> ;
 
     /* assigns what is stored in name to the direct code of what is stored in name */
-    { directFuncName }
-    { #orderEnqueue ! #orderToLiteralCode #orderEnqueue ! name } >> ;
+    /* 1. pushes forced name; 2. pushed directFuncName (name of new identifier); 3. pushes literal code of 1.; */
+    { #orderEnqueue ! name directFuncName #orderEnqueue ! #orderToLiteralCode } >> ;
 
     /* assign call to the identifer in latearg name */
     { #orderEnqueue ! name }
@@ -355,7 +355,7 @@ text ;
 func Hello ;
 
 intVar a "68" ;
-{ a ! int { println ;
+{ a ! int } println ;
 
 return ;
 
@@ -365,7 +365,8 @@ start ;
 
 { wordToGuess wordLength } rawPrint ;
 
-{ { wordToGuess wordLength } rawPrint } >> printWord ;
+{ printWord }
+{ { wordToGuess wordLength } rawPrint } >> ;
 
 printWord ;
 

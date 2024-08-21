@@ -30,14 +30,9 @@ class FetchHandler
             if (fetcher != nullptr) delete fetcher;
         }
 
-        /*if (order.GetType() == Order::Instruction)
-        {
-            Instruction* instruction = InstructionHandler.GetInstruction(order.GetName());
-            if (instruction != nullptr) instruction->Fetch(generator, order);
-        }*/
-
         generator->SetCurrentOrder(order);
         generator->IncrementPhase();
+
         return;
     }
 
