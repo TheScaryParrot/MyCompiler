@@ -23,9 +23,11 @@ class ExecuteHandler
     }
     void HandleInstruction(Instruction* instruction, AbstractGenerator* generator)
     {
-        instruction->Execute(generator);
-        // generator->IncrementPhase() is done by the instructions Execute functions individually as some instructions
-        // might not want to advance to the next phase (or set the phase directly)
+        // Increment phase if the execute function want that
+        if (instruction->Execute(generator))
+        {
+            generator->IncrementPhase();
+        }
     }
 
    public:

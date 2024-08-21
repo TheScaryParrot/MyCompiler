@@ -9,15 +9,17 @@
 class Instruction : public CommentProofable, public OrderQueueProofable
 {
    private:
-    std::function<void(AbstractGenerator*)> executeFunction;
+    std::function<bool(AbstractGenerator*)> executeFunction;
 
    public:
-    Instruction(std::function<void(AbstractGenerator*)> executeFunction, bool orderQueueProof, bool commentProof)
+    Instruction(std::function<bool(AbstractGenerator*)> executeFunction, bool orderQueueProof, bool commentProof)
     {
         this->executeFunction = executeFunction;
         this->SetOrderQueueProof(orderQueueProof);
         this->SetCommentProof(commentProof);
     }
 
-    void Execute(AbstractGenerator* generator) { this->executeFunction(generator); }
+    /// @brief Calls the instructions execute function
+    /// @return Whether the generator should Increment to the next Phase
+    bool Execute(AbstractGenerator* generator) { return this->executeFunction(generator); }
 };

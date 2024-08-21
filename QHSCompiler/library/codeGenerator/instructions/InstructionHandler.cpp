@@ -11,7 +11,7 @@ static class InstructionHandler
    private:
     std::map<std::string, Instruction> instructions = {
         {"enterOrderQueue", Instruction(
-                                [](AbstractGenerator* generator)
+                                [](AbstractGenerator* generator) -> bool
                                 {
                                     Logger.Log("Entering order queue mode", Logger::DEBUG);
 
@@ -23,11 +23,11 @@ static class InstructionHandler
                                     }
 
                                     generator->IncrementOrderQueueDepth();
-                                    generator->IncrementPhase();
+                                    return true;
                                 },
                                 true, false)},
         {"exitOrderQueue", Instruction(
-                               [](AbstractGenerator* generator)
+                               [](AbstractGenerator* generator) -> bool
                                {
                                    Logger.Log("Exiting order queue mode", Logger::DEBUG);
 
@@ -40,47 +40,50 @@ static class InstructionHandler
                                        generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
                                    }
 
-                                   generator->IncrementPhase();
+                                   return true;
                                },
                                true, false)},
         {"clearOrderQueue", Instruction(
-                                [](AbstractGenerator* generator)
+                                [](AbstractGenerator* generator) -> bool
                                 {
                                     generator->DequeueWholeOrderQueue();
-                                    generator->IncrementPhase();
+                                    return true;
                                 },
                                 false, false)},
         {"force", Instruction(
-                      [](AbstractGenerator* generator)
+                      [](AbstractGenerator* generator) -> bool
                       {
                           generator->SetCurrentPhase(GeneratorPhases::FETCH);
                           generator->ExecuteCurrentPhase();
                           generator->SetCurrentPhase(GeneratorPhases::EXECUTE);
                           generator->ExecuteCurrentPhase();
                           generator->RestartCycle();
+                          return false;
                       },
                       true, false)},
         {"orderEnqueue", Instruction(
-                             [](AbstractGenerator* generator)
+                             [](AbstractGenerator* generator) -> bool
                              {
                                  generator->SetCurrentPhase(GeneratorPhases::FETCH);
                                  generator->ExecuteCurrentPhase();
                                  generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
                                  generator->RestartCycle();
+                                 return false;
                              },
                              true, false)},
         {"orderFrontEnqueue", Instruction(
-                                  [](AbstractGenerator* generator)
+                                  [](AbstractGenerator* generator) -> bool
                                   {
                                       generator->SetCurrentPhase(GeneratorPhases::FETCH);
                                       generator->ExecuteCurrentPhase();
                                       generator->EnqueueInOrderQueueFront(generator->GetCurrentOrder());
                                       generator->RestartCycle();
+                                      return false;
                                   },
                                   // TODO: Make order stack proof without bugs in code
                                   false, false)},
         {"deepFetch", Instruction(
-                          [](AbstractGenerator* generator)
+                          [](AbstractGenerator* generator) -> bool
                           {
                               generator->IncrementFetchDepth();
                               generator->SetCurrentPhase(GeneratorPhases::FETCH);
@@ -88,10 +91,11 @@ static class InstructionHandler
                               generator->DecrementFetchDepth();
                               generator->PutInFront(generator->GetCurrentOrder());
                               generator->RestartCycle();
+                              return false;
                           },
                           false, false)},
         {"literalToIdentifier", Instruction(
-                                    [](AbstractGenerator* generator)
+                                    [](AbstractGenerator* generator) -> bool
                                     {
                                         Order order = generator->DequeueFromOrderQueue();
 
@@ -100,24 +104,23 @@ static class InstructionHandler
                                             Logger.Log("Expected LiteralCode for literalToIdentifier, got: " +
                                                            order.ToString(),
                                                        Logger::ERROR);
-                                            generator->IncrementPhase();
-                                            return;
+                                            return true;
                                         }
 
                                         generator->PutInFront(Order(order.GetName(), Order::Identifier));
-                                        generator->IncrementPhase();
+                                        return true;
                                     },
                                     false, false)},
         {"orderToLiteralCode", Instruction(
-                                   [](AbstractGenerator* generator)
+                                   [](AbstractGenerator* generator) -> bool
                                    {
                                        Order order = generator->DequeueFromOrderQueue();
                                        generator->PutInFront(Order(order.GetName(), Order::LiteralCode));
-                                       generator->IncrementPhase();
+                                       return true;
                                    },
                                    false, false)},
         {"assign", Instruction(
-                       [](AbstractGenerator* generator)
+                       [](AbstractGenerator* generator) -> bool
                        {
                            OrderQueue* queue = generator->DequeueWholeOrderQueue();
 
@@ -128,17 +131,17 @@ static class InstructionHandler
                                Logger.Log("Expected Identifier for assign on top of OrderQueue, got: " +
                                               identifierOrder.ToString(),
                                           Logger::ERROR);
-                               return;
+                               return true;
                            }
 
                            std::string identifierName = identifierOrder.GetName();
                            Identifier* identifier = new Identifier(queue);
                            IdentifierHandler.AddIdentifier(identifierName, identifier);
-                           generator->IncrementPhase();
+                           return true;
                        },
                        false, false)},
         {"assignToOne", Instruction(
-                            [](AbstractGenerator* generator)
+                            [](AbstractGenerator* generator) -> bool
                             {
                                 Order identifierOrder = generator->DequeueFromOrderQueue();
 
@@ -147,32 +150,32 @@ static class InstructionHandler
                                     Logger.Log("Expected Identifier for assign on top of OrderQueue, got: " +
                                                    identifierOrder.ToString(),
                                                Logger::ERROR);
-                                    return;
+                                    return true;
                                 }
 
                                 std::string identifierName = identifierOrder.GetName();
                                 OrderQueue* queue = new OrderQueue(generator->DequeueFromOrderQueue());
                                 Identifier* identifier = new Identifier(queue);
                                 IdentifierHandler.AddIdentifier(identifierName, identifier);
-                                generator->IncrementPhase();
+                                return true;
                             },
                             false, false)},
         {"pushEnv", Instruction(
-                        [](AbstractGenerator* generator)
+                        [](AbstractGenerator* generator) -> bool
                         {
                             IdentifierHandler.PushEnvironment();
-                            generator->IncrementPhase();
+                            return true;
                         },
                         false, false)},
         {"popEnv", Instruction(
-                       [](AbstractGenerator* generator)
+                       [](AbstractGenerator* generator) -> bool
                        {
                            IdentifierHandler.PopEnvironment();
-                           generator->IncrementPhase();
+                           return true;
                        },
                        false, false)},
         {"getIntVar", Instruction(
-                          [](AbstractGenerator* generator)
+                          [](AbstractGenerator* generator) -> bool
                           {
                               Order order = generator->DequeueFromOrderQueue();
 
@@ -182,18 +185,17 @@ static class InstructionHandler
                                       "Tried getIntVar but order from OrderQueue is not "
                                       "direct code",
                                       Logger::ERROR);
-                                  generator->IncrementPhase();
-                                  return;
+                                  return true;
                               }
 
                               std::string generatorVarName = order.GetName();
                               int value = generator->GetIntGeneratorVar(generatorVarName);
                               generator->PutInFront(Order(std::to_string(value), Order::LiteralCode));
-                              generator->IncrementPhase();
+                              return true;
                           },
                           false, false)},
         {"setIntVar", Instruction(
-                          [](AbstractGenerator* generator)
+                          [](AbstractGenerator* generator) -> bool
                           {
                               Order nameOrder = generator->DequeueFromOrderQueue();
 
@@ -203,8 +205,7 @@ static class InstructionHandler
                                       "Tried setIntVar but first order (name) from OrderQueue is not "
                                       "direct code",
                                       Logger::ERROR);
-                                  generator->IncrementPhase();
-                                  return;
+                                  return true;
                               }
 
                               Order valueOrder = generator->DequeueFromOrderQueue();
@@ -214,18 +215,17 @@ static class InstructionHandler
                                       "Tried setIntVar but second order (value) from OrderQueue is not "
                                       "direct code",
                                       Logger::ERROR);
-                                  generator->IncrementPhase();
-                                  return;
+                                  return true;
                               }
 
                               std::string generatorVarName = nameOrder.GetName();
                               int value = std::stoi(valueOrder.GetName());
                               generator->SetIntGeneratorVar(generatorVarName, value);
-                              generator->IncrementPhase();
+                              return true;
                           },
                           false, false)},
         {"changeIntVar", Instruction(
-                             [](AbstractGenerator* generator)
+                             [](AbstractGenerator* generator) -> bool
                              {
                                  Order nameOrder = generator->DequeueFromOrderQueue();
                                  if (nameOrder.GetType() != Order::LiteralCode)
@@ -234,8 +234,7 @@ static class InstructionHandler
                                          "Tried changeIntVar but first order (name) from "
                                          "OrderQueue is not direct code",
                                          Logger::ERROR);
-                                     generator->IncrementPhase();
-                                     return;
+                                     return true;
                                  }
 
                                  Order changeOrder = generator->DequeueFromOrderQueue();
@@ -245,8 +244,7 @@ static class InstructionHandler
                                          "Tried changeIntVar but second order (change) from "
                                          "OrderQueue is not direct code",
                                          Logger::ERROR);
-                                     generator->IncrementPhase();
-                                     return;
+                                     return true;
                                  }
 
                                  std::string generatorVarName = nameOrder.GetName();
@@ -256,11 +254,11 @@ static class InstructionHandler
                                  value += change;
 
                                  generator->SetIntGeneratorVar(generatorVarName, value);
-                                 generator->IncrementPhase();
+                                 return true;
                              },
                              false, false)},
         {"getStringVar", Instruction(
-                             [](AbstractGenerator* generator)
+                             [](AbstractGenerator* generator) -> bool
                              {
                                  Order nameOrder = generator->DequeueFromOrderQueue();
                                  if (nameOrder.GetType() != Order::LiteralCode)
@@ -269,18 +267,17 @@ static class InstructionHandler
                                          "Tried getStringVar but order from OrderQueue is not "
                                          "direct code",
                                          Logger::ERROR);
-                                     generator->IncrementPhase();
-                                     return;
+                                     return true;
                                  }
 
                                  std::string generatorVarName = nameOrder.GetName();
                                  std::string value = generator->GetStringGeneratorVar(generatorVarName);
                                  generator->PutInFront(Order(value, Order::LiteralCode));
-                                 generator->IncrementPhase();
+                                 return true;
                              },
                              false, false)},
         {"setStringVar", Instruction(
-                             [](AbstractGenerator* generator)
+                             [](AbstractGenerator* generator) -> bool
                              {
                                  Order nameOrder = generator->DequeueFromOrderQueue();
                                  if (nameOrder.GetType() != Order::LiteralCode)
@@ -289,8 +286,7 @@ static class InstructionHandler
                                          "Tried setStringGeneratorVar but first order (name) from "
                                          "OrderQueue is not direct code",
                                          Logger::ERROR);
-                                     generator->IncrementPhase();
-                                     return;
+                                     return true;
                                  }
 
                                  Order valueOrder = generator->DequeueFromOrderQueue();
@@ -300,26 +296,25 @@ static class InstructionHandler
                                          "Tried setStringGeneratorVar but second order (value) from "
                                          "OrderQueue is not direct code",
                                          Logger::ERROR);
-                                     generator->IncrementPhase();
-                                     return;
+                                     return true;
                                  }
 
                                  std::string generatorVarName = nameOrder.GetName();
                                  std::string value = valueOrder.GetName();
                                  generator->SetStringGeneratorVar(generatorVarName, value);
-                                 generator->IncrementPhase();
+                                 return true;
                              },
                              false, false)},
         {"makeOrderQueueProof",
          Instruction(
 
-             [](AbstractGenerator* generator)
+             [](AbstractGenerator* generator) -> bool
              {
                  Order order = generator->DequeueFromOrderQueue();
                  if (order.GetType() != Order::Identifier)
                  {
                      Logger.Log("Expected Identifier for makeOrderQueueProof, got: " + order.ToString(), Logger::ERROR);
-                     return;
+                     return true;
                  }
 
                  Identifier* identifier = IdentifierHandler.GetIdentifier(order.GetName());
@@ -327,22 +322,22 @@ static class InstructionHandler
                  if (identifier == nullptr)
                  {
                      Logger.Log("Identifier not found for makeOrderQueueProof: " + order.GetName(), Logger::ERROR);
-                     return;
+                     return true;
                  }
 
                  identifier->SetOrderQueueProof(true);
-                 generator->IncrementPhase();
+                 return true;
              },
              false, false)},
         {"makeCommentProof",
          Instruction(
-             [](AbstractGenerator* generator)
+             [](AbstractGenerator* generator) -> bool
              {
                  Order order = generator->DequeueFromOrderQueue();
                  if (order.GetType() != Order::Identifier)
                  {
                      Logger.Log("Expected Identifier for makeCommentProof, got: " + order.ToString(), Logger::ERROR);
-                     return;
+                     return true;
                  }
 
                  Identifier* identifier = IdentifierHandler.GetIdentifier(order.GetName());
@@ -350,38 +345,38 @@ static class InstructionHandler
                  if (identifier == nullptr)
                  {
                      Logger.Log("Identifier not found for makeCommentProof: " + order.GetName(), Logger::ERROR);
-                     return;
+                     return true;
                  }
 
                  identifier->SetCommentProof(true);
-                 generator->IncrementPhase();
+                 return true;
              },
              false, false)},
         {"enterComment", Instruction(
-                             [](AbstractGenerator* generator)
+                             [](AbstractGenerator* generator) -> bool
                              {
                                  generator->EnterComment();
-                                 generator->IncrementPhase();
+                                 return true;
                              },
                              true, false)},
         {"exitComment", Instruction(
-                            [](AbstractGenerator* generator)
+                            [](AbstractGenerator* generator) -> bool
                             {
                                 generator->ExitComment();
-                                generator->IncrementPhase();
+                                return true;
                             },
                             true, true)},
         {"debug", Instruction(
-                      [](AbstractGenerator* generator)
+                      [](AbstractGenerator* generator) -> bool
                       {
                           Logger.Log("Debug Print", Logger::DEBUG);
-                          generator->IncrementPhase();
+                          return true;
                       },
                       false, false)},
         {"debugIdentifierDefinition",
          Instruction(
 
-             [](AbstractGenerator* generator)
+             [](AbstractGenerator* generator) -> bool
              {
                  Order order = generator->DequeueFromOrderQueue();
 
@@ -393,8 +388,7 @@ static class InstructionHandler
                              order.ToString(),
                          Logger::ERROR);
 
-                     generator->IncrementPhase();
-                     return;
+                     return true;
                  }
 
                  Identifier* identifier = IdentifierHandler.GetIdentifier(order.GetName());
@@ -403,36 +397,35 @@ static class InstructionHandler
                  {
                      Logger.Log("Identifier not found for debugIdentifierDefinition: " + order.GetName(),
                                 Logger::ERROR);
-                     generator->IncrementPhase();
-                     return;
+                     return true;
                  }
 
                  Logger.Log("Identifier: " + order.GetName() + " Definition: \n" + identifier->GetQueue()->ToString(),
                             Logger::DEBUG);
 
-                 generator->IncrementPhase();
+                 return true;
              },
              false, false)},
         {"debugOrderQueue", Instruction(
-                                [](AbstractGenerator* generator)
+                                [](AbstractGenerator* generator) -> bool
                                 {
                                     OrderQueue orderQueue = generator->GetOrderQueueCopy();
                                     Logger.Log("Current Order Queue: \n" + orderQueue.ToString(), Logger::DEBUG);
-                                    generator->IncrementPhase();
+                                    return true;
                                 },
                                 false, false)},
         {"activateDebug", Instruction(
-                              [](AbstractGenerator* generator)
+                              [](AbstractGenerator* generator) -> bool
                               {
                                   Logger.SetDebug(true);
-                                  generator->IncrementPhase();
+                                  return true;
                               },
                               false, false)},
         {"deactivateDebug", Instruction(
-                                [](AbstractGenerator* generator)
+                                [](AbstractGenerator* generator) -> bool
                                 {
                                     Logger.SetDebug(false);
-                                    generator->IncrementPhase();
+                                    return true;
                                 },
                                 false, false)}};
 
