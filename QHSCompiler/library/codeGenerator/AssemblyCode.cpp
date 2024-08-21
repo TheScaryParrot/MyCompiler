@@ -2,29 +2,53 @@
 
 #include <string>
 
+#include "../utils/Map.cpp"
+#include "../utils/StringUtils.cpp"
+
 class AssemblyCode
 {
    public:
-    void AddCode(std::string code);
-
-    std::string GetCode();
-    std::string ToString();
-
-   private:
-    std::string code = "";
-};
-
-void AssemblyCode::AddCode(std::string code)
-{
-    // Remove empty lines
-    if (this->code.back() == '\n' && code.front() == '\n')
+    void AddCode(std::string code)
     {
-        code = code.substr(1);
+        if (currentSection == nullptr)
+        {
+            // If is all whitespaces just ignore it
+            if (StringUtils::IsOnlyWhitespaces(code)) return;
+
+            Logger.Log("AssemblyCode currentSection is nullptr, cannot AddCode:" + code +
+                           ". Did you forget to call ChangeSection()?",
+                       Logger::ERROR);
+            return;
+        }
+
+        // Remove empty lines
+        if (this->currentSection->back() == '\n' && code.front() == '\n')
+        {
+            code = code.substr(1);
+        }
+
+        *this->currentSection += code;
     }
 
-    this->code += code;
-}
+    void AddSection(std::string name) { sections.Set(name, ""); }
+    bool HasSection(std::string name) { return sections.Contains(name); }
+    void ChangeSection(std::string name) { currentSection = &sections.Get(name); }
 
-std::string AssemblyCode::GetCode() { return code; }
+    std::string GetCode()
+    {
+        std::string result = "";
 
-std::string AssemblyCode::ToString() { return GetCode(); }
+        for (std::pair<std::string, std::string> sectionPair : sections)
+        {
+            result += sectionPair.second;
+        }
+
+        return result;
+    }
+
+    std::string ToString() { return GetCode(); }
+
+   private:
+    Map<std::string, std::string> sections;
+    std::string* currentSection = nullptr;
+};

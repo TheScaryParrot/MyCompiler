@@ -305,6 +305,23 @@ static class InstructionHandler
                                  return true;
                              },
                              false, false)},
+        {"setAssemblySection", Instruction(
+                                   [](AbstractGenerator* generator) -> bool
+                                   {
+                                       Order order = generator->DequeueFromOrderQueue();
+                                       if (order.GetType() != Order::LiteralCode)
+                                       {
+                                           Logger.Log(
+                                               "Tried setAssemblySection but first order (name) from "
+                                               "OrderQueue is not direct code",
+                                               Logger::ERROR);
+                                           return true;
+                                       }
+
+                                       generator->SetAssemblyCodeSection(order.GetName());
+                                       return true;
+                                   },
+                                   false, false)},
         {"makeOrderQueueProof",
          Instruction(
 

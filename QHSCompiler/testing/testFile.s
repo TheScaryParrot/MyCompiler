@@ -1,11 +1,10 @@
-
+section .bss
+testBssInt: resb 4
+section .data
+testDataInt: dd 67
 section .rodata
 wordToGuess: db 'moin', 0xa
 wordLength: equ $ - wordToGuess
-section .data
-testDataInt: dd 67
-section .bss
-testBssInt: resb 4
 section .text
 Hello:
 mov rbp, rsp

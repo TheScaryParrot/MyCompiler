@@ -92,6 +92,18 @@ class AbstractGenerator
     AssemblyCode* assemblyCode = new AssemblyCode();
 
     void AddToAssemblyCode(std::string code) { this->assemblyCode->AddCode(code); }
+    void SetAssemblyCodeSection(std::string sectionName)
+    {
+        if (assemblyCode->HasSection(sectionName))
+        {
+            assemblyCode->ChangeSection(sectionName);
+            return;
+        }
+
+        assemblyCode->AddSection(sectionName);
+        assemblyCode->ChangeSection(sectionName);
+        assemblyCode->AddCode("section " + sectionName);
+    }
 
    private:
     GeneratorPhases currentPhase = static_cast<GeneratorPhases>(0);

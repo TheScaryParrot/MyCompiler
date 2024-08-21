@@ -61,6 +61,7 @@ debug */
 
 { start }
 {
+    text
     resetRBPoffset ;
     "global _start" ;
     "_start:" ;
@@ -227,6 +228,8 @@ debug */
 
 { func }
 {
+    text
+
     { name } lateArg>> ;
 
     /* assigns what is stored in name to the direct code of what is stored in name */
@@ -259,25 +262,25 @@ debug */
 /* ------------------ sections ------------------ */
 { rodata }
 { 
-    "section .rodata" ; 
+    { ".rodata" } #setAssemblySection ;
     { var roDataVar } >> ;
 } >> ;
 
 { data }
 { 
-    "section .data" ; 
+    { ".data" } #setAssemblySection ;
     { var dataVar } >> ;
 } >> ;
 
 { bss }
 { 
-    "section .bss" ;
+    { ".bss" } #setAssemblySection ;
     { var bssVar } >> ;
 } >> ;
 
 { text }
 {
-    "section .text"
+    { ".text" } #setAssemblySection ;
     { var localVar } >> ;
 } >> ;
 
@@ -348,8 +351,6 @@ bss ;
 intVar testBssInt ;
 
 /* text */
-text ;
-
 /* functions */
 
 func Hello ;
