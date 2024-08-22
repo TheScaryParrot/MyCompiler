@@ -52,6 +52,7 @@ int _start(/*int argc, char argv*/)
     int int2 = 2 + 64;
     int int3 = 2;
     MyType myType3 = {int1, bool1, float1};
+    int noInitInt;
 
     if (int3 == int2)
     {
