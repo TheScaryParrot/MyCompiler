@@ -16,20 +16,23 @@ class Order
     {
         this->name = order.name;
         this->type = order.type;
+        this->line = order.line;
     }
 
-    Order(std::string name, EOrderTypes type)
+    Order(std::string name, EOrderTypes type, unsigned int line)
     {
         this->name = name;
         this->type = type;
+        this->line = line;
     }
 
     std::string GetName() { return this->name; }
     EOrderTypes GetType() { return this->type; }
+    unsigned int GetLine() { return this->line; }
 
     std::string ToString()
     {
-        std::string result = GetName();
+        std::string result = GetName() + "{" + std::to_string(line) + "}";
 
         switch (GetType())
         {
@@ -46,9 +49,12 @@ class Order
         return result;
     }
 
-    static Order Empty() { return Order("EMPTY", EOrderTypes::Identifier); }
+    std::string ToLogString() { return GetName() + "{" + std::to_string(line) + "}"; }
+
+    static Order Empty() { return Order("EMPTY", EOrderTypes::Identifier, 0); }
 
    private:
     std::string name;
     EOrderTypes type = EOrderTypes::Identifier;
+    unsigned int line;
 };

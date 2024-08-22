@@ -73,13 +73,18 @@ class InputFileFetcher : public IOrderFetcher
 
             while (!file->IsEndOfFile() && !directCode.IsCharacterInGroup(character))
             {
+                // Increment line if linebreak inside of direct code
+                if (linebreak.IsCharacterInGroup(character)) line++;
+
                 file->ReadNext();
                 name += character;
                 character = file->PeekNext();
             }
 
             file->ReadNext();
-            return Order(name, type);
+            Order order = Order(name, type, line);
+            lastOrder = order;
+            return order;
         }
 
         if (compilerInstruction.IsCharacterInGroup(character))
@@ -99,23 +104,46 @@ class InputFileFetcher : public IOrderFetcher
 
         ClearWhitespaces(file);
 
-        return Order(name, type);
+        Order order = Order(name, type, line);
+        lastOrder = order;
+        return order;
     }
 
     virtual bool IsEmpty() override { return file->IsEndOfFile(); }
 
+    virtual std::string GetLastOrderLog() override { return lastOrder.ToLogString(); }
+
    private:
     void ClearWhitespaces(InputFile* file)
     {
-        while (!file->IsEndOfFile() && whitespace.IsCharacterInGroup(file->PeekNext()))
+        while (true)
         {
-            file->ReadNext();
+            if (file->IsEndOfFile()) return;
+
+            if (linebreak.IsCharacterInGroup(file->PeekNext()))
+            {
+                line++;
+                file->ReadNext();
+                continue;
+            }
+
+            if (whitespace.IsCharacterInGroup(file->PeekNext()))
+            {
+                file->ReadNext();
+                continue;
+            }
+
+            return;
         }
     }
 
     InputFile* file;
 
-    CharacterGroup whitespace = CharacterGroup(4, new char[4]{' ', '\n', '\t', '\r'});
+    CharacterGroup whitespace = CharacterGroup(3, new char[3]{' ', '\n', '\t'});
+    CharacterGroup linebreak = CharacterGroup(1, new char[1]{'\n'});
     CharacterGroup compilerInstruction = CharacterGroup(1, new char[1]{'#'});
     CharacterGroup directCode = CharacterGroup(1, new char[1]{'"'});
+
+    unsigned int line = 1;
+    Order lastOrder = Order::Empty();
 };

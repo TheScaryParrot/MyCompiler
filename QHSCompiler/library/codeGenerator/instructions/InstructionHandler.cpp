@@ -94,28 +94,29 @@ static class InstructionHandler
                               return false;
                           },
                           false, false)},
-        {"literalToIdentifier", Instruction(
-                                    [](AbstractGenerator* generator) -> bool
-                                    {
-                                        Order order = generator->DequeueFromOrderQueue();
+        {"literalToIdentifier",
+         Instruction(
+             [](AbstractGenerator* generator) -> bool
+             {
+                 Order order = generator->DequeueFromOrderQueue();
 
-                                        if (order.GetType() != Order::LiteralCode)
-                                        {
-                                            Logger.Log("Expected LiteralCode for literalToIdentifier, got: " +
-                                                           order.ToString(),
-                                                       Logger::ERROR);
-                                            return true;
-                                        }
+                 if (order.GetType() != Order::LiteralCode)
+                 {
+                     Logger.Log("Expected LiteralCode for literalToIdentifier, got: " + order.ToString(),
+                                Logger::ERROR);
+                     return true;
+                 }
 
-                                        generator->PutInFront(Order(order.GetName(), Order::Identifier));
-                                        return true;
-                                    },
-                                    false, false)},
+                 generator->PutInFront(Order(order.GetName(), Order::Identifier, order.GetLine()));
+                 return true;
+             },
+             false, false)},
         {"orderToLiteralCode", Instruction(
                                    [](AbstractGenerator* generator) -> bool
                                    {
                                        Order order = generator->DequeueFromOrderQueue();
-                                       generator->PutInFront(Order(order.GetName(), Order::LiteralCode));
+                                       generator->PutInFront(
+                                           Order(order.GetName(), Order::LiteralCode, order.GetLine()));
                                        return true;
                                    },
                                    false, false)},
@@ -190,7 +191,7 @@ static class InstructionHandler
 
                               std::string generatorVarName = order.GetName();
                               int value = generator->GetIntGeneratorVar(generatorVarName);
-                              generator->PutInFront(Order(std::to_string(value), Order::LiteralCode));
+                              generator->PutInFront(Order(std::to_string(value), Order::LiteralCode, order.GetLine()));
                               return true;
                           },
                           false, false)},
@@ -272,7 +273,7 @@ static class InstructionHandler
 
                                  std::string generatorVarName = nameOrder.GetName();
                                  std::string value = generator->GetStringGeneratorVar(generatorVarName);
-                                 generator->PutInFront(Order(value, Order::LiteralCode));
+                                 generator->PutInFront(Order(value, Order::LiteralCode, nameOrder.GetLine()));
                                  return true;
                              },
                              false, false)},
