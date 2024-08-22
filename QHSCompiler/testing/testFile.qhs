@@ -1,5 +1,5 @@
 #enterOrderQueue
-{
+(
 #orderEnqueue
 #enterOrderQueue
 #exitOrderQueue
@@ -7,13 +7,13 @@
 #assign
 
 #enterOrderQueue
-{
+(
 #exitOrderQueue
 #makeOrderQueueProof
 
 
 #enterOrderQueue
-}
+)
 #orderEnqueue
 #exitOrderQueue
 #exitOrderQueue
@@ -21,280 +21,326 @@
 #assign
 
 #enterOrderQueue
-}
+)
 #exitOrderQueue
 #makeOrderQueueProof
 
-{ -> #assignToOne } #assign
-{ >> #assign } #assign
+( -> #assignToOne ) #assign
+( >> #assign ) #assign
 
 
-{ /* #orderEnqueue #enterComment } >>
-{ /* } #makeOrderQueueProof
-{ */ #orderEnqueue #exitComment } >>
-{ */ } #makeCommentProof
-{ */ } #makeOrderQueueProof
+( /* #orderEnqueue #enterComment ) >>
+( /* ) #makeOrderQueueProof
+( */ #orderEnqueue #exitComment ) >>
+( */ ) #makeCommentProof
+( */ ) #makeOrderQueueProof
 
-{ ; "
-" #clearOrderQueue }  >>
+( ; "
+" #clearOrderQueue )  >>
 
-{ debug #debug } >> ;
+( debug #debug ) >> ;
 
 /*
 reeeee
 debug */
 
 
-/* { $ #putInFrontFromOrderQueue } >> $ ; */
+( ! ) ( #orderEnqueue #force ) >> ;
+( ! ) #makeOrderQueueProof ;
 
-{ ! } { #orderEnqueue #force } >> ;
-{ ! } #makeOrderQueueProof ;
-
-{ lateArg>> } {
+( lateArg>> ) (
     /* result in #orderEnqueue ! in order queue */
-    { #orderEnqueue #orderEnqueue #orderEnqueue ! #deepFetch } >> 
-} >> ;
-{ lateArg>> } #makeOrderQueueProof ;
+    ( #orderEnqueue #orderEnqueue #orderEnqueue ! #deepFetch ) >> 
+) >> ;
+( lateArg>> ) #makeOrderQueueProof ;
 
+( start )
+(
+    #pushEnv
+    ( var localVar ) >>
+    ( { ) >> /* { to none */
+    ( } #popEnv ) >> /* } to end of function body */
 
-/* { >> #executeNextInEncounterPhase } >> >>executeOnce ; */
-
-{ start }
-{
-    text
+    ( ".text" ) #setAssemblySection 
     resetRBPoffset ;
     "global _start" ;
     "_start:" ;
     "mov rbp, rsp" ;
-} >> ;
+) >> ;
 
 /* ------------------ data handling ------------------ */
 /* types */
-{ int } { "4" } >> ;
-{ intVar } { var ! int } >> ;
+( int.size ) ( "4" ) >> ;
+( int ) ( ( ! int.size ) var ) >> 
 
-{ bool } { "1" } >> ;
-{ boolVar } { var ! bool } >> ;
+( bool.size ) ( "1" ) >> ;
+( bool ) ( ( ! bool.size ) var ) >>
 
-{ getSizeSpecifier }
-{
+( getSizeSpecifier )
+(
     #orderFrontEnqueue size ->
 
     #pushEnv
 
-    { 1 "byte" } >>
-    { 2 "word" } >>
-    { 4 "dword" } >>
-    { 8 "qword" } >>
+    ( 1 "byte" ) >>
+    ( 2 "word" ) >>
+    ( 4 "dword" ) >>
+    ( 8 "qword" ) >>
 
-    { #orderEnqueue ! size } #literalToIdentifier
+    ( #orderEnqueue ! size ) #literalToIdentifier
 
     #popEnv
 
-} >> ;
+) >> ;
 
-{ getRegisterA }
-{
+( getRegisterA )
+(
     #orderFrontEnqueue size ->
 
     #pushEnv
 
-    { 1 "al" } >>
-    { 2 "ax" } >>
-    { 4 "eax" } >>
-    { 8 "rax" } >>
+    ( 1 "al" ) >>
+    ( 2 "ax" ) >>
+    ( 4 "eax" ) >>
+    ( 8 "rax" ) >>
 
-    { #orderEnqueue ! size } #literalToIdentifier
+    ( #orderEnqueue ! size ) #literalToIdentifier
 
     #popEnv    
 
-} >> ;
+) >> ;
 
-{ getDefineSpecifier }
-{
+( getDefineSpecifier )
+(
     #orderFrontEnqueue size ->
 
     #pushEnv
 
-    { 1 "db" } >>
-    { 2 "dw" } >>
-    { 4 "dd" } >>
-    { 8 "dq" } >>
+    ( 1 "db" ) >>
+    ( 2 "dw" ) >>
+    ( 4 "dd" ) >>
+    ( 8 "dq" ) >>
 
-    { #orderEnqueue ! size } #literalToIdentifier
+    ( #orderEnqueue ! size ) #literalToIdentifier
 
     #popEnv
 
-} >> ;
+) >> ;
 
 /* ------------------ variables ------------------ */
-{ varFromDefineCode }
-{
+( varFromDefineCode )
+(
     #orderFrontEnqueue defineCode -> ;
     
-    { name } lateArg>> ;
+    ( name ) lateArg>> ;
 
     /* assigns what is stored in name to the direct code of what is stored in name */
-    { #orderEnqueue ! name }
-    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
+    ( #orderEnqueue ! name )
+    ( #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ) >> ;
 
     name ": " defineCode ; 
-} >> ;
+) >> ;
 
-{ roDataVar }
-{
-    { size } lateArg>> ;
-    { name } lateArg>> ;
-    { value } lateArg>> ;
+( roDataVar )
+(
+    ( size ) lateArg>> ;
+    ( name ) lateArg>> ;
+    ( value ) lateArg>> ;
 
-    { defineSpecifier }
-    { { #orderEnqueue ! size } getDefineSpecifier }  >> ;
-
-    /* assigns whast is stored in name to the direct code of what is stored in name */
-    { #orderEnqueue ! name }
-    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
-
-    name ": " defineSpecifier " " value ;
-} >> ;
-
-{ dataVar }
-{
-    { size } lateArg>> ;
-    { name } lateArg>> ;
-    { value } lateArg>> ;
-
-    { defineSpecifier }
-    { { #orderEnqueue ! size } getDefineSpecifier } >> ;
+    ( defineSpecifier )
+    ( ( #orderEnqueue ! size ) getDefineSpecifier )  >> ;
 
     /* assigns whast is stored in name to the direct code of what is stored in name */
-    { #orderEnqueue ! name }
-    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
+    ( #orderEnqueue ! name )
+    ( #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ) >> ;
 
     name ": " defineSpecifier " " value ;
-} >> ;
+) >> ;
 
-{ bssVar }
-{
-    { size } lateArg>> ;
-    { name } lateArg>> ;
+( dataVar )
+(
+    #orderFrontEnqueue ".data" #setAssemblySection
+
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue name ->
+    #orderFrontEnqueue value ->
+
+    ( defineSpecifier )
+    ( ( #orderEnqueue ! size ) getDefineSpecifier ) >> ;
+
+    /* assigns whast is stored in name to the direct code of what is stored in name */
+    ( #orderEnqueue ! name )
+    ( #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ) >> ;
+
+    name ": " defineSpecifier " " value ;
+) >> ;
+
+( bssVar )
+(
+    #orderFrontEnqueue ".bss" #setAssemblySection
+
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue name ->
 
     /* assigns what is stored in name to the direct code of what is stored in name */
-    { #orderEnqueue ! name }
-    { #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode } >> ;
+    ( #orderEnqueue ! name )
+    ( #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ) >> ;
 
     name ": resb " size ;
 
-} >> ;
+) >> ;
 
-{ localVar }
-{
-    { size } lateArg>> ;
-    { name } lateArg>> ;
-    { value } lateArg>> ;
+( assign )
+(
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue location ->
+    #orderFrontEnqueue value ->
 
-    { register } { { #orderEnqueue ! size } getRegisterA } >> ;
-    { sizeSpecifier } { { #orderEnqueue ! size } getSizeSpecifier } >> ;
+    ( register ) ( ( #orderEnqueue ! size ) getRegisterA ) >>
 
-    { "rbpOffset" #orderEnqueue ! size } #changeIntVar ;
-    { "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar } >> ;
-    { newRBPvar } { "rbp-" #orderEnqueue ! currentRBPoffset } >> ;
-    { address } { "[" #orderEnqueue ! newRBPvar "]" } >> ;
+    "mov " register ", " value ;
+    "mov " location ", " register ;
+) >>
+
+( localVar )
+(
+    #orderFrontEnqueue size ->
+    ( name ) lateArg>> ;
+
+    ( sizeSpecifier ) ( ( #orderEnqueue ! size ) getSizeSpecifier ) >> ;
+
+    ( "rbpOffset" #orderEnqueue ! size ) #changeIntVar ;
+    ( "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ) >> ;
+    ( newRBPvar ) ( "rbp-" #orderEnqueue ! currentRBPoffset ) >> ;
+    ( address ) ( "[" #orderEnqueue ! newRBPvar "]" ) >> ;
 
     "sub rsp, " size ;
-    "mov " register ", " value ;
-    "mov " address ", " register ;
 
-    { #orderEnqueue ! name }
-    { #orderEnqueue ! sizeSpecifier " " #orderEnqueue ! address } >> ;
-} >> ;
+    ( #orderEnqueue ! name )
+    ( #orderEnqueue ! sizeSpecifier " " #orderEnqueue ! address ) >> ;
+
+    #pushEnv
+    
+    ( = )
+    (
+        #popEnv
+
+        ( #orderEnqueue ! size )
+        ( #orderEnqueue ! name )
+        ( #orderEnqueue #orderEnqueue #orderEnqueue ! #deepFetch )
+        
+        assign
+    ) >>
+
+    ( ; )
+    (
+        #popEnv
+        ;
+    ) >> 
+) >> ;
+
+
+
+( globalVar )
+(
+    
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    ( = )
+    (
+        #popEnv
+
+        /* enqueue next from inputfile order queue (value) */
+        ( #orderEnqueue #orderEnqueue #orderEnqueue ! #deepFetch )
+
+        dataVar ;
+    ) >>
+
+    ( ; )
+    (
+        #popEnv
+
+        bssVar ;
+    ) >>
+
+    /* enqueue size */
+    ( #orderEnqueue ! size )
+
+    /* enqueue next from inputfile order queue (name) */
+    ( #orderEnqueue ! #deepFetch )
+
+) >> ;
+
+/* when making a var globalVar is used */
+( var globalVar ) >> ;
 
 /* ------------------ functions  ------------------ */
-{ resetRBPoffset } { { "rbpOffset" "0" } #setIntVar } >> ;
+( resetRBPoffset ) ( ( "rbpOffset" "0" ) #setIntVar ) >> ;
 
-{ funcBodyPreamble }
-{
+( funcBodyPreamble )
+(
     "mov rbp, rsp" ;
-} >> ;
+) >> ;
 
-{ funcCallPreamble }
-{
+( funcCallPreamble )
+(
     "push rbp" ;
-} >> ;
+) >> ;
 
-{ funcCallPostamble }
-{
+( funcCallPostamble )
+(
     "pop rbp" ;
-} >> ;
+) >> ;
 
-{ func }
-{
-    text
-
-    { name } lateArg>> ;
+( func )
+(
+    ( name ) lateArg>> ;
 
     /* assigns what is stored in name to the direct code of what is stored in name */
     /* 1. pushes forced name; 2. pushed directFuncName (name of new identifier); 3. pushes literal code of 1.; */
-    { #orderEnqueue ! name directFuncName #orderEnqueue ! #orderToLiteralCode } >> ;
+    ( #orderEnqueue ! name directFuncName #orderEnqueue ! #orderToLiteralCode ) >> ;
 
     /* assign call to the identifer in latearg name */
-    { #orderEnqueue ! name }
-    { 
+    ( #orderEnqueue ! name )
+    ( 
         ! funcCallPreamble ;
         "call " directFuncName ;
         ! funcCallPostamble ;
-    } >> ;
+    ) >> ;
 
+    #pushEnv
+    ( var localVar ) >>
+    ( { ) >> /* { to none */
+    ( } #popEnv ) >> /* } to end of function body */
+
+    ( ".text" ) #setAssemblySection
     resetRBPoffset ;
 
     directFuncName ":" ;
 
     funcBodyPreamble ;
 
-} >> ;
+) >> ;
 
 
-{ return }
-{
+( return )
+(
     "mov rsp, rbp" ;
     "ret" ;
-} >> ;
-
-/* ------------------ sections ------------------ */
-{ rodata }
-{ 
-    { ".rodata" } #setAssemblySection ;
-    { var roDataVar } >> ;
-} >> ;
-
-{ data }
-{ 
-    { ".data" } #setAssemblySection ;
-    { var dataVar } >> ;
-} >> ;
-
-{ bss }
-{ 
-    { ".bss" } #setAssemblySection ;
-    { var bssVar } >> ;
-} >> ;
-
-{ text }
-{
-    { ".text" } #setAssemblySection ;
-    { var localVar } >> ;
-} >> ;
+) >> ;
 
 /* ------------------ syscalls ------------------ */
-{ exit }
-{
+( exit )
+(
     "mov rax, 60" ;
     "mov rdi, 0" ;
     "syscall" ;
-} >> ;
+) >> ;
 
-
-{ rawPrint }
-{
+( rawPrint )
+(
     #orderFrontEnqueue message ->
     #orderFrontEnqueue messageLength -> 
 
@@ -303,85 +349,77 @@ debug */
     "mov rsi, " message ;
     "mov rdx, " messageLength ;
     "syscall" ;
-} >> ;
+) >> ;
 
-{ print }
-{
+( print )
+(
     #orderFrontEnqueue message ->
     #orderFrontEnqueue length -> 
 
-    { register }
-    { { #orderEnqueue ! length } getRegisterA } >> ;
+    ( register )
+    ( ( #orderEnqueue ! length ) getRegisterA ) >> ;
 
     "sub rsp, " length ;
     "mov " register ", " message ;
     "mov [rsp], " register ;
 
-    { "rsp " length } rawPrint ;
+    ( "rsp" length ) rawPrint ;
 
     "add rsp, " length ;
-} >> ;
+) >> ;
 
-{ println }
-{
+( println )
+(
     print ;
 
-    { "0xa" "1" } print ;
+    ( "0xa" "1" ) print ;
 
-} >> ;
+) >> ;
 
 
 /* ------------------ actually coding ------------------ */
 
-/* rodata */
-rodata ;
+int bssInt ;
 
-{ "db 'moin', 0xa" } varFromDefineCode wordToGuess ;
+int dataInt = "69" ;
 
-{ "equ $ - wordToGuess" } varFromDefineCode wordLength ;
+( ".rodata" ) #setAssemblySection
+( "db 'moin', 0xa" ) varFromDefineCode wordToGuess ;
+( "equ $ - wordToGuess" ) varFromDefineCode wordLength ;
 
-/* data */
-data ;
-
-intVar testDataInt "67" ;
-
-/* bss */
-bss ;
-
-intVar testBssInt ;
-
-/* text */
 /* functions */
 
-func Hello ;
+func Hello
+{
+    int a = "68" ;
+    ( a ! int.size ) println ;
 
-intVar a "68" ;
-{ a ! int } println ;
-
-return ;
+    return ;
+}
 
 /* start */
-start ;
+start
+{
+    ( wordToGuess wordLength ) rawPrint ;
 
+    ( printWord )
+    ( ( wordToGuess wordLength ) rawPrint ) >> ;
 
-{ wordToGuess wordLength } rawPrint ;
+    printWord ;
 
-{ printWord }
-{ { wordToGuess wordLength } rawPrint } >> ;
+    int num = "65" ; 
+    int num2 = "66" ;
 
-printWord ;
+    ( num ! int.size ) println ;
+    ( num2 ! int.size ) println ;
 
-intVar num "65" ; 
-intVar num2 "66" ;
+    
+    ( dataInt ! int.size ) rawPrint ;
 
-{ num ! int } println ;
-{ num2 ! int } println ;
+    Hello ;
 
-{ testDataInt ! int } rawPrint ;
-
-Hello ;
-
-exit ;
+    exit ;
+}
 
 
 

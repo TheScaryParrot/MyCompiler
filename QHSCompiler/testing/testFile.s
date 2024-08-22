@@ -1,7 +1,7 @@
 section .bss
-testBssInt: resb 4
+bssInt: resb 4
 section .data
-testDataInt: dd 67
+dataInt: dd 69
 section .rodata
 wordToGuess: db 'moin', 0xa
 wordLength: equ $ - wordToGuess
@@ -10,13 +10,13 @@ Hello:
 mov rbp, rsp
 sub rsp, 4
 mov eax, 68
-mov [rbp-4], eax
+mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
 mov [rsp], eax
 mov rax, 1
 mov rdi, 1
-mov rsi, rsp 
+mov rsi, rsp
 mov rdx, 4
 syscall
 add rsp, 4
@@ -25,7 +25,7 @@ mov al, 0xa
 mov [rsp], al
 mov rax, 1
 mov rdi, 1
-mov rsi, rsp 
+mov rsi, rsp
 mov rdx, 1
 syscall
 add rsp, 1
@@ -46,16 +46,16 @@ mov rdx, wordLength
 syscall
 sub rsp, 4
 mov eax, 65
-mov [rbp-4], eax
+mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, 66
-mov [rbp-8], eax
+mov dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
 mov [rsp], eax
 mov rax, 1
 mov rdi, 1
-mov rsi, rsp 
+mov rsi, rsp
 mov rdx, 4
 syscall
 add rsp, 4
@@ -64,7 +64,7 @@ mov al, 0xa
 mov [rsp], al
 mov rax, 1
 mov rdi, 1
-mov rsi, rsp 
+mov rsi, rsp
 mov rdx, 1
 syscall
 add rsp, 1
@@ -73,7 +73,7 @@ mov eax, dword [rbp-8]
 mov [rsp], eax
 mov rax, 1
 mov rdi, 1
-mov rsi, rsp 
+mov rsi, rsp
 mov rdx, 4
 syscall
 add rsp, 4
@@ -82,13 +82,13 @@ mov al, 0xa
 mov [rsp], al
 mov rax, 1
 mov rdi, 1
-mov rsi, rsp 
+mov rsi, rsp
 mov rdx, 1
 syscall
 add rsp, 1
 mov rax, 1
 mov rdi, 1
-mov rsi, testDataInt
+mov rsi, dataInt
 mov rdx, 4
 syscall
 push rbp
