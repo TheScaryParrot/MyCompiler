@@ -31,12 +31,9 @@ Der QHS-Zyklus beginnt mit dem ersten Fetch. Dabei wird die erste Order aus dem 
     \end{tabular}
 \end{table}
 
-Ist die Order vom Typ Identifier oder Literal-Code, wird diese sofort an den nächsten Schritt im Zyklus Decode weitergegeben. Handelt es sich jedoch um eine Instruction ist es dieser möglich hier in den Zyklus einzugreifen.
-Bestimmte Instructions ignorieren die Decode und Execute Schritte und fahren mit dem nächsten Fetch fort, andere geben anstelle von sich selbst eine andere Order an Decode weiter. Auch ist es möglich nur Decode zu überspringen und
-direkt Execute auszuführen. Wie und ob eine Instruction in den Zyklus eingreift, lässt sich im QHS Compiler frei definieren.
-
-Weiter ist es möglich zu beeinflussen Orders \textbf{voraus zu stellen}, die anstelle der nächsten Order im Inputfile gefetched werden. Dies geschieht mit Hilfe des Fetch-Stacks auf den eine Liste an Orders gepushed werden kann.
-Dieser Fetch-Stack folgt Last-In First-Out und \textbf{auf ihn} kann während jeder der drei Schritte des Zyklus gepushed werden. Die Hauptanwendung des Fetch-Stacks wird im Abschnitt \ref{sec:qhs-execute} ausgeführt.
+Es ist hierbei möglich bestimmte Orders \textbf{voraus zu stellen}, die anstelle der nächsten Order im Inputfile gefetched werden. Dies geschieht mit Hilfe des Fetch-Stacks auf den eine Liste an Orders gepushed werden kann.
+Dieser Fetch-Stack folgt Last-In First-Out und \textbf{auf ihn} kann während jeder der drei Schritte des Zyklus, meist jedoch während Execute, gepushed werden.
+Die Hauptanwendung des Fetch-Stacks wird im Abschnitt \ref{sec:qhs-execute} ausgeführt.
 
 \begin{figure}[h!]
     \centering
@@ -50,53 +47,54 @@ Die Compilation wird beendet, sobald keine Order mehr auf dem Fetch-Stack übrig
 
 \section{Decode} \label{sec:qhs-decode}
 Nachdem eine Order gefetched wurde, wird diese an Decode weitergegeben. \textbf{Während Decode werden zwei Aufgaben durchgeführt}.
-Als erstes geht es darum Orders des Typen Identifier ihrer jeweiligen Definition zuzuortnen, sowie auf undefinierte Identifier hinzuweisen und diese zu überspringen.
 
-MAYBE TALK ABOUT ENVIRONMENTS
-
-Als zweites kommt während dem Decode Schritt der Order-Stack ins Spiel. Hierbei handelt es sich um die gleiche Datenstruktur wie der Fetch-Stack. Jedoch ist dessen Anwendung nicht das Vorausstellen von Orders vor den Inputfile,
-sondern das Speichern und spätere Ausführen von Orders. Der Order-Stack kann mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter ausgeführt werden, aktiviert und deaktiviert werden.
-Bei der Aktivierung wird eine leere Liste, die nach First-In First-Out aufgebaut ist, auf den Order-Stack gepushed. Wenn nun eine Order in den Decode Schritt gelangt und der Order-Stack aktiviert ist,
-wird diese Order der momentan obersten Liste des Order-Stacks hinzugefügt. Der Execute Schritt wird danach übersprungen und der Zyklus beginnt von neuem bei Fetch. Die Order wurde ohne ausgeführt zu werden auf dem Order-Stack gespeichert.
-Später ist es nun möglich diese Order mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter thematisiert werden, vom Order-Stack zu enfernen und auszuführen.
-Bestimmte Instructions und Identifiers können jedoch Order-Stack-Proof, also immun gegen den Order-Stack, gemacht werden. Diese werden, auch wenn der Order-Stack aktiv ist, normal an Execute weitergegeben.
-Dies ist zum Beispiel besonders bei der Instruction, die den Order-Stack wieder deaktiviert, wichtig. Da diese sonst nicht ausgeführt und somit der Order-Stack niemehr deaktiviert wird.
-LiteralCode kann nicht Code-Stack-Proof sein.
+Während dem Decode Schritt kommt die Order-Queue ins Spiel. Hierbei handelt es sich um eine Liste an Orders, der Form First-In First-Out. Die Anwendung Aufgabe der Order-Queue ist das Speichern und spätere Ausführen von Orders.
+Die Order-Queue kann mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter ausgeführt werden, aktiviert und deaktiviert werden. Wenn nun eine Order in den Decode Schritt gelangt und die Order-Queue aktiviert ist,
+wird diese Order der Order-Queue hinzugefügt. Der Execute Schritt wird danach übersprungen und der Zyklus beginnt von neuem bei Fetch. Die Order wurde ohne ausgeführt zu werden auf der Order-Queue gespeichert.
+Später ist es nun möglich diese Order mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter thematisiert werden, von der Order-Queue zu entfernen und auszuführen.
+Bestimmte Instructions und Identifiers können jedoch Order-Queue-Proof, also immun gegen die Order-Queue, gemacht werden. Diese werden, auch wenn die Order-Queue aktiv ist, normal an Execute weitergegeben.
+Dies ist zum Beispiel besonders bei der Instruction, die die Order-Queue wieder deaktiviert, wichtig. Da diese Instruction sonst nicht ausgeführt und somit die Order-Queue nie mehr deaktiviert wird.
+LiteralCode kann nicht Code-Queue-Proof sein.
 
 MAYBE CODESTACK FIGURE
 
-Ist der Order-Stack deaktiviert oder die Order Code-Stack-Proof wird diese an den letzen Schritt Execute weitergegeben.
+Ist die Order-Queue deaktiviert oder die Order Code-Queue-Proof wird diese an den letzen Schritt Execute weitergegeben.
 
 \section{Execute} \label{sec:qhs-execute}
 Execute ist der letzte Schritt des Zyklus. Und hier wird nun auch endlich der tatsächliche Assembly Code generiert. Je nach Typ der Order, Identifier, Instruction oder Literal-Code, läuft Execute sehr unterschiedlich ab.
 
 \subsection{Identifier}
-Ein Identifier ist eine Zusammenfassung von mehreren Orders. Wenn nun ein Identifier in den Execute Schritt kommt, werden die Orders auf den Fetch-Stack aus Abschnitt \ref{sec:qhs-fetch} gepushed.
-Beim nächsten Fetch werden nun die zum Identifier gehörenden Orders zurückgegeben. Um Grunde wird der Identifier in seine Orders überführt.
+Ein Identifier ist eine Zusammenfassung von mehreren Orders. Diese sind in einem Environment definiert. Hierbei handelt es sich um eine einfach Map (Dictionary), \textbf{die einen Identifier als string mit einer Liste an Orders verknüpft}.
+Wenn nun ein Identifier in den Execute Schritt kommt, werden die dazugehörige Liste an Orders auf den Fetch-Stack aus Abschnitt \ref{sec:qhs-fetch} gepushed.
+Beim nächsten Fetch werden nun die zum Identifier gehörenden Orders zurückgegeben. Um Grunde wird der Identifier mit seinen Orders ersetzt.
+
+Environments sind hierbei in einer Linked-List gespeichert. Somit können neue Environments zu dieser Liste hinzugefügt und von der Liste entfernt werden. Das unterste Element der Liste ist hierbei das älteste und das oberste Element das neuste.
+Bei der Definition eines Identifiers wird dieser immer zum obersten Environment hinzugefügt. Definitionen des gleichen Identifiers in älteren Environments werden nicht überschrieben oder gelöscht.
+Bei der Abfrage nach einem Identifier wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden wird ein Error ausgegeben.
 
 \subsection{Literal-Code}
 Literal-Code ist der Weg wie der QHS-Compiler Assembly Code generiert. Dieser ist sehr simpel. Wenn Literal-Code in den Execute Schritt gelangt, wird alles was zwischen den " Zeichen steht in das Output-Dokument geschrieben.
 
 \subsection{Instructions}
 Instructions sind die komplexeste Order für den Execute Schritt. Für jede Instruction ist im QHS-Compiler eine Funktion definiert, die ausgeführt wird, wenn diese Instruction in den Execute Schritt gelangt.
-Diese Funktionen können Variabeln im QHS-Compiler speichern, den Order-Stack aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
+Diese Funktionen können Variabeln im QHS-Compiler speichern, den Order-Queue aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
 
-\begin{table}[h]
+\begin{table}[H]
     \centering
-    \begin{tabular}{l|l}
-    \textbf{\#enterOrderStack}   & Aktiviert den Order-Stack                                                                                                                                                                                                             \\ \hline
-    \textbf{\#exitOrderStack}    & Deaktiviert den Order-Stack                                                                                                                                                                                                           \\ \hline
-    \textbf{\#newOrderStackList} & Pushed eine leere Liste auf den Order-Stack                                                                                                                                                                                           \\ \hline
-    \textbf{\#assignIdentifier}  & \begin{tabular}[c]{@{}l@{}}Popt die oberste Liste an Orders vom Order-Stack.\\
-        Das erste Element der Liste muss ein Identifier sein.
-        \\ Der Rest der Orders der Liste wird als Definition für diesen Identifier festgelegt.\end{tabular} \\ \hline
-    \textbf{\#force}             & \begin{tabular}[c]{@{}l@{}} Die nächste Order wird nach Fetch sofort an Execute weitergegeben. \\
-        Überspringt Decode und somit den Order-Stack                                                                                                                       \end{tabular} \\ \hline
-    \textbf{\#forceNoFetch}      & Die nächste Order wird sofot an Execute weitergegeben. Fetch wird hierbei übersprungen.                                                                                                                                               \\ \hline
-    \textbf{\#orderStackPush}    & \begin{tabular}[c]{@{}l@{}} Die nächste Order wird sofort auf die oberste Liste des Order-Stacks gepushed.
-        \\ Auch wenn diese Order-Stack-Proof ist. Execute wird übersprungen.                                                                                            \end{tabular} \\ \hline
-    \textbf{\#orderStackTop}     & Wird mit der obersten Order des Order-Stacks ersetzt                                                                                                                                                                                  \\ \hline
-    \textbf{\#deepFetch}         & Wird mit der ersten Order der zweit obersten Liste an Order auf dem Fetch-Stack ersetzt                                                                                                                                                                                                                                 
-    \end{tabular}
+    \begin{tabularx}{\textwidth}{l|X}
+    \textbf{\#enterOrderStack}   & Aktiviert die Order-Queue. \\ \hline
+    \textbf{\#exitOrderStack}    & Deaktiviert die Order-Queue. \\ \hline
+    \textbf{\#assignIdentifier}  & Das erste Element der Order-Queue muss ein Identifier sein. Der Rest der Orders auf Order-Queue wird als Definition für diesen Identifier festgelegt. \\ \hline
+    \textbf{\#force}             & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Decode und somit die Order-Queue. \\ \hline
+    \textbf{\#orderEnqueue}      & Die nächste Order wird sofort der Order-Queue hinzugefügt, auch wenn diese Order Order-Queue-Proof wäre. Execute wird übersprungen. \\ \hline
+    \textbf{\#orderFrontEnqueue} & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der Order-Queue gesetzt. \\ \hline
+    \textbf{\#deepFetch}         & Wird mit der ersten Order der zweitobersten Liste an Order auf dem Fetch-Stack Ermöglicht den Zugriff auf den Inputfile innerhalb einer Identifier-Definition. \\ \hline
+    \textbf{\#pushEnv}           & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
+    \textbf{\#popEnv}            & Das neuste Environment der Environment Linked-List wird gelöscht.
+        
+    \end{tabularx}
 \end{table}
+
+Der QHScompiler umfässt \textbf{28} Instructions, wobei \textbf{5} dieser nur für Debugging des Compilers dienen.
+
 
