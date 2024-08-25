@@ -5,6 +5,8 @@ dataInt: dd 69
 section .rodata
 wordToGuess: db 'moin', 0xa
 wordLength: equ $ - wordToGuess
+sub rsp, 4
+sub rsp, 1
 section .text
 Hello:
 mov rbp, rsp

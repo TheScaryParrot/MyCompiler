@@ -61,6 +61,23 @@ static class InstructionHandler
                           return false;
                       },
                       true, false)},
+        {"lightForce", Instruction(
+                           [](AbstractGenerator* generator) -> bool
+                           {
+                               if (generator->GetOrderQueueDepth() > 1)
+                               {
+                                   generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
+                                   return true;
+                               }
+
+                               generator->SetCurrentPhase(GeneratorPhases::FETCH);
+                               generator->ExecuteCurrentPhase();
+                               generator->SetCurrentPhase(GeneratorPhases::EXECUTE);
+                               generator->ExecuteCurrentPhase();
+                               generator->RestartCycle();
+                               return false;
+                           },
+                           true, false)},
         {"orderEnqueue", Instruction(
                              [](AbstractGenerator* generator) -> bool
                              {
@@ -71,6 +88,22 @@ static class InstructionHandler
                                  return false;
                              },
                              true, false)},
+        {"infiniteOrderEnqueue", Instruction(
+                                     [](AbstractGenerator* generator) -> bool
+                                     {
+                                         if (generator->GetOrderQueueDepth() > 1)
+                                         {
+                                             generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
+                                         }
+
+                                         generator->SetCurrentPhase(GeneratorPhases::FETCH);
+                                         generator->ExecuteCurrentPhase();
+                                         generator->EnqueueInOrderQueue(generator->GetCurrentOrder());
+                                         generator->RestartCycle();
+
+                                         return false;
+                                     },
+                                     true, false)},
         {"orderFrontEnqueue", Instruction(
                                   [](AbstractGenerator* generator) -> bool
                                   {
@@ -120,6 +153,35 @@ static class InstructionHandler
                                        return true;
                                    },
                                    false, false)},
+        {"literalCombine",
+         Instruction(
+             [](AbstractGenerator* generator) -> bool
+             {
+                 Order literal1 = generator->DequeueFromOrderQueue();
+
+                 if (literal1.GetType() != Order::LiteralCode)
+                 {
+                     Logger.Log(
+                         "Expected LiteralCode for literalToIdentifier at OrderQueue top, got: " + literal1.ToString(),
+                         Logger::ERROR);
+                     return true;
+                 }
+
+                 Order literal2 = generator->DequeueFromOrderQueue();
+
+                 if (literal2.GetType() != Order::LiteralCode)
+                 {
+                     Logger.Log("Expected LiteralCode for literalToIdentifier at OrderQueue second, got: " +
+                                    literal2.ToString(),
+                                Logger::ERROR);
+                     return true;
+                 }
+
+                 generator->PutInFront(
+                     Order(literal1.GetName() + literal2.GetName(), Order::LiteralCode, literal1.GetLine()));
+                 return true;
+             },
+             false, false)},
         {"assign", Instruction(
                        [](AbstractGenerator* generator) -> bool
                        {

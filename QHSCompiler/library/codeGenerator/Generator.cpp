@@ -61,7 +61,8 @@ class Generator : public AbstractGenerator
     virtual void ExitComment() override { decodeHandler.ExitComment(); }
     virtual void IncrementOrderQueueDepth() override { decodeHandler.IncrementOrderQueueDepthCounter(); }
     virtual void DecrementOrderQueueDepth() override { decodeHandler.DecrementOrderQueueDepthCounter(); }
-    virtual bool IsOrderQueueActive() override { return decodeHandler.IsOrderQueueActive(); }
+    virtual unsigned int GetOrderQueueDepth() override { return decodeHandler.GetOrderQueueDepth(); }
+    virtual bool IsOrderQueueActive() override { return GetOrderQueueDepth() > 0; }
 
     virtual void PutInFront(Order order) override
     {

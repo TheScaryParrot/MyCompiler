@@ -70,7 +70,7 @@ class DecodeHandler
 
     void IncrementOrderQueueDepthCounter() { this->orderQueueDepthCounter++; }
     void DecrementOrderQueueDepthCounter() { this->orderQueueDepthCounter--; }
-    bool IsOrderQueueActive() { return this->orderQueueDepthCounter > 0; }
+    unsigned int GetOrderQueueDepth() { return this->orderQueueDepthCounter; }
 
     void EnterComment() { this->isInComment = true; }
     void ExitComment() { this->isInComment = false; }

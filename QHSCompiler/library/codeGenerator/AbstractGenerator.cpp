@@ -54,6 +54,7 @@ class AbstractGenerator
     virtual void ExitComment() = 0;
     virtual void IncrementOrderQueueDepth() = 0;
     virtual void DecrementOrderQueueDepth() = 0;
+    virtual unsigned int GetOrderQueueDepth() = 0;
     virtual bool IsOrderQueueActive() = 0;
 
     virtual void PutInFront(Order order) = 0;
