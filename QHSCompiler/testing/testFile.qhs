@@ -28,6 +28,13 @@
 [ -> #assignToOne ] #assign
 [ >> #assign ] #assign
 
+[ debugOrderQueue ]
+[
+    #activateDebug
+    #debugOrderQueue
+    #deactivateDebug
+] >>
+
 
 [ /* #orderEnqueue #enterComment ] >>
 [ /* ] #makeOrderQueueProof
@@ -147,14 +154,13 @@
     [
         #popEnv
 
-        [ #orderEnqueue ! size ]
-        [ #orderEnqueue ! name ]
-
-        defineFuncIdentifier ;
-
         #pushEnv
 
-        /* redefine var a parameter definition */
+        [ _functionDefinitionOrderQueue ]
+        [ #orderEnqueue ! size ]
+        [ #orderEnqueue ! name ]
+        >>
+        
         initParameterDefinition ;
 
         [ ) ]
@@ -163,8 +169,7 @@
             funcBody ;
         ] >>
 
-        /* define , as nothing */
-        [ , ] [ ] >>
+        [ , ] >> /* , = nothing */
     ] >>
 
 ] >> ;
@@ -253,13 +258,12 @@
 
     [ "rbpOffset" #orderEnqueue ! size ] #changeIntVar ;
     [ "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ] >> ;
-    [ newRBPvar ] [ "rbp-" #orderEnqueue ! currentRBPoffset ] >> ;
-    [ address ] [ "[" #orderEnqueue ! newRBPvar "]" ] >> ;
+
+    /* ! name = sizeSpecifier [rbp-offset] */
+    [ #orderEnqueue ! name ]
+    [ #orderEnqueue ! sizeSpecifier " [rbp-" #orderEnqueue ! currentRBPoffset "]" ] >> ;
 
     "sub rsp, " size ;
-
-    [ #orderEnqueue ! name ]
-    [ #orderEnqueue ! sizeSpecifier " " #orderEnqueue ! address ] >> ;
 
     #pushEnv
     
@@ -287,21 +291,6 @@
 /* functions */
 [ resetRBPoffset ] [ [ "rbpOffset" "0" ] #setIntVar ] >> ;
 
-[ funcBodyPreamble ]
-[
-    "mov rbp, rsp" ;
-] >> ;
-
-[ funcCallPreamble ]
-[
-    "push rbp" ;
-] >> ;
-
-[ funcCallPostamble ]
-[
-    "pop rbp" ;
-] >> ;
-
 [ start ]
 [
     #pushEnv
@@ -318,23 +307,23 @@
 
 [ defineFuncIdentifier ]
 [
+    /* TODO use size for return */
     #orderFrontEnqueue size ->
     #orderFrontEnqueue name ->
+    #orderFrontEnqueue parameterSizes >>
+
+    [ "paramSize" ?! #getIntVar ] #orderFrontEnqueue paramSize >>
 
     #clearOrderQueue /* it should be empty but you never know */
 
     /* funcLabel = name as literalCode */
     [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] #orderFrontEnqueue funcLabel >> 
 
-
-    /* name = name() as identifier */
-    [ #orderEnqueue ! funcLabel "()" ] [ #orderEnqueue ! #literalCombine ]
-    [ #orderEnqueue ! #literalToIdentifier ] #orderFrontEnqueue name >> 
-
     /* name() = call name generated from funcCall identifier */
     [ #orderEnqueue ! name ]
-    [ 
-        [ #orderEnqueue ! funcLabel ] funcCall
+    [
+        [ #orderEnqueue ! funcLabel #orderEnqueue ! paramSize #orderEnqueue ! parameterSizes ] 
+        funcCall
     ] >> ;
 ] >> 
 
@@ -344,15 +333,23 @@
     [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] #orderFrontEnqueue funcLabel >> 
 
     [ definition localVar ] >>
-    [ { ] >> /* { to none */
-    [ } #popEnv ] >> /* } to end of function body */
+    [ { ] >> /* { = none */
+    [ } funcBodyEnd ] >> /* } = end of function body */
 
     [ ".text" ] #setAssemblySection
     resetRBPoffset ;
 
     funcLabel ":" ;
+    "mov rbp, rsp" ;
+] >>
 
-    funcBodyPreamble ;
+[ funcBodyEnd ]
+[
+    [ ?! _functionDefinitionOrderQueue ]
+
+    #popEnv
+
+    defineFuncIdentifier
 ] >>
 
 [ initParameterDefinition ]
@@ -362,6 +359,9 @@
 
     /* rbpOffset = 16 */
     [ "rbpOffset" "16 "] #setIntVar ;
+
+    /* paramSize = 0 */
+    [ "paramSize" "0" ] #setIntVar ;
 ] >>
 
 [ parameterDefinition ]
@@ -374,6 +374,10 @@
     /* first get RBPoffset then rbpOffset += size */
     [ "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ] >> ;
     [ "rbpOffset" #orderEnqueue ! size ] #changeIntVar ;
+
+    /* paramSize += size */
+    [ "paramSize" #orderEnqueue ! size ] #changeIntVar ;
+
     /* parameter is at rbp+offset */
     [ newRBPvar ] [ "rbp+" #orderEnqueue ! currentRBPoffset ] >> ;
     [ address ] [ "[" #orderEnqueue ! newRBPvar "]" ] >> ;
@@ -382,15 +386,96 @@
 
     [ #orderEnqueue ! name ]
     [ #orderEnqueue ! sizeSpecifier " " #orderEnqueue ! address ] >> ;
+
+    [ _functionDefinitionOrderQueue #orderEnqueue ! _functionDefinitionOrderQueue #orderEnqueue ! size ] >>
 ] >>
 
+/* call with with arguments */
 [ funcCall ]
 [
-    #orderFrontEnqueue funcLabel -> 
+    #pushEnv
 
-    ! funcCallPreamble ;
+    #orderFrontEnqueue funcLabel ->
+    /* combined size of all arguments */
+    #orderFrontEnqueue argSize ->
+
+    #orderFrontEnqueue argSizes >>
+
+    [ () ]
+    [
+        #popEnv
+        [ #orderEnqueue ! funcLabel ] literalCall ;
+    ] >>
+
+    [ ) ]
+    [
+        #popEnv
+        [ #orderEnqueue ! funcLabel #orderEnqueue ! argSize ] literalCall ;
+    ] >>
+
+    [ ( ]
+    [
+        [ ?! argSize ]
+        initArguments
+
+        /* size = first order stored in argSizes */
+        [ size ] [ ?! argSizes ] ->
+        #orderFrontEnqueue argSizes >>
+
+        /* argument need to be last instruction as otherwise the expr call in argument would get something from this */
+        [ ?! size ] argument
+    ] >>
+
+    [ , ]
+    [
+        [ size ] [ ?! argSizes ] ->
+        #orderFrontEnqueue argSizes >>
+
+        /* argument need to be last instruction as otherwise the expr call in argument would get something from this */
+        [ ?! size ] argument
+    ] >>
+] >>
+
+/* just the call assembly code */
+[ literalCall ]
+[
+    #orderFrontEnqueue funcLabel -> 
+    #orderFrontEnqueue argSize ->
+
+    "push rbp" ;
     "call " funcLabel ;
-    ! funcCallPostamble ;
+    "pop rbp" ;
+    "add rsp, " argSize ;
+] >>
+
+[ initArguments ]
+[
+    #orderFrontEnqueue argSize ->
+
+    [ "argOffset" #orderEnqueue ! currentRBPoffset ] #setIntVar
+    [ "argOffset" #orderEnqueue ! argSize ] #changeIntVar
+
+    "sub rsp, " argSize ;
+] >>
+
+[ argument ]
+[
+    #orderFrontEnqueue size ->
+    [ value #orderEnqueue ! expr ] >> 
+
+    [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
+
+    /* currentArgoffset = argOffset var */
+    [ "argOffset" currentArgOffset #orderEnqueue ! #getIntVar ] >>
+    /* argument is at rbp-offset */
+    [ newLocation ] [ #orderEnqueue ! sizeSpecifier " [rbp-" #orderEnqueue ! currentArgOffset "]" ] >>
+
+    /* change arg offset, which was set in initArguments */
+    /* changes argOffset by -size */
+    [ "-" #orderEnqueue ! size ?! #literalCombine ] 
+    #orderFrontEnqueue "argOffset" #changeIntVar ;
+
+    [ #orderEnqueue ! size ] [ newLocation ] [ #orderEnqueue ! value ] assign ;
 ] >>
 
 [ return ]
@@ -466,10 +551,21 @@ int dataInt = "69" ;
 
 /* functions */
 
-void Hello ( int p1 , bool p2 )
+void Hello ( int p1 , bool p2 , int p3 )
 {
-    int a = "68" ;
+    int a = p3 ;
     [ a ! int.size ] println ;
+
+    return ;
+}
+
+void Hello2 ( int p1 , int p2 )
+{
+    int a = p1 ;
+    int b = p2 ;
+
+    [ a ! int.size ] println ;
+    [ b ! int.size ] println ;
 
     return ;
 }
@@ -493,7 +589,9 @@ start
     
     [ dataInt ! int.size ] rawPrint ;
 
-    Hello() ;
+    Hello ( num2 , "1" , "69" ) ;
+
+    Hello2 ( num , num2 ) ;
 
     exit ;
 }
