@@ -282,7 +282,20 @@ static class InstructionHandler
                               }
 
                               std::string generatorVarName = nameOrder.GetName();
-                              int value = std::stoi(valueOrder.GetName());
+                              int value = 0;
+
+                              try
+                              {
+                                  value = std::stoi(valueOrder.GetName());
+                              }
+                              catch (std::invalid_argument)
+                              {
+                                  Logger.Log("Tried changeIntVar but second order: " + valueOrder.ToString() +
+                                                 " from OrderQueue is not a number",
+                                             Logger::ERROR);
+                                  return true;
+                              }
+
                               generator->SetIntGeneratorVar(generatorVarName, value);
                               return true;
                           },
@@ -311,7 +324,19 @@ static class InstructionHandler
                                  }
 
                                  std::string generatorVarName = nameOrder.GetName();
-                                 int change = std::stoi(changeOrder.GetName());
+                                 int change = 0;
+
+                                 try
+                                 {
+                                     change = std::stoi(changeOrder.GetName());
+                                 }
+                                 catch (std::invalid_argument)
+                                 {
+                                     Logger.Log("Tried changeIntVar but second order: " + changeOrder.ToString() +
+                                                    " from OrderQueue is not a number",
+                                                Logger::ERROR);
+                                     return true;
+                                 }
 
                                  int value = generator->GetIntGeneratorVar(generatorVarName);
                                  value += change;
