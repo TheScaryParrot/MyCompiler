@@ -8,9 +8,9 @@ Jedoch unterscheiden sich beide Compiler stark in der Funktionsweise. Der Compil
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.3]{resources/TEMP_von-neumann-cycle.jpg}
-    \caption{TEMP! Zyklus der QHS Compilation, basierend auf Von-Neumann Zyklus}
-    \label{fig:von-neumann-cycle}
+    \includegraphics[scale=0.6]{resources/qhs-cycle.png}
+    \caption{Zyklus der QHS Compilation}
+    \label{fig:qhs-cycle}
 \end{figure}
 
 TALK ABOUT ORDERS AND THE MEANING OF IDENTIFIERS, INSTRUCTIONS AND LITERAL CODE
@@ -70,7 +70,7 @@ Beim nächsten Fetch werden nun die zum Identifier gehörenden Orders zurückgeg
 
 Environments sind hierbei in einer Linked-List gespeichert. Somit können neue Environments zu dieser Liste hinzugefügt und von der Liste entfernt werden. Das unterste Element der Liste ist hierbei das älteste und das oberste Element das neuste.
 Bei der Definition eines Identifiers wird dieser immer zum obersten Environment hinzugefügt. Definitionen des gleichen Identifiers in älteren Environments werden nicht überschrieben oder gelöscht.
-Bei der Abfrage nach einem Identifier wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden wird ein Error ausgegeben.
+Bei der Abfrage nach einem Identifier wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden, wird ein Error ausgegeben.
 
 \subsection{Literal-Code}
 Literal-Code ist der Weg wie der QHS-Compiler Assembly Code generiert. Dieser ist sehr simpel. Wenn Literal-Code in den Execute Schritt gelangt, wird alles was zwischen den " Zeichen steht in das Output-Dokument geschrieben.
@@ -78,23 +78,55 @@ Literal-Code ist der Weg wie der QHS-Compiler Assembly Code generiert. Dieser is
 \subsection{Instructions}
 Instructions sind die komplexeste Order für den Execute Schritt. Für jede Instruction ist im QHS-Compiler eine Funktion definiert, die ausgeführt wird, wenn diese Instruction in den Execute Schritt gelangt.
 Diese Funktionen können Variabeln im QHS-Compiler speichern, den Order-Queue aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
+Für manche Instructions ist nach ihrem Namen ein Zeichen als Abkürzung angegeben. Diese Abkürzungen sind in QHS als Identifier definiert, die für diese Instruction stehen. Diese Abkürzungen werden in weitern QHS Beispielen verwendet.
 
 \begin{table}[H]
     \centering
     \begin{tabularx}{\textwidth}{l|X}
-    \textbf{\#enterOrderStack}   & Aktiviert die Order-Queue. \\ \hline
-    \textbf{\#exitOrderStack}    & Deaktiviert die Order-Queue. \\ \hline
-    \textbf{\#assignIdentifier}  & Das erste Element der Order-Queue muss ein Identifier sein. Der Rest der Orders auf Order-Queue wird als Definition für diesen Identifier festgelegt. \\ \hline
-    \textbf{\#force}             & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Decode und somit die Order-Queue. \\ \hline
-    \textbf{\#orderEnqueue}      & Die nächste Order wird sofort der Order-Queue hinzugefügt, auch wenn diese Order Order-Queue-Proof wäre. Execute wird übersprungen. \\ \hline
-    \textbf{\#orderFrontEnqueue} & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der Order-Queue gesetzt. \\ \hline
-    \textbf{\#deepFetch}         & Wird mit der ersten Order der zweitobersten Liste an Order auf dem Fetch-Stack Ermöglicht den Zugriff auf den Inputfile innerhalb einer Identifier-Definition. \\ \hline
-    \textbf{\#pushEnv}           & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
-    \textbf{\#popEnv}            & Das neuste Environment der Environment Linked-List wird gelöscht.
+    \textbf{\#enterOrderQueue} [    & Aktiviert die Order-Queue. \\ \hline
+    \textbf{\#exitOrderQueue} ]     & Deaktiviert die Order-Queue. \\ \hline
+    \textbf{\#assign} >>            & Das erste Element der Order-Queue muss ein Identifier sein. Der Rest der Orders auf Order-Queue wird als Definition für diesen Identifier festgelegt. \\ \hline
+    \textbf{\#assignToOne} ->       & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der Order-Queue genommen und als Definition für den Identifier verwendet. \\ \hline
+    \textbf{\#force} !              & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Decode und somit die Order-Queue. \\ \hline
+    \textbf{\#orderEnqueue}         & Die nächste Order wird sofort der Order-Queue hinzugefügt, auch wenn diese Order Order-Queue-Proof wäre. Execute wird übersprungen. \\ \hline
+    \textbf{\#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der Order-Queue gesetzt. \\ \hline
+    \textbf{\#deepFetch}            & Wird mit der ersten Order der zweitobersten Liste an Order auf dem Fetch-Stack. Ermöglicht den Zugriff auf den Inputfile innerhalb einer Identifier-Definition. \\ \hline
+    \textbf{\#pushEnv}              & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
+    \textbf{\#popEnv}               & Das neuste Environment der Environment Linked-List wird gelöscht.
         
     \end{tabularx}
 \end{table}
 
 Der QHScompiler umfässt \textbf{28} Instructions, wobei \textbf{5} dieser nur für Debugging des Compilers dienen.
+
+\section{Bringing it all together}
+Und das war's. Dies ist der gesamte QHScompiler. Im Vergleich zu einem traditionellen Compiler wirkt der QHScompiler fast schon \textbf{armselig}. Und dies hat einen einfachen Grund. Der QHScompiler ist zwar \textbf{vollendet},
+die dazugehörige Sprache QHS jedoch noch lange nicht. Es ist zwar grundsätzlich durch LiteralCode möglich jedes Programm QHS zu schreiben, jedoch handelt es sich dann dabei einfach nur um Assembly Code.
+Doch der Aufbau des QHScompilers ermöglicht es mithilfe von Identifiern eine komplexere Programmiersprache zu definieren.
+
+\subsection{Shortcuts}
+Shortcuts like ; and stuff
+
+\subsection{Variablen}
+Die Umsetzung von Variablen in QHS ist simpel. Zuerst soll die Grösse der Variabel vom Stack abgezogen werden. Dann wird ein für den Identifier ein Variabelnamen definiert, der zu der Position der Variabel auf dem Stack zeigt.
+Mit nur LiteralCode in QHS lässt sich dies wie folgt ausdrücken:
+
+\begin{lstlisting}[language=QHS, label=eg:qhs-var-literal, caption=THING]
+    "sub 4" ;
+    [ a "[rbp-4]" ] >> /* a = [rbp-4] */
+
+    "add " a ", 5" ;
+\end{lstlisting}
+
+Dieser QHS Code wird zu folgendem compiled:
+
+\begin{lstlisting}[label=eg:qhs-var-literal-compiled, caption=THING]
+    sub 4
+    add [rbp-4], 5
+\end{lstlisting}
+
+Jedoch ist dies noch nicht besonders angenehm. Weiter lässt sich zum Beispiel der Var Identifier definieren, der die Grösse der Variabel oben auf der OrderQueue erwartet. 
+
+
 
 
