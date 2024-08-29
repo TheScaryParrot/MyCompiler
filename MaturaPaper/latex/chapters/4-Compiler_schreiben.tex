@@ -104,10 +104,16 @@ Und das war's. Dies ist der gesamte QHScompiler. Im Vergleich zu einem tradition
 die dazugehörige Sprache QHS jedoch noch lange nicht. Es ist zwar grundsätzlich durch LiteralCode möglich jedes Programm QHS zu schreiben, jedoch handelt es sich dann dabei einfach nur um Assembly Code.
 Doch der Aufbau des QHScompilers ermöglicht es mithilfe von Identifiern eine komplexere Programmiersprache zu definieren.
 
+COMMENTS PSEUDO CODE IN EXAMPLES
+
 \subsection{Shortcuts}
 Shortcuts like ; and stuff
 
-\subsection{Variablen}
+\subsection{Identifier Parameters and Return}
+Parameter and Return through OrderQueue or PutInFront
+lateArg>> ?
+
+\subsection{Variablen} \label{sec:qhs-vars}
 Die Umsetzung von Variablen in QHS ist simpel. Zuerst soll die Grösse der Variabel vom Stack abgezogen werden. Dann wird ein für den Identifier ein Variabelnamen definiert, der zu der Position der Variabel auf dem Stack zeigt.
 Mit nur LiteralCode in QHS lässt sich dies wie folgt ausdrücken:
 
@@ -125,7 +131,49 @@ Dieser QHS Code wird zu folgendem compiled:
     add [rbp-4], 5
 \end{lstlisting}
 
-Jedoch ist dies noch nicht besonders angenehm. Weiter lässt sich zum Beispiel der Var Identifier definieren, der die Grösse der Variabel oben auf der OrderQueue erwartet. 
+Jedoch ist dies noch nicht besonders angenehm. Weiter lässt sich zum Beispiel ein Var Identifier definieren, der die Grösse der Variabel als Argument annimmt OrderQueue. Um die in vielen Programmiersprachen geläufige Syntax
+einer Variabel Definition beizubehalten, wird der Variabel Name als lateArg>> \textbf{angegeben}.
+RBP-OFFSET
+
+EXAMPLE
+
+Zuletzt lässt sich das umständliche Hinzufügen der Grösse der Variable sowie der Var Identifier unter einem Identifier zusammenfassen. Dies wäre passenderweise die bekannte Bezeichnung für den Variabel Typen.
+
+EXAMPLE
+
+So sieht eine Variabel Definition genau so aus, wie es in anderen Programmiersprachen gebräuchlich ist. Der Shortcut ; ist hierbei optional.
+
+\subsection{Funktionen}
+Funktionen sind im Vergleich zu Variablen deutlich komplizierter. \textbf{Daher soll hierbei nur auf zwei der Problematiken an Funktionen behandelt werden.}
+
+Zum Schluss sollte eine Funktionsdefinition wie folgt aussehen:
+
+EXAMPLE
+
+Hier lässt sich bereits ein erstes Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der Int Identifier für eine Variabel Definition verwendet. 
+REF-TO-EXAMPLE würde vom QHScompiler also als eine Variabel Definition verstehen. Der Unterschied zwischen Funktions und Variabel Definition besteht hierbei in den Klammern die auf den \textbf{Namen} folgen.
+Der QHScompiler müsste also beim Int Identifier nach vorne schauen, ob sich eine Klammer nach dem \textbf{Namen} befindet, und folglich eine Variabel oder Funktionsdefinition ausführen.
+Dies ist jedoch aufgrund des einfachen Designs des QHScompilers nicht möglich. Er kann bloss Orders ausführen, nicht jedoch überprüfen, ob eine Order vorhanden ist. Glücklicherweise lässt sich dieses Problem jedoch lösen,
+ohne eine Änderung am QHScompiler vorzunehmen. Die Lösung basiert darauf beim Int Identifier sowohl eine Variabel als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
+Weiter wird nun eine Klammer als Identifier für eine Funktionsdefinition definiert. Sowie ein Semikolon als Variabeldefinition. Befindet sich nach dem \textbf{Namen} also eine Klammer, wird eine Funktionsdefinition ausgeführt.
+Ist dort aber ein Semikolon wird eine Variabeldefinition durchgeführt. Dieses Konzept wird weiterführend als DelayedExecute beschrieben. Das Ganze könnte dann wie folgt aussehen:
+
+EXAMPLE
+
+
+Das zweite Problem sind die Parameter eine Funktionsdefinition. Diese sehen genau gleich aus wie eine Variabeldefinition, sollen jedoch vom QHScompiler anders ausgeführt werden.
+Erstens sollte bei einer Parameterdefiniton nicht der LiteralCode zur Subtraktion vom RSP hinzugefügt werden. Zweitens verwendet eine Parameterdefintion einen anderen RBP-Offset.
+Die Lösung hierzu liegt in einer Umdefinition des Definition Identifiers. Dieser ist momentan für sowohl für Variabel als auch Funktionsdefinitionen verantwortlich.
+Bei der Anfangsklammer der Funktionsdefinition wird der Definition Identifier neu definiert, so dass er eine Parameterdefinition ausführt. Die vorherige Definition geht Dank der \#pushEnv Instruction nicht verloren.
+Bei der schliessenden Klammer wird \#popEnv durchgeführt, und der Definition Identifier ist wieder für Variablen und Funktionen zuständig. Diese Lösung wird im folgenden TempAssign genannt.
+Das ganze lässt sich im QHS wie folgt umsetzten:
+
+EXAMPLE
+
+Nun fehlt nur noch eine Sache der Funktionsdefiniton, der Funktionsbody. Dieser ist vergleichsweise simpel. Beim Öffnen des Bodies wird das ein Assembly Label des Funktionnamens gesetzt.
+Der gesammte Code innerhalb des Bodies wird nun einfach ganz normal vom QHScompiler ausgeführt und an den Output Assembly File angehenkt. So lässt sich die Funktion durch einen einfachen Assembly Call ausführen.
+\textbf{Wie das Callen von Funktionen aussieht, soll hierbei nicht weiter betrachtet werden.}
+
 
 
 
