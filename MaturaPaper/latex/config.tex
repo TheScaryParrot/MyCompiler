@@ -35,24 +35,28 @@
 \usepackage{xcolor}
 \lstdefinelanguage{QHS}
 {
-    morekeywords={},
+    %morekeywords={\textgreater\textgreater},
     %morecomment=[l]{//}, % l is for line comment
     morecomment=[s]{/*}{*/}, % s is for start and end delimiter
-    morestring=[b]" % defines that strings are enclosed in double quotes (LiteralCode)
+    morestring=[b]", % defines that strings are enclosed in double quotes (LiteralCode)
+    %alsoletter=\textgreater
 }
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{codebrown}{HTML}{AB7763}
+\definecolor{codeviolet}{HTML}{785175}
+\definecolor{backcolour}{HTML}{CCD6E8}
 \lstdefinestyle{QHSstyle}
 {
-    backgroundcolor=\color{backcolour},   
+    %backgroundcolor=\color{backcolour},   
     commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
+    keywordstyle=\color{codeviolet},
     numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize
+    stringstyle=\color{codebrown},
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    frameround=tttt
 }
 
 \lstset{style=QHSstyle}
