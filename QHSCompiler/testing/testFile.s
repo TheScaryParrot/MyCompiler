@@ -7,7 +7,7 @@ wordToGuess: db 'moin', 0xa
 wordLength: equ $ - wordToGuess
 sub rsp, 4
 section .text
-Print:
+PrintLine:
 mov rbp, rsp
 sub rsp, 4
 mov eax, dword [rbp+16]
@@ -36,6 +36,7 @@ Hello:
 mov rbp, rsp
 sub rsp, 4
 mov eax, dword [rbp+21]
+mov eax, eax
 mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
@@ -63,9 +64,11 @@ Hello2:
 mov rbp, rsp
 sub rsp, 4
 mov eax, dword [rbp+16]
+mov eax, eax
 mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, dword [rbp+20]
+mov eax, eax
 mov dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
@@ -120,28 +123,54 @@ mov rdx, wordLength
 syscall
 sub rsp, 4
 mov eax, 65
+add eax, dataInt
+sub eax, dataInt
+mov eax, eax
 mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, 66
+mov eax, eax
 mov dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
 mov dword [rbp-12], eax
 push rbp
-call Print
+call PrintLine
 pop rbp
 add rsp, 4
-mov eax, 4
-add eax, 67
+mov eax, 67
+add eax, 4
 mov eax, eax
 mov dword [rbp-8], eax
+mov eax, 6
+add dword [rbp-8], eax
+mov eax, 6
+add eax, 1
+sub dword [rbp-8], eax
+mov eax, 35
+sub dword [rbp-8], eax
+mov eax, 2
+mov edx, eax
+mov eax, dword [rbp-8]
+mul edx
+mov dword [rbp-8], eax
+mov eax, 1
+mov edx, 5
+mul edx
+sub eax, 4
+add dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-8]
 mov dword [rbp-12], eax
 push rbp
-call Print
+call PrintLine
 pop rbp
 add rsp, 4
+mov eax, dword [rbp-8]
+add eax, 5
+mov edx, dword [rbp-8]
+mul edx
+sub eax, 3
 mov rax, 1
 mov rdi, 1
 mov rsi, dataInt

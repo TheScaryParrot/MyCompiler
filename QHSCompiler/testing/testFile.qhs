@@ -45,6 +45,9 @@
 [ ; "
 " #clearOrderQueue ]  >>
 
+[ \n "
+" ] >>
+
 
 [ ! ] [ #orderEnqueue #force ] >> ;
 [ ! ] #makeOrderQueueProof ;
@@ -103,6 +106,23 @@
 
 ] >> ;
 
+[ getRegisterD ]
+[
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ 1 "dl" ] >>
+    [ 2 "dx" ] >>
+    [ 4 "edx" ] >>
+    [ 8 "rdx" ] >>
+
+    [ #orderEnqueue ! size ] #literalToIdentifier
+
+    #popEnv    
+
+] >> ;
+
 [ getDefineSpecifier ]
 [
     #orderFrontEnqueue size ->
@@ -136,7 +156,6 @@
         [ #orderEnqueue ! size ]
         [ #orderEnqueue ! name ]
         [ ?! expr ]
-
         dataVar ;
     ] >>
 
@@ -237,18 +256,6 @@
 
 ] >> ;
 
-[ assign ]
-[
-    #orderFrontEnqueue size ->
-    #orderFrontEnqueue location ->
-    #orderFrontEnqueue value ->
-
-    [ register ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
-
-    "mov " register ", " value ;
-    "mov " location ", " register ;
-] >>
-
 [ localVar ]
 [
     #orderFrontEnqueue size ->
@@ -272,12 +279,22 @@
     [ = ]
     [
         #popEnv
-
         [ #orderEnqueue ! size ]
-        [ #orderEnqueue ! name ]
-        [ #orderEnqueue #orderEnqueue #orderEnqueue ! expr ]
-        
-        assign
+        [ ?! #deepFetch ]
+        exprInit ;
+
+        [ ; ]
+        [
+            #popEnv
+
+            [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+            [ #orderEnqueue ! size ]
+            [ #orderEnqueue ! name ]
+            [ ?! registerA ]
+            
+            assign ;
+        ] >> 
     ] >>
 
     [ ; ]
@@ -286,6 +303,18 @@
         ;
     ] >> 
 ] >> ;
+
+[ assign ]
+[
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue location ->
+    #orderFrontEnqueue value >>
+
+    [ register ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    "mov " register ", " value ;
+    "mov " location ", " register ;
+] >>
 
 /* return on OrderQueue */
 [ varSize ]
@@ -475,6 +504,7 @@
 [
     #orderFrontEnqueue argSize ->
 
+    [ "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ] >> ;
     [ "argOffset" #orderEnqueue ! currentRBPoffset ] #setIntVar
     [ "argOffset" #orderEnqueue ! argSize ] #changeIntVar
 
@@ -509,6 +539,43 @@
 
 /* expressions */
 
+[ exprInit ]
+[
+    #pushEnv
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue first >>
+
+    [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >> ;
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+
+    "mov " registerA ", " first ;
+
+    [ + ]
+    [
+        "add " registerA ", " #deepFetch \n
+    ] >>
+
+    [ - ]
+    [
+        "sub " registerA ", " #deepFetch \n
+    ] >>
+
+    [ * ]
+    [
+        "mov " registerD ", " #deepFetch \n
+        "mul " registerD \n
+    ] >>
+
+    [ / ]
+    [
+        "mov " registerD ", " #deepFetch \n
+        "div " registerD \n
+    ] >>
+] >>
+
 [ expr ]
 [
     /* TODO: Implement operators */
@@ -518,14 +585,109 @@
 
 [ = ]
 [
-    #pushEnv
     #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
 
-    [ ?! var ] varSize
-    [ ?! var ]
-    [ #orderEnqueue ! #deepFetch ] 
-    assign ;
-    #popEnv
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit ;
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+        [ ?! size ]
+        [ ?! var ]
+        [ ?! registerA ] 
+        assign ;
+    ] >>
+] >>
+
+[ += ]
+[
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit ;
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+        "add " var ", " registerA ;
+    ] >>
+] >>
+
+[ -= ]
+[
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit ;
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+        "sub " var ", " registerA ;
+    ] >>
+] >>
+
+[ *= ]
+[
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit ;
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+        [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+
+        "mov " registerD ", " registerA ;
+        "mov " registerA ", " var ;
+        "mul " registerD ;
+        "mov " var ", " registerA ;
+    ] >>
+] >>
+
+[ /= ]
+[
+    /* TODO Division gives floating point error, probably same in THScompiler */
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit ;
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+        [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+
+        "mov " registerD ", " registerA ;
+        "mov " registerA ", " var ;
+        "div " registerD ;
+        "mov " var ", " registerA ;
+    ] >>
 ] >>
 
 /* ------------------ syscalls ------------------ */
@@ -586,7 +748,7 @@ int dataInt = "69" ;
 
 /* functions */
 
-void Print ( int char )
+void PrintLine ( int char )
 {
     [ char ! int.size ] println ;
 
@@ -622,17 +784,21 @@ start
 
     printWord ;
 
-    int num = "65" ; 
+    int num = "65" + dataInt - dataInt ;
     int num2 = "66" ;
 
-    Print ( num ) ;
+    PrintLine ( num ) ;
 
-    "mov eax, " [ num2 ] varSize #executeOrderTop ;
-    "add eax, 67" ;
+    [ num2 ] = "67" + num2.size ;
+    [ num2 ] += "6" ;
+    [ num2 ] -= "6" + "1" ;
+    [ num2 ] -= "35" ;
+    [ num2 ] *= "2" ;
+    [ num2 ] += "1" * "5" - "4" ; /* num2 = 71 */
 
-    [ num2 ] = "eax" ;
+    PrintLine ( num2 ) ; /* G */
 
-    Print ( num2 ) ;
+    [ ! num2.size num2 ] exprInit + "5" * num2 - "3" #popEnv ;
     
     [ dataInt ! int.size ] rawPrint ;
 
