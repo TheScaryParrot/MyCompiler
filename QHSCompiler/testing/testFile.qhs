@@ -260,8 +260,10 @@
     [ "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ] >> ;
 
     /* ! name = sizeSpecifier [rbp-offset] */
-    [ #orderEnqueue ! name ]
-    [ #orderEnqueue ! sizeSpecifier " [rbp-" #orderEnqueue ! currentRBPoffset "]" ] >> ;
+    [ ?! size ]
+    [ ?! name ]
+    [ ?! sizeSpecifier " [rbp-" ?! currentRBPoffset "]" ] 
+    defineVarIdentifier ;
 
     "sub rsp, " size ;
 
@@ -284,6 +286,27 @@
         ;
     ] >> 
 ] >> ;
+
+/* return on OrderQueue */
+[ varSize ]
+[
+    #orderFrontEnqueue variabel ->
+
+    [ ?! variabel ?! #orderToLiteralCode ".size" ?! #literalCombine ?! #literalToIdentifier ] [ ?! #executeOrderTop ]
+] >>
+
+/* expects Queue top as size, rest the identifier Assign for the identifier */
+[ defineVarIdentifier ]
+[
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue identifier ->
+    #orderFrontEnqueue value >>
+    
+    [ ?! identifier ?! value ] >>
+
+    /* IDENTIFIER.size = size */
+    [ ?! identifier ?! #orderToLiteralCode ".size" ?! #literalCombine ?! #literalToIdentifier ] [ ?! size ] >>
+] >>
 
 /* defintion current is globalDefinition */
 [ definition globalDefinition ] >> ;
@@ -461,21 +484,21 @@
 [ argument ]
 [
     #orderFrontEnqueue size ->
-    [ value #orderEnqueue ! expr ] >> 
+    [ value ?! expr ] >> 
 
     [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
 
     /* currentArgoffset = argOffset var */
-    [ "argOffset" currentArgOffset #orderEnqueue ! #getIntVar ] >>
+    [ "argOffset" currentArgOffset ?! #getIntVar ] >>
     /* argument is at rbp-offset */
-    [ newLocation ] [ #orderEnqueue ! sizeSpecifier " [rbp-" #orderEnqueue ! currentArgOffset "]" ] >>
+    [ newLocation ] [ ?! sizeSpecifier " [rbp-" ?! currentArgOffset "]" ] >>
 
     /* change arg offset, which was set in initArguments */
     /* changes argOffset by -size */
-    [ "-" #orderEnqueue ! size ?! #literalCombine ] 
+    [ "-" ?! size ?! #literalCombine ] 
     #orderFrontEnqueue "argOffset" #changeIntVar ;
 
-    [ #orderEnqueue ! size ] [ newLocation ] [ #orderEnqueue ! value ] assign ;
+    [ ?! size ] [ newLocation ] [ ?! value ] assign ;
 ] >>
 
 [ return ]
@@ -491,6 +514,18 @@
     /* TODO: Implement operators */
     /* current just a deepFetch */
     #orderEnqueue ! #deepFetch
+] >>
+
+[ = ]
+[
+    #pushEnv
+    #orderFrontEnqueue var ->
+
+    [ ?! var ] varSize
+    [ ?! var ]
+    [ #orderEnqueue ! #deepFetch ] 
+    assign ;
+    #popEnv
 ] >>
 
 /* ------------------ syscalls ------------------ */
@@ -551,6 +586,13 @@ int dataInt = "69" ;
 
 /* functions */
 
+void Print ( int char )
+{
+    [ char ! int.size ] println ;
+
+    return ;
+}
+
 void Hello ( int p1 , bool p2 , int p3 )
 {
     int a = p3 ;
@@ -583,9 +625,14 @@ start
     int num = "65" ; 
     int num2 = "66" ;
 
-    [ num ! int.size ] println ;
-    [ num2 ! int.size ] println ;
+    Print ( num ) ;
 
+    "mov eax, " [ num2 ] varSize #executeOrderTop ;
+    "add eax, 67" ;
+
+    [ num2 ] = "eax" ;
+
+    Print ( num2 ) ;
     
     [ dataInt ! int.size ] rawPrint ;
 

@@ -27,6 +27,7 @@ static class Logger
     }
 
     void SetDebug(bool debug) { IsDebug = debug; }
+    bool IsDebugActive() { return IsDebug; }
 
     void SetLogPathGetter(ILogPathGetter* pathGetter) { logPathGetter = pathGetter; }
 

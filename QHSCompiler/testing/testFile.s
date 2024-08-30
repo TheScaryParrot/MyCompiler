@@ -6,9 +6,32 @@ section .rodata
 wordToGuess: db 'moin', 0xa
 wordLength: equ $ - wordToGuess
 sub rsp, 4
+section .text
+Print:
+mov rbp, rsp
+sub rsp, 4
+mov eax, dword [rbp+16]
+mov [rsp], eax
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp
+mov rdx, 4
+syscall
+add rsp, 4
+sub rsp, 1
+mov al, 0xa
+mov [rsp], al
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp
+mov rdx, 1
+syscall
+add rsp, 1
+mov rsp, rbp
+ret
+sub rsp, 4
 sub rsp, 1
 sub rsp, 4
-section .text
 Hello:
 mov rbp, rsp
 sub rsp, 4
@@ -103,40 +126,22 @@ mov eax, 66
 mov dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
-mov [rsp], eax
-mov rax, 1
-mov rdi, 1
-mov rsi, rsp
-mov rdx, 4
-syscall
+mov dword [rbp-12], eax
+push rbp
+call Print
+pop rbp
 add rsp, 4
-sub rsp, 1
-mov al, 0xa
-mov [rsp], al
-mov rax, 1
-mov rdi, 1
-mov rsi, rsp
-mov rdx, 1
-syscall
-add rsp, 1
+mov eax, 4
+add eax, 67
+mov eax, eax
+mov dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-8]
-mov [rsp], eax
-mov rax, 1
-mov rdi, 1
-mov rsi, rsp
-mov rdx, 4
-syscall
+mov dword [rbp-12], eax
+push rbp
+call Print
+pop rbp
 add rsp, 4
-sub rsp, 1
-mov al, 0xa
-mov [rsp], al
-mov rax, 1
-mov rdi, 1
-mov rsi, rsp
-mov rdx, 1
-syscall
-add rsp, 1
 mov rax, 1
 mov rdi, 1
 mov rsi, dataInt

@@ -50,6 +50,17 @@ static class InstructionHandler
                                     return true;
                                 },
                                 false, false)},
+        {"executeOrderTop", Instruction(
+                                [](AbstractGenerator* generator) -> bool
+                                {
+                                    Order order = generator->DequeueFromOrderQueue();
+                                    generator->SetCurrentOrder(order);
+                                    generator->SetCurrentPhase(GeneratorPhases::EXECUTE);
+                                    generator->ExecuteCurrentPhase();
+                                    generator->RestartCycle();
+                                    return false;
+                                },
+                                false, false)},
         {"force", Instruction(
                       [](AbstractGenerator* generator) -> bool
                       {
@@ -474,13 +485,15 @@ static class InstructionHandler
         {"debug", Instruction(
                       [](AbstractGenerator* generator) -> bool
                       {
+                          bool wasDebugActive = Logger.IsDebugActive();
+                          Logger.SetDebug(true);
                           Logger.Log("Debug Print", Logger::DEBUG);
+                          Logger.SetDebug(wasDebugActive);
                           return true;
                       },
                       false, false)},
         {"debugIdentifierDefinition",
          Instruction(
-
              [](AbstractGenerator* generator) -> bool
              {
                  Order order = generator->DequeueFromOrderQueue();
@@ -505,8 +518,11 @@ static class InstructionHandler
                      return true;
                  }
 
+                 bool wasDebugActive = Logger.IsDebugActive();
+                 Logger.SetDebug(true);
                  Logger.Log("Identifier: " + order.GetName() + " Definition: \n" + identifier->GetQueue()->ToString(),
                             Logger::DEBUG);
+                 Logger.SetDebug(wasDebugActive);
 
                  return true;
              },
@@ -515,7 +531,11 @@ static class InstructionHandler
                                 [](AbstractGenerator* generator) -> bool
                                 {
                                     OrderQueue orderQueue = generator->GetOrderQueueCopy();
+
+                                    bool wasDebugActive = Logger.IsDebugActive();
+                                    Logger.SetDebug(true);
                                     Logger.Log("Current Order Queue: \n" + orderQueue.ToString(), Logger::DEBUG);
+                                    Logger.SetDebug(wasDebugActive);
                                     return true;
                                 },
                                 false, false)},
