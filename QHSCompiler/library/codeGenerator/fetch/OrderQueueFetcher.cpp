@@ -6,21 +6,21 @@
 class OrderQueueFetcher : public IOrderFetcher
 {
    public:
-    OrderQueueFetcher(OrderQueue* queue) : queue(queue) {}
+    OrderQueueFetcher(OrderQueue queue) { this->queue = queue; }
 
     virtual Order Next() override
     {
-        Order order = queue->Dequeue();
+        Order order = queue.Dequeue();
         lastOrder = order;
         return order;
     }
 
-    virtual bool IsEmpty() override { return queue->IsEmpty(); }
+    virtual bool IsEmpty() override { return queue.IsEmpty(); }
 
     virtual std::string GetLastOrderLog() override { return lastOrder.ToLogString(); }
 
    private:
-    OrderQueue* queue;
+    OrderQueue queue;
 
     Order lastOrder = Order::Empty();
 };

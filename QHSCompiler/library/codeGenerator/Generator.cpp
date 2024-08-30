@@ -64,13 +64,10 @@ class Generator : public AbstractGenerator
     virtual unsigned int GetOrderQueueDepth() override { return decodeHandler.GetOrderQueueDepth(); }
     virtual bool IsOrderQueueActive() override { return GetOrderQueueDepth() > 0; }
 
-    virtual void PutInFront(Order order) override
+    virtual void PutInFront(Order order) override { fetchHandler.PutInFront(new OrderQueueFetcher(OrderQueue(order))); }
+    virtual void PutInFront(OrderQueue& orderQueue) override
     {
-        fetchHandler.PutInFront(new OrderQueueFetcher(new OrderQueue(order)));
-    }
-    virtual void PutInFront(OrderQueue orderQueue) override
-    {
-        fetchHandler.PutInFront(new OrderQueueFetcher(new OrderQueue(orderQueue)));
+        fetchHandler.PutInFront(new OrderQueueFetcher(orderQueue));
     }
     virtual void PutInFront(InputFile* file) override { fetchHandler.PutInFront(new InputFileFetcher(file)); }
 

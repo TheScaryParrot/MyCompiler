@@ -59,7 +59,7 @@ class AbstractGenerator
     virtual bool IsOrderQueueActive() = 0;
 
     virtual void PutInFront(Order order) = 0;
-    virtual void PutInFront(OrderQueue orderQueue) = 0;
+    virtual void PutInFront(OrderQueue& orderQueue) = 0;
     virtual void PutInFront(InputFile*) = 0;
 
     virtual Order DequeueFromOrderQueue() = 0;

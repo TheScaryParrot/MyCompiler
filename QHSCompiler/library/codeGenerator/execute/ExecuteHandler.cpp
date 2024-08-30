@@ -16,8 +16,6 @@ class ExecuteHandler
     }
     void HandleIdentifier(Identifier* identifier, AbstractGenerator* generator)
     {
-        // Derefrences the OrderQueue to make a copy
-        // TODO: Might make OrderQueueFetcher differentely using a iterator over a OrderQueue*
         generator->PutInFront(*identifier->GetQueue());
         generator->IncrementPhase();
     }

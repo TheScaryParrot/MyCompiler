@@ -4,15 +4,15 @@
 
 #include "Order.cpp"
 
-struct Node
-{
-    Order order = Order::Empty();
-    Node* next;
-    Node* prev;
-};
-
 class OrderQueue
 {
+    struct Node
+    {
+        Order order = Order::Empty();
+        Node* next;
+        Node* prev;
+    };
+
    public:
     OrderQueue() = default;
     OrderQueue(Order order) { this->Enqueue(order); }
