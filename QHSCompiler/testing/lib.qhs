@@ -28,13 +28,6 @@
 [ -> #assignToOne ] #assign
 [ >> #assign ] #assign
 
-[ debugOrderQueue ]
-[
-    #activateDebug
-    #debugOrderQueue
-    #deactivateDebug
-] >>
-
 
 [ /* #orderEnqueue #enterComment ] >>
 [ /* ] #makeOrderQueueProof
