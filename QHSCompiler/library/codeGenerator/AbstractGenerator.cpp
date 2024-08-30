@@ -103,7 +103,7 @@ class AbstractGenerator
 
         assemblyCode->AddSection(sectionName);
         assemblyCode->ChangeSection(sectionName);
-        assemblyCode->AddCode("section " + sectionName);
+        assemblyCode->AddCode("section " + sectionName + "\n");
     }
 
    private:

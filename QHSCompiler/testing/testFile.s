@@ -166,11 +166,6 @@ push rbp
 call PrintLine
 pop rbp
 add rsp, 4
-mov eax, dword [rbp-8]
-add eax, 5
-mov edx, dword [rbp-8]
-mul edx
-sub eax, 3
 mov rax, 1
 mov rdi, 1
 mov rsi, dataInt
