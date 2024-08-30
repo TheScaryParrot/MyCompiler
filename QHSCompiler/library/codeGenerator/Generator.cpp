@@ -72,6 +72,7 @@ class Generator : public AbstractGenerator
     {
         fetchHandler.PutInFront(new OrderQueueFetcher(new OrderQueue(orderQueue)));
     }
+    virtual void PutInFront(InputFile* file) override { fetchHandler.PutInFront(new InputFileFetcher(file)); }
 
     virtual Order DequeueFromOrderQueue() override { return decodeHandler.DequeueFromOrderQueue(); }
     virtual void EnqueueInOrderQueue(Order order) override { decodeHandler.EnqueueInOrderQueue(order); }

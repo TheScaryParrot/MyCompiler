@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../InputFile.cpp"
 #include "../utils/Logger.cpp"
 #include "../utils/Map.cpp"
 #include "AssemblyCode.cpp"
@@ -59,6 +60,7 @@ class AbstractGenerator
 
     virtual void PutInFront(Order order) = 0;
     virtual void PutInFront(OrderQueue orderQueue) = 0;
+    virtual void PutInFront(InputFile*) = 0;
 
     virtual Order DequeueFromOrderQueue() = 0;
     virtual void EnqueueInOrderQueue(Order order) = 0;

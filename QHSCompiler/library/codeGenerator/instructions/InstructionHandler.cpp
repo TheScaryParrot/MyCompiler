@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 
+#include "../../InputFile.cpp"
 #include "../identifiers/IdentifierHandler.cpp"
 #include "Instruction.cpp"
 
@@ -482,6 +483,24 @@ static class InstructionHandler
                                 return true;
                             },
                             true, true)},
+        {"include", Instruction(
+                        [](AbstractGenerator* generator) -> bool
+                        {
+                            Order order = generator->DequeueFromOrderQueue();
+
+                            if (order.GetType() != Order::LiteralCode)
+                            {
+                                Logger.Log("Expected LiteralCode for include, got: " + order.ToString(), Logger::ERROR);
+                                return true;
+                            }
+
+                            Logger.Log("Including file " + order.GetName(), Logger::DEBUG);
+
+                            generator->PutInFront(new InputFile(order.GetName()));
+
+                            return true;
+                        },
+                        false, false)},
         {"debug", Instruction(
                       [](AbstractGenerator* generator) -> bool
                       {
