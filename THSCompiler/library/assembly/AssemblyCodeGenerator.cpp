@@ -66,6 +66,24 @@ static class AssemblyCodeGenerator
         return nullptr;
     }
 
+    IVariableLocation* GetNewBXRegisterVarLocation(unsigned int size, AssemblyCode* assemblyCode)
+    {
+        switch (size)
+        {
+            case 1:
+                return new AXRegisterVarLocation("bl");
+            case 2:
+                return new AXRegisterVarLocation("bx");
+            case 4:
+                return new AXRegisterVarLocation("ebx");
+            case 8:
+                return new AXRegisterVarLocation("rbx");
+        }
+
+        Logger.Log("Invalid size for registry variable location " + std::to_string(size), Logger::ERROR);
+        return nullptr;
+    }
+
     IVariableLocation* GetNewLocalVarLocation(unsigned int size, AssemblyCode* assemblyCode)
     {
         DecrementRSP(size, assemblyCode);

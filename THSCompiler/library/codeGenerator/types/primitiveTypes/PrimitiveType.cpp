@@ -32,7 +32,13 @@ class PrimitiveType : public Type
     virtual void GenerateDiv(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
                              AssemblyCode* assemblyCode) override
     {
-        GenerateBinaryOperationOnAXregister(destination, source, "div", assemblyCode);
+        AssemblyInstructionLine* resetRDX = new AssemblyInstructionLine("xor");
+        resetRDX->AddArgument("rdx");
+        resetRDX->AddArgument("rdx");
+        assemblyCode->AddLine(resetRDX);
+        // As div uses rdx:rax as dividend, we need to reset rdx to 0
+        // Make sure B register is used in case of source needing a register
+        GenerateBinaryOperationOnAXregister(destination, source, "div", assemblyCode, true);
     }
 
     virtual void GenerateMod(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
@@ -170,15 +176,15 @@ class PrimitiveType : public Type
 
     /// @brief Generates a binary operation that is applied to the AX register; like mul or div
     void GenerateBinaryOperationOnAXregister(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
-                                             std::string operation, AssemblyCode* assemblyCode)
+                                             std::string operation, AssemblyCode* assemblyCode, bool useBX = false)
     {
+        if (source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode, useBX);
+        }
+
         if (destination->IsAXregister())
         {
-            if (source->RequiresRegister())
-            {
-                source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
-            }
-
             GenerateUsualUnaryOperation(source, operation, assemblyCode);
             return;
         }
