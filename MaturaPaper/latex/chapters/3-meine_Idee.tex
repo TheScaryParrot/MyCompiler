@@ -1,36 +1,48 @@
 \chapter{Meine Idee}
 Ein Compiler ein äusserts komplexes Programm, mit vielen verschiedenen Schritten. Jedoch ist die zugrundeliegende Aufgabe gar nicht so kompliziert.
 Man braucht ja nur, ein Dokument mit Text der bestimmten Regeln folgt, in Text mit anderen Regeln verwandeln. Natürlich ist dies etwas salopp ausgedrückt, trotzdem fragte ich mich,
-ob es nicht möglich sei einen viel einfacheren Compiler zu schreiben. Als Grundidee 
+ob es nicht möglich sei einen viel einfacheren Compiler zu schreiben. Während meinen \textbf{Nachforschungen} zum Thema Compiler, stiess ich auf den Begriff \textit{Macro Expansion}.
+Dabei handelt es sich um eine Methode zur Code Generation, bei der eine Struktur des AST (z.B. ein If-Statement) mit einem \textit{Macro} ersetzt wird. Bei diesem Macro kann es sich um so ziemlich alles,
+meist jedoch ein Stuck Assembly oder Object Code, handeln. Somit wird nach und nach der gesamte AST ersetzt, bis nur noch Macros übrig sind. Inspiriert von dieser Methode der Code Generation,
+überlegte ich mir ein Compiler, der möglichst stark dieses Konzept der Macros verwendet. Ein Compiler, der sowohl Lexical als auch Syntax Analysis überspringen kann.
+Ein Compiler, der es ermöglicht in einem Programm weitere Macros, und somit eine Art eigene Programmiersprache, selbst zu definieren.
 
 \section{Vergleich der Compiler}
-Der THS Compiler folgt dem theoretischen Aufbau eines Compilers und besteht aus Lexer, Parser und Code Generator. Als Parser wird ein Predictive Descent Parser verwendet.
-Der Code Generator arbeitet auf dem Abstract Syntax Tree mithilfe eines Visitor Patterns. Die Semantic Analysis wird während der Code Generation durchgeführt. Geschrieben ist der Compiler in C++ und liefert x86 Assembly nach NASM Syntax.
+Um die Leistung meiner Idee zu testen, werden folgende der Compiler verglichen.
 
-Genauso wie der THScompiler ist auch der QHScompiler in C++ geschrieben und generiert x86 Assembly nach NASM Syntax.
+Der \textit{QHS Compiler} ist ein von mir nach meiner Idee entwickelter Compiler.
+Der QHS Compiler ist in C++ geschrieben und generiert x86 Assembly nach NASM Syntax aus meiner Sprache QHS.
 
-\subsection{Anforderungen an die Compiler}
-Um einen \textbf{fairen} Vergleich zu ermöglichen, müssen die Compiler folgende Anforderungen erfüllen.
+Der GCC Compiler ist der gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt [...]
 
-\begin{table}[h]
-    \begin{tabular}{l|l}
-    Output als Assembly Code     & Die Output-Sprache muss Assembly Code sein                               \\
-    C-like Syntax                & Die Input-Sprache muss einen C-ähnlichen Syntax aufweisen                \\
-    Variablen und Funktionen     & Lokale und globale Variablen sowie Funktionen müssen unterstützt werden  \\
-    Benutzerdefinierte Datatypes & Benutzerdefinierte Datatypes müssen unterstützt werden                                 
-    \end{tabular}
-\end{table}
+Der \textit{THS Compiler} repräsentiert in diesem Vergleich einen traditionellen von mir geschrieben Compiler. Im Gegensatz zu GCC ist der THS Compiler deutlich simpler und kleiner.
+Er dient daher als realistische Konkurrenz zum QHS Compiler und wird verwendet, um zu testen, wie viel meine Idee taugt. Er folgt dem theoretischen Aufbau eines Compilers und besteht aus Lexer, Parser und Code Generator.
+Als Parser wird ein Predictive Descent Parser verwendet. Optimization wird spezifisch keine durchgeführt. Der Code Generator arbeitet auf dem Abstract Syntax Tree mithilfe eines Visitor Patterns.
+Die Semantic Analysis wird während der Code Generation durchgeführt. Geschrieben ist der Compiler in C++ und liefert x86 Assembly nach NASM Syntax.
 
-Die Anforderungen machen dass Compiler gleich komplex.
+
 
 \subsection{Kriterien des Vergleichs}
 Die Compiler werden nach folgenden Kriterien bewertet und verglichen.
 
 \begin{table}[h!]
     \begin{tabular}{l|l}
-    Geschwindikeit des Output-Codes     & Wie schnell wird der Output-Code ausgeführt?                      \\
-    Geschwindikeit der Compilation      & Wie lange dauert die Compilation von Code?                        \\
+    Geschwindigkeit des Output-Codes    & Wie schnell wird der Output-Code ausgeführt?                      \\
+    Geschwindigkeit der Compilation     & Wie lange dauert die Compilation von Code?                        \\
     Benutzerfreundlichkeit              & Wie einfach ist die Verwendung des Compilers?                     \\
     Möglichkeit für Erweiterung         & Wie einfach ist die Input-Sprache zu erweitern?                                 
     \end{tabular}
 \end{table}
+
+\subsection{Anforderungen an die Compiler}
+Um einen \textbf{fairen} Vergleich zu ermöglichen, müssen die Compiler folgende Anforderungen erfüllen.
+
+\begin{table}[h]
+    \begin{tabular}{l|l}
+    Output als Assembly Code        & Die Output-Sprache muss Assembly Code sein                               \\
+    C-like Syntax                   & Die Input-Sprache muss einen C-ähnlichen Syntax aufweisen                \\
+    Variablen und Funktionen        & Lokale und globale Variablen sowie Funktionen müssen unterstützt werden  \\
+    Branching und Loops             & If-Statements sowie While-Loops müssen umsetzbar sein                            
+    \end{tabular}
+\end{table}
+
