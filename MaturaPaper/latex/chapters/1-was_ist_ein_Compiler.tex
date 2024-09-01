@@ -43,15 +43,15 @@ int foo()
 Würde hierbei zu einem Array von Token Objekten umgewandelt werden:
 
 \begin{lstlisting}[label=eg:postLex, caption=Tokens nach Lexical Analysis]
-KeywordToken (keyword="int")
-IdentifierToken (id="foo")
-LParenthesisToken
-RParenthesisToken
-KeywordToken (keyword="if")
-LParenthesisToken
-IdentifierToken (id="bar")
-OperatorToken (operator=ComparisonEqual)
-LiteralIntToken (value=0)
+Keyword         (keyword="int")
+Identifier      (id="foo")
+LParenthesis
+RParenthesis
+Keyword         (keyword="if")
+LParenthesis
+Identifier      (id="bar")
+Operator        (operator=ComparisonEqual)
+LiteralInt      (value=0)
 [...]
 \end{lstlisting}
 
