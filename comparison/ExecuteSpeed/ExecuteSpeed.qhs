@@ -1,0 +1,88 @@
+#enterOrderQueue "../qhsLib/lib.qhs" #exitOrderQueue #include 
+
+/* This is deliberately written in a way that uses as many different features as possible */
+
+int mod ( int a , int b )
+{
+    int localA = a ;
+    int localB = b ;
+
+    /* implement while loop */
+    while ( localA >= localB )
+    {
+        localA -= localB ;
+    }
+
+    /* implement return */
+    return localA ;
+}
+
+bool isPrime ( int n )
+{
+    bool result ;
+
+    /* implement if else */
+    /* implement comparison */
+    if (n <= 1)
+    {
+        result = false ;
+        return result ;
+    }
+    else
+    {
+        /* implement for loop */
+        for ( int i = 2 ; i * i <= n ; i++ )
+        {
+            if ( mod( n , i ) == 0 )
+            {
+                result = false ;
+                return result ;
+            }
+        }
+
+        result = true ;
+        return result ;
+    }
+
+    return ;
+}
+
+void printDigit ( int n )
+{
+    n += 48 ;
+    [ n ?! int.size ] print ;
+
+    return ;
+}
+
+void printInt ( int n )
+{
+
+    /* implement function call in expression */
+    int digit = mod ( n , 10 ) ;
+    n -= digit ;
+    n /= 10 ;
+
+    if ( n > 0 )
+    {
+        printInt ( n ) ;
+    }
+
+    printDigit ( digit ) ;
+}
+
+start
+{
+    int checkUntil = 100000 ;
+
+    for ( int i = 0 ; i < checkUntil ; i += 1 )
+    {
+        if ( isPrime ( i ) )
+        {
+            printInt ( i ) ;
+            print ( 10 ) ;
+        }
+    }
+
+    return ;
+}

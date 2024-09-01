@@ -1,0 +1,78 @@
+// This is deliberately written in a way that uses as many different features as possible
+
+int mod(int a, int b)
+{
+    int localA = a;
+    int localB = b;
+
+    while (localA >= localB)
+    {
+        localA -= localB;
+    }
+
+    return localA;
+}
+
+bool isPrime(int n)
+{
+    bool result;
+
+    if (n <= 1)
+    {
+        result = false;
+        return result;
+    }
+    else
+    {
+        for (int i = 2; i * i <= n; i += 1;)
+        {
+            if (mod(n, i) == 0)
+            {
+                result = false;
+                return result;
+            }
+        }
+
+        result = true;
+        return result;
+    }
+}
+
+extern void _print(int length, int value);
+
+void printDigit(int n)
+{
+    n += 48;
+    _print(4, n);
+}
+
+void printInt(int n)
+{
+
+    int digit = mod(n, 10);
+    n -= digit;
+    int ten = 10;
+    n /= ten;
+
+    if (n > 0)
+    {
+        printInt(n);
+    }
+
+    printDigit(digit);
+}
+
+global _start;
+int _start()
+{
+    int checkUntil = 100000;
+
+    for (int i = 0; i < checkUntil; i += 1;)
+    {
+        if (isPrime(i))
+        {
+            printInt(i);
+            _print(4, 10);
+        }
+    }
+}

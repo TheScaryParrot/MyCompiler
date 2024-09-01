@@ -1,0 +1,729 @@
+#enterOrderQueue
+[
+#orderEnqueue
+#enterOrderQueue
+#exitOrderQueue
+
+#assign
+
+#enterOrderQueue
+[
+#exitOrderQueue
+#makeOrderQueueProof
+
+
+#enterOrderQueue
+]
+#orderEnqueue
+#exitOrderQueue
+#exitOrderQueue
+
+#assign
+
+#enterOrderQueue
+]
+#exitOrderQueue
+#makeOrderQueueProof
+
+[ -> #assignToOne ] #assign
+[ >> #assign ] #assign
+
+
+[ /* #orderEnqueue #enterComment ] >>
+[ /* ] #makeOrderQueueProof
+[ */ #orderEnqueue #exitComment ] >>
+[ */ ] #makeCommentProof
+[ */ ] #makeOrderQueueProof
+
+[ ; "
+" #clearOrderQueue ]  >>
+
+[ \n "
+" ] >>
+
+
+[ ! ] [ #orderEnqueue #force ] >>
+[ ! ] #makeOrderQueueProof
+
+[ ?! ] [ #orderEnqueue #lightForce ] >>
+[ ?! ] #makeOrderQueueProof
+
+[ lateArg>> ] [
+    /* result in #orderEnqueue ! in order queue */
+    [ #orderEnqueue #orderEnqueue #orderEnqueue ! #deepFetch ] >> 
+] >>
+[ lateArg>> ] #makeOrderQueueProof
+
+/* ------------------ data handling ------------------ */
+/* types */
+[ int.size ] [ "4" ] >>
+[ int ] [ [ ! int.size ] definition ] >> 
+
+[ bool.size ] [ "1" ] >>
+[ bool ] [ [ ! bool.size ] definition ] >>
+
+[ void ] [ [ "0" ] definition ] >>
+
+/* assembly stuff */
+[ getSizeSpecifier ]
+[
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ 1 "byte" ] >>
+    [ 2 "word" ] >>
+    [ 4 "dword" ] >>
+    [ 8 "qword" ] >>
+
+    [ #orderEnqueue ! size ] #literalToIdentifier
+
+    #popEnv
+
+] >>
+
+[ getRegisterA ]
+[
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ 1 "al" ] >>
+    [ 2 "ax" ] >>
+    [ 4 "eax" ] >>
+    [ 8 "rax" ] >>
+
+    [ #orderEnqueue ! size ] #literalToIdentifier
+
+    #popEnv    
+
+] >>
+
+[ getRegisterD ]
+[
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ 1 "dl" ] >>
+    [ 2 "dx" ] >>
+    [ 4 "edx" ] >>
+    [ 8 "rdx" ] >>
+
+    [ #orderEnqueue ! size ] #literalToIdentifier
+
+    #popEnv    
+
+] >>
+
+[ getDefineSpecifier ]
+[
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ 1 "db" ] >>
+    [ 2 "dw" ] >>
+    [ 4 "dd" ] >>
+    [ 8 "dq" ] >>
+
+    [ #orderEnqueue ! size ] #literalToIdentifier
+
+    #popEnv
+
+] >>
+
+/* ------------------ definitions ------------------ */
+
+[ globalDefinition ]
+[
+    #orderFrontEnqueue size ->
+    [ name ] lateArg>>
+
+    #pushEnv
+
+    [ = ]
+    [
+        #popEnv
+
+        [ #orderEnqueue ! size ]
+        [ #orderEnqueue ! name ]
+        [ ?! expr ]
+        dataVar
+    ] >>
+
+    [ ; ]
+    [
+        #popEnv
+
+        [ #orderEnqueue ! size ]
+        [ #orderEnqueue ! name ]
+
+        bssVar
+    ] >>
+
+    [ ( ]
+    [
+        #popEnv
+
+        #pushEnv
+
+        [ _functionDefinitionOrderQueue ]
+        [ #orderEnqueue ! size ]
+        [ #orderEnqueue ! name ]
+        >>
+        
+        initParameterDefinition
+
+        [ ) ]
+        [
+            [ #orderEnqueue ! name ]
+            funcBody
+        ] >>
+
+        [ , ] >> /* , = nothing */
+    ] >>
+
+] >>
+
+/* variables  */
+[ varFromDefineCode ]
+[
+    #orderFrontEnqueue defineCode ->
+    
+    [ name ] lateArg>>
+
+    /* assigns what is stored in name to the direct code of what is stored in name */
+    [ #orderEnqueue ! name ]
+    [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] >>
+
+    name ": " defineCode \n 
+] >>
+
+[ roDataVar ]
+[
+    [ size ] lateArg>>
+    [ name ] lateArg>>
+    [ value ] lateArg>>
+
+    [ defineSpecifier ]
+    [ [ #orderEnqueue ! size ] getDefineSpecifier ]  >>
+
+    /* assigns whast is stored in name to the direct code of what is stored in name */
+    [ #orderEnqueue ! name ]
+    [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] >>
+
+    name ": " defineSpecifier " " value \n
+] >>
+
+[ dataVar ]
+[
+    #orderFrontEnqueue ".data" #setAssemblySection
+
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue name ->
+    #orderFrontEnqueue value ->
+
+    [ defineSpecifier ]
+    [ [ #orderEnqueue ! size ] getDefineSpecifier ] >>
+
+    /* assigns whast is stored in name to the direct code of what is stored in name */
+    [ #orderEnqueue ! name ]
+    [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] >>
+
+    name ": " defineSpecifier " " value \n
+] >>
+
+[ bssVar ]
+[
+    #orderFrontEnqueue ".bss" #setAssemblySection
+
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue name ->
+
+    /* assigns what is stored in name to the direct code of what is stored in name */
+    [ #orderEnqueue ! name ]
+    [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] >>
+
+    name ": resb " size \n
+
+] >>
+
+[ localVar ]
+[
+    #orderFrontEnqueue size ->
+    [ name ] lateArg>>
+
+    [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
+
+    [ "rbpOffset" #orderEnqueue ! size ] #changeIntVar
+    [ "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ] >>
+
+    /* ! name = sizeSpecifier [rbp-offset] */
+    [ ?! size ]
+    [ ?! name ]
+    [ ?! sizeSpecifier " [rbp-" ?! currentRBPoffset "]" ] 
+    defineVarIdentifier
+
+    "sub rsp, " size \n
+
+    #pushEnv
+    
+    [ = ]
+    [
+        #popEnv
+        [ #orderEnqueue ! size ]
+        [ ?! #deepFetch ]
+        exprInit
+
+        [ ; ]
+        [
+            #popEnv
+
+            [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+            [ #orderEnqueue ! size ]
+            [ #orderEnqueue ! name ]
+            [ ?! registerA ]
+            
+            assign
+        ] >> 
+    ] >>
+
+    [ ; ]
+    [
+        #popEnv
+        \n
+    ] >> 
+] >>
+
+[ assign ]
+[
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue location ->
+    #orderFrontEnqueue value >>
+
+    [ register ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    "mov " register ", " value \n
+    "mov " location ", " register \n
+] >>
+
+/* return on OrderQueue */
+[ varSize ]
+[
+    #orderFrontEnqueue variabel ->
+
+    [ ?! variabel ?! #orderToLiteralCode ".size" ?! #literalCombine ?! #literalToIdentifier ] [ ?! #executeOrderTop ]
+] >>
+
+/* expects Queue top as size, rest the identifier Assign for the identifier */
+[ defineVarIdentifier ]
+[
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue identifier ->
+    #orderFrontEnqueue value >>
+    
+    [ ?! identifier ?! value ] >>
+
+    /* IDENTIFIER.size = size */
+    [ ?! identifier ?! #orderToLiteralCode ".size" ?! #literalCombine ?! #literalToIdentifier ] [ ?! size ] >>
+] >>
+
+/* defintion current is globalDefinition */
+[ definition globalDefinition ] >>
+
+/* functions */
+[ resetRBPoffset ] [ [ "rbpOffset" "0" ] #setIntVar ] >>
+
+[ start ]
+[
+    #pushEnv
+    [ definition localVar ] >>
+    [ { ] >> /* { to none */
+    [ } #popEnv ] >> /* } to end of function body */
+
+    [ ".text" ] #setAssemblySection 
+    resetRBPoffset \n
+    "global _start" \n
+    "_start:" \n
+    "mov rbp, rsp" \n
+] >>
+
+[ defineFuncIdentifier ]
+[
+    /* TODO use size for return */
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue name ->
+    #orderFrontEnqueue parameterSizes >>
+
+    [ "paramSize" ?! #getIntVar ] #orderFrontEnqueue paramSize >>
+
+    #clearOrderQueue /* it should be empty but you never know */
+
+    /* funcLabel = name as literalCode */
+    [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] #orderFrontEnqueue funcLabel >> 
+
+    /* name() = call name generated from funcCall identifier */
+    [ #orderEnqueue ! name ]
+    [
+        [ #orderEnqueue ! funcLabel #orderEnqueue ! paramSize #orderEnqueue ! parameterSizes ] 
+        funcCall
+    ] >>
+] >> 
+
+[ funcBody ]
+[
+    #orderFrontEnqueue name -> 
+    [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] #orderFrontEnqueue funcLabel >> 
+
+    [ definition localVar ] >>
+    [ { ] >> /* { = none */
+    [ } funcBodyEnd ] >> /* } = end of function body */
+
+    [ ".text" ] #setAssemblySection
+    resetRBPoffset
+
+    funcLabel ":" \n
+    "mov rbp, rsp" \n
+] >>
+
+[ funcBodyEnd ]
+[
+    [ ?! _functionDefinitionOrderQueue ]
+
+    #popEnv
+
+    defineFuncIdentifier
+] >>
+
+[ initParameterDefinition ]
+[
+    /* definitions now are parameterDefinition */
+    [ definition parameterDefinition ] >>
+
+    /* rbpOffset = 16 */
+    [ "rbpOffset" "16 "] #setIntVar
+
+    /* paramSize = 0 */
+    [ "paramSize" "0" ] #setIntVar
+] >>
+
+[ parameterDefinition ]
+[
+    #orderFrontEnqueue size ->
+    [ name ] lateArg>>
+
+    [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
+
+    /* first get RBPoffset then rbpOffset += size */
+    [ "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ] >>
+    [ "rbpOffset" #orderEnqueue ! size ] #changeIntVar 
+
+    /* paramSize += size */
+    [ "paramSize" #orderEnqueue ! size ] #changeIntVar 
+
+    /* parameter is at rbp+offset */
+    [ newRBPvar ] [ "rbp+" #orderEnqueue ! currentRBPoffset ] >>
+    [ address ] [ "[" #orderEnqueue ! newRBPvar "]" ] >>
+
+    "sub rsp, " size \n
+
+    [ #orderEnqueue ! name ]
+    [ #orderEnqueue ! sizeSpecifier " " #orderEnqueue ! address ] >>
+
+    [ _functionDefinitionOrderQueue #orderEnqueue ! _functionDefinitionOrderQueue #orderEnqueue ! size ] >>
+] >>
+
+/* call with with arguments */
+[ funcCall ]
+[
+    #pushEnv
+
+    #orderFrontEnqueue funcLabel ->
+    /* combined size of all arguments */
+    #orderFrontEnqueue argSize ->
+
+    #orderFrontEnqueue argSizes >>
+
+    [ () ]
+    [
+        #popEnv
+        [ #orderEnqueue ! funcLabel ] literalCall
+    ] >>
+
+    [ ) ]
+    [
+        #popEnv
+        [ #orderEnqueue ! funcLabel #orderEnqueue ! argSize ] literalCall
+    ] >>
+
+    [ ( ]
+    [
+        [ ?! argSize ]
+        initArguments
+
+        /* size = first order stored in argSizes */
+        [ size ] [ ?! argSizes ] ->
+        #orderFrontEnqueue argSizes >>
+
+        /* argument need to be last instruction as otherwise the expr call in argument would get something from this */
+        [ ?! size ] argument
+    ] >>
+
+    [ , ]
+    [
+        [ size ] [ ?! argSizes ] ->
+        #orderFrontEnqueue argSizes >>
+
+        /* argument need to be last instruction as otherwise the expr call in argument would get something from this */
+        [ ?! size ] argument
+    ] >>
+] >>
+
+/* just the call assembly code */
+[ literalCall ]
+[
+    #orderFrontEnqueue funcLabel -> 
+    #orderFrontEnqueue argSize ->
+
+    "push rbp" \n
+    "call " funcLabel \n
+    "pop rbp" \n
+    "add rsp, " argSize \n
+] >>
+
+[ initArguments ]
+[
+    #orderFrontEnqueue argSize ->
+
+    [ "rbpOffset" currentRBPoffset #orderEnqueue ! #getIntVar ] >>
+    [ "argOffset" #orderEnqueue ! currentRBPoffset ] #setIntVar
+    [ "argOffset" #orderEnqueue ! argSize ] #changeIntVar
+
+    "sub rsp, " argSize \n
+] >>
+
+[ argument ]
+[
+    #orderFrontEnqueue size ->
+    [ value ?! expr ] >> 
+
+    [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
+
+    /* currentArgoffset = argOffset var */
+    [ "argOffset" currentArgOffset ?! #getIntVar ] >>
+    /* argument is at rbp-offset */
+    [ newLocation ] [ ?! sizeSpecifier " [rbp-" ?! currentArgOffset "]" ] >>
+
+    /* change arg offset, which was set in initArguments */
+    /* changes argOffset by -size */
+    [ "-" ?! size ?! #literalCombine ] 
+    #orderFrontEnqueue "argOffset" #changeIntVar
+
+    [ ?! size ] [ newLocation ] [ ?! value ] assign
+] >>
+
+[ return ]
+[
+    "mov rsp, rbp" \n
+    "ret" \n
+] >>
+
+/* expressions */
+
+[ exprInit ]
+[
+    #pushEnv
+    #orderFrontEnqueue size ->
+    #orderFrontEnqueue first >>
+
+    [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+
+    "mov " registerA ", " first \n
+
+    [ + ]
+    [
+        "add " registerA ", " #deepFetch \n
+    ] >>
+
+    [ - ]
+    [
+        "sub " registerA ", " #deepFetch \n
+    ] >>
+
+    [ * ]
+    [
+        "mov " registerD ", " #deepFetch \n
+        "mul " registerD \n
+    ] >>
+
+    [ / ]
+    [
+        "mov " registerD ", " #deepFetch \n
+        "div " registerD \n
+    ] >>
+] >>
+
+[ expr ]
+[
+    /* TODO: Implement operators */
+    /* current just a deepFetch */
+    #orderEnqueue ! #deepFetch
+] >>
+
+[ = ]
+[
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+        [ ?! size ]
+        [ ?! var ]
+        [ ?! registerA ] 
+        assign
+    ] >>
+] >>
+
+[ += ]
+[
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+        "add " var ", " registerA \n
+    ] >>
+] >>
+
+[ -= ]
+[
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+        "sub " var ", " registerA \n
+    ] >>
+] >>
+
+[ *= ]
+[
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+        [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+
+        "mov " registerD ", " registerA \n
+        "mov " registerA ", " var \n
+        "mul " registerD \n
+        "mov " var ", " registerA \n
+    ] >>
+] >>
+
+[ /= ]
+[
+    /* TODO Division gives floating point error, probably same in THScompiler */
+    #orderFrontEnqueue var ->
+    /* size = var.size */
+    [ ?! var ] varSize #orderFrontEnqueue size >>
+
+    [ ?! size ]
+    [ ?! #deepFetch ]
+    exprInit
+
+    [ ; ]
+    [
+        #popEnv
+        [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+        [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+
+        "mov " registerD ", " registerA \n
+        "mov " registerA ", " var \n
+        "div " registerD \n
+        "mov " var ", " registerA \n
+    ] >>
+] >>
+
+/* ------------------ syscalls ------------------ */
+[ exit ]
+[
+    "mov rax, 60" \n
+    "mov rdi, 0" \n
+    "syscall" \n
+] >>
+
+[ rawPrint ]
+[
+    #orderFrontEnqueue message ->
+    #orderFrontEnqueue messageLength -> 
+
+    "mov rax, 1" \n
+    "mov rdi, 1" \n
+    "mov rsi, " message \n
+    "mov rdx, " messageLength \n
+    "syscall" \n
+] >>
+
+[ print ]
+[
+    #orderFrontEnqueue message ->
+    #orderFrontEnqueue length -> 
+
+    [ register ]
+    [ [ #orderEnqueue ! length ] getRegisterA ] >>
+
+    "sub rsp, " length \n
+    "mov " register ", " message \n
+    "mov [rsp], " register \n
+
+    [ "rsp" length ] rawPrint \n
+
+    "add rsp, " length \n
+] >>
+
+[ println ]
+[
+    print \n
+
+    [ "0xa" "1" ] print \n
+
+] >>
