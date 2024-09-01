@@ -1,4 +1,10 @@
-\chapter{QHS Compiler}
+\chapter{QHS Compiler} \label{cha:4-QHS_Compiler}
+Die QHS Sprache besteht natürlich aus Wörtern. Im Kontext von QHS werden diese Wörter im folgenden als Orders benannt. Diese Orders weisen 3 verschiedenen Typen auf. Identifiers, Instructions und LiteralCode.
+Bei Identifiers handelt es sich um die in Kapitel \ref{cha:3-Meine_Idee} bereits erwähnten Macros. Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der exakt so wie er steht,
+in den Output-File geschrieben wird. Wie diese 3 Orders genau funktionieren wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
+
+IDENTIFIERS WILL BE DEFINED IN THE CODE, BUT COULD EASILY BE COMPILED WITH THE QHS COMPILER
+
 Der Compilation von QHS steht ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
 
 \begin{figure}[h!]
@@ -8,10 +14,9 @@ Der Compilation von QHS steht ein einfacher Zyklus zugrunde, dessen Vorbild der 
     \label{fig:qhs-cycle}
 \end{figure}
 
-TALK ABOUT ORDERS AND THE MEANING OF IDENTIFIERS, INSTRUCTIONS AND LITERAL CODE
-
 \section{Fetch} \label{sec:qhs-fetch}
 Der QHS-Zyklus beginnt mit dem ersten Fetch. Dabei wird die erste Order aus dem Inputfile extrahiert. Eine Order weist einen der drei Typen Identifier, Instruction oder Literal-Code auf. Diese sind mit folgenden RegEx definiert.
+Whitespaces dienen als Trennung zwischen zwei Orders und werden ignoriert.
 
 \begin{table}[h]
     \centering
@@ -26,8 +31,11 @@ Der QHS-Zyklus beginnt mit dem ersten Fetch. Dabei wird die erste Order aus dem 
     \end{tabular}
 \end{table}
 
-Es ist hierbei möglich bestimmte Orders \textbf{voraus zu stellen}, die anstelle der nächsten Order im Inputfile gefetched werden. Dies geschieht mit Hilfe des Fetch-Stacks auf den eine Liste an Orders gepushed werden kann.
-Dieser Fetch-Stack folgt Last-In First-Out und \textbf{auf ihn} kann während jeder der drei Schritte des Zyklus, meist jedoch während Execute, gepushed werden.
+Auffällig gegenüber einem traditionellen Compiler ist hierbei, dass kaum zwischen Zeichen differenziert wird. Während die Lexical Analysis traditionell zwischen vielen verschiedenen Tokens unterscheidet,
+sind für den QHScompiler alle Zeichen bis auf \# und " gleich.
+
+Es ist hierbei möglich bestimmte Orders voran zu stellen, die anstelle der nächsten Order im Inputfile gefetched werden. Dies geschieht mit Hilfe des Fetch-Stacks auf den eine Liste an Orders gepushed werden kann.
+Auf diesen Fetch-Stack kann während jeder der drei Schritte des Zyklus, meist jedoch während Execute, gepushed werden. Wie der Name Stack schon sagt, funktioniert der Fetch-Stack mit Last-In First-Out.
 Die Hauptanwendung des Fetch-Stacks wird im Abschnitt \ref{sec:qhs-execute} ausgeführt.
 
 \begin{figure}[h!]
@@ -73,16 +81,15 @@ Literal-Code ist der Weg wie der QHS-Compiler Assembly Code generiert. Dieser is
 \subsection{Instructions}
 Instructions sind die komplexeste Order für den Execute Schritt. Für jede Instruction ist im QHS-Compiler eine Funktion definiert, die ausgeführt wird, wenn diese Instruction in den Execute Schritt gelangt.
 Diese Funktionen können Variabeln im QHS-Compiler speichern, den Order-Queue aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
-Für manche Instructions ist nach ihrem Namen ein Zeichen als Abkürzung angegeben. Diese Abkürzungen sind in QHS als Identifier definiert, die für diese Instruction stehen. Diese Abkürzungen werden in weitern QHS Beispielen verwendet.
 
 \begin{table}[H]
     \centering
     \begin{tabularx}{\textwidth}{l|X}
-    \textbf{\#enterOrderQueue} [    & Aktiviert die Order-Queue. \\ \hline
-    \textbf{\#exitOrderQueue} ]     & Deaktiviert die Order-Queue. \\ \hline
-    \textbf{\#assign} >>            & Das erste Element der Order-Queue muss ein Identifier sein. Der Rest der Orders auf Order-Queue wird als Definition für diesen Identifier festgelegt. \\ \hline
-    \textbf{\#assignToOne} ->       & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der Order-Queue genommen und als Definition für den Identifier verwendet. \\ \hline
-    \textbf{\#force} !              & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Decode und somit die Order-Queue. \\ \hline
+    \textbf{\#enterOrderQueue}      & Aktiviert die Order-Queue. \\ \hline
+    \textbf{\#exitOrderQueue}       & Deaktiviert die Order-Queue. \\ \hline
+    \textbf{\#assign}               & Das erste Element der Order-Queue muss ein Identifier sein. Der Rest der Orders auf Order-Queue wird als Definition für diesen Identifier festgelegt. \\ \hline
+    \textbf{\#assignToOne}          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der Order-Queue genommen und als Definition für den Identifier verwendet. \\ \hline
+    \textbf{\#force}                & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Decode und somit die Order-Queue. \\ \hline
     \textbf{\#orderEnqueue}         & Die nächste Order wird sofort der Order-Queue hinzugefügt, auch wenn diese Order Order-Queue-Proof wäre. Execute wird übersprungen. \\ \hline
     \textbf{\#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der Order-Queue gesetzt. \\ \hline
     \textbf{\#deepFetch}            & Wird mit der ersten Order der zweitobersten Liste an Order auf dem Fetch-Stack. Ermöglicht den Zugriff auf den Inputfile innerhalb einer Identifier-Definition. \\ \hline
@@ -92,17 +99,33 @@ Für manche Instructions ist nach ihrem Namen ein Zeichen als Abkürzung angegeb
     \end{tabularx}
 \end{table}
 
-Der QHScompiler umfässt \textbf{28} Instructions, wobei \textbf{5} dieser nur für Debugging des Compilers dienen.
+ADD put in front and addIdentifier and lightForce
+
+Der QHScompiler umfässt \textbf{33} Instructions, wobei \textbf{5} dieser nur für Debugging des Compilers dienen.
 
 \section{Bringing it all together}
 Und das war's. Dies ist der gesamte QHScompiler. Im Vergleich zu einem traditionellen Compiler wirkt der QHScompiler fast schon \textbf{armselig}. Und dies hat einen einfachen Grund. Der QHScompiler ist zwar \textbf{vollendet},
 die dazugehörige Sprache QHS jedoch noch lange nicht. Es ist zwar grundsätzlich durch LiteralCode möglich jedes Programm QHS zu schreiben, jedoch handelt es sich dann dabei einfach nur um Assembly Code.
 Doch der Aufbau des QHScompilers ermöglicht es mithilfe von Identifiern eine komplexere Programmiersprache zu definieren.
 
-COMMENTS PSEUDO CODE IN EXAMPLES
-
 \subsection{Shortcuts}
-Shortcuts like ; and stuff
+Um die Leserlichkeit von QHS zu verbessern, werden ein paar Identifiers anstelle der umständlichen Instruction Namen definiert.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l|l}
+    \textbf{{[}}                 & \#enterOrderStack              \\ \hline
+    \textbf{{]}}                 & \#exitOrderStack               \\ \hline
+    \textgreater{}\textgreater{} & \#assign                       \\ \hline
+    \textbf{-\textgreater{}}     & \#assignToOne                  \\ \hline
+    \textbf{!}                   & \#force                        \\ \hline
+    \textbf{?!}                  & \#lightForce                   \\ \hline
+    \textbf{\textbackslash{}n}   & Eine neue Zeile im Output-File
+    \end{tabular}
+\end{table}
+
+Weiter wird in den Kommentaren innerhalb der Beispiele Pseudo-Code verwendet, um den QHS Code besser zu erklären. Kommentare können über mehrere Zeilen reichen und beginnen immer mit /* und enden mit */.
+Der Kommentar /* X = "hello" \#pushEnv */ würde bedeuten, dass der Identifier X zu den Orders "hello" (LiteralCode) und \#pushEnv (Instruction) definiert wurde. 
 
 \subsection{Identifier Parameters and Return}
 Parameter and Return through OrderQueue or PutInFront
@@ -112,29 +135,93 @@ lateArg>> ?
 Die Umsetzung von Variablen in QHS ist simpel. Zuerst soll die Grösse der Variabel vom Stack abgezogen werden. Dann wird ein für den Identifier ein Variabelnamen definiert, der zu der Position der Variabel auf dem Stack zeigt.
 Mit nur LiteralCode in QHS lässt sich dies wie folgt ausdrücken:
 
-\begin{lstlisting}[language=QHS, label=eg:qhs-var-literal, caption=THING, frame=single]
-    "sub 4" ;
-    [ a "[rbp-4]" ] >> /* a = [rbp-4] */
+\begin{lstlisting}[language=QHS, caption=Beispiel einer Variabel in QHS]
+"sub rsp, 4" \n
+[ a "[rbp-4]" ] >> /* a = "[rbp-4]" */
 
-    "add " a ", 5" ;
-\end{lstlisting}
+"add " a ", 5"
 
-Dieser QHS Code wird zu folgendem compiled:
-
-\begin{lstlisting}[label=eg:qhs-var-literal-compiled, caption=THING]
-    sub 4
-    add [rbp-4], 5
+%\noindent\hrulefill Output\noindent\hrulefill%
+sub rsp, 4
+add [rbp-4], 5
 \end{lstlisting}
 
 Jedoch ist dies noch nicht besonders angenehm. Weiter lässt sich zum Beispiel ein Var Identifier definieren, der die Grösse der Variabel als Argument annimmt OrderQueue. Um die in vielen Programmiersprachen geläufige Syntax
-einer Variabel Definition beizubehalten, wird der Variabel Name als lateArg>> \textbf{angegeben}.
-RBP-OFFSET
+einer Variabel Definition beizubehalten, wird der Variabel Name mithilfe der \#deepFetch Instruction beschafft.
 
-EXAMPLE
+\begin{lstlisting}[language=QHS, caption=Definition einer Variable mit var Identifier]
+[ var ]
+[
+    #putInFront size ->             /* size = argument1 */
+    [ name ?! #deepFetch ] >>       /* name = Was nach dem var Identifier folgt */
+
+    "sub rsp, " size \n
+
+    [ ?! name "[rbp-4]" ] >>        /* var = "[rbp-4]" */
+] >> 
+
+[ "4" ] var a 
+
+"add " a ", 5"
+    
+%\noindent\hrulefill Output\noindent\hrulefill%
+sub 4
+add [rbp-4], 5
+\end{lstlisting}
+
+Ganz so richtig funktioniert dies aber noch nicht. Momentan erhält jede Variable die Addresse rbp-4 und somit überschreiben sich die Variablen gegenseitig. Der momentane rbp-Offset muss also gespeichert und erhöht werden.
+Hierzu wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 definiert. Mithilfe der \#addToIdentifier Instruction, lässt sich daraufhin rbpOffset erhöhen. Dies kann wiefolgt aussehen.
+
+\begin{lstlisting}[language=QHS, caption=Definition einer Variable mit rbpOffset]
+[ rbpOffset "0" ] >>    /* rbpOffset = "0" */
+
+[ var ]
+[
+    #putInFront size ->             /* size = argument1 */
+    [ name ?! #deepFetch ] >>       /* name = Was nach dem var Identifier folgt */
+
+    "sub rsp, " size \n
+
+    [ rbpOffset ?! size ] #addToIdentifier  /* rbpOffset += size */
+
+    [ ?! name "[rbp-" ?! rbpOffset "]" ] >> /* var = "[rbp-OFFSET]" */
+] >> 
+
+[ "4" ] var a 
+[ "8" ] var b 
+
+"add " a ", 5"
+"sub " b ", 10"
+    
+%\noindent\hrulefill Output\noindent\hrulefill%
+sub rsp, 4
+sub rsp, 8
+add [rbp-4], 5
+sub [rbp-12], 10
+\end{lstlisting}
 
 Zuletzt lässt sich das umständliche Hinzufügen der Grösse der Variable sowie der Var Identifier unter einem Identifier zusammenfassen. Dies wäre passenderweise die bekannte Bezeichnung für den Variabel Typen.
 
-EXAMPLE
+\begin{lstlisting}[language=QHS, caption=Definition einer Variable mit int Identifier]
+(...)
+
+[ int ] 
+[
+    [ "4" ] var
+] >>
+    
+int a 
+int var b 
+    
+"add " a ", 5"
+"sub " b ", 10"
+        
+%\noindent\hrulefill Output\noindent\hrulefill%
+sub rsp, 4
+sub rsp, 8
+add [rbp-4], 5
+sub [rbp-12], 10
+\end{lstlisting}
 
 So sieht eine Variabel Definition genau so aus, wie es in anderen Programmiersprachen gebräuchlich ist. Der Shortcut ; ist hierbei optional.
 
@@ -143,31 +230,91 @@ Funktionen sind im Vergleich zu Variablen deutlich komplizierter. \textbf{Daher 
 
 Zum Schluss sollte eine Funktionsdefinition wie folgt aussehen:
 
-EXAMPLE
+
+\begin{lstlisting}[language=QHS, label=eg:qhs-function_goal, caption=Ziel für die Definition einer Funktion in QHS]
+int foo ( int param1 , int param2 )
+{
+    (...)
+}
+            
+%\noindent\hrulefill Output\noindent\hrulefill%
+foo:
+(...)
+\end{lstlisting}
 
 Hier lässt sich bereits ein erstes Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der Int Identifier für eine Variabel Definition verwendet. 
-REF-TO-EXAMPLE würde vom QHScompiler also als eine Variabel Definition verstehen. Der Unterschied zwischen Funktions und Variabel Definition besteht hierbei in den Klammern die auf den \textbf{Namen} folgen.
-Der QHScompiler müsste also beim Int Identifier nach vorne schauen, ob sich eine Klammer nach dem \textbf{Namen} befindet, und folglich eine Variabel oder Funktionsdefinition ausführen.
+Das int aus Beispiel \ref{eg:qhs-function_goal} würde vom QHScompiler also als eine Variabel Definition verstanden werden. Der Unterschied zwischen Funktions und Variabel Definition besteht hierbei in den Klammern,
+die auf den \textbf{Namen} folgen. Der QHScompiler müsste also beim Int Identifier nach vorne schauen, ob sich eine Klammer nach dem \textbf{Namen} befindet, und folglich eine Variabel oder Funktionsdefinition ausführen.
 Dies ist jedoch aufgrund des einfachen Designs des QHScompilers nicht möglich. Er kann bloss Orders ausführen, nicht jedoch überprüfen, ob eine Order vorhanden ist. Glücklicherweise lässt sich dieses Problem jedoch lösen,
 ohne eine Änderung am QHScompiler vorzunehmen. Die Lösung basiert darauf beim Int Identifier sowohl eine Variabel als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
 Weiter wird nun eine Klammer als Identifier für eine Funktionsdefinition definiert. Sowie ein Semikolon als Variabeldefinition. Befindet sich nach dem \textbf{Namen} also eine Klammer, wird eine Funktionsdefinition ausgeführt.
-Ist dort aber ein Semikolon wird eine Variabeldefinition durchgeführt. Dieses Konzept wird weiterführend als DelayedExecute beschrieben. Das Ganze könnte dann wie folgt aussehen:
+Ist dort aber ein Semikolon wird eine Variabeldefinition durchgeführt. Dieses Konzept wird weiterführend als DelayedExecute beschrieben. Das ganze könnte dann wie folgt aussehen:
 
-EXAMPLE
+\begin{lstlisting}[language=QHS, caption=Implementation eines DelayedExecute für Definitionen]
+[ function ]
+[
+    #putInFront returnSize ->   /* size = argument1 */
+    #putInFront name ->         /* name = argument2 */
+
+    [ ?! name ] #orderToLiteral ":" \n      /* "foo:" */
+] >>
+
+[ definition ]
+[
+    #putInFront size ->             /* size = argument1 */
+    [ name ?! #deepFetch ] >>       /* name = Was nach dem var Identifier folgt */
+
+    [ ; ]
+    [
+        [ #orderEnqueue ! size #orderEnqueue ! name ] var 
+    ] >>
+    /* ; = [ size name ] var */
+
+    [ ( ]
+    [
+        [ #orderEnqueue ! size #orderEnqueue ! name ] function 
+    ] >>
+    /* ( = [ size name ] function */
+
+] >>
+
+[ int ]
+[
+    [ "4" ] definition
+] >>
+\end{lstlisting}
 
 
 Das zweite Problem sind die Parameter eine Funktionsdefinition. Diese sehen genau gleich aus wie eine Variabeldefinition, sollen jedoch vom QHScompiler anders ausgeführt werden.
 Erstens sollte bei einer Parameterdefiniton nicht der LiteralCode zur Subtraktion vom RSP hinzugefügt werden. Zweitens verwendet eine Parameterdefintion einen anderen RBP-Offset.
 Die Lösung hierzu liegt in einer Umdefinition des Definition Identifiers. Dieser ist momentan für sowohl für Variabel als auch Funktionsdefinitionen verantwortlich.
-Bei der Anfangsklammer der Funktionsdefinition wird der Definition Identifier neu definiert, so dass er eine Parameterdefinition ausführt. Die vorherige Definition geht Dank der \#pushEnv Instruction nicht verloren.
+Bei der Anfangsklammer der Funktionsdefinition wird der Definition Identifier neu definiert, sodass er eine Parameterdefinition ausführt. Die vorherige Definition geht Dank der \#pushEnv Instruction nicht verloren.
 Bei der schliessenden Klammer wird \#popEnv durchgeführt, und der Definition Identifier ist wieder für Variablen und Funktionen zuständig. Diese Lösung wird im folgenden TempAssign genannt.
-Das ganze lässt sich im QHS wie folgt umsetzten:
+Dies lässt sich in QHS wie folgt umsetzten:
 
-EXAMPLE
+\begin{lstlisting}[language=QHS, caption=Implementation eines TempAssigns für Parameter Definitionen]
+[ function ]
+[
+    #pushEnv
 
-Nun fehlt nur noch eine Sache der Funktionsdefiniton, der Funktionsbody. Dieser ist vergleichsweise simpel. Beim Öffnen des Bodies wird das ein Assembly Label des Funktionnamens gesetzt.
-Der gesammte Code innerhalb des Bodies wird nun einfach ganz normal vom QHScompiler ausgeführt und an den Output Assembly File angehenkt. So lässt sich die Funktion durch einen einfachen Assembly Call ausführen.
-\textbf{Wie das Callen von Funktionen aussieht, soll hierbei nicht weiter betrachtet werden.}
+    #putInFront returnSize ->   /* size = argument1 */
+    #putInFront name ->         /* name = argument2 */
+
+    [ ?! name ] #orderToLiteral ":" \n      /* "foo:" */
+
+    [ definition paramDefinition ] /* definition = paramDefinition */
+
+    #popEnv     /* neu Definition von definition wird vergessen */
+] >>
+\end{lstlisting}
+
+Der Identifier paramDefinition ist hierbei gleich wie der Var Identifier aus Abschnitt \ref{sec:qhs-vars}. Jedoch wird anstelle von rbpOffset ein neuer ParamOffset Identifier verwendet.
+
+Nun fehlt nur noch eine Sache der Funktionsdefiniton, der Funktionsbody. Dieser ist vergleichsweise simpel. Die beiden geschwungenen Klammern werden ganz einfach zu einem leeren Identifier definiert und somit einfach ignoriert.
+Der gesammte Code innerhalb des Bodies wird nun einfach ganz normal vom QHScompiler ausgeführt und an den Output Assembly File angehenkt. \textbf{Wie das Callen von Funktionen aussieht, soll hierbei nicht weiter betrachtet werden.}
+
+Mithilfe von DelayedExecute und TempAssign lassen sich also auch syntaktisch komplexen Code problemlos in QHS definieren und ausführen.
+
 
 
 

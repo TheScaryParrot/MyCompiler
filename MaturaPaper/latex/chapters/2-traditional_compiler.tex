@@ -4,7 +4,7 @@ Ein Compiler ist traditionell nach folgendem Schema aufgebaut.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.15]{resources/mountain.png}
+    \includegraphics[scale=0.2]{resources/mountain.png}
     \caption{Schritte, die ein Compiler durchläuft \cite{Compiler:Mountain}}
     \label{fig:mountain}
 \end{figure}
@@ -13,7 +13,7 @@ In dieser Arbeit werde ich mich nur auf die im unteren Schema dargestellten Schr
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.15]{resources/mountain-edited.png}
+    \includegraphics[scale=0.2]{resources/mountain-edited.png}
     \caption{Schritte, die in dieser Arbeit behandelt werden (Basierend auf Figure \ref{fig:mountain})}
     \label{fig:mountain-edited}
 \end{figure}
@@ -71,15 +71,21 @@ Ein AST enthält somit nicht nur Informationen über die Tokens, sondern über d
 [...]
 
 \section{Semantic Analysis}
-Wie auch bei den meisten Menschensprachen gibt es auch für Programmiersprachen eine Semantik und diese muss natürlich vom Compiler verstanden werden. [...]
+Semantik ist die Wissenschaft der Bedeutung von Worten einer Menschensprache. So ähnlich ist es auch bei Programmiersprachen, jedoch geht hierbei viel weniger um Bedeutung und eher um den Datatype.
+In diesem Schritt der Compilation beschäftigt sich der Compiler mit der Validität von Expressions. Unbekannte Variablen oder Funktionen werden in diesem Schritt abgefangen.
+Weiter wird der Datatype einer Node an diese angebunden. Gegebenenfalls kann auch ein Implicit-Cast, also ein impliziter Wechsel des Datatypes hinzugefügt werden.
+So geben zum Beispiel manche Programmiersprache bei der Division zweier Integers eine Float zurück. Wird eine Variable nicht konform ihres Datatypes verwendet, zum Beispiel die Division zweier Strings,
+wird dies ebenfalls während der Semantic Analysis entdeckt und gemeldet.
 
 
 \section{Code Generation}
-Code Generation ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss. Nun da unser Input-Code nicht mehr nur als Textfile, sondern als Intermediate Representation vorliegt, kann endlich Output-Code generiert werden.
-Jedoch lässt sich über diesen Schritt fast am wenigsten sagen, da er je nach Output-Sprache sehr unterschiedlich aussehen kann. 
+Code Generation ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss. Nun da unser Input-Code nicht mehr nur als Textfile, sondern als Intermediate Representation vorliegt,
+kann endlich Output-Code generiert werden. Jedoch lässt sich über diesen Schritt fast am wenigsten sagen, da er je nach Output-Sprache sehr unterschiedlich aussehen kann. 
+[Code generation types]
 
 \section{Optimization}
-Code Generation ist zwar der letzte Schritt beim Compilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. Optimization ist ein Sprache die zwischen jedem der genannten Schritte geschiet.
-Dabei geht es darum den Output-Code so effizient wie möglich zu machen. Effizient kann hierbei jedoch viel Verschiedenes bedeuten. Der Output-Code muss so schnell wie möglich ausgeführt werden können, Memory sparsam verwenden
-und am besten auch noch ein kleiner File sein. Optimization reicht vom Entfernen der Kommentare beim Scannen oder umstellen von mathematischen Operationen bis zu entfernen von ungebrauchten Variablen und Deadstores.
-Es muss von CPU Registern profitiert, mit Heap-Memory umgegangen und von inline Funktionen Gebrauch gemacht werden. Compiler Optimization ist somit ein sehr vielseitiges Problem, dass hierbei nicht weiter thematisiert werden sollte.
+Code Generation ist zwar der letzte Schritt beim Compilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. Optimization ist ein Sache die zwischen jedem der genannten Schritte geschiet
+und dies häufig mehrmals. Dabei geht es darum den Output-Code so effizient wie möglich zu machen. Effizient kann hierbei jedoch viel Verschiedenes bedeuten. Der Output-Code muss so schnell wie möglich ausgeführt werden können,
+Memory sparsam verwenden und am besten auch noch ein kleiner File sein. Optimization reicht vom Entfernen der Kommentare beim Scannen oder umstellen von mathematischen Operationen bis zu entfernen von ungebrauchten Variablen und Deadstores.
+Es muss von CPU Registern profitiert, mit Heap-Memory umgegangen und von inline Funktionen Gebrauch gemacht werden. Compiler Optimization ist somit ein sehr vielseitiges und komplexes Problem,
+dass hierbei nicht weiter thematisiert werden sollte.
