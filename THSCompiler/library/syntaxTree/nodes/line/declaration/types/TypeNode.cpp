@@ -9,6 +9,11 @@ class TypeNode : public AbstractTreeNode
     TypeNode() = default;
     ~TypeNode();
 
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        Logger.Log("TypeNode::Traverse() is not suposed to be called. Use name property directly", Logger::ERROR);
+    }
+
     virtual std::string ToString() override;
 
     std::string name;

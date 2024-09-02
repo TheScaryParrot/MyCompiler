@@ -5,14 +5,10 @@
 class BreakStatementNode : public AbstractKeywordStatementNode
 {
    public:
-    BreakStatementNode();
-    ~BreakStatementNode();
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetBreakLabel()));
+    }
 
-    virtual std::string ToString() override;
+    virtual std::string ToString() override { return "break"; }
 };
-
-BreakStatementNode::BreakStatementNode() : AbstractKeywordStatementNode() {}
-
-BreakStatementNode::~BreakStatementNode() {}
-
-std::string BreakStatementNode::ToString() { return "break"; }

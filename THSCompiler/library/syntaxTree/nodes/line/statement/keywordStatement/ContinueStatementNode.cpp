@@ -5,14 +5,10 @@
 class ContinueStatementNode : public AbstractKeywordStatementNode
 {
    public:
-    ContinueStatementNode();
-    ~ContinueStatementNode();
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetContinueLabel()));
+    }
 
-    virtual std::string ToString() override;
+    virtual std::string ToString() override { return "continue"; }
 };
-
-ContinueStatementNode::ContinueStatementNode() : AbstractKeywordStatementNode() {}
-
-ContinueStatementNode::~ContinueStatementNode() {}
-
-std::string ContinueStatementNode::ToString() { return "continue"; }

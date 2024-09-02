@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "library/OutputFile.cpp"
-#include "library/codeGenerator/SyntaxTreeTraverser.cpp"
 #include "library/parser/parserDefinitions/CompilerInstructionParserDefinitions.cpp"
 #include "library/parser/parserDefinitions/DeclarationParserDefinitions.cpp"
 #include "library/parser/parserDefinitions/ExpressionParserDefinitions.cpp"
@@ -26,8 +25,9 @@ AssemblyCode* CompileFile(std::string filename)
     // std::cout << syntaxTree->ToString() << std::endl;
 
     // Code generation
-    SyntaxTreeTraverser syntaxTreeTraverser = SyntaxTreeTraverser();
-    AssemblyCode* assemblyCode = syntaxTreeTraverser.Traverse(syntaxTree);
+    AssemblyCode* assemblyCode = new AssemblyCode();
+    CodeGenerator codeGenerator = CodeGenerator();
+    syntaxTree->GetCode()->Traverse(&codeGenerator, assemblyCode);
     delete syntaxTree;
 
     return assemblyCode;

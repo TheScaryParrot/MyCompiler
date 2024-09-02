@@ -13,5 +13,10 @@ class ParenthesisExpressionNode : public AbstractValueNode
 
     virtual bool RequiresAXRegister() override { return expression->RequiresAXRegister(); }
 
+    virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        return expression->TraverseExpression(codeGenerator, assemblyCode);
+    }
+
     virtual std::string ToString() override { return "(" + expression->ToString() + ")"; }
 };

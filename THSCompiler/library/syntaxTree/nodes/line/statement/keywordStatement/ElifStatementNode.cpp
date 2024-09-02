@@ -9,6 +9,11 @@ class ElifStatementNode : public AbstractKeywordStatementNode
     ElifStatementNode(AbstractExpressionNode* expression, AbstractStatementNode* statement);
     ~ElifStatementNode();
 
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+    {
+        Logger.Log("ElifStatementNode::Traverse() is not supposed to be used. Use expression and statement properties instead.", Logger::ERROR);
+    }
+
     virtual std::string ToString() override;
 
     AbstractExpressionNode* expression;

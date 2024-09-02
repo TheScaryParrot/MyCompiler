@@ -6,28 +6,23 @@
 class BodyNode : public AbstractStatementNode
 {
    public:
-    BodyNode();
-    BodyNode(BodyCodeNode* BodyCodeNode);
-    ~BodyNode();
+    BodyNode() : AbstractStatementNode() { this->bodyCodeNode = new BodyCodeNode(); }
+    BodyNode(BodyCodeNode* BodyCodeNode) : AbstractStatementNode() { this->bodyCodeNode = bodyCodeNode; }
+    ~BodyNode() { delete bodyCodeNode; }
 
-    void AddCodeLine(AbstractLineNode* codeLine);
+    void AddCodeLine(AbstractLineNode* codeLine) { bodyCodeNode->AddLine(codeLine); }
 
-    BodyCodeNode* GetCodeBlock();
+    BodyCodeNode* GetCodeBlock() { return bodyCodeNode; }
 
-    virtual std::string ToString() override;
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        codeGenerator->PushNewEnvironment();
+        this->GetCodeBlock()->Traverse(codeGenerator, assemblyCode);
+        codeGenerator->PopEnvironment(assemblyCode);
+    }
+
+    virtual std::string ToString() override { return bodyCodeNode->ToString(); }
 
    private:
     BodyCodeNode* bodyCodeNode;
 };
-
-BodyNode::BodyNode() : AbstractStatementNode() { this->bodyCodeNode = new BodyCodeNode(); }
-
-BodyNode::BodyNode(BodyCodeNode* bodyCodeNode) : AbstractStatementNode() { this->bodyCodeNode = bodyCodeNode; }
-
-BodyNode::~BodyNode() { delete bodyCodeNode; }
-
-void BodyNode::AddCodeLine(AbstractLineNode* codeLine) { bodyCodeNode->AddLine(codeLine); }
-
-BodyCodeNode* BodyNode::GetCodeBlock() { return bodyCodeNode; }
-
-std::string BodyNode::ToString() { return bodyCodeNode->ToString(); }

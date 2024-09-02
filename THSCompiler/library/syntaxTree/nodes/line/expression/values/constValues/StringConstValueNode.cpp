@@ -9,6 +9,12 @@ class StringConstValueNode : public AbstractConstValueNode
 
     std::string GetValue() { return value; }
 
+    virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        // TODO: String const value
+        return nullptr;
+    }
+
     virtual std::string ToString() override { return '"' + GetValue() + '"'; }
 
    private:

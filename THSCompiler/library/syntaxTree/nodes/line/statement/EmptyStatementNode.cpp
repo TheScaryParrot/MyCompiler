@@ -5,14 +5,7 @@
 class EmptyStatementNode : public AbstractStatementNode
 {
    public:
-    EmptyStatementNode();
-    ~EmptyStatementNode();
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override { /* Do nothing */ }
 
-    virtual std::string ToString() override;
+    virtual std::string ToString() override { return ";"; }
 };
-
-EmptyStatementNode::EmptyStatementNode() : AbstractStatementNode() {}
-
-EmptyStatementNode::~EmptyStatementNode() {}
-
-std::string EmptyStatementNode::ToString() { return ";"; }

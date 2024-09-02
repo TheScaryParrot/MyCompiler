@@ -19,6 +19,39 @@ class UnaryOperatorExpressionNode : public AbstractExpressionNode
 
     virtual bool RequiresAXRegister() override { return false; }
 
+    virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        std::shared_ptr<Variable> variable = this->value->TraverseExpression(codeGenerator, assemblyCode);
+
+        if (!this->applyToReference)
+        {
+            std::shared_ptr<Variable> newVariable =
+                std::shared_ptr<Variable>(codeGenerator->GetNewLocalVariable(variable->type, false, assemblyCode));
+            codeGenerator->ApplyBinaryOperatorOnVariables(newVariable, variable, EOperators::ASSIGN_OPERATOR, assemblyCode);
+            variable = newVariable;
+        }
+
+        switch (this->preUnaryOperator)
+        {
+            case EPreUnaryOperators::PRE_NOT:
+                variable->type->GenerateNot(variable->location, assemblyCode);
+                break;
+            case EPreUnaryOperators::PRE_NEGATE:
+                variable->type->GenerateNeg(variable->location, assemblyCode);
+                break;
+            case EPreUnaryOperators::PRE_INCREMENT:
+                variable->type->GenerateInc(variable->location, assemblyCode);
+                break;
+            case EPreUnaryOperators::PRE_DECREMENT:
+                variable->type->GenerateDec(variable->location, assemblyCode);
+                break;
+        }
+
+        // TODO: Post unary operators
+
+        return variable;
+    }
+
     virtual std::string ToString() override
     {
         return EPreUnaryOperatorsToString(preUnaryOperator) + value->ToString() + EPostUnaryOperatorsToString(postUnaryOperator);

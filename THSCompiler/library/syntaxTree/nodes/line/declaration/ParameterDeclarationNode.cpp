@@ -21,6 +21,12 @@ class ParameterDeclarationNode : public AbstractDeclarationNode
         return result + type + " " + name;
     }
 
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        Variable* newVariable = codeGenerator->GetNewParameterVariable(codeGenerator->GetType(this->type), this->isFinal, assemblyCode);
+        codeGenerator->AddVariable(this->name, std::shared_ptr<Variable>(newVariable));
+    }
+
     std::string name;
     std::string type;
 

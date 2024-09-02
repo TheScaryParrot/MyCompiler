@@ -16,32 +16,42 @@ class TypeDefCodeNode : AbstractTreeNode
         }
     }
 
-    void AddProperty(PropertyDeclarationNode* line);
-    PropertyDeclarationNode* GetProperty(int index);
-    unsigned int GetLineCount();
+    void AddProperty(PropertyDeclarationNode* line) { lines.push_back(line); }
+    PropertyDeclarationNode* GetProperty(int index) { return lines[index]; }
+    unsigned int GetLineCount() { return lines.size(); }
 
-    std::string ToString();
+    std::shared_ptr<StructType> TraverseTypeDef(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode)
+    {
+        StructType* structType = new StructType();
+
+        for (unsigned int i = 0; i < this->GetLineCount(); i++)
+        {
+            PropertyDeclarationNode* declaration = this->GetProperty(i);
+
+            if (declaration == nullptr) continue;
+
+            declaration->TraversePropertyDeclaration(structType, codeGenerator, assemblyCode);
+        }
+
+        return std::shared_ptr<StructType>(structType);
+    }
+
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override { TraverseTypeDef(codeGenerator, assemblyCode); }
+
+    std::string ToString()
+    {
+        std::string result = "{\n";
+
+        for (auto& line : lines)
+        {
+            result += "\t" + line->ToString() + "\n";
+        }
+
+        result += "}";
+
+        return result;
+    }
 
    private:
     std::vector<PropertyDeclarationNode*> lines;
 };
-
-void TypeDefCodeNode::AddProperty(PropertyDeclarationNode* codeLine) { lines.push_back(codeLine); }
-
-PropertyDeclarationNode* TypeDefCodeNode::GetProperty(int index) { return lines[index]; }
-
-unsigned int TypeDefCodeNode::GetLineCount() { return lines.size(); }
-
-std::string TypeDefCodeNode::ToString()
-{
-    std::string result = "{\n";
-
-    for (auto& line : lines)
-    {
-        result += "\t" + line->ToString() + "\n";
-    }
-
-    result += "}";
-
-    return result;
-}

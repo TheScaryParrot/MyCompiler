@@ -33,6 +33,51 @@ class AssignmentNode : public AbstractExpressionNode
 
     virtual bool RequiresAXRegister() override { return true; }
 
+    virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        std::shared_ptr<Variable> value = this->value->TraverseExpression(codeGenerator, assemblyCode);
+
+        for (Assignment* assignment : this->assignments)
+        {
+            std::shared_ptr<Variable> l_variable = assignment->L_value->TraverseExpression(codeGenerator, assemblyCode);
+
+            if (l_variable->isFinal)
+            {
+                Logger.Log("Cannot assign to final variable " + assignment->L_value->ids[0], Logger::ERROR);
+                continue;
+            }
+
+            EOperators op = EOperators::ASSIGN_OPERATOR;
+
+            switch (assignment->assignOperator)
+            {
+                case EAssignOperators::ASSIGN:
+                    break;
+                case EAssignOperators::ADD_ASSIGN:
+                    op = EOperators::ADD_OPERATOR;
+                    break;
+                case EAssignOperators::SUB_ASSIGN:
+                    op = EOperators::SUB_OPERATOR;
+                    break;
+                case EAssignOperators::MUL_ASSIGN:
+                    op = EOperators::MUL_OPERATOR;
+                    break;
+                case EAssignOperators::DIV_ASSIGN:
+                    op = EOperators::DIV_OPERATOR;
+                    break;
+                case EAssignOperators::MOD_ASSIGN:
+                    op = EOperators::MOD_OPERATOR;
+                    break;
+            }
+
+            codeGenerator->ApplyBinaryOperatorOnVariables(l_variable, value, op, assemblyCode);
+
+            value = l_variable;
+        }
+
+        return value;
+    }
+
     virtual std::string ToString() override
     {
         std::string result = "";

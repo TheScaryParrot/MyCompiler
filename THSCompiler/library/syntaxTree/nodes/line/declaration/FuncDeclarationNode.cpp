@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../assembly/AssemblyLabelLine.cpp"
 #include "../statement/BodyNode.cpp"
 #include "AbstractDeclarationNode.cpp"
 #include "ParameterDeclarationNode.cpp"
@@ -32,6 +33,66 @@ class FuncDeclarationNode : public AbstractDeclarationNode
         delete parameters;
 
         delete body;
+    }
+
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        bool isStartFunction = this->name == "_start";
+
+        std::vector<std::shared_ptr<Type>> parameterTypes;
+
+        for (ParameterDeclarationNode* parameter : *this->parameters)
+        {
+            parameterTypes.push_back(codeGenerator->GetType(parameter->type));
+        }
+
+        std::shared_ptr<Type> returnType = nullptr;
+
+        // if not void
+        if (!this->returnType.IsVoid())
+        {
+            returnType = codeGenerator->GetType(this->returnType.name);
+        }
+
+        Function* newFunction = new Function(this->name, parameterTypes, returnType);
+
+        codeGenerator->AddFunction(this->name, std::shared_ptr<Function>(newFunction));
+
+        // Generate assembly code
+        codeGenerator->PushNewEnvironment();
+
+        for (ParameterDeclarationNode* parameter : *this->parameters)
+        {
+            parameter->Traverse(codeGenerator, assemblyCode);
+        }
+        codeGenerator->ClearParameterCounter();
+
+        assemblyCode->AddLine(new AssemblyLabelLine(this->name));
+
+        if (isStartFunction)
+        {
+            AssemblyCodeGenerator.AddPreStartBody(assemblyCode);
+        }
+        else
+        {
+            AssemblyCodeGenerator.AddPreBody(assemblyCode);
+        }
+
+        this->body->Traverse(codeGenerator, assemblyCode);
+
+        if (isStartFunction)
+        {
+            AssemblyCodeGenerator.AddPostStartBody(assemblyCode);
+        }
+        else
+        {
+            AssemblyCodeGenerator.AddPostBody(assemblyCode);
+        }
+
+        // Add ret always at the end, not perfect but works
+        assemblyCode->AddLine(new AssemblyInstructionLine("ret"));
+
+        codeGenerator->PopEnvironment(assemblyCode);
     }
 
     virtual std::string ToString() override

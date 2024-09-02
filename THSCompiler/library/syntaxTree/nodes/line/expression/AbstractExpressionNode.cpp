@@ -6,12 +6,9 @@
 class AbstractExpressionNode : public AbstractStatementNode
 {
    public:
-    AbstractExpressionNode();
-    virtual ~AbstractExpressionNode();
-
     virtual bool RequiresAXRegister() = 0;
+
+    virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) = 0;
+
+    virtual void Traverse(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override { TraverseExpression(codeGenerator, assemblyCode); }
 };
-
-AbstractExpressionNode::AbstractExpressionNode() : AbstractStatementNode() {}
-
-AbstractExpressionNode::~AbstractExpressionNode() {}
