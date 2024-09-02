@@ -3,8 +3,6 @@ Die QHS Sprache besteht natürlich aus Wörtern. Im Kontext von QHS werden diese
 Bei Identifiers handelt es sich um die in Kapitel \ref{cha:3-Meine_Idee} bereits erwähnten Macros. Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der exakt so wie er steht,
 in den Output-File geschrieben wird. Wie diese 3 Orders genau funktionieren wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
 
-IDENTIFIERS WILL BE DEFINED IN THE CODE, BUT COULD EASILY BE COMPILED WITH THE QHS COMPILER
-
 Der Compilation von QHS steht ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
 
 \begin{figure}[h!]
@@ -48,20 +46,18 @@ Die Hauptanwendung des Fetch-Stacks wird im Abschnitt \ref{sec:qhs-execute} ausg
 Wenn eine Liste an Orders komplett gefetched wurde, wird diese vom Stack gelöscht. Der Inputfile befindet sich auf dem letzten Platz des Fetch-Stacks und wird somit nur verwendet, wenn der Stack ansonsten komplett leer ist.
 Die Compilation wird beendet, sobald keine Order mehr auf dem Fetch-Stack übrig ist.
 
-\section{Decode} \label{sec:qhs-decode}
-Nachdem eine Order gefetched wurde, wird diese an Decode weitergegeben. \textbf{Während Decode werden zwei Aufgaben durchgeführt}.
-
-Während dem Decode Schritt kommt die Order-Queue ins Spiel. Hierbei handelt es sich um eine Liste an Orders, der Form First-In First-Out. Die Anwendung Aufgabe der Order-Queue ist das Speichern und spätere Ausführen von Orders.
-Die Order-Queue kann mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter ausgeführt werden, aktiviert und deaktiviert werden. Wenn nun eine Order in den Decode Schritt gelangt und die Order-Queue aktiviert ist,
-wird diese Order der Order-Queue hinzugefügt. Der Execute Schritt wird danach übersprungen und der Zyklus beginnt von neuem bei Fetch. Die Order wurde ohne ausgeführt zu werden auf der Order-Queue gespeichert.
-Später ist es nun möglich diese Order mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter thematisiert werden, von der Order-Queue zu entfernen und auszuführen.
-Bestimmte Instructions und Identifiers können jedoch Order-Queue-Proof, also immun gegen die Order-Queue, gemacht werden. Diese werden, auch wenn die Order-Queue aktiv ist, normal an Execute weitergegeben.
-Dies ist zum Beispiel besonders bei der Instruction, die die Order-Queue wieder deaktiviert, wichtig. Da diese Instruction sonst nicht ausgeführt und somit die Order-Queue nie mehr deaktiviert wird.
+\section{Validate} \label{sec:qhs-Validate}
+Nachdem eine Order gefetched wurde, wird diese an Validate weitergegeben. Während dem Validate Schritt kommt die OrderQueue ins Spiel. Hierbei handelt es sich um eine Liste an Orders, der Form First-In First-Out.
+Die Anwendung Aufgabe der OrderQueue ist das Speichern und spätere Ausführen von Orders. Die OrderQueue kann mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter ausgeführt werden, aktiviert und deaktiviert werden.
+Wenn nun eine Order in den Validate Schritt gelangt und die OrderQueue aktiviert ist, wird diese Order der OrderQueue hinzugefügt. Der Execute Schritt wird danach übersprungen und der Zyklus beginnt von neuem bei Fetch.
+Die Order wurde ohne ausgeführt zu werden auf der OrderQueue gespeichert. Später ist es nun möglich diese Order mit Hilfe von Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter thematisiert werden, 
+von der OrderQueue zu entfernen und auszuführen. Bestimmte Instructions und Identifiers können jedoch OrderQueue-Proof, also immun gegen die OrderQueue, gemacht werden. Diese werden, auch wenn die OrderQueue aktiv ist, 
+normal an Execute weitergegeben. Dies ist zum Beispiel besonders bei der Instruction, die die OrderQueue wieder deaktiviert, wichtig. Da diese Instruction sonst nicht ausgeführt und somit die OrderQueue nie mehr deaktiviert wird.
 LiteralCode kann nicht Code-Queue-Proof sein.
 
 MAYBE CODESTACK FIGURE
 
-Ist die Order-Queue deaktiviert oder die Order Code-Queue-Proof wird diese an den letzen Schritt Execute weitergegeben.
+Ist die OrderQueue deaktiviert oder die Order OrderQueue-Proof, wird diese an den letzten Schritt Execute weitergegeben.
 
 \section{Execute} \label{sec:qhs-execute}
 Execute ist der letzte Schritt des Zyklus. Und hier wird nun auch endlich der tatsächliche Assembly Code generiert. Je nach Typ der Order, Identifier, Instruction oder Literal-Code, läuft Execute sehr unterschiedlich ab.
@@ -80,18 +76,18 @@ Literal-Code ist der Weg wie der QHS-Compiler Assembly Code generiert. Dieser is
 
 \subsection{Instructions}
 Instructions sind die komplexeste Order für den Execute Schritt. Für jede Instruction ist im QHS-Compiler eine Funktion definiert, die ausgeführt wird, wenn diese Instruction in den Execute Schritt gelangt.
-Diese Funktionen können Variabeln im QHS-Compiler speichern, den Order-Queue aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
+Diese Funktionen können Variabeln im QHS-Compiler speichern, den OrderQueue aktivieren, Identifier definieren und noch viel mehr. Folgend sind ein paar der wichtigsten Instructions aufgelistet.
 
 \begin{table}[H]
     \centering
     \begin{tabularx}{\textwidth}{l|X}
-    \textbf{\#enterOrderQueue}      & Aktiviert die Order-Queue. \\ \hline
-    \textbf{\#exitOrderQueue}       & Deaktiviert die Order-Queue. \\ \hline
-    \textbf{\#assign}               & Das erste Element der Order-Queue muss ein Identifier sein. Der Rest der Orders auf Order-Queue wird als Definition für diesen Identifier festgelegt. \\ \hline
-    \textbf{\#assignToOne}          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der Order-Queue genommen und als Definition für den Identifier verwendet. \\ \hline
-    \textbf{\#force}                & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Decode und somit die Order-Queue. \\ \hline
-    \textbf{\#orderEnqueue}         & Die nächste Order wird sofort der Order-Queue hinzugefügt, auch wenn diese Order Order-Queue-Proof wäre. Execute wird übersprungen. \\ \hline
-    \textbf{\#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der Order-Queue gesetzt. \\ \hline
+    \textbf{\#enterOrderQueue}      & Aktiviert die OrderQueue. \\ \hline
+    \textbf{\#exitOrderQueue}       & Deaktiviert die OrderQueue. \\ \hline
+    \textbf{\#assign}               & Das erste Element der OrderQueue muss ein Identifier sein. Der Rest der Orders auf OrderQueue wird als Definition für diesen Identifier festgelegt. \\ \hline
+    \textbf{\#assignToOne}          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der OrderQueue genommen und als Definition für den Identifier verwendet. \\ \hline
+    \textbf{\#force}                & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Validate und somit die OrderQueue. \\ \hline
+    \textbf{\#orderEnqueue}         & Die nächste Order wird sofort der OrderQueue hinzugefügt, auch wenn diese Order OrderQueue-Proof wäre. Execute wird übersprungen. \\ \hline
+    \textbf{\#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der OrderQueue gesetzt. \\ \hline
     \textbf{\#deepFetch}            & Wird mit der ersten Order der zweitobersten Liste an Order auf dem Fetch-Stack. Ermöglicht den Zugriff auf den Inputfile innerhalb einer Identifier-Definition. \\ \hline
     \textbf{\#pushEnv}              & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
     \textbf{\#popEnv}               & Das neuste Environment der Environment Linked-List wird gelöscht.
