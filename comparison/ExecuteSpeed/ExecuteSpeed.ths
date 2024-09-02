@@ -50,9 +50,7 @@ void printInt(int n)
 {
 
     int digit = mod(n, 10);
-    n -= digit;
-    int ten = 10;
-    n /= ten;
+    n = (n - digit) / 10;
 
     if (n > 0)
     {

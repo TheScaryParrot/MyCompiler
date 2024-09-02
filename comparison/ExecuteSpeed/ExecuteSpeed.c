@@ -44,15 +44,14 @@ bool isPrime(int n)
 void printDigit(char n)
 {
     n += 48;
-    printf(&n);
+    putchar(n);
 }
 
 void printInt(int n)
 {
 
     int digit = mod(n, 10);
-    n -= digit;
-    n /= 10;
+    n = (n - digit) / 10;
 
     if (n > 0)
     {
@@ -71,7 +70,7 @@ void main(int argc, char *argv[])
         if (isPrime(i))
         {
             printInt(i);
-            printf("\n");
+            putchar('\n');
         }
     }
 }
