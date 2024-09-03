@@ -264,6 +264,45 @@ push rbp
 call Print
 pop rbp
 add rsp, 4
+sub rsp, 1
+mov al, 1
+mov byte [rbp-21], al
+mov al, byte [rbp-21]
+test al, al
+jz JL3
+sub rsp, 4
+mov eax, 65
+mov dword [rbp-25], eax
+push rbp
+call PrintLine
+pop rbp
+add rsp, 4
+JL3:
+mov al, byte [rbp-21]
+cmp al, 0
+sete dl
+xor rax, rax
+mov al, dl
+test al, al
+jz JL4
+sub rsp, 4
+mov eax, 66
+mov dword [rbp-25], eax
+push rbp
+call PrintLine
+pop rbp
+add rsp, 4
+JL4:
+test al, al
+jnz JL5
+sub rsp, 4
+mov eax, 67
+mov dword [rbp-25], eax
+push rbp
+call PrintLine
+pop rbp
+add rsp, 4
+JL5:
 mov rax, 60
 mov rdi, 0
 syscall

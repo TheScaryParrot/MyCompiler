@@ -95,6 +95,26 @@ start
 
     Print ( "10" ) ; /* print newline */
 
+    bool ifBool = "1" ;
+
+    [ "1" ]
+    if ( ifBool )
+    {
+        PrintLine ( "65" ) ;
+    }
+
+    [ "1" ]
+    if ( ifBool == "0" )
+    {
+        PrintLine ( "66" ) ;
+    }
+    [ "1" ]
+    else
+    {
+        PrintLine ( "67" ) ;
+    }
+    
+
     exit ;
 }
 

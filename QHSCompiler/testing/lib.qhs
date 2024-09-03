@@ -178,11 +178,11 @@
 
         bssVar
     ] >>
-
+    
     [ ( ]
     [
         #popEnv
-
+        
         #pushEnv
 
         [ _functionDefinitionOrderQueue ]
@@ -798,7 +798,6 @@
         [ #orderEnqueue ! size ]
         [ ?! #deepFetch ]
         exprInit
-        /* expression init for byte size (bool) */
     ] >>
 
     [ ) ]
@@ -818,6 +817,71 @@
         #popEnv
         /* } = end of while loop */
         "jmp " startLabel \n
+        endLabel ":" \n
+    ] >>
+] >>
+
+[ if ]
+[
+    #orderFrontEnqueue size ->
+
+    newJumpLabel #orderFrontEnqueue endLabel >> /* endLabel = new jumplabel */
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    #pushEnv
+
+    [ ( ]
+    [
+        [ #orderEnqueue ! size ]
+        [ ?! #deepFetch ]
+        exprInit
+    ] >>
+
+    [ ) ]
+    [
+        #popEnv
+        "test " registerA ", " registerA \n
+        "jz " endLabel \n
+    ] >>
+
+    [ { ]
+    [
+        /* { = none */
+    ] >>
+
+    [ } ]
+    [
+        #popEnv
+        /* } = end of if statement */
+        endLabel ":" \n
+    ] >>
+] >>
+
+[ else ]
+[
+    #orderFrontEnqueue size ->
+
+    newJumpLabel #orderFrontEnqueue endLabel >> /* endLabel = new jumplabel */
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    #pushEnv
+
+    /* expression result is still stored in registerA */
+    /* jumps on if expression is true; therefore when the if was executed */
+    "test " registerA ", " registerA \n
+    "jnz " endLabel \n
+
+    [ { ]
+    [
+        /* { = none */
+    ] >>
+
+    [ } ]
+    [
+        #popEnv
+        /* } = end of else statement */
         endLabel ":" \n
     ] >>
 ] >>
