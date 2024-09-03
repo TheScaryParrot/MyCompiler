@@ -17,17 +17,17 @@ class Generator : public AbstractGenerator
     {
         unsigned int phaseCounter = 0;
 
-        while (!fetchHandler.IsDone() && phaseCounter < 100000)
+        while (!fetchHandler.IsDone() /* && phaseCounter < 100000 */)
         {
             ExecuteCurrentPhase();
             phaseCounter++;
         }
 
-        if (phaseCounter >= 100000)
+        /*if (phaseCounter >= 100000)
         {
             Logger.Log("Generator reached phase limit of 100000", Logger::ERROR);
             Logger.Log("Final phase was " + std::to_string(GetCurrentPhase()), Logger::ERROR);
-        }
+        }*/
 
         return this->assemblyCode;
     }
