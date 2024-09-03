@@ -121,12 +121,6 @@ syscall
 add rsp, 1
 mov rsp, rbp
 ret
-sub rsp, 4
-sub rsp, 4
-Test:
-mov rbp, rsp
-mov rsp, rbp
-ret
 global _start
 _start:
 mov rbp, rsp

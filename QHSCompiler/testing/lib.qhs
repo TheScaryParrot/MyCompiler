@@ -336,9 +336,9 @@
 [
     #orderFrontEnqueue size ->
     #orderFrontEnqueue identifier ->
-    #orderFrontEnqueue value >>
+    #orderFrontEnqueue location >>
     
-    [ ?! identifier ?! value ] >>
+    [ ?! identifier ?! location ] >>
 
     /* IDENTIFIER.size = size */
     [ ?! identifier ?! #orderToLiteralCode ".size" ?! #literalCombine ?! #literalToIdentifier ] [ ?! size ] >>
@@ -448,8 +448,10 @@
 
     "sub rsp, " size \n
 
-    [ #orderEnqueue ! name ]
-    [ #orderEnqueue ! sizeSpecifier " " #orderEnqueue ! address ] >>
+    [ ?! size ]
+    [ ?! name ]
+    [ ?! sizeSpecifier " [rbp+" ?! currentRBPoffset "]" ]
+    defineVarIdentifier
 
     [ _functionDefinitionOrderQueue #orderEnqueue ! _functionDefinitionOrderQueue #orderEnqueue ! size ] >>
 ] >>
