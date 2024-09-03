@@ -5,8 +5,8 @@ dataInt: dd 69
 section .rodata
 wordToGuess: db 'moin', 0xa
 wordLength: equ $ - wordToGuess
-sub rsp, 4
 section .text
+sub rsp, 4
 PrintLine:
 mov rbp, rsp
 sub rsp, 4
@@ -41,34 +41,6 @@ mov rsi, rsp
 mov rdx, 4
 syscall
 add rsp, 4
-mov rsp, rbp
-ret
-sub rsp, 4
-sub rsp, 1
-sub rsp, 4
-Hello:
-mov rbp, rsp
-sub rsp, 4
-mov eax, dword [rbp+21]
-mov dword [rbp-4], eax
-sub rsp, 4
-mov eax, dword [rbp-4]
-mov [rsp], eax
-mov rax, 1
-mov rdi, 1
-mov rsi, rsp
-mov rdx, 4
-syscall
-add rsp, 4
-sub rsp, 1
-mov al, 0xa
-mov [rsp], al
-mov rax, 1
-mov rdi, 1
-mov rsi, rsp
-mov rdx, 1
-syscall
-add rsp, 1
 mov rsp, rbp
 ret
 sub rsp, 4
@@ -119,6 +91,40 @@ syscall
 add rsp, 1
 xor rax, rax
 mov eax, dword [rbp+16]
+mov rsp, rbp
+ret
+sub rsp, 4
+sub rsp, 1
+sub rsp, 4
+Hello:
+mov rbp, rsp
+sub rsp, 4
+mov eax, dword [rbp+21]
+mov dword [rbp-4], eax
+sub rsp, 4
+mov eax, dword [rbp-4]
+mov [rsp], eax
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp
+mov rdx, 4
+syscall
+add rsp, 4
+sub rsp, 1
+mov al, 0xa
+mov [rsp], al
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp
+mov rdx, 1
+syscall
+add rsp, 1
+mov rsp, rbp
+ret
+sub rsp, 4
+sub rsp, 4
+Test:
+mov rbp, rsp
 mov rsp, rbp
 ret
 global _start

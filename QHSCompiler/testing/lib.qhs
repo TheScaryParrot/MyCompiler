@@ -552,11 +552,22 @@
 
     [ = ]
     [
+        #popEnv
+
         /* clear rax as expr will write partially over it. eg al */
         "xor rax, rax" \n
         [ ?! size ]
         [ ?! #deepFetch ]
         exprInit
+
+        /* redefinition as oly one was lost by #popEnv */
+        [ ; ]
+        [
+            #popEnv
+
+            "mov rsp, rbp" \n
+            "ret" \n
+        ] >>
     ] >>
 
     [ ; ]

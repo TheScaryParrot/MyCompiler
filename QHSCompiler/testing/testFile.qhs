@@ -24,14 +24,6 @@ void Print ( int char )
     return ;
 }
 
-void Hello ( int p1 , bool p2 , int p3 )
-{
-    int a = p3 ;
-    [ a ! int.size ] println ;
-
-    return ;
-}
-
 int Hello2 ( int p1 , int p2 )
 {
     int a = p1 ;
@@ -41,6 +33,14 @@ int Hello2 ( int p1 , int p2 )
     [ b ! int.size ] println ;
 
     return = p1 ;
+}
+
+void Hello ( int p1 , bool p2 , int p3 )
+{
+    int a = p3 ;
+    [ a ! int.size ] println ;
+
+    return ;
 }
 
 /* start */
