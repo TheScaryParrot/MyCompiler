@@ -99,6 +99,23 @@
 
 ] >>
 
+[ getRegisterB ]
+[
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ 1 "bl" ] >>
+    [ 2 "bx" ] >>
+    [ 4 "ebx" ] >>
+    [ 8 "rbx" ] >>
+
+    [ #orderEnqueue ! size ] #literalToIdentifier
+
+    #popEnv    
+
+] >>
+
 [ getRegisterD ]
 [
     #orderFrontEnqueue size ->
@@ -542,6 +559,8 @@
 
     [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
 
+    [ registerB ] [ [ #orderEnqueue ! size ] getRegisterB ] >>
+
     [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
 
     "mov " registerA ", " first \n
@@ -564,8 +583,14 @@
 
     [ / ]
     [
-        "mov " registerD ", " #deepFetch \n
-        "div " registerD \n
+        "mov " registerB ", " #deepFetch \n
+        "xor rdx, rdx" \n
+        "div " registerB \n
+    ] >>
+
+    [ == ]
+    [
+
     ] >>
 ] >>
 
