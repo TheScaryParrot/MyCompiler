@@ -7,49 +7,54 @@ int mod ( int a , int b )
     int localA = a ;
     int localB = b ;
 
-    /* implement while loop */
+    [ "4" ]
     while ( localA >= localB )
     {
-        localA -= localB ;
+        [ localA ] -= localB ;
     }
 
-    /* implement return */
-    return localA ;
+    return = localA ;
 }
 
 bool isPrime ( int n )
 {
-    bool result ;
+    bool result = "0" ;
 
-    /* implement if else */
-    /* implement comparison */
-    if (n <= 1)
+    [ "4" ]
+    if ( n <= "1" )
     {
-        result = false ;
-        return result ;
+        [ result ] = "0" ;
+        return = result ;
     }
+    [ "4" ]
     else
     {
-        /* implement for loop */
-        for ( int i = 2 ; i * i <= n ; i++ )
+        int i = "2" ;
+
+        [ "4" ]
+        while ( i * i <= n )
         {
-            if ( mod( n , i ) == 0 )
+            mod ( n , i ) ;
+            [ "4" ]
+            if ( "eax" == "0" )
             {
-                result = false ;
-                return result ;
+                [ result ] = "0" ;
+                return = result ;
             }
+
+            [ i ] += "1" ;
         }
 
-        result = true ;
-        return result ;
+        [ result ] = "1" ;
+        return = result ;
     }
 
-    return ;
+    return = result ;
 }
 
 void printDigit ( int n )
 {
-    n += 48 ;
+    [ n ] += "48" ;
     [ n ?! int.size ] print ;
 
     return ;
@@ -57,32 +62,42 @@ void printDigit ( int n )
 
 void printInt ( int n )
 {
+    mod ( n , "10" ) ;
+    int digit = "eax" ;
 
-    /* implement function call in expression */
-    int digit = mod ( n , 10 ) ;
-    n -= digit ;
-    n /= 10 ;
+    [ n ] -= digit ;
+    [ n ] /= "10" ;
 
-    if ( n > 0 )
+    [ "4" ]
+    if ( n > "0" )
     {
         printInt ( n ) ;
     }
 
     printDigit ( digit ) ;
+
+    return ;
 }
 
 start
 {
-    int checkUntil = 100000 ;
+    int checkUntil = "100000" ;
 
-    for ( int i = 0 ; i < checkUntil ; i += 1 )
+    int i = "0" ;
+
+    [ "4" ]
+    while ( i < checkUntil )
     {
-        if ( isPrime ( i ) )
+        isPrime ( i ) ;
+        [ "1" ]
+        if ( "al" )
         {
             printInt ( i ) ;
-            print ( 10 ) ;
+            [ "10" "4" ] print ; /* print newline */
         }
+
+        [ i ] += "1" ;
     }
 
-    return ;
+    exit ;
 }

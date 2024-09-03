@@ -12,4 +12,4 @@ echo ""
 echo ""
 
 echo "QHS:"
-#time ./ExecuteSpeedQHS
+time ./ExecuteSpeedQHS > /dev/null

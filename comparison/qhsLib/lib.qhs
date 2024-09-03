@@ -99,6 +99,23 @@
 
 ] >>
 
+[ getRegisterB ]
+[
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ 1 "bl" ] >>
+    [ 2 "bx" ] >>
+    [ 4 "ebx" ] >>
+    [ 8 "rbx" ] >>
+
+    [ #orderEnqueue ! size ] #literalToIdentifier
+
+    #popEnv    
+
+] >>
+
 [ getRegisterD ]
 [
     #orderFrontEnqueue size ->
@@ -148,7 +165,7 @@
 
         [ #orderEnqueue ! size ]
         [ #orderEnqueue ! name ]
-        [ ?! expr ]
+        [ ?! #deepFetch ]
         dataVar
     ] >>
 
@@ -161,15 +178,16 @@
 
         bssVar
     ] >>
-
+    
     [ ( ]
     [
         #popEnv
+        
+        #orderFrontEnqueue ".text" #setAssemblySection
 
         #pushEnv
 
         [ _functionDefinitionOrderQueue ]
-        [ #orderEnqueue ! size ]
         [ #orderEnqueue ! name ]
         >>
         
@@ -177,6 +195,12 @@
 
         [ ) ]
         [
+            /* define function in function scope for recursion */
+            /* definition for localScope happens in funcBodyEnd */
+            [ ?! _functionDefinitionOrderQueue ]
+            defineFuncIdentifier
+
+            [ #orderEnqueue ! size ]
             [ #orderEnqueue ! name ]
             funcBody
         ] >>
@@ -281,12 +305,7 @@
             #popEnv
 
             [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
-
-            [ #orderEnqueue ! size ]
-            [ #orderEnqueue ! name ]
-            [ ?! registerA ]
-            
-            assign
+            "mov " name ", " registerA \n
         ] >> 
     ] >>
 
@@ -322,9 +341,9 @@
 [
     #orderFrontEnqueue size ->
     #orderFrontEnqueue identifier ->
-    #orderFrontEnqueue value >>
+    #orderFrontEnqueue location >>
     
-    [ ?! identifier ?! value ] >>
+    [ ?! identifier ?! location ] >>
 
     /* IDENTIFIER.size = size */
     [ ?! identifier ?! #orderToLiteralCode ".size" ?! #literalCombine ?! #literalToIdentifier ] [ ?! size ] >>
@@ -352,8 +371,6 @@
 
 [ defineFuncIdentifier ]
 [
-    /* TODO use size for return */
-    #orderFrontEnqueue size ->
     #orderFrontEnqueue name ->
     #orderFrontEnqueue parameterSizes >>
 
@@ -374,7 +391,14 @@
 
 [ funcBody ]
 [
+    #orderFrontEnqueue size ->
     #orderFrontEnqueue name -> 
+
+    [ return ]
+    [
+        [ #orderEnqueue ! size ] returnBlueprint
+    ] >>
+
     [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] #orderFrontEnqueue funcLabel >> 
 
     [ definition localVar ] >>
@@ -429,9 +453,12 @@
 
     "sub rsp, " size \n
 
-    [ #orderEnqueue ! name ]
-    [ #orderEnqueue ! sizeSpecifier " " #orderEnqueue ! address ] >>
+    [ ?! size ]
+    [ ?! name ]
+    [ ?! sizeSpecifier " [rbp+" ?! currentRBPoffset "]" ]
+    defineVarIdentifier
 
+    /* _functionDefinitionOrderQueue += size */
     [ _functionDefinitionOrderQueue #orderEnqueue ! _functionDefinitionOrderQueue #orderEnqueue ! size ] >>
 ] >>
 
@@ -507,7 +534,7 @@
 [ argument ]
 [
     #orderFrontEnqueue size ->
-    [ value ?! expr ] >> 
+    [ value ?! #deepFetch ] >> 
 
     [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
 
@@ -524,13 +551,43 @@
     [ ?! size ] [ newLocation ] [ ?! value ] assign
 ] >>
 
-[ return ]
+/* return but it needs a argument, return is defined as [ "size" ] returnBlueprint */
+[ returnBlueprint ]
 [
-    "mov rsp, rbp" \n
-    "ret" \n
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ = ]
+    [
+        #popEnv
+
+        /* clear rax as expr will write partially over it. eg al */
+        "xor rax, rax" \n
+        [ ?! size ]
+        [ ?! #deepFetch ]
+        exprInit
+
+        /* redefinition as oly one was lost by #popEnv */
+        [ ; ]
+        [
+            #popEnv
+
+            "mov rsp, rbp" \n
+            "ret" \n
+        ] >>
+    ] >>
+
+    [ ; ]
+    [
+        #popEnv
+
+        "mov rsp, rbp" \n
+        "ret" \n
+    ] >>
 ] >>
 
-/* expressions */
+/* ------------------ expressions ------------------ */
 
 [ exprInit ]
 [
@@ -541,6 +598,8 @@
     [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
 
     [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    [ registerB ] [ [ #orderEnqueue ! size ] getRegisterB ] >>
 
     [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
 
@@ -564,16 +623,68 @@
 
     [ / ]
     [
-        "mov " registerD ", " #deepFetch \n
-        "div " registerD \n
+        "mov " registerB ", " #deepFetch \n
+        "xor rdx, rdx" \n
+        "div " registerB \n
     ] >>
-] >>
 
-[ expr ]
-[
-    /* TODO: Implement operators */
-    /* current just a deepFetch */
-    #orderEnqueue ! #deepFetch
+    [ == ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "sete dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ != ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setne dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ < ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setl dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ <= ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setle dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ > ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setg dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ >= ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setge dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ && ]
+    [
+        "and " registerA ", " #deepFetch \n
+    ] >>
+
+    [ || ]
+    [
+        "or " registerA ", " #deepFetch \n
+    ] >>
 ] >>
 
 [ = ]
@@ -590,11 +701,7 @@
     [
         #popEnv
         [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
-
-        [ ?! size ]
-        [ ?! var ]
-        [ ?! registerA ] 
-        assign
+        "mov " var ", " registerA \n
     ] >>
 ] >>
 
@@ -661,7 +768,6 @@
 
 [ /= ]
 [
-    /* TODO Division gives floating point error, probably same in THScompiler */
     #orderFrontEnqueue var ->
     /* size = var.size */
     [ ?! var ] varSize #orderFrontEnqueue size >>
@@ -674,12 +780,130 @@
     [
         #popEnv
         [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
-        [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+        [ registerB ] [ [ #orderEnqueue ! size ] getRegisterB ] >>
 
-        "mov " registerD ", " registerA \n
+        "mov " registerB ", " registerA \n
+        "xor rdx, rdx" \n
         "mov " registerA ", " var \n
-        "div " registerD \n
+        "div " registerB \n
         "mov " var ", " registerA \n
+    ] >>
+] >>
+
+/* ------------------ constrol flow ------------------ */
+
+[ "currentJumpLabel" "0" ] #setIntVar
+
+/* returns to order queue */
+[ newJumpLabel ]
+[
+    [ "currentJumpLabel" "1" ] #changeIntVar
+    [ "currentJumpLabel" "JL" ?! #getIntVar ?! #literalCombine ]
+] >>
+
+[ while ]
+[
+    #orderFrontEnqueue size ->
+
+    newJumpLabel #orderFrontEnqueue startLabel >> /* startLabel = new jumplabel */
+    newJumpLabel #orderFrontEnqueue endLabel >> /* endLabel = new jumplabel */
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    startLabel ":" \n
+
+    #pushEnv
+
+    [ ( ]
+    [
+        [ #orderEnqueue ! size ]
+        [ ?! #deepFetch ]
+        exprInit
+    ] >>
+
+    [ ) ]
+    [
+        #popEnv
+        "test " registerA ", " registerA \n
+        "jz " endLabel \n
+    ] >>
+
+    [ { ]
+    [
+        /* { = none */
+    ] >>
+
+    [ } ]
+    [
+        #popEnv
+        /* } = end of while loop */
+        "jmp " startLabel \n
+        endLabel ":" \n
+    ] >>
+] >>
+
+[ if ]
+[
+    #orderFrontEnqueue size ->
+
+    newJumpLabel #orderFrontEnqueue endLabel >> /* endLabel = new jumplabel */
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    #pushEnv
+
+    [ ( ]
+    [
+        [ #orderEnqueue ! size ]
+        [ ?! #deepFetch ]
+        exprInit
+    ] >>
+
+    [ ) ]
+    [
+        #popEnv
+        "test " registerA ", " registerA \n
+        "jz " endLabel \n
+    ] >>
+
+    [ { ]
+    [
+        /* { = none */
+    ] >>
+
+    [ } ]
+    [
+        #popEnv
+        /* } = end of if statement */
+        endLabel ":" \n
+    ] >>
+] >>
+
+[ else ]
+[
+    #orderFrontEnqueue size ->
+
+    newJumpLabel #orderFrontEnqueue endLabel >> /* endLabel = new jumplabel */
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    #pushEnv
+
+    /* expression result is still stored in registerA */
+    /* jumps on if expression is true; therefore when the if was executed */
+    "test " registerA ", " registerA \n
+    "jnz " endLabel \n
+
+    [ { ]
+    [
+        /* { = none */
+    ] >>
+
+    [ } ]
+    [
+        #popEnv
+        /* } = end of else statement */
+        endLabel ":" \n
     ] >>
 ] >>
 
