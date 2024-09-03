@@ -195,6 +195,11 @@
 
         [ ) ]
         [
+            /* define function in function scope for recursion */
+            /* definition for localScope happens in funcBodyEnd */
+            [ ?! _functionDefinitionOrderQueue ]
+            defineFuncIdentifier
+
             [ #orderEnqueue ! size ]
             [ #orderEnqueue ! name ]
             funcBody
@@ -453,6 +458,7 @@
     [ ?! sizeSpecifier " [rbp+" ?! currentRBPoffset "]" ]
     defineVarIdentifier
 
+    /* _functionDefinitionOrderQueue += size */
     [ _functionDefinitionOrderQueue #orderEnqueue ! _functionDefinitionOrderQueue #orderEnqueue ! size ] >>
 ] >>
 
@@ -762,7 +768,6 @@
 
 [ /= ]
 [
-    /* TODO Division gives floating point error, probably same in THScompiler */
     #orderFrontEnqueue var ->
     /* size = var.size */
     [ ?! var ] varSize #orderFrontEnqueue size >>
@@ -775,11 +780,12 @@
     [
         #popEnv
         [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
-        [ registerD ] [ [ #orderEnqueue ! size ] getRegisterD ] >>
+        [ registerB ] [ [ #orderEnqueue ! size ] getRegisterB ] >>
 
-        "mov " registerD ", " registerA \n
+        "mov " registerB ", " registerA \n
+        "xor rdx, rdx" \n
         "mov " registerA ", " var \n
-        "div " registerD \n
+        "div " registerB \n
         "mov " var ", " registerA \n
     ] >>
 ] >>
