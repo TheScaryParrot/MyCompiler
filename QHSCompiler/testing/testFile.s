@@ -50,7 +50,6 @@ Hello:
 mov rbp, rsp
 sub rsp, 4
 mov eax, dword [rbp+21]
-mov eax, eax
 mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
@@ -78,11 +77,9 @@ Hello2:
 mov rbp, rsp
 sub rsp, 4
 mov eax, dword [rbp+16]
-mov eax, eax
 mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, dword [rbp+20]
-mov eax, eax
 mov dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
@@ -120,6 +117,8 @@ mov rsi, rsp
 mov rdx, 1
 syscall
 add rsp, 1
+xor rax, rax
+mov eax, dword [rbp+16]
 mov rsp, rbp
 ret
 global _start
@@ -139,11 +138,9 @@ sub rsp, 4
 mov eax, 65
 add eax, dataInt
 sub eax, dataInt
-mov eax, eax
 mov dword [rbp-4], eax
 sub rsp, 4
 mov eax, 66
-mov eax, eax
 mov dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-4]
@@ -154,7 +151,6 @@ pop rbp
 add rsp, 4
 mov eax, 67
 add eax, 4
-mov eax, eax
 mov dword [rbp-8], eax
 mov eax, 6
 add dword [rbp-8], eax
@@ -179,7 +175,6 @@ mov eax, dword [rbp-8]
 mov ebx, 2
 xor rdx, rdx
 div ebx
-mov eax, eax
 mov dword [rbp-8], eax
 mov eax, 2
 mov edx, eax
@@ -193,7 +188,6 @@ sete dl
 xor rax, rax
 mov al, dl
 or eax, 1
-mov eax, eax
 mov dword [rbp-12], eax
 mov eax, dword [rbp-12]
 add dword [rbp-8], eax
@@ -220,21 +214,32 @@ push rbp
 call Hello
 pop rbp
 add rsp, 9
+sub rsp, 4
+mov eax, 0
+mov dword [rbp-16], eax
 sub rsp, 8
 mov eax, dword [rbp-4]
-mov dword [rbp-20], eax
+mov dword [rbp-24], eax
 mov eax, dword [rbp-8]
-mov dword [rbp-16], eax
+mov dword [rbp-20], eax
 push rbp
 call Hello2
 pop rbp
 add rsp, 8
-sub rsp, 4
-mov eax, 65
 mov eax, eax
 mov dword [rbp-16], eax
-JL1:
+sub rsp, 4
 mov eax, dword [rbp-16]
+mov dword [rbp-20], eax
+push rbp
+call PrintLine
+pop rbp
+add rsp, 4
+sub rsp, 4
+mov eax, 65
+mov dword [rbp-20], eax
+JL1:
+mov eax, dword [rbp-20]
 cmp eax, 70
 setle dl
 xor rax, rax
@@ -242,19 +247,19 @@ mov al, dl
 test eax, eax
 jz JL2
 sub rsp, 4
-mov eax, dword [rbp-16]
-mov dword [rbp-20], eax
+mov eax, dword [rbp-20]
+mov dword [rbp-24], eax
 push rbp
 call Print
 pop rbp
 add rsp, 4
 mov eax, 1
-add dword [rbp-16], eax
+add dword [rbp-20], eax
 jmp JL1
 JL2:
 sub rsp, 4
 mov eax, 10
-mov dword [rbp-20], eax
+mov dword [rbp-24], eax
 push rbp
 call Print
 pop rbp

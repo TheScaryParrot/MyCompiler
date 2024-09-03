@@ -165,7 +165,7 @@
 
         [ #orderEnqueue ! size ]
         [ #orderEnqueue ! name ]
-        [ ?! expr ]
+        [ ?! #deepFetch ]
         dataVar
     ] >>
 
@@ -186,7 +186,6 @@
         #pushEnv
 
         [ _functionDefinitionOrderQueue ]
-        [ #orderEnqueue ! size ]
         [ #orderEnqueue ! name ]
         >>
         
@@ -194,6 +193,7 @@
 
         [ ) ]
         [
+            [ #orderEnqueue ! size ]
             [ #orderEnqueue ! name ]
             funcBody
         ] >>
@@ -298,12 +298,7 @@
             #popEnv
 
             [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
-
-            [ #orderEnqueue ! size ]
-            [ #orderEnqueue ! name ]
-            [ ?! registerA ]
-            
-            assign
+            "mov " name ", " registerA \n
         ] >> 
     ] >>
 
@@ -369,8 +364,6 @@
 
 [ defineFuncIdentifier ]
 [
-    /* TODO use size for return */
-    #orderFrontEnqueue size ->
     #orderFrontEnqueue name ->
     #orderFrontEnqueue parameterSizes >>
 
@@ -391,7 +384,14 @@
 
 [ funcBody ]
 [
+    #orderFrontEnqueue size ->
     #orderFrontEnqueue name -> 
+
+    [ return ]
+    [
+        [ #orderEnqueue ! size ] returnBlueprint
+    ] >>
+
     [ #orderEnqueue ! name #orderEnqueue ! #orderToLiteralCode ] #orderFrontEnqueue funcLabel >> 
 
     [ definition localVar ] >>
@@ -524,7 +524,7 @@
 [ argument ]
 [
     #orderFrontEnqueue size ->
-    [ value ?! expr ] >> 
+    [ value ?! #deepFetch ] >> 
 
     [ sizeSpecifier ] [ [ #orderEnqueue ! size ] getSizeSpecifier ] >>
 
@@ -541,10 +541,29 @@
     [ ?! size ] [ newLocation ] [ ?! value ] assign
 ] >>
 
-[ return ]
+/* return but it needs a argument, return is defined as [ "size" ] returnBlueprint */
+[ returnBlueprint ]
 [
-    "mov rsp, rbp" \n
-    "ret" \n
+    #orderFrontEnqueue size ->
+
+    #pushEnv
+
+    [ = ]
+    [
+        /* clear rax as expr will write partially over it. eg al */
+        "xor rax, rax" \n
+        [ ?! size ]
+        [ ?! #deepFetch ]
+        exprInit
+    ] >>
+
+    [ ; ]
+    [
+        #popEnv
+
+        "mov rsp, rbp" \n
+        "ret" \n
+    ] >>
 ] >>
 
 /* ------------------ expressions ------------------ */
@@ -647,13 +666,6 @@
     ] >>
 ] >>
 
-[ expr ]
-[
-    /* TODO: Implement operators */
-    /* current just a deepFetch */
-    #orderEnqueue ! #deepFetch
-] >>
-
 [ = ]
 [
     #orderFrontEnqueue var ->
@@ -668,11 +680,7 @@
     [
         #popEnv
         [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
-
-        [ ?! size ]
-        [ ?! var ]
-        [ ?! registerA ] 
-        assign
+        "mov " var ", " registerA \n
     ] >>
 ] >>
 
