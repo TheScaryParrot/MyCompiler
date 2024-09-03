@@ -159,6 +159,21 @@ mov edx, 5
 mul edx
 sub eax, 4
 add dword [rbp-8], eax
+mov eax, 1
+sub dword [rbp-8], eax
+mov eax, dword [rbp-8]
+mov ebx, 2
+xor rdx, rdx
+div ebx
+mov eax, eax
+mov dword [rbp-8], eax
+mov eax, 2
+mov edx, eax
+mov eax, dword [rbp-8]
+mul edx
+mov dword [rbp-8], eax
+mov eax, 1
+add dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-8]
 mov dword [rbp-12], eax
