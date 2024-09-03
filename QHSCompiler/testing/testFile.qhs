@@ -17,6 +17,13 @@ void PrintLine ( int char )
     return ;
 }
 
+void Print ( int char )
+{
+    [ char ! int.size ] print ;
+
+    return ;
+}
+
 void Hello ( int p1 , bool p2 , int p3 )
 {
     int a = p3 ;
@@ -73,14 +80,16 @@ start
 
     Hello2 ( num , num2 ) ;
 
-    int whileInt = "70" ;
+    int whileInt = "65" ;
 
     [ "4" ]
-    while ( whileInt >= "65" )
+    while ( whileInt <= "70" )
     {
-        PrintLine ( whileInt ) ;
-        [ whileInt ] -= "1" ;
+        Print ( whileInt ) ;
+        [ whileInt ] += "1" ;
     }
+
+    Print ( "10" ) ; /* print newline */
 
     exit ;
 }

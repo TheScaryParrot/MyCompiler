@@ -30,6 +30,20 @@ add rsp, 1
 mov rsp, rbp
 ret
 sub rsp, 4
+Print:
+mov rbp, rsp
+sub rsp, 4
+mov eax, dword [rbp+16]
+mov [rsp], eax
+mov rax, 1
+mov rdi, 1
+mov rsi, rsp
+mov rdx, 4
+syscall
+add rsp, 4
+mov rsp, rbp
+ret
+sub rsp, 4
 sub rsp, 1
 sub rsp, 4
 Hello:
@@ -216,13 +230,13 @@ call Hello2
 pop rbp
 add rsp, 8
 sub rsp, 4
-mov eax, 70
+mov eax, 65
 mov eax, eax
 mov dword [rbp-16], eax
 JL1:
 mov eax, dword [rbp-16]
-cmp eax, 65
-setge dl
+cmp eax, 70
+setle dl
 xor rax, rax
 mov al, dl
 test eax, eax
@@ -231,13 +245,20 @@ sub rsp, 4
 mov eax, dword [rbp-16]
 mov dword [rbp-20], eax
 push rbp
-call PrintLine
+call Print
 pop rbp
 add rsp, 4
 mov eax, 1
-sub dword [rbp-16], eax
+add dword [rbp-16], eax
 jmp JL1
 JL2:
+sub rsp, 4
+mov eax, 10
+mov dword [rbp-20], eax
+push rbp
+call Print
+pop rbp
+add rsp, 4
 mov rax, 60
 mov rdi, 0
 syscall
