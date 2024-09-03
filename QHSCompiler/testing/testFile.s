@@ -172,11 +172,20 @@ mov edx, eax
 mov eax, dword [rbp-8]
 mul edx
 mov dword [rbp-8], eax
+sub rsp, 4
 mov eax, 1
+cmp eax, 1
+sete dl
+xor rax, rax
+mov al, dl
+or eax, 1
+mov eax, eax
+mov dword [rbp-12], eax
+mov eax, dword [rbp-12]
 add dword [rbp-8], eax
 sub rsp, 4
 mov eax, dword [rbp-8]
-mov dword [rbp-12], eax
+mov dword [rbp-16], eax
 push rbp
 call PrintLine
 pop rbp
@@ -188,20 +197,20 @@ mov rdx, 4
 syscall
 sub rsp, 9
 mov eax, dword [rbp-8]
-mov dword [rbp-17], eax
+mov dword [rbp-21], eax
 mov al, 1
-mov byte [rbp-13], al
+mov byte [rbp-17], al
 mov eax, 69
-mov dword [rbp-12], eax
+mov dword [rbp-16], eax
 push rbp
 call Hello
 pop rbp
 add rsp, 9
 sub rsp, 8
 mov eax, dword [rbp-4]
-mov dword [rbp-16], eax
+mov dword [rbp-20], eax
 mov eax, dword [rbp-8]
-mov dword [rbp-12], eax
+mov dword [rbp-16], eax
 push rbp
 call Hello2
 pop rbp

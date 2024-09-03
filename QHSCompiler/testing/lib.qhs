@@ -590,7 +590,60 @@
 
     [ == ]
     [
+        "cmp " registerA ", " #deepFetch \n
+        "sete dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
 
+    [ != ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setne dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ < ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setl dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ <= ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setle dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ > ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setg dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ >= ]
+    [
+        "cmp " registerA ", " #deepFetch \n
+        "setge dl" \n
+        "xor rax, rax" \n
+        "mov al, dl" \n
+    ] >>
+
+    [ && ]
+    [
+        "and " registerA ", " #deepFetch \n
+    ] >>
+
+    [ || ]
+    [
+        "or " registerA ", " #deepFetch \n
     ] >>
 ] >>
 

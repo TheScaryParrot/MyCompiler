@@ -60,7 +60,10 @@ start
     [ num2 ] -= "1" ;
     [ num2 ] = num2 / "2" ;
     [ num2 ] *= "2" ;
-    [ num2 ] += "1" ;
+
+    int add = "1" == "1" || "1" ;
+
+    [ num2 ] += add ;
 
     PrintLine ( num2 ) ; /* G */
     
