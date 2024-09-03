@@ -18,4 +18,7 @@ echo ""
 echo ""
 
 echo "QHS:"
-#time 
+time ../../QHSCompiler/QHScompiler CompileSpeed.qhs -c -o CompileSpeedQHS.s
+
+echo ""
+echo ""
