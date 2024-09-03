@@ -215,6 +215,29 @@ push rbp
 call Hello2
 pop rbp
 add rsp, 8
+sub rsp, 4
+mov eax, 70
+mov eax, eax
+mov dword [rbp-16], eax
+JL1:
+mov eax, dword [rbp-16]
+cmp eax, 65
+setge dl
+xor rax, rax
+mov al, dl
+test eax, eax
+jz JL2
+sub rsp, 4
+mov eax, dword [rbp-16]
+mov dword [rbp-20], eax
+push rbp
+call PrintLine
+pop rbp
+add rsp, 4
+mov eax, 1
+sub dword [rbp-16], eax
+jmp JL1
+JL2:
 mov rax, 60
 mov rdi, 0
 syscall

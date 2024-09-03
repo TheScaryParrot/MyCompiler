@@ -65,13 +65,22 @@ start
 
     [ num2 ] += add ;
 
-    PrintLine ( num2 ) ; /* G */
+    PrintLine ( num2 ) ; /* G (71) */
     
     [ dataInt ! int.size ] rawPrint ;
 
     Hello ( num2 , "1" , "69" ) ;
 
     Hello2 ( num , num2 ) ;
+
+    int whileInt = "70" ;
+
+    [ "4" ]
+    while ( whileInt >= "65" )
+    {
+        PrintLine ( whileInt ) ;
+        [ whileInt ] -= "1" ;
+    }
 
     exit ;
 }

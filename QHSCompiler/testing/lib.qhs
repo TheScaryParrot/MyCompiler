@@ -547,7 +547,7 @@
     "ret" \n
 ] >>
 
-/* expressions */
+/* ------------------ expressions ------------------ */
 
 [ exprInit ]
 [
@@ -758,6 +758,59 @@
         "mov " registerA ", " var \n
         "div " registerD \n
         "mov " var ", " registerA \n
+    ] >>
+] >>
+
+/* ------------------ constrol flow ------------------ */
+
+[ "currentJumpLabel" "0" ] #setIntVar
+
+/* returns to order queue */
+[ newJumpLabel ]
+[
+    [ "currentJumpLabel" "1" ] #changeIntVar
+    [ "currentJumpLabel" "JL" ?! #getIntVar ?! #literalCombine ]
+] >>
+
+[ while ]
+[
+    #orderFrontEnqueue size ->
+
+    newJumpLabel #orderFrontEnqueue startLabel >> /* startLabel = new jumplabel */
+    newJumpLabel #orderFrontEnqueue endLabel >> /* endLabel = new jumplabel */
+
+    [ registerA ] [ [ #orderEnqueue ! size ] getRegisterA ] >>
+
+    startLabel ":" \n
+
+    #pushEnv
+
+    [ ( ]
+    [
+        [ #orderEnqueue ! size ]
+        [ ?! #deepFetch ]
+        exprInit
+        /* expression init for byte size (bool) */
+    ] >>
+
+    [ ) ]
+    [
+        #popEnv
+        "test " registerA ", " registerA \n
+        "jz " endLabel \n
+    ] >>
+
+    [ { ]
+    [
+        /* { = none */
+    ] >>
+
+    [ } ]
+    [
+        #popEnv
+        /* } = end of while loop */
+        "jmp " startLabel \n
+        endLabel ":" \n
     ] >>
 ] >>
 
