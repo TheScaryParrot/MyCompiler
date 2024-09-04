@@ -52,7 +52,7 @@ void Link(std::string inFile, std::string outFile, bool deleteInFile)
 
 int main(int argc, char const* argv[])
 {
-    argparse::ArgumentParser program("THS compiler");
+    argparse::ArgumentParser program("QHS compiler");
 
     program.add_argument("file").help("The file to compile");
     program.add_argument("-o", "--output")
