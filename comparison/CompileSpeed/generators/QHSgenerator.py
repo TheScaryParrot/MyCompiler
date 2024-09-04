@@ -1,3 +1,5 @@
+import sys
+
 PREAMBLE = """
 #enterOrderQueue "../qhsLib/lib.qhs" #exitOrderQueue #include 
 
@@ -78,10 +80,12 @@ def GenFunction(i: int, file):
     file.write('void Func' + str(i) + ' ( int n ) ' + FUNCTIONBODY)
 
 
-with open('CompileSpeed.qhs', 'w') as file:
+with open('tmp/CompileSpeed.qhs', 'w') as file:
     file.write(PREAMBLE)
 
-    for i in range(10000):
+    num = int(sys.argv[1])
+
+    for i in range(num):
         GenFunction(i, file)
 
     file.write("""
@@ -89,7 +93,7 @@ start
 {
 """)
 
-    for i in range(10000):
+    for i in range(num):
         file.write('Func' + str(i) + ' ( "' + str(i) + '" ) ; \n')
 
     file.write('}\n')

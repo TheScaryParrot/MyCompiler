@@ -1,3 +1,5 @@
+import sys
+
 PREAMBLE = """
 # include <stdbool.h>
 # include <stdio.h>
@@ -62,10 +64,12 @@ def GenFunction(i: int, file):
     file.write('void Func' + str(i) + '(int n)' + FUNCTIONBODY)
 
 
-with open('CompileSpeed.c', 'w') as file:
+with open('tmp/CompileSpeed.c', 'w') as file:
     file.write(PREAMBLE)
 
-    for i in range(10000):
+    num = int(sys.argv[1])
+
+    for i in range(num):
         GenFunction(i, file)
 
     file.write("""
@@ -73,7 +77,7 @@ int main(int argc, char * argv[])
 {
 """)
 
-    for i in range(10000):
+    for i in range(num):
         file.write('Func' + str(i) + '(' + str(i) + '); \n')
 
     file.write('return 0;\n}\n')

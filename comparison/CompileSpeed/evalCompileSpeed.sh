@@ -1,24 +1,23 @@
 #!/bin/bash
 
+./genfiles.sh $1
+
 echo "C:"
-time gcc -o CompileSpeedC.s -S CompileSpeed.c
-#gcc CompileSpeedC.s -o CompileSpeedC
-#rm CompileSpeedC.s
+time gcc -o tmp/CompileSpeedC.s -S tmp/CompileSpeed.c
+rm tmp/CompileSpeedC.s
 
 echo ""
 echo ""
 
 echo "THS:"
-time ../../THSCompiler/THScompiler CompileSpeed.ths -c -o CompileSpeedTHS.s
-#nasm -f elf64 CompileSpeedTHS.s -o CompileSpeedTHS.o
-#rm CompileSpeedTHS.s
-#ld CompileSpeedTHS.o ../thsLib/print.o -o CompileSpeedTHS
-#rm CompileSpeedTHS.o
+time ../../THSCompiler/THScompiler tmp/CompileSpeed.ths -c -o tmp/CompileSpeedTHS.s
+rm tmp/CompileSpeedTHS.s
 echo ""
 echo ""
 
 echo "QHS:"
-time ../../QHSCompiler/QHScompiler CompileSpeed.qhs -c -o CompileSpeedQHS.s
+time ../../QHSCompiler/QHScompiler tmp/CompileSpeed.qhs -c -o tmp/CompileSpeedQHS.s
+rm tmp/CompileSpeedQHS.s
 
 echo ""
 echo ""
