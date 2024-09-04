@@ -7,10 +7,10 @@
 class Identifier : public CommentProofable, public OrderQueueProofable
 {
    private:
-    OrderQueue* queue;
+    std::shared_ptr<OrderQueue> queue;
 
    public:
-    Identifier(OrderQueue* queue) { this->queue = queue; }
+    Identifier(OrderQueue* queue) { this->queue = std::shared_ptr<OrderQueue>(queue); }
 
-    OrderQueue* GetQueue() { return this->queue; }
+    std::shared_ptr<OrderQueue> GetQueue() { return this->queue; }
 };

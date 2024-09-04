@@ -5,6 +5,8 @@
 class IOrderFetcher
 {
    public:
+    virtual ~IOrderFetcher() = default;
+
     virtual Order Next() = 0;
     virtual bool IsEmpty() = 0;
 

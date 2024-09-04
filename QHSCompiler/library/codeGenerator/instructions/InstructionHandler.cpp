@@ -47,7 +47,7 @@ static class InstructionHandler
         {"clearOrderQueue", Instruction(
                                 [](AbstractGenerator* generator) -> bool
                                 {
-                                    generator->DequeueWholeOrderQueue();
+                                    delete generator->DequeueWholeOrderQueue();
                                     return true;
                                 },
                                 false, false)},
@@ -203,6 +203,7 @@ static class InstructionHandler
 
                            if (identifierOrder.GetType() != Order::Identifier)
                            {
+                               delete queue;
                                Logger.Log("Expected Identifier for assign on top of OrderQueue, got: " +
                                               identifierOrder.ToString(),
                                           Logger::ERROR);
@@ -210,8 +211,7 @@ static class InstructionHandler
                            }
 
                            std::string identifierName = identifierOrder.GetName();
-                           Identifier* identifier = new Identifier(queue);
-                           IdentifierHandler.AddIdentifier(identifierName, identifier);
+                           IdentifierHandler.AddIdentifier(identifierName, new Identifier(queue));
                            return true;
                        },
                        false, false)},
@@ -230,8 +230,7 @@ static class InstructionHandler
 
                                 std::string identifierName = identifierOrder.GetName();
                                 OrderQueue* queue = new OrderQueue(generator->DequeueFromOrderQueue());
-                                Identifier* identifier = new Identifier(queue);
-                                IdentifierHandler.AddIdentifier(identifierName, identifier);
+                                IdentifierHandler.AddIdentifier(identifierName, new Identifier(queue));
                                 return true;
                             },
                             false, false)},

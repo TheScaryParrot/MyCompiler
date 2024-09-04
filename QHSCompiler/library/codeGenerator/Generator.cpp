@@ -64,8 +64,12 @@ class Generator : public AbstractGenerator
     virtual unsigned int GetOrderQueueDepth() override { return decodeHandler.GetOrderQueueDepth(); }
     virtual bool IsOrderQueueActive() override { return GetOrderQueueDepth() > 0; }
 
-    virtual void PutInFront(Order order) override { fetchHandler.PutInFront(new OrderQueueFetcher(OrderQueue(order))); }
-    virtual void PutInFront(OrderQueue& orderQueue) override
+    virtual void PutInFront(Order order) override
+    {
+        std::shared_ptr<OrderQueue> orderQueue = std::make_shared<OrderQueue>(order);
+        fetchHandler.PutInFront(new OrderQueueFetcher(orderQueue));
+    }
+    virtual void PutInFront(std::shared_ptr<OrderQueue> orderQueue) override
     {
         fetchHandler.PutInFront(new OrderQueueFetcher(orderQueue));
     }

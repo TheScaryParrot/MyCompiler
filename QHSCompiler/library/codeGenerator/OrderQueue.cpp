@@ -1,11 +1,13 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "Order.cpp"
 
 class OrderQueue
 {
+   public:
     struct Node
     {
         Order order = Order::Empty();
@@ -13,9 +15,9 @@ class OrderQueue
         Node* prev;
     };
 
-   public:
     OrderQueue() = default;
     OrderQueue(Order order) { this->Enqueue(order); }
+    ~OrderQueue() { this->Clear(); }
 
     void Enqueue(Order order)
     {
@@ -63,7 +65,9 @@ class OrderQueue
         Node* current = head;
         head = head->next;
         if (head != nullptr) head->prev = nullptr;
-        return current->order;
+        Order order = current->order;
+        delete current;
+        return order;
     }
     Order Front() { return this->head->order; }
     bool IsEmpty() { return this->head == nullptr; }
@@ -71,6 +75,8 @@ class OrderQueue
     {
         while (!IsEmpty()) Dequeue();
     }
+
+    Node* GetHead() { return this->head; }
 
     std::string ToString()
     {
@@ -90,4 +96,31 @@ class OrderQueue
    private:
     Node* head = nullptr;
     Node* tail = nullptr;
+};
+
+class OrderQueueIterator
+{
+   private:
+    std::shared_ptr<OrderQueue> queue;
+    OrderQueue::Node* current;
+
+   public:
+    OrderQueueIterator(std::shared_ptr<OrderQueue> queue)
+    {
+        this->queue = queue;
+        this->current = queue->GetHead();
+    }
+
+    Order GetNext()
+    {
+        if (current == nullptr) return Order::Empty();
+
+        Order order = current->order;
+
+        current = current->next;
+
+        return order;
+    }
+
+    bool IsDone() { return current == nullptr; }
 };

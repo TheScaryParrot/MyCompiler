@@ -12,7 +12,14 @@ class FetchHandler : public ILogPathGetter
 {
    public:
     FetchHandler() { Logger.SetLogPathGetter(this); }
-    ~FetchHandler() { Logger.SetLogPathGetter(nullptr); }
+    ~FetchHandler()
+    {
+        Logger.SetLogPathGetter(nullptr);
+        for (auto fetcher : fetcherList)
+        {
+            delete fetcher;
+        }
+    }
 
     void Fetch(AbstractGenerator* generator)
     {
@@ -54,7 +61,11 @@ class FetchHandler : public ILogPathGetter
 
     void PutInFront(IOrderFetcher* fetcher)
     {
-        if (fetcher->IsEmpty()) return;
+        if (fetcher->IsEmpty())
+        {
+            delete fetcher;
+            return;
+        }
 
         fetcherList.insert(fetcherList.begin() + fetcherDepth, fetcher);
     }

@@ -16,7 +16,7 @@ class ExecuteHandler
     }
     void HandleIdentifier(Identifier* identifier, AbstractGenerator* generator)
     {
-        generator->PutInFront(*identifier->GetQueue());
+        generator->PutInFront(identifier->GetQueue());
         generator->IncrementPhase();
     }
     void HandleInstruction(Instruction* instruction, AbstractGenerator* generator)

@@ -6,14 +6,15 @@
 static class IdentifierHandler
 {
    private:
-    EnvironmentLinkedList environment;
+    EnvironmentLinkedList* envList = new EnvironmentLinkedList();
 
    public:
     IdentifierHandler() { PushEnvironment(); }
+    ~IdentifierHandler() { delete envList; }
 
-    void PushEnvironment() { this->environment.PushEnvironment(new Environment()); }
-    void PopEnvironment() { this->environment.PopEnvironment(); }
+    void PushEnvironment() { this->envList->PushEnvironment(new Environment()); }
+    void PopEnvironment() { this->envList->PopEnvironment(); }
 
-    void AddIdentifier(std::string name, Identifier* identifier) { this->environment.AddIdentifier(name, identifier); }
-    Identifier* GetIdentifier(std::string name) { return this->environment.GetIdentifier(name); }
+    void AddIdentifier(std::string name, Identifier* identifier) { this->envList->AddIdentifier(name, identifier); }
+    Identifier* GetIdentifier(std::string name) { return this->envList->GetIdentifier(name); }
 } IdentifierHandler;

@@ -42,7 +42,7 @@ class InputFileFetcher : public IOrderFetcher
 
         this->file = file;
     }
-    ~InputFileFetcher() { delete file; }
+    virtual ~InputFileFetcher() { delete file; }
 
     virtual Order Next() override
     {
@@ -75,7 +75,7 @@ class InputFileFetcher : public IOrderFetcher
             }
 
             file->ReadNext();
-            Order order = Order(name, type, line);
+            Order order(name, type, line);
             lastOrder = order;
             return order;
         }
@@ -97,7 +97,7 @@ class InputFileFetcher : public IOrderFetcher
 
         ClearWhitespaces(file);
 
-        Order order = Order(name, type, line);
+        Order order(name, type, line);
         lastOrder = order;
         return order;
     }

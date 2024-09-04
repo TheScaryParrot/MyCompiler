@@ -12,13 +12,19 @@ class Environment
    public:
     ~Environment()
     {
-        for (auto const& identifier : identifiers)
+        for (auto const& pair : identifiers)
         {
-            delete identifier.second;
+            delete pair.second;
         }
     }
 
-    void AddIdentifier(std::string name, Identifier* identifier) { identifiers[name] = identifier; }
+    void AddIdentifier(std::string name, Identifier* identifier)
+    {
+        // deletes existing identifier (delete nullptr is safe)
+        delete GetIdentifier(name);
+
+        identifiers[name] = identifier;
+    }
     Identifier* GetIdentifier(std::string name)
     {
         if (identifiers.find(name) == identifiers.end())

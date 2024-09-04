@@ -13,8 +13,6 @@ AssemblyCode* CompileFile(std::string filename)
 
     AssemblyCode* assemblyCode = generator.Generate();
 
-    delete file;
-
     return assemblyCode;
 }
 
