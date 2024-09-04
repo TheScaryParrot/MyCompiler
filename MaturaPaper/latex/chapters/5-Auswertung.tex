@@ -5,6 +5,44 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
 
 \section{Geschwindigkeit der Compilation}
 
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        enlargelimits=false,
+        xlabel=File Size,
+        xmode=log,
+        log basis x=10,
+        ylabel=Compile Time (ms),
+        ymode=log,
+        log basis y=10,
+        tick label style={font=\bfseries\large},grid=major,
+        legend style={at={(0.5, 1.2)}, anchor=north,legend columns=-1},
+    ]
+    \addplot[
+        smooth,
+        color=blue,
+        mark=square,
+        mark size=2.9pt]
+    table [col sep=comma]
+    {resources/data/compilespeed_qhs.csv};
+    \addplot[
+        smooth,
+        color=red,
+        mark=square,
+        mark size=2.9pt]
+    table [col sep=comma]
+    {resources/data/compilespeed_ths.csv};
+    \addplot[
+        smooth,
+        color=green,
+        mark=square,
+        mark size=2.9pt]
+    table [col sep=comma]
+    {resources/data/compilespeed_c.csv};
+    \legend{QHS, THS, C}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
 
 \section{Geschwindigkeit eines Programmes}
 

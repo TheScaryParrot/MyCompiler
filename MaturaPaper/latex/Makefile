@@ -1,5 +1,5 @@
 CompilerConstruction.pdf:
 	rm -rf out
-	latexmk -f -pdf -xelatex CompilerConstruction.tex -outdir=out
+	latexmk -shell-escape -f -pdf -xelatex CompilerConstruction.tex -outdir=out
 	detex CompilerConstruction.tex | wc -w
 	
