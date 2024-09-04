@@ -15,6 +15,6 @@ static class IdentifierHandler
     void PushEnvironment() { this->envList->PushEnvironment(new Environment()); }
     void PopEnvironment() { this->envList->PopEnvironment(); }
 
-    void AddIdentifier(std::string name, Identifier* identifier) { this->envList->AddIdentifier(name, identifier); }
-    Identifier* GetIdentifier(std::string name) { return this->envList->GetIdentifier(name); }
+    void AddIdentifier(std::string& name, Identifier* identifier) { this->envList->AddIdentifier(name, identifier); }
+    Identifier* GetIdentifier(std::string& name) { return this->envList->GetIdentifier(name); }
 } IdentifierHandler;

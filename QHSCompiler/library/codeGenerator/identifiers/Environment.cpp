@@ -18,14 +18,14 @@ class Environment
         }
     }
 
-    void AddIdentifier(std::string name, Identifier* identifier)
+    void AddIdentifier(std::string& name, Identifier* identifier)
     {
         // deletes existing identifier (delete nullptr is safe)
         delete GetIdentifier(name);
 
         identifiers[name] = identifier;
     }
-    Identifier* GetIdentifier(std::string name)
+    Identifier* GetIdentifier(std::string& name)
     {
         if (identifiers.find(name) == identifiers.end())
         {

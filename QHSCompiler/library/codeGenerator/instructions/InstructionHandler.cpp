@@ -262,7 +262,7 @@ static class InstructionHandler
                                   return true;
                               }
 
-                              std::string generatorVarName = order.GetName();
+                              std::string& generatorVarName = order.GetName();
                               int value = generator->GetIntGeneratorVar(generatorVarName);
                               generator->PutInFront(Order(std::to_string(value), Order::LiteralCode, order.GetLine()));
                               return true;
@@ -292,7 +292,7 @@ static class InstructionHandler
                                   return true;
                               }
 
-                              std::string generatorVarName = nameOrder.GetName();
+                              std::string& generatorVarName = nameOrder.GetName();
                               int value = 0;
 
                               try
@@ -334,7 +334,7 @@ static class InstructionHandler
                                      return true;
                                  }
 
-                                 std::string generatorVarName = nameOrder.GetName();
+                                 std::string& generatorVarName = nameOrder.GetName();
                                  int change = 0;
 
                                  try
@@ -369,7 +369,7 @@ static class InstructionHandler
                                      return true;
                                  }
 
-                                 std::string generatorVarName = nameOrder.GetName();
+                                 std::string& generatorVarName = nameOrder.GetName();
                                  std::string value = generator->GetStringGeneratorVar(generatorVarName);
                                  generator->PutInFront(Order(value, Order::LiteralCode, nameOrder.GetLine()));
                                  return true;
@@ -398,8 +398,8 @@ static class InstructionHandler
                                      return true;
                                  }
 
-                                 std::string generatorVarName = nameOrder.GetName();
-                                 std::string value = valueOrder.GetName();
+                                 std::string& generatorVarName = nameOrder.GetName();
+                                 std::string& value = valueOrder.GetName();
                                  generator->SetStringGeneratorVar(generatorVarName, value);
                                  return true;
                              },

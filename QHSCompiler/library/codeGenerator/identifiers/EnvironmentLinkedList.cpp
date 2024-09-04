@@ -40,9 +40,12 @@ class EnvironmentLinkedList
         head = next;
     }
 
-    void AddIdentifier(std::string name, Identifier* identifier) { head->environment->AddIdentifier(name, identifier); }
+    void AddIdentifier(std::string& name, Identifier* identifier)
+    {
+        head->environment->AddIdentifier(name, identifier);
+    }
 
-    Identifier* GetIdentifier(std::string name)
+    Identifier* GetIdentifier(std::string& name)
     {
         Node* current = head;
         while (current != nullptr)

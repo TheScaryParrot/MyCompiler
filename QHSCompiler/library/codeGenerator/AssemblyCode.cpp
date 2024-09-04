@@ -30,9 +30,9 @@ class AssemblyCode
         *this->currentSection += code;
     }
 
-    void AddSection(std::string name) { sections.Set(name, ""); }
-    bool HasSection(std::string name) { return sections.Contains(name); }
-    void ChangeSection(std::string name) { currentSection = &sections.Get(name); }
+    void AddSection(std::string& name) { sections.Set(name, ""); }
+    bool HasSection(std::string& name) { return sections.Contains(name); }
+    void ChangeSection(std::string& name) { currentSection = &sections.Get(name); }
 
     std::string GetCode()
     {

@@ -68,7 +68,7 @@ class AbstractGenerator
     virtual OrderQueue GetOrderQueueCopy() = 0;
     virtual OrderQueue* DequeueWholeOrderQueue() = 0;
 
-    int GetIntGeneratorVar(std::string name)
+    int GetIntGeneratorVar(std::string& name)
     {
         if (!intGeneratorVars.Contains(name))
         {
@@ -78,9 +78,9 @@ class AbstractGenerator
 
         return intGeneratorVars.Get(name);
     }
-    void SetIntGeneratorVar(std::string name, int value) { intGeneratorVars.Set(name, value); }
+    void SetIntGeneratorVar(std::string& name, int value) { intGeneratorVars.Set(name, value); }
 
-    std::string GetStringGeneratorVar(std::string name)
+    std::string GetStringGeneratorVar(std::string& name)
     {
         if (!stringGeneratorVars.Contains(name))
         {
@@ -90,12 +90,12 @@ class AbstractGenerator
 
         return stringGeneratorVars.Get(name);
     }
-    void SetStringGeneratorVar(std::string name, std::string value) { stringGeneratorVars.Set(name, value); }
+    void SetStringGeneratorVar(std::string& name, std::string& value) { stringGeneratorVars.Set(name, value); }
 
     AssemblyCode* assemblyCode = new AssemblyCode();
 
-    void AddToAssemblyCode(std::string code) { this->assemblyCode->AddCode(code); }
-    void SetAssemblyCodeSection(std::string sectionName)
+    void AddToAssemblyCode(std::string& code) { this->assemblyCode->AddCode(code); }
+    void SetAssemblyCodeSection(std::string& sectionName)
     {
         if (assemblyCode->HasSection(sectionName))
         {
