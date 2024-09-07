@@ -105,14 +105,14 @@ GCC fängt besonders gut Fehler früh ab und meldet diese. Der traditionelle Com
 Der QHScompiler weisst hier hingegen einige Macken auf. Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
 \textbf{Er führt ganz einfach und strickt nur aus was als nächstes Auftaucht}. Somit führt ein fehlendes Zeichen nicht immer zu Fehlern. Folgendes Beispiel compiliert einweindfrei und lässt sich auch problemlos ausführen.
 
-\begin{lstlisting}[language=QHS, caption=QHS mit fehlerhaftem Syntax, label=eg:qhs-faulty-syntax-1]
+\begin{lstlisting}[language=QHS, caption=QHS mit fehlenden Tokens, label=eg:qhs-faulty-syntax-1]
 int a = "69"    /* ; fehlt */
 foo ( a  ;      /* ) fehlt */
 \end{lstlisting}
 
 Weder das Semikolon noch die schliessende Klammer bei \ref{eg:qhs-faulty-syntax-1} ist hierbei nötig und das Programm lässt sich problemlos compilieren und ausführen. (...)
 
-\begin{lstlisting}[language=QHS, caption=QHS mit fehlerhaftem Syntax, label=eg:qhs-faulty-syntax-2]
+\begin{lstlisting}[language=QHS, caption=QHS mit fehlender (, label=eg:qhs-faulty-syntax-2]
 int a = "69"    /* ; fehlt */
 foo a ) ;       /* ( fehlt */
 \end{lstlisting}
@@ -121,7 +121,7 @@ Der QHS Code bei \ref{eg:qhs-faulty-syntax-2} compiliert einwandfrei, jedoch ist
 
 Weiter sind auch die Fehlermedlungen nicht immer besonders klar.
 
-\begin{lstlisting}[language=QHS, caption=QHS mit fehlerhaftem Syntax, label=eg:qhs-faulty-syntax-3]
+\begin{lstlisting}[language=QHS, caption=QHS mit falscher Anzahl Argumente, label=eg:qhs-faulty-syntax-3]
 void foo ( ) { }
 
 start
