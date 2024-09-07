@@ -56,12 +56,54 @@ Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und
 \section{Benutzerfreundlichkeit}
 Benutzerfreundlichkeit ist im Gegensatz zu den beiden vorherigen Vergleichskriterien etwas subjektives. Jedoch würde ich sagen behaupten, dass auch hier das Urteil ziemlich klar ist.
 GCC und der THScompiler folgen beide exakt definiertem Syntax und Semantik. Dies ist ein Resultat des Scanner und des Parsers die noch diesen bestimmten Regeln geschrieben wurden.
-Anfangs scheinen Semikolons am Ende jedes Statements vielleicht etwas unnötig, jedoch bemerkt man schnell, dass genau diese Pingelikeit der Compiler für eine Programmiersprache äussers wichtig istd.
-GCC fängt besonders gut Fehler früh ab und meldet diese. Der traditionelle Compiler ist somit sehr gut in puncto Benutzerfreundlichkeit aufgestellt.
+Anfangs scheinen Semikolons am Ende jedes Statements vielleicht etwas unnötig, jedoch bemerkt man schnell, dass genau diese Pingelikeit der Compiler für eine Programmiersprache äussers wichtig ist.
+GCC fängt besonders gut Fehler früh ab und meldet diese. Der traditionelle Compiler ist somit sehr gut in puncto Benutzerfreundlichkeit.
 
 Der QHScompiler weisst hier hingegen einige Macken auf. Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
-\textbf{Er führt ganz einfach und strickt nur aus was als nächstes Auftaucht}.
+\textbf{Er führt ganz einfach und strickt nur aus was als nächstes Auftaucht}. Somit führt ein fehlendes Zeichen nicht immer zu Fehlern. Folgendes Beispiel compiliert einweindfrei und lässt sich auch problemlos ausführen.
 
+\begin{lstlisting}[language=QHS, caption=QHS mit fehlerhaftem Syntax, label=eg:qhs-faulty-syntax-1]
+int a = "69"    /* ; fehlt */
+foo ( a  ;      /* ) fehlt */
+\end{lstlisting}
 
+Weder das Semikolon noch die schliessende Klammer bei \ref{eg:qhs-faulty-syntax-1} ist hierbei nötig und das Programm lässt sich problemlos compilieren und ausführen. (...)
+
+\begin{lstlisting}[language=QHS, caption=QHS mit fehlerhaftem Syntax, label=eg:qhs-faulty-syntax-2]
+int a = "69"    /* ; fehlt */
+foo a ) ;       /* ( fehlt */
+\end{lstlisting}
+
+Der QHS Code bei \ref{eg:qhs-faulty-syntax-2} compiliert einwandfrei, jedoch ist der genierte Assembly-Code fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument angesehen.
+
+Weiter sind auch die Fehlermedlungen nicht immer besonders klar.
+
+\begin{lstlisting}[language=QHS, caption=QHS mit fehlerhaftem Syntax, label=eg:qhs-faulty-syntax-3]
+void foo ( ) { }
+
+start
+{
+    int a = "69" 
+    foo ( a ) ;
+
+    exit ;
+}
+
+%\noindent\hrulefill Output\noindent\hrulefill%
+[ERROR] Cannot dequeue, OrderQueue is empty!
+[ERROR] Expected LiteralCode for #literalToIdentifier at OrderQueue second, got: EMPTY
+[ERROR] Cannot dequeue, OrderQueue is empty!
+[ERROR] Tried #changeIntVar but second order (change) from OrderQueue is not direct code
+[ERROR] Expected LiteralCode for #literalToIdentifier, got: EMPTY
+[ERROR] Expected LiteralCode for #literalToIdentifier, got: EMPTY
+[ERROR] Expected LiteralCode for #literalToIdentifier, got: EMPTY
+\end{lstlisting}
+
+Bei \ref{eg:qhs-faulty-syntax-3} wird die Funktion foo ohne Parameter definiert, später jedoch mit einem Argument aufgerufen. Der QHScompiler verfügt hierbei über keine Möglichkeit die Menge an Argumenten zu überprüfen
+und meldet nicht direkt einen Fehler. Als er jedoch versucht die Grösse des erwarteten Argumentes von der OrderQueue zu nehmen ist diese leer \textbf{WHY? they don't know how calls work}.
+Der QHScompiler meldet also einen OrderQueue-Empty Error gefolgt von vielen Folgefehlern.
+Somit ist der QHScompiler einerseits weniger strikt andererseits aber auch deutlich unübersichtlicher als ein traditioneller Compiler.
+
+In meinen Augen triumphiert daher auch in dieser Kategorie der traditionele Compiler über meinen QHScompiler.
 
 \section{Offenheit für Erweiterung}
