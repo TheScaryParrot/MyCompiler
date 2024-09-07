@@ -86,16 +86,16 @@ Diese Funktionen können Variabeln im QHS-Compiler speichern, den OrderQueue akt
     \textbf{\#assign}               & Das erste Element der OrderQueue muss ein Identifier sein. Der Rest der Orders auf OrderQueue wird als Definition für diesen Identifier festgelegt. \\ \hline
     \textbf{\#assignToOne}          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der OrderQueue genommen und als Definition für den Identifier verwendet. \\ \hline
     \textbf{\#force}                & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Validate und somit die OrderQueue. \\ \hline
+    \textbf{\#lightForce}           & Ähnlich wird \#force, jedoch wird diese nur ausgeführt, wenn \textbf{explain this} \\ \hline
     \textbf{\#orderEnqueue}         & Die nächste Order wird sofort der OrderQueue hinzugefügt, auch wenn diese Order OrderQueue-Proof wäre. Execute wird übersprungen. \\ \hline
     \textbf{\#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der OrderQueue gesetzt. \\ \hline
-    \textbf{\#deepFetch}            & Wird mit der ersten Order der zweitobersten Liste an Order auf dem Fetch-Stack. Ermöglicht den Zugriff auf den Inputfile innerhalb einer Identifier-Definition. \\ \hline
+    \textbf{\#deepFetch}            & Die erste Order der zweitobersten Liste auf dem Fetch-Stack wird oben auf den Fetch-Stack gesetzt. Ermöglicht den Zugriff auf den Inputfile innerhalb einer Identifier-Definition. \\ \hline
+    \textbf{\#queueFetch}           & Die oberste Order der Order-Queue wird oben auf den Fetch-Stack gesetzt \\ \hline 
     \textbf{\#pushEnv}              & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
-    \textbf{\#popEnv}               & Das neuste Environment der Environment Linked-List wird gelöscht.
-        
+    \textbf{\#popEnv}               & Das neuste Environment der Environment Linked-List wird gelöscht. \\ \hline
+    \textbf{\#addLiterals}          & Die beiden obersten Orders auf der OrderQueue müssen LiteralCode sein. Diese werden als Zahl interpretiert und addiert. Sollten diese keine Zahl sein, wird ein Fehler gemeldet.        
     \end{tabularx}
 \end{table}
-
-ADD put in front and addIdentifier and lightForce
 
 Der QHScompiler umfässt \textbf{33} Instructions, wobei \textbf{5} dieser nur für Debugging des Compilers dienen.
 
