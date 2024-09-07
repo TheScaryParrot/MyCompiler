@@ -5,7 +5,8 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
 
 \section{Geschwindigkeit der Compilation}
 
-\begin{center}
+\begin{figure}[h!]
+\centering
 \begin{tikzpicture}
     \begin{axis}[
         enlargelimits=false,
@@ -16,7 +17,7 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
         ymode=log,
         log basis y=10,
         tick label style={font=\bfseries\large},grid=major,
-        legend style={at={(0.5, 1.2)}, anchor=north,legend columns=-1},
+        legend pos=north west,
     ]
     \addplot[
         smooth,
@@ -25,6 +26,7 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
         mark size=2.9pt]
     table [col sep=comma]
     {resources/data/compilespeed_qhs.csv};
+    \addlegendentry{QHS}
     \addplot[
         smooth,
         color=red,
@@ -32,6 +34,7 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
         mark size=2.9pt]
     table [col sep=comma]
     {resources/data/compilespeed_ths.csv};
+    \addlegendentry{THS}
     \addplot[
         smooth,
         color=green,
@@ -39,15 +42,26 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
         mark size=2.9pt]
     table [col sep=comma]
     {resources/data/compilespeed_c.csv};
-    \legend{QHS, THS, C}
+    \addlegendentry{C}
     \end{axis}
 \end{tikzpicture}
-\end{center}
+\caption{Compile Time mit Log-Log Skalen}
+\end{figure}
 
 \section{Geschwindigkeit eines Programmes}
+Die Geschwindigkeit eines compilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Dieser ist so geschrieben, dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet.
+Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und Loops. Dieser Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt.
 
 
 \section{Benutzerfreundlichkeit}
+Benutzerfreundlichkeit ist im Gegensatz zu den beiden vorherigen Vergleichskriterien etwas subjektives. Jedoch würde ich sagen behaupten, dass auch hier das Urteil ziemlich klar ist.
+GCC und der THScompiler folgen beide exakt definiertem Syntax und Semantik. Dies ist ein Resultat des Scanner und des Parsers die noch diesen bestimmten Regeln geschrieben wurden.
+Anfangs scheinen Semikolons am Ende jedes Statements vielleicht etwas unnötig, jedoch bemerkt man schnell, dass genau diese Pingelikeit der Compiler für eine Programmiersprache äussers wichtig istd.
+GCC fängt besonders gut Fehler früh ab und meldet diese. Der traditionelle Compiler ist somit sehr gut in puncto Benutzerfreundlichkeit aufgestellt.
+
+Der QHScompiler weisst hier hingegen einige Macken auf. Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
+\textbf{Er führt ganz einfach und strickt nur aus was als nächstes Auftaucht}.
+
 
 
 \section{Offenheit für Erweiterung}
