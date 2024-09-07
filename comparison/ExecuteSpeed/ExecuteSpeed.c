@@ -63,7 +63,7 @@ void printInt(int n)
 
 void main(int argc, char *argv[])
 {
-    int checkUntil = 100000;
+    int checkUntil = 1000000;
 
     for (int i = 0; i < checkUntil; i++)
     {
