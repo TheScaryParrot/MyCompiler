@@ -81,7 +81,7 @@ void printInt ( int n )
 
 start
 {
-    int checkUntil = "1000000" ;
+    int checkUntil = "800000" ;
 
     int i = "0" ;
 

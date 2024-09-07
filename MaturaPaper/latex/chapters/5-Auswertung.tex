@@ -54,6 +54,47 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
 Die Geschwindigkeit eines compilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Dieser ist so geschrieben, dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet.
 Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und Loops. Dieser Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt.
 
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        enlargelimits=false,
+        xlabel=Primes until,
+        ylabel=Execute Time (ms),
+        tick style={draw=none},
+        tick label style={font=\bfseries\large},
+        grid=major,
+        legend pos=north west,
+    ]
+    \addplot[
+        smooth,
+        color=blue,
+        mark=square,
+        mark size=2pt]
+    table [col sep=comma]
+    {resources/data/executespeed_qhs.csv};
+    \addlegendentry{QHS}
+    \addplot[
+        smooth,
+        color=red,
+        mark=square,
+        mark size=2pt]
+    table [col sep=comma]
+    {resources/data/executespeed_ths.csv};
+    \addlegendentry{THS}
+    \addplot[
+        smooth,
+        color=green,
+        mark=square,
+        mark size=2pt]
+    table [col sep=comma]
+    {resources/data/executespeed_c.csv};
+    \addlegendentry{C}
+    \end{axis}
+\end{tikzpicture}
+\caption{Execute Time mit Log-Log Skalen}
+\end{figure}
+
 
 \section{Benutzerfreundlichkeit}
 Benutzerfreundlichkeit ist im Gegensatz zu den beiden vorherigen Vergleichskriterien etwas subjektives. Jedoch würde ich sagen behaupten, dass auch hier das Urteil ziemlich klar ist.
