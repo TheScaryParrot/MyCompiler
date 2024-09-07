@@ -246,14 +246,8 @@ mov eax, 60
 xor edi, edi
 syscall 
 ret 
-
-section .bss
 bool3: resb 1
 float3: resb 4
-
-section .data
 bool2: db 0
-
-section .rodata
 bool1: db 1
 float2: dd 1.714286

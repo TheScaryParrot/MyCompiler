@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -12,24 +13,28 @@ class AssemblyCode
    public:
     ~AssemblyCode()
     {
-        for (auto& line : text)
+        while (!text.empty())
         {
-            delete line;
+            delete text.front();
+            text.pop();
         }
 
-        for (auto& line : bss)
+        while (!bss.empty())
         {
-            delete line;
+            delete bss.front();
+            bss.pop();
         }
 
-        for (auto& line : roData)
+        while (!data.empty())
         {
-            delete line;
+            delete data.front();
+            data.pop();
         }
 
-        for (auto& line : data)
+        while (!roData.empty())
         {
-            delete line;
+            delete roData.front();
+            roData.pop();
         }
     }
 
@@ -37,28 +42,28 @@ class AssemblyCode
     {
         if (line == nullptr) return;
 
-        this->text.push_back(line);
+        this->text.push(line);
     }
 
     void AddToBss(DataDeclarationLine* line)
     {
         if (line == nullptr) return;
 
-        this->bss.push_back(line);
+        this->bss.push(line);
     }
 
     void AddToRoData(DataDeclarationLine* line)
     {
         if (line == nullptr) return;
 
-        this->roData.push_back(line);
+        this->roData.push(line);
     }
 
     void AddToData(DataDeclarationLine* line)
     {
         if (line == nullptr) return;
 
-        this->data.push_back(line);
+        this->data.push(line);
     }
 
     std::string ToString()
@@ -66,44 +71,43 @@ class AssemblyCode
         std::string result = "";
 
         result += "section .text\n";
-        for (auto& line : text)
+        while (!text.empty())
         {
-            result += line->ToString() + "\n";
+            result += text.front()->ToString() + "\n";
+            delete text.front();
+            text.pop();
         }
 
-        if (bss.size() > 0)
+        result += "section .bss\n";
+        while (!bss.empty())
         {
-            result += "\nsection .bss\n";
-            for (auto& line : bss)
-            {
-                result += line->ToString() + "\n";
-            }
+            result += bss.front()->ToString() + "\n";
+            delete bss.front();
+            bss.pop();
         }
 
-        if (data.size() > 0)
+        result += "section .data\n";
+        while (!data.empty())
         {
-            result += "\nsection .data\n";
-            for (auto& line : data)
-            {
-                result += line->ToString() + "\n";
-            }
+            result += data.front()->ToString() + "\n";
+            delete data.front();
+            data.pop();
         }
 
-        if (roData.size() > 0)
+        result += "section .rodata\n";
+        while (!roData.empty())
         {
-            result += "\nsection .rodata\n";
-            for (auto& line : roData)
-            {
-                result += line->ToString() + "\n";
-            }
+            result += roData.front()->ToString() + "\n";
+            delete roData.front();
+            roData.pop();
         }
 
         return result;
     };
 
    private:
-    std::vector<IAssemblyLine*> text = std::vector<IAssemblyLine*>();
-    std::vector<DataDeclarationLine*> bss = std::vector<DataDeclarationLine*>();
-    std::vector<DataDeclarationLine*> roData = std::vector<DataDeclarationLine*>();
-    std::vector<DataDeclarationLine*> data = std::vector<DataDeclarationLine*>();
+    std::queue<IAssemblyLine*> text;
+    std::queue<DataDeclarationLine*> bss;
+    std::queue<DataDeclarationLine*> roData;
+    std::queue<DataDeclarationLine*> data;
 };
