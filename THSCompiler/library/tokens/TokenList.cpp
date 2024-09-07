@@ -8,17 +8,48 @@
 
 class TokenList
 {
+   private:
+    struct Node
+    {
+        Token* token;
+        Node* next;
+    };
+
+    Node* head = nullptr;
+    Node* tail = nullptr;
+    size_t size = 0;
+
    public:
     ~TokenList()
     {
-        for (auto token : tokens)
+        Node* temp;
+        while (head != nullptr)
         {
-            delete token;
+            temp = head->next;
+            delete head->token;
+            delete head;
+            head = temp;
         }
     }
 
-    void AddToken(Token* token) { tokens.push_back(token); }
-    unsigned int GetSize() { return tokens.size(); }
+    void AddToken(Token* token)
+    {
+        size++;
+        Node* node = new Node();
+        node->token = token;
+        node->next = nullptr;
+
+        if (head == nullptr)
+        {
+            head = node;
+            tail = node;
+            return;
+        }
+
+        tail->next = node;
+        tail = node;
+    }
+    size_t GetSize() { return size; }
 
     template <typename T>
     T* Next()
@@ -30,45 +61,49 @@ class TokenList
     {
         if (HasNext())
         {
-            return tokens[readIndex++];
+            size--;
+            Token* token = head->token;
+            Node* temp = head;
+            head = temp->next;
+            delete temp;
+            return token;
         }
 
         return nullptr;
     }
 
-    Token* Peek(int offset = 0)
+    Token* Peek(unsigned int offset = 0)
     {
-        if (readIndex + offset < 0 || readIndex + offset >= GetSize())
+        if (!HasNext(offset)) return nullptr;
+
+        Node* current = head;
+        for (unsigned int i = 0; i < offset; i++)
         {
-            return nullptr;
+            current = current->next;
         }
 
-        return tokens[readIndex + offset];
+        return current->token;
     }
-    bool IsPeekOfTokenType(Token& other, int offset = 0)
+    bool IsPeekOfTokenType(Token& other, unsigned int offset = 0)
     {
-        if (!HasNext(offset))
-        {
-            return false;
-        }
+        if (!HasNext(offset)) return false;
 
         return Peek(offset)->IsThisToken(other);
     }
 
-    bool HasNext(int offset = 0) { return readIndex + offset < tokens.size(); }
+    bool HasNext(unsigned int offset = 0) { return offset < size; }
 
     std::string ToString()
     {
         std::string result = "";
-        for (int i = 0; i < tokens.size(); i++)
+        Node* current = head;
+
+        while (current != nullptr)
         {
-            result += tokens[i]->ToString() + "\n";
+            result += current->token->ToString() + " ";
+            current = current->next;
         }
+
         return result;
     }
-
-   private:
-    // TODO: Maybe a better data structure for this as there is a lot of adding
-    std::vector<Token*> tokens;
-    unsigned int readIndex = 0;
 };
