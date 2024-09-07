@@ -63,7 +63,7 @@ Ist die OrderQueue deaktiviert oder die Order OrderQueue-Proof, wird diese an de
 Execute ist der letzte Schritt des Zyklus. Und hier wird nun auch endlich der tatsächliche Assembly Code generiert. Je nach Typ der Order, Identifier, Instruction oder Literal-Code, läuft Execute sehr unterschiedlich ab.
 
 \subsection{Identifier}
-Ein Identifier ist eine Zusammenfassung von mehreren Orders. Diese sind in einem Environment definiert. Hierbei handelt es sich um eine einfach Map (Dictionary), \textbf{die einen Identifier als string mit einer Liste an Orders verknüpft}.
+Ein Identifier ist eine Zusammenfassung von mehreren Orders. Diese sind in einem Environment definiert. Hierbei handelt es sich um eine einfach Map (Dictionary), die einen Identifier mit einer Liste an Orders verknüpft.
 Wenn nun ein Identifier in den Execute Schritt kommt, werden die dazugehörige Liste an Orders auf den Fetch-Stack aus Abschnitt \ref{sec:qhs-fetch} gepushed.
 Beim nächsten Fetch werden nun die zum Identifier gehörenden Orders zurückgegeben. Um Grunde wird der Identifier mit seinen Orders ersetzt.
 
@@ -222,20 +222,16 @@ sub [rbp-12], 10
 So sieht eine Variabel Definition genau so aus, wie es in anderen Programmiersprachen gebräuchlich ist. Der Shortcut ; ist hierbei optional.
 
 \subsection{Funktionen} \label{sec:qhs-funcs}
-Funktionen sind im Vergleich zu Variablen deutlich komplizierter. \textbf{Daher soll hierbei nur auf zwei der Problematiken an Funktionen behandelt werden.}
+Funktionen sind im Vergleich zu Variablen deutlich komplizierter. Hierbei sollen zwei der Problematiken an Funktionen behandelt werden.
 
 Zum Schluss sollte eine Funktionsdefinition wie folgt aussehen:
 
 
-\begin{lstlisting}[language=QHS, label=eg:qhs-function_goal, caption=Ziel für die Definition einer Funktion in QHS]
+\begin{lstlisting}[language=C, label=eg:qhs-function_goal, caption=Ziel für die Definition einer Funktion in QHS]
 int foo ( int param1 , int param2 )
 {
     (...)
 }
-            
-%\noindent\hrulefill Output\noindent\hrulefill%
-foo:
-(...)
 \end{lstlisting}
 
 Hier lässt sich bereits ein erstes Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der Int Identifier für eine Variabel Definition verwendet. 
