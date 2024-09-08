@@ -1,22 +1,25 @@
 \chapter{Auswertung}
-
 Wie bereits in Kapitel \ref{cha:3-Meine_Idee} beschrieben wurde, sollen drei Compiler QHScompiler, THScompiler und GCC sowie deren dazugehörigen Sprachen QHS, THS und C verglichen werden.
 Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilierten Programmes, Benutzerfreundlichkeit und Offenheit für Erweiterung bewertet. 
 
-\section{Geschwindigkeit der Compilation}
+\section{Geschwindigkeit der Compilation} \label{sec:compare-compilespeed}
+Für die Messung der Compilations Geschwindigkeit wird eine Funktion, die prüft, ob eine Zahl eine Primzahl ist, compiliert. Diese Funktion wurde so geschrieben, dass jedes Feature, das alle drei Compiler unterstützen, verwendet wird.
+Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und Loops. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt. Anschliessend wurde jedes Programm 10x Compiliert.
+Die durchschnittliche Dauer der Kompilierung ist in \ref{fig:compilespeed} ersichtlich.
 
 \begin{figure}[h!]
 \centering
+\label{fig:compilespeed}
 \begin{tikzpicture}
     \begin{axis}[
         enlargelimits=false,
-        xlabel=File Size,
+        xlabel=Anzahl der Funktionen,
         xmode=log,
         log basis x=10,
-        ylabel=Compile Time (ms),
+        ylabel=Kompilierungsdauer (ms),
         ymode=log,
         log basis y=10,
-        tick style={draw=none},
+        %tick style={draw=none},
         tick label style={font=\bfseries\large},
         grid=major,
         legend pos=north west,
@@ -44,24 +47,34 @@ Diese werden in Geschwindigkeit der Compilation, Geschwindigkeit eines compilier
         mark size=2pt]
     table [col sep=comma]
     {resources/data/compilespeed_c.csv};
-    \addlegendentry{C}
+    \addlegendentry{GCC}
     \end{axis}
 \end{tikzpicture}
-\caption{Compile Time mit Log-Log Skalen}
+\caption{Vergleich der Kompilierungsdauer mit Log-Log Skalen}
 \end{figure}
 
+Interessant ist hierbei, dass sowohl QHS als auch GCC mit einer hohen Kompilierungsdauer beginnen und sich später linear verhalten. Während THS zwar zu Beginn mit einer sehr schnellen Kompilierung glänzt,
+daraufhin jedoch exponentiell ansteigt. Bei etwas mehr als 10³ Kopien der Funktion wird GCC und daraufhin zwischen 10⁴ und 10⁵ Kopien auch der QHScompiler schneller als der THScompiler. Für die exponentielle Kompilerungsdauer
+des THScompilers habe ich leider keine Erklärung. Grundsätzlich sollten alle Schritte die der THScompiler durchläuft eine lineare Komplexität aufweisen. Daher liegt der Fehler wahrscheinlich bei meinen eigenen C++ Kenntnissen.
+Durch die logarithmischen Skalen erscheint der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler konstant, jedoch braucht der QHScompiler ab einer Programmgrösse über 10² Funktionskopien konsistent 7-8 mal
+länger für die Kompilierung als GCC. 
+Der QHScompiler ist somit deutlich geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer beim THScompiler nicht am Prinzip des traditionellen Compilers und viel mehr an meiner Implementation davon.
+Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
+
+
 \section{Geschwindigkeit eines Programmes}
-Die Geschwindigkeit eines compilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Dieser ist so geschrieben, dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet.
-Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und Loops. Dieser Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt.
+Die Geschwindigkeit eines compilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Sowie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
+dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Dieser Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt.
 
 \begin{figure}[h!]
 \centering
+\label{fig:executespeed}
 \begin{tikzpicture}
     \begin{axis}[
         enlargelimits=false,
-        xlabel=Primes until,
-        ylabel=Execute Time (ms),
-        tick style={draw=none},
+        xlabel=Primzahlen bis,
+        ylabel=Ausführungsdauer (ms),
+        %tick style={draw=none},
         tick label style={font=\bfseries\large},
         grid=major,
         legend pos=north west,
@@ -92,8 +105,10 @@ Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und
     \addlegendentry{C}
     \end{axis}
 \end{tikzpicture}
-\caption{Execute Time mit Log-Log Skalen}
+\caption{Vergleich der Ausführungsdauer}
 \end{figure}
+
+In Grafik \ref{fig:executespeed} ist ersichtlich, dass 
 
 
 \section{Benutzerfreundlichkeit}
@@ -103,7 +118,7 @@ Anfangs scheinen Semikolons am Ende jedes Statements vielleicht etwas unnötig, 
 GCC fängt besonders gut Fehler früh ab und meldet diese. Der traditionelle Compiler ist somit sehr gut in puncto Benutzerfreundlichkeit.
 
 Der QHScompiler weisst hier hingegen einige Macken auf. Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
-\textbf{Er führt ganz einfach und strickt nur aus was als nächstes Auftaucht}. Somit führt ein fehlendes Zeichen nicht immer zu Fehlern. Folgendes Beispiel compiliert einweindfrei und lässt sich auch problemlos ausführen.
+\textbf{Er führt ganz einfach und strickt nur aus was als Nächstes auftaucht}. Somit führt ein fehlendes Zeichen nicht immer zu Fehlern. Folgendes Beispiel compiliert einweindfrei und lässt sich auch problemlos ausführen.
 
 \begin{lstlisting}[language=QHS, caption=QHS mit fehlenden Tokens, label=eg:qhs-faulty-syntax-1]
 int a = "69"    /* ; fehlt */
@@ -119,7 +134,7 @@ foo a ) ;       /* ( fehlt */
 
 Der QHS Code bei \ref{eg:qhs-faulty-syntax-2} compiliert einwandfrei, jedoch ist der genierte Assembly-Code fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument angesehen.
 
-Weiter sind auch die Fehlermedlungen nicht immer besonders klar.
+Weiter sind auch die Fehlermeldungen nicht immer besonders klar.
 
 \begin{lstlisting}[language=QHS, caption=QHS mit falscher Anzahl Argumente, label=eg:qhs-faulty-syntax-3]
 void foo ( ) { }
