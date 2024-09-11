@@ -33,6 +33,7 @@
 % Used for including code snippets
 \usepackage{listings}
 \usepackage{xcolor}
+\newcommand*{\listingFont}{\ttfamily}
 \lstdefinelanguage{QHS}
 {
     %morekeywords={\textgreater\textgreater},
@@ -54,7 +55,7 @@
     keywordstyle=\color{codeviolet},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codebrown},
-    basicstyle=\ttfamily\footnotesize,
+    basicstyle=\listingFont\footnotesize,
     frame=single,
     frameround=tttt,
     escapechar=\%,
