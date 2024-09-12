@@ -1,6 +1,6 @@
-\chapter{Traditioneller Compiler}
+\chapter{Ein traditioneller Compiler}
 
-Ein Compiler ist traditionell nach folgendem Schema aufgebaut.
+Ein Compiler ist traditionell mit folgendem Schema beschreiben.
 
 \begin{figure}[h!]
     \centering
@@ -9,7 +9,7 @@ Ein Compiler ist traditionell nach folgendem Schema aufgebaut.
     \label{fig:mountain}
 \end{figure}
 
-In dieser Arbeit werde ich mich nur auf die im unteren Schema dargestellten Schritte fokussieren.
+In dieser Arbeit werde ich mich nur auf die im unteren Schema \ref{fig:mountain-edited} dargestellten Schritte fokussieren.
 
 \begin{figure}[h!]
     \centering
@@ -19,9 +19,9 @@ In dieser Arbeit werde ich mich nur auf die im unteren Schema dargestellten Schr
 \end{figure}
 
 \section{Lexical Analysis}
-Meist werden Programme so geschrieben, dass wir Menschen es lesen und verstehen können. Dafür verwendet man Buchstaben und Zahlen, Zeichen, wie +, *, oder Klammern, und Whitespaces, wie Leerzeichen oder Absätze.
-Diese Zeichen sind jedoch für den Computer unverständlich. Der erste Schritt beim compilieren ist daher die Lexical Analysis. Dies wird von einem Teil des Compilers, dem Lexer, durchgeführt.
-Die Aufgabe dieses Lexers ist es den Input File zu scannen und die gescannten Zeichen in sogenannte Tokens zu verwandeln. Diese Tokens sind Datenstrukturen, die der Compiler kennt und mit denen er weiterarbeiten kann.
+Meist werden Programme so geschrieben, dass wir Menschen sie lesen und verstehen können. Dafür verwendet man Buchstaben, Zahlen, Zeichen, wie + oder *, und Whitespaces, wie Leerzeichen oder Absätze.
+Diese sind jedoch für den Computer noch nicht sofort verständlich. Der erste Schritt beim Kompilieren ist daher die \textit{Lexical Analysis}. Dies wird von einem Teil des Compilers, dem \textit{Lexer}, durchgeführt.
+Die Aufgabe dieses Lexers ist es den Inputfile zu analysieren und die gefundenen Zeichen in sogenannte \textit{Tokens} zu verwandeln. Diese Tokens sind Datenstrukturen, die der Compiler kennt und mit denen er weiterarbeiten kann.
 
 Als Beispiel:
 
@@ -37,8 +37,6 @@ int foo()
 }
 \end{lstlisting}
 
-Würde hierbei zu einem Array von Token Objekten umgewandelt werden:
-
 \begin{lstlisting}[label=eg:postLex, caption=Tokens nach Lexical Analysis]
 Keyword         (keyword="int")
 Identifier      (id="foo")
@@ -52,13 +50,14 @@ LiteralInt      (value=0)
 [...]
 \end{lstlisting}
 
-Der Lexer legt hierbei fest welche Zeichen die Input-Programmiersprache enthalten darf und welche Bedeutung ihnen Zugesprochen wird. So ist zum Beispiel im Lexer festgelegt, dass ein + Zeichen als Addition interpretiert wird.
+Der Lexer legt hierbei fest welche Zeichen die Input-Programmiersprache enthalten darf und welche Bedeutung ihnen zugesprochen wird. So ist zum Beispiel im Lexer festgelegt, dass ein + Zeichen als Addition interpretiert wird.
 Genauso wie im Listing \ref{eg:postLex} 'if' als KeywordToken gesehen wird, lässt sich im Lexer auch bestimmen, dass ein Wort wie 'print' als Keyword angesehen werden soll.
 
 \section{Syntax Analysis}
-Nun versteht der Compiler was mit den Zeichen im Input File gemeint ist, jedoch fehlt noch etwas bis tatsächlich in eine andere Programmiersprache übersetzt werden kann. Und das ist Verständnis für Syntax.
+Nun versteht der Compiler was mit den Zeichen im Inputfile gemeint ist, jedoch fehlt noch etwas bis tatsächlich in eine andere Programmiersprache übersetzt werden kann. Und das ist Verständnis für Syntax.
 Die meisten High-Level Programmiersprachen weisen Syntaxregeln auf. Diese beinhalten, wie Funktionen und Variablen definiert werden oder mit welchen Punktvorstrich-Regeln Expressions evaluiert werden.
-Die bei der Lexical Analysis gefundenen Tokens werden nun ineinander verschachtelt und in einen sogenannten Abstract Syntax Tree (AST) überführt.
+In diesem Schritt für der sogenannte \textit{Parser} die \textit{Syntax Analysis} durch.
+Hierbei werden die bei der Lexical Analysis gefundenen Tokens ineinander verschachtelt und in einen sogenannten \textit{Abstract Syntax Tree (AST)} überführt.
 
 \begin{figure}[H]
     \centering
@@ -68,16 +67,17 @@ Die bei der Lexical Analysis gefundenen Tokens werden nun ineinander verschachte
 \end{figure}
 
 Ein AST enthält somit nicht nur Informationen über die Tokens, sondern über die gesamten Strukturen und Abhängigkeiten, die sich aus den Tokens ergeben. Variabel- und Funktionsdefinitionen oder komplexe Statements wie 'if' oder 'for'
-sind im AST enthalten. Wenn man die Nodes des AST von unten nach oben (Bottom-Up) durchquert erhält man die Reihenfolge der einzelnen Tokens ohne Abhängigkeitskonflikte. Eine Subtraktion kann zum Beispiel erst ausgeführt werden,
-wenn sowohl die linke als auch die rechte Zahl bekannt ist. Daher befindet sich, wie in Abbildung \ref{fig:syntax-tree} ersichtlich, die Subtraktion über den beiden Werten im AST.
+sind im AST als \textit{Nodes} enthalten. Wenn man die Nodes des AST von unten nach oben durchquert, erhält man die Reihenfolge der einzelnen Tokens ohne Abhängigkeitskonflikte.
+Eine Subtraktion kann zum Beispiel erst ausgeführt werden, wenn sowohl die linke als auch die rechte Zahl bekannt ist.
+Daher befindet sich, wie in Abbildung \ref{fig:syntax-tree} ersichtlich, die Subtraktion über den beiden benötigten Werten im AST.
 
 \section{Semantic Analysis}
-Semantik ist die Wissenschaft der Bedeutung von Worten einer Menschensprache. So ähnlich ist es auch bei Programmiersprachen, jedoch geht hierbei viel weniger um Bedeutung und eher um den Datatype.
-In diesem Schritt der Compilation beschäftigt sich der Compiler mit der Validität von Expressions. Unbekannte Variablen oder Funktionen werden in diesem Schritt abgefangen.
-Weiter wird der Datatype einer Node an diese angebunden. Gegebenenfalls kann auch ein Implicit-Cast, also ein impliziter Wechsel des Datatypes hinzugefügt werden.
-So geben zum Beispiel manche Programmiersprache bei der Division zweier Integers eine Float zurück. Wird eine Variable nicht konform ihres Datatypes verwendet, zum Beispiel die Division zweier Strings,
-wird dies ebenfalls während der Semantic Analysis entdeckt und gemeldet.
-
+Semantik ist die Wissenschaft der Bedeutung von Worten einer Menschensprache. Bei einem Compiler geht es bei der \textit{Semantic Analysis} weniger um Bedeutung und mehr um die Konsistenz von Datentypen.
+In diesem Schritt der Kompilierung beschäftigt sich der Compiler mit der Korrektheit von Expressions.
+Wird eine Variable nicht konform ihres Datentyps verwendet, zum Beispiel die Division zweier Strings, wird dies während der Semantic Analysis entdeckt und gemeldet.
+Auch werden unbekannte Variablen und Funktionen in diesem Schritt abgefangen.
+Weiter wird der Datentyp einer Node an diese angebunden. Gegebenenfalls kann auch ein impliziter Cast, also ein impliziter Wechsel des Datentyps hinzugefügt werden.
+So geben zum Beispiel manche Programmiersprachen bei der Division zweier Integers eine Float zurück.
 
 \section{Code Generation}
 Code Generation ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss. Nun da unser Input-Code nicht mehr nur als Textfile, sondern als Intermediate Representation vorliegt,
@@ -85,8 +85,8 @@ kann endlich Output-Code generiert werden. Jedoch lässt sich über diesen Schri
 [Code generation types]
 
 \section{Optimization}
-Code Generation ist zwar der letzte Schritt beim Compilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. Optimization ist ein Sache die zwischen jedem der genannten Schritte geschiet
-und dies häufig mehrmals. Dabei geht es darum den Output-Code so effizient wie möglich zu machen. Effizient kann hierbei jedoch viel Verschiedenes bedeuten. Der Output-Code muss so schnell wie möglich ausgeführt werden können,
-Memory sparsam verwenden und am besten auch noch ein kleiner File sein. Optimization reicht vom Entfernen der Kommentare beim Scannen oder umstellen von mathematischen Operationen bis zu entfernen von ungebrauchten Variablen und Deadstores.
+Code Generation ist zwar der letzte Schritt beim Kompilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. \textit{Optimization} geschieht zwischen jedem der genannten Schritte und dies häufig mehrmals.
+Dabei geht es darum den Output-Code so effizient wie möglich zu machen. Effizient kann hierbei viel Verschiedenes bedeuten. Der Output-Code muss so schnell wie möglich ausgeführt werden,
+Memory sparsam verwenden und am besten auch noch eine möglichst kleine Datei sein. Optimization reicht vom Entfernen der Kommentare und Umstellen von mathematischen Operationen bis zu entfernen von ungebrauchten Variablen und Deadstores.
 Es muss von CPU Registern profitiert, mit Heap-Memory umgegangen und von inline Funktionen Gebrauch gemacht werden. Compiler Optimization ist somit ein sehr vielseitiges und komplexes Problem,
 dass hierbei nicht weiter thematisiert werden sollte.
