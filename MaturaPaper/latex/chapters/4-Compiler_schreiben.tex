@@ -1,6 +1,6 @@
 \chapter{Der QHScompiler} \label{cha:4-QHS_Compiler}
 Die QHS Sprache besteht natürlich aus Wörtern. Im Kontext von QHS werden diese Wörter \textit{Orders} genannt. Diese Orders weisen 3 verschiedenen Typen auf. \textit{Identifiers}, \textit{Instructions} und \textit{LiteralCode}.
-Bei Identifiers handelt es sich um die in Kapitel \ref{cha:3-Meine_Idee} bereits erwähnten Macros. Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der exakt so wie er steht,
+Bei Identifiers handelt es sich um die in Abschnitt \ref{cha:3-Meine_Idee} CHANGE THIS bereits erwähnten Macros. Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der exakt so wie er steht,
 in den Outputfile geschrieben wird. Wie diese 3 Order Typen genau funktionieren wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
 
 Dem QHScompiler steht für die Kompilierung von QHS ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
@@ -18,6 +18,9 @@ Diese sind mit folgenden RegEx definiert. Whitespaces dienen als Trennung zwisch
 
 \begin{table}[h]
     \centering
+    \caption{RegEx Definitionen der Order Typen}
+    \vspace{3mm} % Adjust the height of the space between caption and tabular
+    
     \begin{tabular}{ll}
     \multicolumn{1}{l|}{identifier}        & \textless{}identiferChar\textgreater{}*                           \\ \hline
     \multicolumn{1}{l|}{instruction}       & \# \textless{}identiferChar\textgreater{}*                        \\ \hline
@@ -87,6 +90,9 @@ Diese Funktionen können Variablen im QHScompiler speichern, die OrderQueue akti
 
 \begin{table}[H]
     \centering
+    \caption{Wichtige Instructions des QHScompilers}
+    \vspace{3mm} % Adjust the height of the space between caption and tabular
+    
     \begin{tabularx}{\textwidth}{l|X}
     \textbf{\#enterOrderQueue}      & Aktiviert die OrderQueue. \\ \hline
     \textbf{\#exitOrderQueue}       & Deaktiviert die OrderQueue. \\ \hline
@@ -111,16 +117,19 @@ Und das war's. Dies ist der gesamte QHScompiler. Im Vergleich zu einem tradition
 die dazugehörige Sprache QHS jedoch noch lange nicht. Es ist zwar grundsätzlich durch LiteralCode möglich jedes Programm zu schreiben und zu kompilieren, jedoch handelt es sich dann dabei einfach nur um Assembly Code.
 Doch der Aufbau des QHScompilers ermöglicht es mithilfe von Identifiern eine komplexere Programmiersprache zu definieren.
 
-\subsection{Shortcuts}
+\subsection{Abkürzungen}
 Um die Leserlichkeit von QHS zu verbessern, werden ein paar Identifiers anstelle der umständlichen Instruction Namen definiert.
 
 {
 \begin{table}[H]
     \centering
+    \caption{Abkürzende Identifier}
+    \vspace{3mm} % Adjust the height of the space between caption and tabular
+    
     % select font of listing in first column (to be equivalent to listings)
     \begin{tabular}{>{\listingFont\selectfont}l|l}
-    \textbf{{[}}                 & \#enterOrderStack              \\ \hline
-    \textbf{{]}}                 & \#exitOrderStack               \\ \hline
+    \textbf{{[}}                 & \#enterOrderQueue              \\ \hline
+    \textbf{{]}}                 & \#exitOrderQueue               \\ \hline
     \textgreater{}\textgreater{} & \#assign                       \\ \hline
     \textbf{-\textgreater{}}     & \#assignToOne                  \\ \hline
     \textbf{!}                   & \#force                        \\ \hline
@@ -135,30 +144,30 @@ Der Kommentar /* X = "hello" \#pushEnv */ würde bedeuten, dass der Identifier X
 
 Auch wird besonders bei längeren Identifier Definitionen zuerst der Identifier Name getrennt von den restlichen Orders der OrderQueue hinzugefügt. Diese Seperation dient lediglich der Leserlichkeit und ist ansonsten nicht nötig.
 
-\subsection{Identifier Parameters and Return}
-Mithilfe der \#enterOrderQueue und \#exitOrderQueue Instructions kann innerhalb eines Identifiers die OrderQueue verwendet werden. Dies ermöglicht eine Art von Parametern und Return für Identifiers.
+\subsection{Identifier Parameter und Rückgabewert}
+Mithilfe der \#enterOrderQueue und \#exitOrderQueue Instructions kann innerhalb eines Identifiers die OrderQueue verwendet werden. Dies ermöglicht eine Art von Parametern und Rückgabewert für Identifier.
 Parameter werden vor dem Aufruf eines Identifiers der OrderQueue hinzugefügt. Diese kann dann der Identifier verwenden. Genauso kann der Identifier am Ende Orders der OrderQueue hinzufügen und diese somit zurückgeben.
 
-\begin{lstlisting}[language=QHS, caption=Parameter und Return eines Identifiers]
+\begin{lstlisting}[language=QHS, caption=Parameter und Rückgabewert eines Identifiers]
 [ foo ]
 [
     #orderFrontEnqueue param1 ->    /* param1 = erstes Argument */
     #orderFrontEnqueue param2 ->    /* param2 = zweites Argument */
 
-    param1 " : " param2 \n        /* param1 + " : " + param2 + "\n" */
+    param1 " : " param2 \n          /* param1 + " : " + param2 + "\n" */
 
-    [ "Return" ]                    /* "Return" wird der OrderQueue hinzugefügt */
+    [ "return" ]                    /* "return" wird der OrderQueue hinzugefügt */
 ] >>
 
-[ "Parameter 1" "Parameter 2" ]     /* 2 Argumente werden der OrderQueue hinzugefügt */
+[ "1" "2" ]                         /* 2 Argumente werden der OrderQueue hinzugefügt */
 foo                                 /* foo wird ausgeführt */
-#queueFetch                         /* Die Return Order wird von der OrderQueue geholt
-                                       und ausgeführt */
+#queueFetch                         /* Die zurückgegebene Order wird von der OrderQueue
+                                    geholt und ausgeführt */
 
 
 %\noindent\hrulefill Output\noindent\hrulefill%
-Parameter 1 : Parameter 2
-Return
+1 : 2
+return
 \end{lstlisting}
 
 
@@ -280,6 +289,7 @@ ohne eine Änderung am QHScompiler vorzunehmen. Die Lösung basiert darauf beim 
 Weiter wird nun eine Klammer als Identifier für eine Funktionsdefinition gesetzt, sowie ein Semikolon für die Definition einer Variable. Befindet sich nach dem Namen also eine Klammer, wird eine Funktionsdefinition ausgeführt.
 Ist dort aber ein Semikolon wird eine Variable definiert. Dieses Konzept wird im weiteren als \textit{DelayedExecute} bezeichnet. Das ganze könnte dann wie folgt aussehen:
 
+%minipage keeps the listing from splitting onto multiple pages
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=QHS, caption=Implementation eines DelayedExecute für Definitionen]
 [ function ]

@@ -6,8 +6,9 @@
 \KOMAoption{DIV}{15}
 
 % Text auf Titelseite festlegen
+\newcommand{\thetitle}{Compiler Construction}
 \subject{Maturaarbeit}
-\title{Compiler Construction}
+\title{\thetitle}
 \author{Fabio Stalder\vspace{1cm}\\
 Betreut durch \\
 Thomas Jampen}
@@ -16,7 +17,7 @@ Gymnasium Kirchenfeld\\
 Abteilung MN}
 
 % selbst definierte Kopf- und Fusszeile
-\lohead{Maturaarbeit}
+\lohead{\thetitle}
 %\rohead{\theauthor}
 \cofoot{\thepage}
 
@@ -99,16 +100,17 @@ Abteilung MN}
     \end{enumerate}
 \fi
 
-\input{chapters/0-abstract.tex}
-\input{chapters/1-introduction.tex}
-\input{chapters/2-traditional_compiler.tex}
-\input{chapters/3-meine_Idee.tex}
+\input{chapters/0-Abstract.tex}
+\input{chapters/1-Introduction.tex}
+\input{chapters/2-Vergleich.tex}
+\input{chapters/3-Traditional_Compiler.tex}
 \input{chapters/4-Compiler_schreiben.tex}
 \input{chapters/5-Auswertung.tex}
-\input{chapters/6-conclusion.tex}
+\input{chapters/6-Conclusion.tex}
 
 \listoffigures
 \lstlistoflistings
+\listoftables
 
 % bibliography
 \bibliographystyle{plain}

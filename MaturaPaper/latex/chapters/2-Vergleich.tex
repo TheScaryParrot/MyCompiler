@@ -1,0 +1,52 @@
+\chapter{Vergleich der Compiler} \label{cha:2-Vergleich}
+Um die Leistung meiner Idee zu testen, werden folgende Compiler verglichen.
+
+\begin{enumerate}
+\item
+Der \textit{QHScompiler} ist ein von mir nach meiner Idee entwickelter Compiler. Seine genaue Funktionalität wird in Abschnitt \ref{cha:4-QHS_Compiler} weiter ausgeführt.
+Er ist in C++ geschrieben und generiert x86 Assembly mit NASM Syntax aus meiner Programmiersprache QHS.
+
+\item
+\textit{GCC} ist ein gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht heutzutage auch die Kompilierung von C++, Rust, Fortran, usw.
+[...] <- Add if data is actually useful
+
+\item
+Der \textit{THScompiler} repräsentiert in diesem Vergleich einen traditionellen von mir geschrieben Compiler. Im Gegensatz zu GCC ist der THScompiler deutlich simpler und kleiner.
+Er dient daher als realistische Konkurrenz zum QHScompiler und wird verwendet, um zu testen, wie viel meine Idee taugt. Er folgt dem theoretischen Aufbau eines Compilers und besteht aus Lexer, Parser und Code Generator.
+Als Parser wird ein Predictive Descent Parser verwendet. Optimization wird nicht separat durchgeführt und ist somit auch sehr schwach.
+Die Semantic Analysis wird während der Code Generation durchgeführt. Geschrieben ist der Compiler in C++ und liefert x86 Assembly mit NASM Syntax.
+\end{enumerate}
+
+\section{Anforderungen an die Compiler}
+Die drei Compiler müssen folgende Anforderungen mindestens erfüllen.
+
+\begin{table}[H]
+    \centering
+    \caption{Anforderungen an die Compiler}
+    \vspace{3mm} % Adjust the height of the space between caption and tabular
+    
+    \begin{tabular}{l|l}
+    Output als Assembly Code        & Die Output-Sprache muss Assembly Code sein                               \\
+    C-like Syntax                   & Die Input-Sprache muss einen C-ähnlichen Syntax aufweisen                \\
+    Variablen und Funktionen        & Lokale und globale Variablen sowie Funktionen müssen unterstützt werden  \\
+    Branching und Loops             & If-Statements sowie While-Loops müssen umsetzbar sein
+    \end{tabular}
+\end{table}
+
+
+\section{Kriterien des Compiler-Vergleichs}
+Zum Schluss werden die drei Compiler nach folgenden Kriterien bewertet und verglichen.
+
+\begin{table}[H]
+    \centering
+    \caption{Vergleichskriterien der Compiler}
+    \vspace{3mm} % Adjust the height of the space between caption and tabular
+
+    \begin{tabular}{l|l}
+    Geschwindigkeit des Output-Codes    & Wie schnell wird der Output-Code ausgeführt?                      \\
+    Geschwindigkeit der Kompilierung    & Wie lange dauert die Kompilierung von Code?                       \\
+    Benutzerfreundlichkeit              & Wie einfach ist die Verwendung des Compilers?                     \\
+    Möglichkeit für Erweiterung         & Wie einfach ist die Input-Sprache zu erweitern?                                 
+    \end{tabular}
+\end{table}
+

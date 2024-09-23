@@ -1,4 +1,4 @@
-\chapter{Introduction}
+\chapter{Einleitung}
 In der Informatik beschreibt \textit{Compiler} ein Programm, das Code aus einer Programmiersprache in eine andere übersetzt. In dieser Hinsicht gleichen Compiler Übersetzern für Menschensprache.
 Genauso wie ein Übersetzer für die Kommunikation zwischen zwei verschiedensprachigen Menschen nötig ist, braucht man Compiler um die Kommunikation zwischen Mensch und Computer zu ermöglichen oder zumindest zu vereinfachen.
 Grundsätzlich ist es mithilfe einer Assembly Sprache möglich ohne Compiler einem Computer Befehle zu geben, jedoch ist dies aufwendig und nicht gerade simpel. 
@@ -7,4 +7,11 @@ Compiler unterscheiden sich jedoch grundsätzlich von Übersetzern in der Erwart
 Programmiersprachen hingegen sind so definiert, dass sie möglichst keinen Raum für Missverständnisse oder Ungenauigkeit lassen. Genauso muss auch ein Compiler exakt und fehlerfrei übersetzten.
 Neben fehlerfrei muss die Kompilierung auch möglichst schnell sein. Dasselbe gilt natürlich auch für den resultierenden Output-Code. Dieser sollte möglichst optimal generiert werden, um die schlussendliche
 Ausführungsdauer so kurz wie möglich zu halten. Und falls sich doch einmal ein Fehler im Input-Code befindet, sollten diese verständlich gemeldet werden. Compiler sind also durchaus keine simplen Programme und daher auch bis heute noch
-ein aktives Forschungsgebiet. In folgendem Text werde ich die Idee, Entwicklung und schlussendliche Auswertung eines von mir erdachten alternativen Ansatzes für den Aufbau eines Compilers beschreiben. 
+ein aktives Forschungsgebiet.  
+Ein Compiler ist also äusserst komplexes Programm. Jedoch ist die zugrundeliegende Aufgabe gar nicht so kompliziert.
+Man braucht ja nur, ein Dokument mit Text der bestimmten Regeln folgt, in Text mit anderen Regeln verwandeln. Natürlich ist dies etwas salopp ausgedrückt, trotzdem fragte ich mich,
+ob es nicht möglich sei einen viel einfacheren Compiler zu schreiben. Während meinen Nachforschungen zum Thema Compiler, stiess ich auf den Begriff \textit{Macro Expansion}.
+Dabei handelt es sich um eine Methode der Code Generation, bei der eine Struktur des AST (z.B. ein If-Statement) mit einem \textit{Macro} ersetzt wird. Bei diesem Macro kann es sich um so ziemlich alles,
+meist jedoch ein Stuck Assembly oder Object Code, handeln. Somit wird nach und nach der gesamte AST ersetzt, bis nur noch Macros übrig sind. Inspiriert von dieser Methode der Code Generation,
+überlegte ich mir ein Compiler, der möglichst stark dieses Konzept der Macros verwendet. Ein Compiler, der sowohl Lexical als auch Syntax Analysis überspringen kann und es ermöglicht in einem Programm weitere Macros,
+und somit eine Art eigene Programmiersprache, selbst zu definieren.
