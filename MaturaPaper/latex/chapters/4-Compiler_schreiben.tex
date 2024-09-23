@@ -42,15 +42,15 @@ Es ist jedoch möglich Orders voranzustellen. Diese Orders werden beim nächsten
 Beim nächsten Fetch wird immer die oberste Order des FetchStacks geholt und daraufhin vom FetchStack enfernt.
 Die Inputdatei befindet sich auf dem untersten Platz des FetchStacks und wird somit nur verwendet, wenn der Stack ansonsten komplett leer ist.
 Eine Order kann während jedem der drei Schritte des Zyklus auf den FetchStack gelegt werden.
-Während der Laufzeit des QHScompilers könnte der FetchStack folgendermassen aussehen:
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=1.1]{resources/images/fetch-stack.png}
-    \caption{Struktur des FetchStacks UPDATE}
-    \label{fig:fetchstack}
-\end{figure}
-
+%Während der Laufzeit des QHScompilers könnte der FetchStack folgendermassen aussehen:
+%
+%\begin{figure}[h!]
+%    \centering
+%    \includegraphics[scale=1.1]{resources/images/fetch-stack.png}
+%    \caption{Struktur des FetchStacks UPDATE}
+%    \label{fig:fetchstack}
+%\end{figure}
+%
 Die Hauptanwendung des FetchStacks wird im Abschnitt \ref{sec:qhs-execute} erklärt.
 Die Kompilierung ist beendet, sobald keine Order mehr auf dem FetchStack vorhanden ist.
 
