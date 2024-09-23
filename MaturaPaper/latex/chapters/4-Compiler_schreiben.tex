@@ -120,18 +120,23 @@ Dies ist die einzige Möglichkeit für den QHScompiler Assembly Code zu generier
 
 \section{Bringing it all together} \label{sec:qhs-bringing-it-together}
 Und somit ist der QHScompiler komplett. Im Vergleich zu einem traditionellen Compiler wirkt der QHScompiler fast schon zu simpel. (... cuz function and vars and all of that hasn't even been mentioned) 
-Und dies hat einen einfachen Grund. Der QHScompiler ist zwar komplett,
-die dazugehörige Sprache QHS jedoch noch lange nicht. Es ist zwar grundsätzlich durch LiteralCode möglich jedes Programm zu schreiben und zu kompilieren, jedoch handelt es sich dann dabei einfach nur um Assembly Code.
-Doch der Aufbau des QHScompilers ermöglicht es mithilfe von Identifiern eine komplexere Programmiersprache zu definieren.
+Dies hat einen einfachen Grund. Der QHScompiler ist zwar komplett, die dazugehörige Programmiersprache QHS jedoch noch lange nicht.
+Grundsätzlich ist es möglich mit LiteralCode jedes Programm zu schreiben und zu kompilieren, jedoch handelt es sich dann nur um Assembly Code.
+Doch der Aufbau des QHScompilers ermöglicht es mit Identifiern eine komplexere Programmiersprache zu definieren. Ein fester Bestandteil ein jedes Programms, das mit dem QHScompiler kompiliert werden soll, ist ein Stück Code,
+das die jeweilige Programmiersprache definiert. Dieser Code wird im Kontext des QHScompilers \textit{Preamble} genannt. Theoretisch ist es möglich durch das Anpassen dieses Preambles, 
+viele unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren. In diesem Abschnitt wird behandelt wie sich die Sprache QHS, welche die Kriterien aus Abschnitt \ref{sec:Vergleichs_Kriterien} erfüllt,
+für den QHScompiler definieren lässt.
 
 \subsection{Abkürzungen}
-Um die Leserlichkeit von QHS zu verbessern, werden ein paar Identifiers anstelle der umständlichen Instruction Namen definiert.
+Um die Leserlichkeit von QHS zu verbessern, werden ein paar Identifiers anstelle der umständlichen Instructions definiert.
+Diese sind in der folgenden Tabelle \ref{tab:shortcuts} aufgeführt.
 
 {
 \begin{table}[H]
     \centering
-    \caption{Abkürzende Identifier}
+    \caption{Identifiers als Abkürzung von Instruction}
     \vspace{3mm} % Adjust the height of the space between caption and tabular
+    \label{tab:shortcuts}
     
     % select font of listing in first column (to be equivalent to listings)
     \begin{tabular}{>{\listingFont\selectfont}l|l}
@@ -146,16 +151,17 @@ Um die Leserlichkeit von QHS zu verbessern, werden ein paar Identifiers anstelle
 \end{table}
 }
 
-Weiter wird in den Kommentaren innerhalb der Beispiele Pseudo-Code verwendet, um den QHS Code besser zu erklären. Kommentare können über mehrere Zeilen reichen und beginnen immer mit /* und enden mit */.
+Weiter wird innerhalb von Kommentaren Pseudo-Code verwendet, um den QHS Code verständlicher zu erklären. Kommentare können mehrere Zeilen umfassen und beginnen immer mit /* und enden mit */.
 Der Kommentar /* X = "hello" \#pushEnv */ würde bedeuten, dass der Identifier X zu den Orders "hello" (LiteralCode) und \#pushEnv (Instruction) definiert wurde. 
 
-Auch wird besonders bei längeren Identifier Definitionen zuerst der Identifier Name getrennt von den restlichen Orders der OrderQueue hinzugefügt. Diese Seperation dient lediglich der Leserlichkeit und ist ansonsten nicht nötig.
+Besonders bei längeren Identifier Definitionen wird zuerst der Identifier Name getrennt von den restlichen Orders der OrderQueue hinzugefügt.
+Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
 
 \subsection{Identifier Parameter und Rückgabewert}
 Mithilfe der \#enterOrderQueue und \#exitOrderQueue Instructions kann innerhalb eines Identifiers die OrderQueue verwendet werden. Dies ermöglicht eine Art von Parametern und Rückgabewert für Identifier.
 Parameter werden vor dem Aufruf eines Identifiers der OrderQueue hinzugefügt. Diese kann dann der Identifier verwenden. Genauso kann der Identifier am Ende Orders der OrderQueue hinzufügen und diese somit zurückgeben.
 
-\begin{lstlisting}[language=QHS, caption=Parameter und Rückgabewert eines Identifiers]
+\begin{lstlisting}[language=QHS, caption=Verwendung von Parametern und Rückgabewert eines Identifiers]
 [ foo ]
 [
     #orderFrontEnqueue param1 ->    /* param1 = erstes Argument */
@@ -179,11 +185,11 @@ return
 
 
 \subsection{Variablen} \label{sec:qhs-vars}
-Die Umsetzung von Variablen in QHS ist simpel. Zuerst soll der Assembly Code für das Abziehen der Grösse der Variable vom Stack-Pointer hinzugefügt werden.
-Dann wird für die Variable ein Identifier definiert, der zu der Position der Variable auf dem Stack zeigt.
-Mit nur LiteralCode in QHS lässt sich dies wie folgt ausdrücken:
+Die Umsetzung von Variablen in QHS ist einfach. Zuerst soll der Assembly Code für das Abziehen der Grösse der Variable vom Stack-Pointer hinzugefügt werden.
+Dann wird für die Variable ein Identifier definiert, der zur Position der Variable auf dem Stack zeigt.
+Mit LiteralCode lässt sich dies wie folgt in QHS ausdrücken:
 
-\begin{lstlisting}[language=QHS, caption=Definition einer Variable mit viel LiteralCode]
+\begin{lstlisting}[language=QHS, caption=Definition einer Variable mit LiteralCode]
 "sub rsp, 4" \n
 [ a "[rbp-4]" ] >>      /* a = "[rbp-4]" */
 
@@ -194,8 +200,9 @@ sub rsp, 4
 add [rbp-4], 5
 \end{lstlisting}
 
-Jedoch ist dies noch nicht besonders angenehm. Weiter lässt sich zum Beispiel ein \textit{var} Identifier definieren, der die Grösse der Variable als Argument über die OrderQueue annimmt. Um die in vielen Programmiersprachen geläufige Syntax
-einer Variable beizubehalten, wird der Name der Variable mithilfe der \#deepFetch Instruction beschafft.
+Jedoch braucht man für diese Implementation immer noch viel LiteralCode und Assembly Kenntnisse. Um die Definition von Variablen einfacher zu gestallten, lässt sich zum Beispiel ein \textit{var} Identifier definieren.
+Dieser var Identifier nimmt die Grösse der Variable als Argument über die OrderQueue an. Um die in vielen Programmiersprachen geläufige Syntax der Definition einer Variable beizubehalten,
+wird der Name der Variable mit der \#deepFetch Instruction beschafft.
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit \textit{var} Identifier]
 [ var ]
@@ -217,8 +224,8 @@ sub 4
 add [rbp-4], 5
 \end{lstlisting}
 
-Ganz so richtig funktioniert dies aber noch nicht. Momentan erhält jede Variable die Addresse rbp-4 und somit überschreiben sich die Variablen gegenseitig. Der momentane rbp-Offset muss also gespeichert und erhöht werden.
-Hierzu wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 definiert. Mithilfe der \#addToIdentifier Instruction, lässt sich daraufhin rbpOffset erhöhen. Dies kann folgendermassen aussehen:
+Momentan erhält jede Variable jedoch noch die Addresse rbp-4, weswegen sich die Variablen gegenseitig überschreiben würden. Der momentane rbp-Offset muss also gespeichert und erhöht werden.
+Dafür wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 definiert. Mit der \#addToIdentifier Instruction, lässt sich nun rbpOffset erhöhen. Dies kann folgendermassen aussehen:
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit rbpOffset]
@@ -250,7 +257,7 @@ sub [rbp-12], 10
 \end{lstlisting}
 \end{minipage}
 
-Zuletzt lässt sich das umständliche Hinzufügen der Grösse der Variable sowie der \textit{var} Identifier unter einem Identifier zusammenfassen. Dies wäre passenderweise die bekannte Bezeichnung für den Typen der Variable.
+Zuletzt lässt sich das umständliche Hinzufügen der Grösse der Variable sowie der \textit{var} Identifier unter einem neuen Identifier zusammenfassen. Dies ist passenderweise die bekannte Bezeichnung für den Typen der Variable.
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit \textit{int} Identifier]
 (...)
@@ -273,12 +280,12 @@ add [rbp-4], 5
 sub [rbp-12], 10
 \end{lstlisting}
 
-So sieht eine Variable genau so aus, wie es in anderen Programmiersprachen gebräuchlich ist.
+Nun sieht die Definition einer Variable genau so aus, wie es in anderen Programmiersprachen gebräuchlich ist.
 
 \subsection{Funktionen} \label{sec:qhs-funcs}
-Funktionen sind im Vergleich zu Variablen deutlich komplizierter. Hierbei sollen zwei der Problematiken an Funktionen behandelt werden.
+Funktionen sind im Vergleich zu Variablen komplizierter. Nachfolgend sollen zwei der Probleme von Funktionsdefinitionen behandelt werden.
 
-Zum Schluss sollte eine Funktionsdefinition wie folgt aussehen:
+Anhand einer Funktionsdefinition, wie sie zum Schluss aussehen sollte, will ich die beiden Probleme erläutern:
 
 
 \begin{lstlisting}[language=C, label=eg:qhs-function_goal, caption=Ziel für die Definition einer Funktion in QHS]
@@ -288,13 +295,13 @@ int foo ( int param1 , int param2 )
 }
 \end{lstlisting}
 
-Hier lässt sich bereits ein erstes Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der \textit{int} Identifier für die Definition einer Variable verwendet. 
-Das int aus Beispiel \ref{eg:qhs-function_goal} würde vom QHScompiler also als Definition für eine Variable verstanden werden. Der Unterschied zwischen Variable und Funktionsdefinition besteht hierbei in den Klammern,
+Hier lässt sich bereits das erstes Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der \textit{int} Identifier für die Definition einer Variable verwendet. 
+Das int in der Auflistung \ref{eg:qhs-function_goal} würde vom QHScompiler also als Definition für eine Variable verstanden werden. Der Unterschied zwischen Variable und Funktionsdefinition besteht hierbei in den Klammern,
 die auf den Namen folgen. Der QHScompiler müsste also beim \textit{int} Identifier nach vorne schauen, ob sich eine Klammer nach dem Namen befindet, und folglich eine Variable oder Funktionsdefinition ausführen.
-Dies ist jedoch aufgrund des einfachen Designs des QHScompilers nicht möglich. Er kann bloss Orders ausführen, nicht jedoch überprüfen, ob eine Order vorhanden ist. Glücklicherweise lässt sich dieses Problem jedoch lösen,
-ohne eine Änderung am QHScompiler vorzunehmen. Die Lösung basiert darauf beim \textit{int} Identifier sowohl eine Variable als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
-Weiter wird nun eine Klammer als Identifier für eine Funktionsdefinition gesetzt, sowie ein Semikolon für die Definition einer Variable. Befindet sich nach dem Namen also eine Klammer, wird eine Funktionsdefinition ausgeführt.
-Ist dort aber ein Semikolon wird eine Variable definiert. Dieses Konzept wird im weiteren als \textit{DelayedExecute} bezeichnet. Das ganze könnte dann wie folgt aussehen:
+Dieses Vorgehen ist jedoch aufgrund des einfachen Designs des QHScompilers nicht möglich. Er kann bloss Orders ausführen, nicht jedoch überprüfen, ob eine Order vorhanden ist. Glücklicherweise lässt sich dieses erste Problem lösen,
+ohne eine Änderung am QHScompiler vorzunehmen. Die Lösung basiert darauf, beim \textit{int} Identifier sowohl eine Variable als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
+Weiter wird eine Klammer als Identifier für eine Funktionsdefinition gesetzt, sowie ein Semikolon für die Definition einer Variable. Befindet sich nach dem Namen eine Klammer, wird eine Funktionsdefinition ausgeführt.
+Ist dort aber ein Semikolon wird eine Variable definiert. Dieses Konzept wird im weiteren als \textit{DelayedExecute} bezeichnet. Das Ganze sieht danach wie folgt aus:
 
 %minipage keeps the listing from splitting onto multiple pages
 \begin{minipage}{\linewidth}
@@ -334,12 +341,12 @@ Ist dort aber ein Semikolon wird eine Variable definiert. Dieses Konzept wird im
 \end{minipage}
 
 
-Das zweite Problem sind die Parameter eine Funktionsdefinition. Diese sehen genau gleich aus wie eine die Definition einer Variable, sollen jedoch vom QHScompiler anders ausgeführt werden.
-Erstens sollte bei einer Parameterdefinition nicht der LiteralCode zur Subtraktion vom RSP hinzugefügt werden. Zweitens verwendet eine Parameterdefinition einen anderen rbp-Offset.
-Die Lösung hierzu liegt im Umdefinieren des \textit{definition} Identifiers. Dieser ist momentan für sowohl für Variable als auch Funktionsdefinitionen verantwortlich.
+Das zweite Problem sind die Parameter eine Funktionsdefinition. Diese sehen genau gleich aus wie die Definition einer Variable, sollten jedoch vom QHScompiler anders ausgeführt werden.
+Erstens sollte bei einer Parameterdefinition nicht der LiteralCode zur Subtraktion vom rsp hinzugefügt werden. Zweitens verwendet eine Parameterdefinition einen anderen rbp-Offset.
+Die Lösung liegt im Umdefinieren des \textit{definition} Identifiers. Dieser ist momentan für die Definition von Variablen und Funktionen verantwortlich.
 Bei der Anfangsklammer der Funktionsdefinition wird der \textit{definition} Identifier neu definiert, sodass er eine Parameterdefinition ausführt. Die vorherige Definition geht dank der \#pushEnv Instruction nicht verloren.
 Bei der schliessenden Klammer wird \#popEnv durchgeführt, und der \textit{definition} Identifier ist wieder für Variablen und Funktionen zuständig. Diese Lösung wird im folgenden \textit{TempAssign} genannt.
-Dies lässt sich in QHS wie folgt umsetzten:
+Dies lässt sich in QHS wie folgt umsetzen:
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=QHS, caption=Implementation eines TempAssigns für Parameter Definitionen]
@@ -359,10 +366,10 @@ Dies lässt sich in QHS wie folgt umsetzten:
 \end{lstlisting}
 \end{minipage}
 
-Der Identifier \textit{paramDefinition} ist hierbei gleich wie der \textit{var} Identifier aus Abschnitt \ref{sec:qhs-vars}. Jedoch wird anstelle von \textit{rbpOffset} ein neuer \textit{paramOffset} Identifier verwendet.
+Der Identifier \textit{paramDefinition} ist gleich wie der \textit{var} Identifier aus Abschnitt \ref{sec:qhs-vars}. Jedoch wird anstelle von \textit{rbpOffset} ein neuer \textit{paramOffset} Identifier verwendet.
 
-Nun fehlt nur noch eine Sache für die Funktionsdefinition, der Funktionsbody. Dieser ist vergleichsweise simpel. Die beiden geschwungenen Klammern werden ganz einfach zu einem leeren Identifier definiert und somit einfach ignoriert.
-Der gesamte Code innerhalb des Body wird nun einfach ganz normal vom QHScompiler ausgeführt und an den Outputdatei angehängt. Das Endresultat sieht wie folgt aus:
+Nun fehlt nur noch etwas an der Funktionsdefinition, der Funktionsbody. Dieser ist vergleichsweise einfach. Die beiden geschwungenen Klammern werden zu einem leeren Identifier definiert und somit ignoriert.
+Der gesamte Code innerhalb des Body wird ganz normal vom QHScompiler ausgeführt und an die Outputdatei angehängt. Das Endresultat sieht wie folgt aus:
 
 \begin{lstlisting}[language=QHS, caption=Finale Definition einer Funktion in QHS]
 int foo ( int param1 , int param2 )
@@ -375,8 +382,10 @@ foo:
 add [rbp+16], [rbp+20]
 \end{lstlisting}
 
-Mithilfe von DelayedExecute und TempAssign lassen sich also auch syntaktisch komplexen Code problemlos in QHS definieren und ausführen.
-\textbf{Wie das Callen von Funktionen aussieht, soll hierbei nicht weiter betrachtet werden.}
+Mit von DelayedExecute und TempAssign lässt sich also syntaktisch komplexen Code problemlos in QHS definieren und ausführen.
+
+QHS weist noch viele weitere Identifier, die einen C-like Syntax ermöglichen, auf.
+Diese Identifier werden hier jedoch nicht weiter betrachtet, da diese einem ähnlichen Prinzip wie die beschriebenen Definitionen von Variablen und Funktionen folgen. 
 
 
     
