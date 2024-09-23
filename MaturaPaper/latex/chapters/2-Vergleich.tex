@@ -1,24 +1,23 @@
 \chapter{Vergleich der Compiler} \label{cha:2-Vergleich}
-Um die Leistung meiner Idee zu testen, werden folgende Compiler verglichen.
+Um die Leistung meines Compilers zu testen, werde ich ihn mit zwei weiteren Compilern vergleichen.
 
 \begin{enumerate}
 \item
-Der \textit{QHScompiler} ist ein von mir nach meiner Idee entwickelter Compiler. Seine genaue Funktionalität wird in Abschnitt \ref{cha:4-QHS_Compiler} weiter ausgeführt.
+Der \textit{QHScompiler} ist der von mir nach meiner Idee entwickelte Compiler. Seine genaue Funktionsweise wird in Abschnitt \ref{cha:4-QHS_Compiler} ausgeführt.
 Er ist in C++ geschrieben und generiert x86 Assembly mit NASM Syntax aus meiner Programmiersprache QHS.
 
 \item
-\textit{GCC} ist ein gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht heutzutage auch die Kompilierung von C++, Rust, Fortran, usw.
+\textit{GCC} ist ein gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht inzwischen auch die Kompilierung von C++, Rust, Fortran, usw.
 [...] <- Add if data is actually useful
 
 \item
-Der \textit{THScompiler} repräsentiert in diesem Vergleich einen traditionellen von mir geschrieben Compiler. Im Gegensatz zu GCC ist der THScompiler deutlich simpler und kleiner.
-Er dient daher als realistische Konkurrenz zum QHScompiler und wird verwendet, um zu testen, wie viel meine Idee taugt. Er folgt dem theoretischen Aufbau eines Compilers und besteht aus Lexer, Parser und Code Generator.
-Als Parser wird ein Predictive Descent Parser verwendet. Optimization wird nicht separat durchgeführt und ist somit auch sehr schwach.
-Die Semantic Analysis wird während der Code Generation durchgeführt. Geschrieben ist der Compiler in C++ und liefert x86 Assembly mit NASM Syntax.
+Der \textit{THScompiler} repräsentiert in diesem Vergleich einen traditionellen von mir geschrieben Compiler. Im Gegensatz zu GCC kann der THScompiler weniger.
+Er dient daher als realistische Konkurrenz zum QHScompiler und wird verwendet, um zu testen, ob meine Idee taugt. Der THScompiler folgt dem in Abschnitt \ref{cha:3-Tradional_Compiler} beschriebenen traditionellen Aufbau eines Compilers.
+Geschrieben ist der THScompiler in C++ und liefert x86 Assembly mit NASM Syntax.
 \end{enumerate}
 
 \section{Anforderungen an die Compiler}
-Die drei Compiler müssen folgende Anforderungen mindestens erfüllen.
+Für die von mir entwickelten Compiler habe ich folgende Mindestanforderungen gestellt:
 
 \begin{table}[H]
     \centering
@@ -43,10 +42,10 @@ Zum Schluss werden die drei Compiler nach folgenden Kriterien bewertet und vergl
     \vspace{3mm} % Adjust the height of the space between caption and tabular
 
     \begin{tabular}{l|l}
-    Geschwindigkeit des Output-Codes    & Wie schnell wird der Output-Code ausgeführt?                      \\
+    Geschwindigkeit des Output-Codes    & Wie lange dauert die Ausführeung des Output-Codes?                \\
     Geschwindigkeit der Kompilierung    & Wie lange dauert die Kompilierung von Code?                       \\
     Benutzerfreundlichkeit              & Wie einfach ist die Verwendung des Compilers?                     \\
-    Möglichkeit für Erweiterung         & Wie einfach ist die Input-Sprache zu erweitern?                                 
+    Offenheit für Erweiterung           & Wie einfach kann die Input-Sprache erweitert werden?                                 
     \end{tabular}
 \end{table}
 

@@ -1,9 +1,9 @@
 \chapter{Der QHScompiler} \label{cha:4-QHS_Compiler}
-Die QHS Sprache besteht natürlich aus Wörtern. Im Kontext von QHS werden diese Wörter \textit{Orders} genannt. Diese Orders weisen 3 verschiedenen Typen auf. \textit{Identifiers}, \textit{Instructions} und \textit{LiteralCode}.
-Bei Identifiers handelt es sich um die in Abschnitt \ref{cha:3-Meine_Idee} CHANGE THIS bereits erwähnten Macros. Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der exakt so wie er steht,
-in den Outputfile geschrieben wird. Wie diese 3 Order Typen genau funktionieren wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
+Die QHS Programmiersprache besteht aus Wörtern. Im Kontext von QHS werden diese Wörter \textit{Orders} genannt. Diese Orders weisen drei verschiedenen Typen auf. \textit{Identifiers}, \textit{Instructions} und \textit{LiteralCode}.
+Bei Identifiers handelt es sich um die in Abschnitt \ref{cha:3-Meine_Idee} CHANGE THIS bereits erwähnten Macros. Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der unverändert
+in die Outputdatei geschrieben wird. Wie diese drei Order Typen genau funktionieren wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
 
-Dem QHScompiler steht für die Kompilierung von QHS ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
+Dem QHScompiler steht für die Kompilierung ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
 
 \begin{figure}[h!]
     \centering
@@ -13,7 +13,7 @@ Dem QHScompiler steht für die Kompilierung von QHS ein einfacher Zyklus zugrund
 \end{figure}
 
 \section{Fetch} \label{sec:qhs-fetch}
-Der \textit{QHS-Zyklus} beginnt mit dem ersten \textit{Fetch}. Dabei wird die erste Order aus dem Inputfile extrahiert. Eine Order weist einen der drei Typen Identifier, Instruction oder Literal-Code auf.
+Der \textit{QHS-Zyklus} beginnt mit dem ersten \textit{Fetch}. Dabei wird die erste Order aus dem Inputfile extrahiert. Eine Order weist wie erwähnt einen der drei Typen Identifier, Instruction oder LiteralCode auf.
 Diese sind mit folgenden RegEx definiert. Whitespaces dienen als Trennung zwischen zwei Orders und werden ignoriert.
 
 \begin{table}[h]
@@ -32,8 +32,8 @@ Diese sind mit folgenden RegEx definiert. Whitespaces dienen als Trennung zwisch
     \end{tabular}
 \end{table}
 
-Auffällig gegenüber einem traditionellen Compiler ist hierbei, dass kaum zwischen Zeichen differenziert wird. Während die Lexical Analysis traditionell zwischen vielen verschiedenen Tokens unterscheidet,
-sind für den QHScompiler alle Zeichen bis auf \# und " gleichbedeutend.
+Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum zwischen Zeichen differenziert wird. Während die Lexical Analysis traditionell zwischen vielen verschiedenen Tokens unterscheidet,
+sind für den QHScompiler alle Zeichen (mit Ausnahme von \# und " ) gleichbedeutend.
 
 Bei einem Fetch wird die nächste Order normalerweise vom Inputfile geholt.
 Es ist jedoch möglich Orders voranzustellen. Diese werden beim nächsten Fetch zuerst gefunden. Dies geschieht mithilfe des \textit{FetchStacks} auf den eine Queue an Orders gelegt werden kann.
@@ -66,7 +66,7 @@ MAYBE CODESTACK FIGURE
 Ist die OrderQueue deaktiviert oder die Order OrderQueue-Proof, wird diese an den letzten Schritt Execute weitergegeben.
 
 \section{Execute} \label{sec:qhs-execute}
-Execute ist der letzte Schritt des QHS-Zyklus. Hier wird nun auch endlich der tatsächliche Assembly Code generiert. Je nach Typ der Order, Identifier, Instruction oder Literal-Code, läuft Execute sehr unterschiedlich ab.
+Execute ist der letzte Schritt des QHS-Zyklus. Hier wird nun auch endlich der tatsächliche Assembly Code generiert. Je nach Typ der Order, Identifier, Instruction oder LiteralCode, läuft Execute sehr unterschiedlich ab.
 
 \subsection{Identifier}
 Ein Identifier ist eine Zusammenfassung von mehreren Orders. Diese sind in einem \textit{Environment} definiert.
@@ -80,8 +80,8 @@ Das unterste Environment der Liste ist hierbei das älteste und das oberste Envi
 Ein neuer Identifiers wird immer zum obersten Environment hinzugefügt. Definitionen des gleichen Identifiers in älteren Environments werden nicht überschrieben oder gelöscht.
 Bei der Abfrage nach einem Identifier wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden, wird ein Error ausgegeben.
 
-\subsection{Literal-Code}
-Literal-Code ist der Weg wie der QHScompiler Assembly Code generiert. Dieser ist sehr simpel. Wenn Literal-Code in den Execute Schritt gelangt, wird alles was zwischen den " Zeichen steht in das Output-Dokument geschrieben.
+\subsection{LiteralCode}
+LiteralCode ist der Weg wie der QHScompiler Assembly Code generiert. Dieser ist sehr simpel. Wenn LiteralCode in den Execute Schritt gelangt, wird alles was zwischen den " Zeichen steht in das Output-Dokument geschrieben.
 Dies ist die einzige Möglichkeit für den QHScompiler Assembly Code zu generieren. Somit könnte nur durch das Ändern von den einzelnen LiteralCode Orders die Output-Sprache des QHScompilers komplett geändert werden.
 
 \subsection{Instructions}
@@ -134,7 +134,7 @@ Um die Leserlichkeit von QHS zu verbessern, werden ein paar Identifiers anstelle
     \textbf{-\textgreater{}}     & \#assignToOne                  \\ \hline
     \textbf{!}                   & \#force                        \\ \hline
     \textbf{?!}                  & \#lightForce                   \\ \hline
-    \textbf{\textbackslash{}n}   & Eine neue Zeile im Outputfile
+    \textbf{\textbackslash{}n}   & Eine neue Zeile im Outputdatei
     \end{tabular}
 \end{table}
 }
@@ -355,7 +355,7 @@ Dies lässt sich in QHS wie folgt umsetzten:
 Der Identifier \textit{paramDefinition} ist hierbei gleich wie der \textit{var} Identifier aus Abschnitt \ref{sec:qhs-vars}. Jedoch wird anstelle von \textit{rbpOffset} ein neuer \textit{paramOffset} Identifier verwendet.
 
 Nun fehlt nur noch eine Sache für die Funktionsdefinition, der Funktionsbody. Dieser ist vergleichsweise simpel. Die beiden geschwungenen Klammern werden ganz einfach zu einem leeren Identifier definiert und somit einfach ignoriert.
-Der gesamte Code innerhalb des Body wird nun einfach ganz normal vom QHScompiler ausgeführt und an den Outputfile angehängt. Das Endresultat sieht wie folgt aus:
+Der gesamte Code innerhalb des Body wird nun einfach ganz normal vom QHScompiler ausgeführt und an den Outputdatei angehängt. Das Endresultat sieht wie folgt aus:
 
 \begin{lstlisting}[language=QHS, caption=Finale Definition einer Funktion in QHS]
 int foo ( int param1 , int param2 )

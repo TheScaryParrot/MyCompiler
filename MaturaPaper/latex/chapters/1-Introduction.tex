@@ -1,14 +1,16 @@
 \chapter{Einleitung}
-In der Informatik beschreibt \textit{Compiler} ein Programm, das Code aus einer Programmiersprache in eine andere übersetzt. In dieser Hinsicht gleichen Compiler Übersetzern für Menschensprache.
+In der Informatik beschreibt \textit{Compiler} ein Programm, das Code aus einer Programmiersprache in eine andere Programmiersprache übersetzt. In dieser Hinsicht gleichen Compiler Übersetzern für Menschensprache.
 Genauso wie ein Übersetzer für die Kommunikation zwischen zwei verschiedensprachigen Menschen nötig ist, braucht man Compiler um die Kommunikation zwischen Mensch und Computer zu ermöglichen oder zumindest zu vereinfachen.
-Grundsätzlich ist es mithilfe einer Assembly Sprache möglich ohne Compiler einem Computer Befehle zu geben, jedoch ist dies aufwendig und nicht gerade simpel. 
-Compiler ermöglichen das Übersetzten von verständlicheren Programmiersprachen zu Assembly und sind daher für die Informatik essentiel.
+Grundsätzlich ist es mit einer Assembly Sprache möglich, ohne Compiler einem Computer Befehle zu geben. Jedoch sind Assembly Sprachen, nicht besonders einfach zu verwenden.
+Compiler übersetzten von verständlicheren Programmiersprachen zu Assembly und ermöglichen daher ein viel einfacheres Schreiben von Programmen.
 Compiler unterscheiden sich jedoch grundsätzlich von Übersetzern in der Erwartungshaltung, die an sie gestellt wird. Menschensprache ist sehr komplex und nicht immer besonders eindeutig. 
-Programmiersprachen hingegen sind so definiert, dass sie möglichst keinen Raum für Missverständnisse oder Ungenauigkeit lassen. Genauso muss auch ein Compiler exakt und fehlerfrei übersetzten.
-Neben fehlerfrei muss die Kompilierung auch möglichst schnell sein. Dasselbe gilt natürlich auch für den resultierenden Output-Code. Dieser sollte möglichst optimal generiert werden, um die schlussendliche
-Ausführungsdauer so kurz wie möglich zu halten. Und falls sich doch einmal ein Fehler im Input-Code befindet, sollten diese verständlich gemeldet werden. Compiler sind also durchaus keine simplen Programme und daher auch bis heute noch
-ein aktives Forschungsgebiet.  
-Ein Compiler ist also äusserst komplexes Programm. Jedoch ist die zugrundeliegende Aufgabe gar nicht so kompliziert.
+Programmiersprachen hingegen sind so definiert, dass sie keinen Raum für Missverständnisse oder Ungenauigkeit lassen. Genauso muss auch ein Compiler exakt und fehlerfrei übersetzen.
+Neben fehlerfrei muss die Kompilierung auch möglichst schnell sein. Dasselbe gilt natürlich auch für den resultierenden Output-Code. Dieser sollte optimal generiert werden, um die schlussendliche
+Ausführungsdauer so kurz wie möglich zu halten. Sollte sich doch einmal ein Fehler im Input-Code befindet, muss dieser verständlich gemeldet werden. Compiler sind also keine simplen Programme und daher auch bis heute
+ein aktives Forschungsgebiet.
+
+(!!!rework)
+Jedoch ist die zugrundeliegende Aufgabe eines Comilers gar nicht so kompliziert.
 Man braucht ja nur, ein Dokument mit Text der bestimmten Regeln folgt, in Text mit anderen Regeln verwandeln. Natürlich ist dies etwas salopp ausgedrückt, trotzdem fragte ich mich,
 ob es nicht möglich sei einen viel einfacheren Compiler zu schreiben. Während meinen Nachforschungen zum Thema Compiler, stiess ich auf den Begriff \textit{Macro Expansion}.
 Dabei handelt es sich um eine Methode der Code Generation, bei der eine Struktur des AST (z.B. ein If-Statement) mit einem \textit{Macro} ersetzt wird. Bei diesem Macro kann es sich um so ziemlich alles,
