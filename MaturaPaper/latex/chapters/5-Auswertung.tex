@@ -62,7 +62,7 @@ Der QHScompiler ist somit deutlich geschlagen. Wie GCC zeigt, liegt das Problem 
 Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
 
 
-\section{Geschwindigkeit des Output-Codes}
+\section{Geschwindigkeit des Output-Codes} \label{sec:execute_speed}
 Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Sowie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
 dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Dieser Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt.
 
@@ -102,7 +102,7 @@ dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet
         mark size=2pt]
     table [col sep=comma]
     {resources/data/executespeed_c.csv};
-    \addlegendentry{C}
+    \addlegendentry{GCC}
     \end{axis}
 \end{tikzpicture}
 \caption{Vergleich der Ausführungsdauer}
@@ -149,27 +149,53 @@ start
 
 %\noindent\hrulefill Output\noindent\hrulefill%
 [ERROR] Cannot dequeue, OrderQueue is empty!
-[ERROR] Expected LiteralCode for #literalToIdentifier at OrderQueue second, got: EMPTY
+[ERROR] Expected LiteralCode for #literalToIdentifier at OrderQueue second, got: NONE
 [ERROR] Cannot dequeue, OrderQueue is empty!
 [ERROR] Tried #changeIntVar but second order (change) from OrderQueue is not direct code
-[ERROR] Expected LiteralCode for #literalToIdentifier, got: EMPTY
-[ERROR] Expected LiteralCode for #literalToIdentifier, got: EMPTY
-[ERROR] Expected LiteralCode for #literalToIdentifier, got: EMPTY
+[ERROR] Expected LiteralCode for #literalToIdentifier, got: NONE
+[ERROR] Expected LiteralCode for #literalToIdentifier, got: NONE
+[ERROR] Expected LiteralCode for #literalToIdentifier, got: NONE
 \end{lstlisting}
 
 Bei \ref{eg:qhs-faulty-syntax-3} wird die Funktion foo ohne Parameter definiert, später jedoch mit einem Argument aufgerufen. Der QHScompiler verfügt hierbei über keine Möglichkeit die Menge an Argumenten zu überprüfen
 und meldet nicht direkt einen Fehler. Als er jedoch versucht die Grösse des erwarteten Argumentes von der OrderQueue zu nehmen ist diese leer.
 Der QHScompiler meldet also einen OrderQueue-Empty Error gefolgt von vielen Folgefehlern.
-Somit ist der QHScompiler einerseits weniger strikt andererseits aber auch deutlich verwirrender und ungenauer als ein traditioneller Compiler.
 
+%Ein weiterer Kritikpunkt am QHScompiler wäre die fehlende Semantic Analysis. Implizite Casts 
+
+Somit ist der QHScompiler bei der Meldung von Fehlern einerseits weniger strikt, andererseits aber auch deutlich verwirrender und ungenauer als ein traditioneller Compiler.
 In meinen Augen triumphiert daher auch in dieser Kategorie der traditionelle Compiler über meinen QHScompiler.
 
 \section{Offenheit für Erweiterung}
 Als eine auch professionell verwendete Programmiersprache, hat C selbstverständlich eine Vielzahl an Features. Zum Beispiel lassen sich mithilfe von Templates Datentyp unabhängige Datenstrukturen wie Stacks, Queues oder Vectors definieren.
 Weiter lassen sich mit Libraries komplexe Algorithmen einmal schreiben und nachher ganz einfach wieder verwenden. All dies ist innerhalb eines traditionellen Compilers möglich.
 
-Der QHScompiler ist hierbei jedoch noch etwas interessanter. Denn es ist möglich eigene Identifier zu definieren. Mit den im Abschnitt \ref{sec:qhs-funcs} beschriebenen Techniken DelayedExecute und TempAssign
+Libraries lassen sich ebenfalls mit dem QHScompiler verwenden. Templates sollten theoretisch ebenfalls möglich sein, jedoch habe ich dies nicht getestet.
+Jedoch unterstützt der QHScompiler, wie in Abschnitt \ref{cha:4-QHS_Compiler} bereits angetönt, noch weitere Möglichkeiten zur Erweiterung. 
+Denn es ist möglich eigene Identifier zu definieren. Mit den im Abschnitt \ref{sec:qhs-funcs} beschriebenen Techniken DelayedExecute und TempAssign
 lassen sich sogar selbstständig syntaktisch komplexe Code Strukturen bilden. Im Gegensatz zu einem traditionellen Compiler muss hierfür nicht einmal der QHScompiler angepasst werden.
-Es lässt sich also im Grunde eine komplett andere Sprache als QHS ohne jegliche Änderung am QHScompiler definieren. Jedoch ist dies nicht besonders intuitiv und sehr fehleranfällig.
+Dadurch kann man unterschiedliche Programmiersprachen mit dem QHScompiler kompilieren. Es ist sogar möglich die Programmiersprache innerhalb einer Datei zu wechseln.
+Leider ist die Definition der benötigten Macros für eine neue Programmiersprache nicht besonders intuitiv. 
+Trotzdem würde ich sagen, dass der QHScompiler einem mehr Freiheit bei der Erweiterung bietet, als ein traditioneller Compiler.
 
-Der QHScompiler ermöglicht einem also grundsätzlich mehr Freiheit. (...)
+\section{Fazit}
+Im Vergleich mit traditionellen Compilern hat der QHScompiler nicht besonders gut abgeschnitten.
+Er ist sowohl in der Geschwindigkeit der Kompilierung als auch bei der eines kompilierten Programmes einem traditionellen Compiler unterlegen.
+Zudem ist der QHScompiler auch nicht besonders benutzerfreundlich und nicht wirklich angenehm zu verwenden. Als einziger Vorteil lässt sich seine Möglichkeit zur Erweiterung sehen.
+
+Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der Identifier besonders ineffizient ist. 
+Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig so verschachtelt, dass 
+
+Aus dem Vergleich der Benutzerfreundlichkeit wird ausserdem klar, dass die Syntax Analysis für die angenehme Verwendung eines Compilers äusserst wichtig ist.
+Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies folge der fehlenden Syntax Analysis nicht möglich.
+
+Ausserdem ist ein AST, wie in Abschnitt \ref{sec:execute_speed} thematisiert, auch für die Optimierung der Ausgabedatei äusserst praktisch.
+Grundsätzlich ist Optimierung für den QHScompiler äusserst schwierig. Da die Eingabesprache während der Kompilierung erst definiert wird, müssten auch passende Optimierungsmethoden spontan gefunden werden.
+Dies äussert sich in einer langsameren Geschwindigkeit des Output-Codes.
+
+Der einzige Vorteil des QHScompilers liegt in der Offenheit für Erweiterung.
+Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
+In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem \textit{Linker} kombinieren.
+
+Zusammengefasst führt das System der während der Kompilerung definierten Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung des Output-Codes.
+Der QHScompiler ist einem tradtionellen Compiler also stark unterlegen.

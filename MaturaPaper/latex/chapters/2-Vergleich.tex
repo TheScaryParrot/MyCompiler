@@ -1,19 +1,20 @@
 \chapter{Vergleich der Compiler} \label{cha:2-Vergleich}
-Um die Leistung meines Compilers zu testen, werde ich ihn mit zwei weiteren Compilern vergleichen.
+Um die Leistung meines alternativen Aufbaus eines Compilers zu testen, werde folgende drei Compiler vergleichen:
 
 \begin{enumerate}
 \item
-Der \textit{QHScompiler} ist der von mir nach meiner Idee entwickelte Compiler. Seine genaue Funktionsweise wird in Abschnitt \ref{cha:4-QHS_Compiler} ausgeführt.
-Er ist in C++ geschrieben und generiert x86 Assembly mit NASM Syntax aus meiner Programmiersprache QHS.
+Der \textit{QHScompiler} ist der von mir nach meinem Aufbau entwickelte Compiler. Seine genaue Funktionsweise wird in Abschnitt \ref{cha:4-QHS_Compiler} ausgeführt.
+Er ist in C++ geschrieben und verwendet meine eigene Programmiersprache QHS als Eingabesprache. 
 
 \item
-\textit{GCC} ist ein gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht inzwischen auch die Kompilierung von C++, Rust, Fortran, usw.
-[...] <- Add if data is actually useful
+\textit{GCC} ist der gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht inzwischen auch die Kompilierung von C++, Rust, Fortran, usw.
+Der traditionelle Compiler Aufbau wird in diesem Vergleich von GCC repräsentiert.
 
 \item
-Der \textit{THScompiler} repräsentiert in diesem Vergleich einen traditionellen von mir geschrieben Compiler. Im Gegensatz zu GCC kann der THScompiler weniger.
-Er dient daher als realistische Konkurrenz zum QHScompiler und wird verwendet, um zu testen, ob meine Idee taugt. Der THScompiler folgt dem in Abschnitt \ref{cha:3-Tradional_Compiler} beschriebenen traditionellen Aufbau eines Compilers.
-Geschrieben ist der THScompiler in C++ und liefert x86 Assembly mit NASM Syntax.
+Der \textit{THScompiler} ist ebenfalls ein traditioneller Compiler. Der Unterschied zu GCC liegt jedoch darin, dass der THScompiler von mir selbst entwickelt wurde. 
+Er ist dadurch deutlich weniger optimiert und umfasst weniger Funktionen. In der Komplexität entspricht der THScompiler ungefähr dem QHScompiler.
+Der THScompiler dient mit ähnlichem Arbeitsaufwand, Optimierung und Niveau der Programmierung als "realistische" Konkurrenz zum QHScompiler.
+Geschrieben ist der THScompiler in C++ und kompiliert aus meiner eigenen Programmiersprache THS.
 \end{enumerate}
 
 \section{Anforderungen an die Compiler}
@@ -25,10 +26,10 @@ Für die von mir entwickelten Compiler habe ich folgende Mindestanforderungen ge
     \vspace{3mm} % Adjust the height of the space between caption and tabular
     
     \begin{tabular}{l|l}
-    Output als Assembly Code        & Die Output-Sprache muss Assembly Code sein                               \\
-    C-like Syntax                   & Die Input-Sprache muss einen C-ähnlichen Syntax aufweisen                \\
+    Output als Assembly Code        & Die Ausgabesprache muss Assembly Code sein                               \\
+    C-like Syntax                   & Die Eingabesprache muss einen C-ähnlichen Syntax aufweisen               \\
     Variablen und Funktionen        & Lokale und globale Variablen sowie Funktionen müssen unterstützt werden  \\
-    Branching und Loops             & If-Statements sowie While-Loops müssen umsetzbar sein
+    Branching und Loops             & If-Statements und einfache Loops müssen umsetzbar sein
     \end{tabular}
 \end{table}
 
@@ -43,9 +44,9 @@ Zum Schluss werden die drei Compiler nach folgenden Kriterien bewertet und vergl
 
     \begin{tabular}{l|l}
     Geschwindigkeit der Kompilierung    & Wie lange dauert die Kompilierung von Code?                       \\
-    Geschwindigkeit des Output-Codes    & Wie lange dauert die Ausführeung des Output-Codes?                \\
+    Geschwindigkeit des Output-Codes    & Wie lange dauert die Ausführung des Output-Codes?                 \\
     Benutzerfreundlichkeit              & Wie einfach ist die Verwendung des Compilers?                     \\
-    Offenheit für Erweiterung           & Wie einfach kann die Input-Sprache erweitert werden?                                 
+    Offenheit für Erweiterung           & Wie einfach kann die Eingabesprache erweitert werden?                                 
     \end{tabular}
 \end{table}
 

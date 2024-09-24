@@ -1,9 +1,17 @@
 \chapter{Der QHScompiler} \label{cha:4-QHS_Compiler}
-Die QHS Programmiersprache besteht aus Wörtern. Im Kontext von QHS werden diese Wörter \textit{Orders} genannt. Diese Orders weisen drei verschiedenen Typen auf. \textit{Identifiers}, \textit{Instructions} und \textit{LiteralCode}.
-Bei Identifiers handelt es sich um die in Abschnitt \ref{cha:3-Meine_Idee} CHANGE THIS bereits erwähnten Macros. Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der unverändert
-in die Outputdatei geschrieben wird. Wie diese drei Order Typen genau funktionieren wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
+Der QHScompiler basiert auf einem von mir erdachten alternativen Aufbau für einen Compiler. Diesem Aufbau liegt eine einfache Idee zugrunde:
+Die Macros die für Macro Expansion aus Abschnitt \ref{sec:traditional_code_generation} sollen während der Kompilierung erst definiert werden. 
+\textbf{Aus dieser Grundidee lassen zwei Dinge aufbauen.} Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesammte Syntax Analysis zu überspringen und keinen AST generieren zu müssen.
+Zweitens sollte es rein durch die Veränderung von diesen Macros möglich sein jegliche Programmiersprache zu kompilieren. Man könnte also in einem Dokument verschiedene Programmiersprachen verwenden und
+müsste dazwischen bloss die jeweiligen Macros definieren. 
 
-Dem QHScompiler steht für die Kompilierung ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
+Die Sprache, in der sich Macros definieren lassen, wird als QHS bezeichnet. 
+Diese Programmiersprache besteht wie die meisten anderen aus Wörtern. Im Kontext von QHS werden diese Wörter \textit{Orders} genannt.
+Orders können drei verschiedenen Typen aufweisen: \textit{Identifiers}, \textit{Instructions} und \textit{LiteralCode}.
+%Bei Identifiers handelt es sich um die bereits erwähnten Macros, Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der unverändert in die Outputdatei geschrieben wird.
+Wie diese drei Ordertypen genau funktionieren wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
+
+Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus zugrunde, dessen Vorbild der Von-Neumann Zyklus ist.
 
 \begin{figure}[h!]
     \centering
@@ -13,14 +21,16 @@ Dem QHScompiler steht für die Kompilierung ein einfacher Zyklus zugrunde, desse
 \end{figure}
 
 \section{Fetch} \label{sec:qhs-fetch}
-Die Aufgabe von \textit{Fetch} ist es die nächste Order, die verarbeitet werden soll, zu finden.
-Der \textit{QHS-Zyklus} beginnt mit dem ersten Fetch. Dabei wird die erste Order aus der Inputdatei extrahiert. Bei jedem weiteren Fetch wird nun die nächste Order aus der Inputdatei geholt.
+Der \textit{QHS-Zyklus} beginnt mit \textit{Fetch}. 
+Die Aufgabe von \textit{Fetch} ist es die nächste Order, die verarbeitet werden soll, zu finden. In dieser Hinsicht gleicht Fetch der Lexical Analysis eines traditionellen Compilers.
+Beim ersten Fetch wird die erste Order aus der Inputdatei extrahiert. Bei jedem weiteren Fetch wird nun die nächste Order aus der Inputdatei geholt.
 Eine Order weist wie erwähnt einen der drei Typen Identifier, Instruction oder LiteralCode auf.
-Diese sind mit folgenden RegEx definiert. Whitespaces dienen als Trennung zwischen zwei Orders und werden ignoriert.
+Fetch ist dafür zuständig die nächste Order einem der drei Typen zuzuordenen.
+Diese Ordertypen sind mit folgenden RegEx definiert. Whitespaces dienen als Trennung zwischen zwei Orders und werden ignoriert.
 
 \begin{table}[h]
     \centering
-    \caption{RegEx Definitionen der Order Typen}
+    \caption{RegEx Definitionen der Ordertypen}
     \vspace{3mm} % Adjust the height of the space between caption and tabular
     
     \begin{tabular}{ll}
@@ -35,7 +45,7 @@ Diese sind mit folgenden RegEx definiert. Whitespaces dienen als Trennung zwisch
 \end{table}
 
 Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum zwischen Zeichen differenziert wird. Während die Lexical Analysis traditionell zwischen vielen verschiedenen Tokens unterscheidet,
-sind für den QHScompiler alle Zeichen (mit Ausnahme von \# und " ) gleichbedeutend.
+sind für den QHScompiler alle Zeichen (mit Ausnahme von \# und ") gleichbedeutend. Welche Bedeutung den übrigen Zeichen zukommt wird  
 
 Bei einem Fetch kommt die nächste Order wie erwähnt von der Inputdatei.
 Es ist jedoch möglich Orders voranzustellen. Diese Orders werden beim nächsten Fetch zuerst gefunden. Dies geschieht mithilfe des \textit{FetchStacks}, auf den Orders gelegt werden können.
@@ -72,9 +82,9 @@ Ist die OrderQueue deaktiviert oder die Order orderQueue-proof, wird diese Order
 Execute ist der letzte Schritt des QHS-Zyklus. Hier wird der tatsächliche Assembly Code generiert. Je nach Typ der Order (Identifier, Instruction oder LiteralCode) läuft Execute sehr unterschiedlich ab.
 
 \subsection{Identifier}
-Ein Identifier ist eine Zusammenfassung von mehreren Orders. Diese sind in einem \textit{Environment} definiert.
+Ein Identifier ist eine Referenz zu den an Anfang von Abschnitt \ref{cha:4-QHS_Compiler} erwähnten Macros. Diese sind in einem \textit{Environment} definiert.
 Hierbei handelt es sich um eine einfache Map, die einen Identifier mit einer Liste an Orders verknüpft.
-In anderen Programmiersprachen werden Environments auch als Scope bezeichnet.
+%In anderen Programmiersprachen werden Environments auch als Scope bezeichnet.
 Wenn nun ein Identifier in den Execute Schritt kommt, werden die dazugehörigen Orders auf den FetchStack aus Abschnitt \ref{sec:qhs-fetch} gelegt.
 Bei den nächsten Fetches werden nun zuerst die zum Identifier gehörenden Orders nacheinander abgebaut. Einfach ausgedeückt wird der Identifier im Inputfile mit seinen Orders ersetzt.
 

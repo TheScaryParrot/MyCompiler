@@ -9,11 +9,19 @@ Neben fehlerfrei muss die Kompilierung auch möglichst schnell sein. Dasselbe gi
 Ausführungsdauer so kurz wie möglich zu halten. Sollte sich doch einmal ein Fehler im Input-Code befindet, muss dieser verständlich gemeldet werden. Compiler sind also keine simplen Programme und daher auch bis heute
 ein aktives Forschungsgebiet.
 
-(!!!rework)
-Jedoch ist die zugrundeliegende Aufgabe eines Comilers gar nicht so kompliziert.
-Man braucht ja nur, ein Dokument mit Text der bestimmten Regeln folgt, in Text mit anderen Regeln verwandeln. Natürlich ist dies etwas salopp ausgedrückt, trotzdem fragte ich mich,
-ob es nicht möglich sei einen viel einfacheren Compiler zu schreiben. Während meinen Nachforschungen zum Thema Compiler, stiess ich auf den Begriff \textit{Macro Expansion}.
-Dabei handelt es sich um eine Methode der Code Generation, bei der eine Struktur des AST (z.B. ein If-Statement) mit einem \textit{Macro} ersetzt wird. Bei diesem Macro kann es sich um so ziemlich alles,
-meist jedoch ein Stuck Assembly oder Object Code, handeln. Somit wird nach und nach der gesamte AST ersetzt, bis nur noch Macros übrig sind. Inspiriert von dieser Methode der Code Generation,
-überlegte ich mir ein Compiler, der möglichst stark dieses Konzept der Macros verwendet. Ein Compiler, der sowohl Lexical als auch Syntax Analysis überspringen kann und es ermöglicht in einem Programm weitere Macros,
-und somit eine Art eigene Programmiersprache, selbst zu definieren.
+Als ich mit meiner Maturaarbeit begann, war mein Ziel die Entwicklung eines einfachen Compilers zu einer C ähnlichen Programmiersprache. Unterstützt wurde ich darin freundlicherweise durch eine Vorlesung der Universität Bern.
+Während mir in dieser Vorlesung der theoretische Aufbau eines Compilers gelehrt wurde, fragte ich mich trotzdem hin und wieder, wieso genau ein Compiler tatsächlich so aufgebaut ist und
+ob es nicht eine einfachere Möglichkeit gäbe. Als ich dann in den Sommerferien auf Probleme in der Entwicklung meines eigenen Compilers stiess, entschied ich mich einem von mir erdachten alternativen Aufbau für Compiler eine Chance zu geben. 
+
+In dieser Maturaarbeit werde ich anhand des "traditionellen" Compiler Aufbaus meine alternative Idee erklären und auf mögliche Probleme in der Umsetzung eingehen.
+Zum Schluss werde ich einen nach dem alternativen Aufbau entwickelten Compiler mit traditionellen Compilern vergleichen und damit Vor- und Nachteile der beiden Möglichkeiten aufzeigen.
+
+\iffalse
+    Jedoch ist die zugrundeliegende Aufgabe eines Comilers gar nicht so kompliziert.
+    Man braucht ja nur, ein Dokument mit Text der bestimmten Regeln folgt, in Text mit anderen Regeln verwandeln. Natürlich ist dies etwas salopp ausgedrückt, trotzdem fragte ich mich,
+    ob es nicht möglich sei einen viel einfacheren Compiler zu schreiben. Während meinen Nachforschungen zum Thema Compiler, stiess ich auf den Begriff \textit{Macro Expansion}.
+    Dabei handelt es sich um eine Methode der Code Generation, bei der eine Struktur des AST (z.B. ein If-Statement) mit einem \textit{Macro} ersetzt wird. Bei diesem Macro kann es sich um so ziemlich alles,
+    meist jedoch ein Stuck Assembly oder Object Code, handeln. Somit wird nach und nach der gesamte AST ersetzt, bis nur noch Macros übrig sind. Inspiriert von dieser Methode der Code Generation,
+    überlegte ich mir ein Compiler, der möglichst stark dieses Konzept der Macros verwendet. Ein Compiler, der sowohl Lexical als auch Syntax Analysis überspringen kann und es ermöglicht in einem Programm weitere Macros,
+    und somit eine Art eigene Programmiersprache, selbst zu definieren.
+\fi
