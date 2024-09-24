@@ -53,62 +53,122 @@ Die durchschnittliche Dauer der Kompilierung ist in \ref{fig:compilespeed} ersic
 \caption{Vergleich der Kompilierungsdauer mit Log-Log Skalen}
 \end{figure}
 
-Interessant ist hierbei, dass sowohl QHS als auch GCC mit einer hohen Kompilierungsdauer beginnen und sich später linear verhalten. Während THS zwar zu Beginn mit einer sehr schnellen Kompilierung glänzt,
-daraufhin jedoch exponentiell ansteigt. Bei etwas mehr als 10³ Kopien der Funktion wird GCC und daraufhin zwischen 10⁴ und 10⁵ Kopien auch der QHScompiler schneller als der THScompiler. Für die exponentielle Kompilerungsdauer
-des THScompilers habe ich leider keine Erklärung. Grundsätzlich sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen. Daher liegt der Fehler wahrscheinlich bei meinen eigenen C++ Kenntnissen.
-Durch die logarithmischen Skalen erscheint der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler konstant, jedoch braucht der QHScompiler ab einer Programmgrösse über 10² Funktionskopien konsistent 7-8 mal
-länger als GCC. 
-Der QHScompiler ist somit deutlich geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer beim THScompiler nicht am Prinzip des traditionellen Compilers und viel mehr an meiner Implementation davon.
+Interessant ist hierbei, dass sowohl QHS als auch GCC mit einer hohen Kompilierungsdauer beginnen und sich später linear verhalten.
+Zu Beginn glänzt THS zwar mit einer sehr schnellen Kompilierung, steigt daraufhin jedoch exponentiell an.
+Bei etwas mehr als 10³ Kopien der Funktion wird GCC und daraufhin zwischen 10⁴ und 10⁵ Kopien auch der QHScompiler schneller als der THScompiler.
+Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Grundsätzlich sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
+%Daher liegt der Fehler wahrscheinlich bei meinen eigenen C++ Kenntnissen.
+Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
+Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien konsistent 7-8 mal länger als GCC. 
+Der QHScompiler ist somit deutlich geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am Aufbau des traditionellen Compilers und viel mehr an meiner Implementation davon.
 Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
 
 
 \section{Geschwindigkeit des Output-Codes} \label{sec:execute_speed}
 Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Sowie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
-dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Dieser Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt.
+dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Der Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt und daraufhin für verschiedene Mengen an zu berechnenden Primzahlen je zehnmal ausgeführt.
 
-\begin{figure}[h!]
-\centering
-\label{fig:executespeed}
-\begin{tikzpicture}
-    \begin{axis}[
-        enlargelimits=false,
-        xlabel=Primzahlen bis,
-        ylabel=Ausführungsdauer (ms),
-        %tick style={draw=none},
-        tick label style={font=\bfseries\large},
-        grid=major,
-        legend pos=north west,
-    ]
-    \addplot[
-        smooth,
-        color=blue,
-        mark=square,
-        mark size=2pt]
-    table [col sep=comma]
-    {resources/data/executespeed_qhs.csv};
-    \addlegendentry{QHS}
-    \addplot[
-        smooth,
-        color=red,
-        mark=square,
-        mark size=2pt]
-    table [col sep=comma]
-    {resources/data/executespeed_ths.csv};
-    \addlegendentry{THS}
-    \addplot[
-        smooth,
-        color=green,
-        mark=square,
-        mark size=2pt]
-    table [col sep=comma]
-    {resources/data/executespeed_c.csv};
-    \addlegendentry{GCC}
-    \end{axis}
-\end{tikzpicture}
-\caption{Vergleich der Ausführungsdauer}
+\begin{figure}[H]
+    \centering
+    \label{fig:executespeed_optimized}
+    \begin{tikzpicture}
+        \begin{axis}[
+            enlargelimits=false,
+            xlabel=Menge der Primzahlen,
+            ylabel=Ausführungsdauer (ms),
+            %tick style={draw=none},
+            tick label style={font=\bfseries\large},
+            grid=major,
+            legend pos=north west,
+        ]
+        \addplot[
+            smooth,
+            color=blue,
+            mark=square,
+            mark size=2pt]
+        table [col sep=comma]
+        {resources/data/executespeed_qhs.csv};
+        \addlegendentry{QHS}
+        \addplot[
+            smooth,
+            color=red,
+            mark=square,
+            mark size=2pt]
+        table [col sep=comma]
+        {resources/data/executespeed_ths.csv};
+        \addlegendentry{THS}
+        \addplot[
+            smooth,
+            color=green,
+            mark=square,
+            mark size=2pt]
+        table [col sep=comma]
+        {resources/data/executespeed_optimized_c.csv};
+        \addlegendentry{GCC}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Vergleich der Ausführungsdauer mit GCC Optimierung}
 \end{figure}
 
-In Grafik \ref{fig:executespeed} ist ersichtlich, dass (...)
+Wie in Abbildung \ref{fig:executespeed_optimized} ersichtlich, beginnen alle drei kompilierten Programme mit einer sehr tiefen Ausführungsdauer.
+Die Progamme des THS- und QHScompilers werden bis zum Schluss nahezu gleich schnell ausgeführt.
+Das von GCC generierte Programm ist jedoch deutlich schneller als die Programme des THS- und QHScompilers.
+Dies liegt ganz klar an den Optimierungsmethoden von GCC. Wenn man die Optimierung beim Kompilieren mit GCC deaktiviert, sieht die Grafik wie folgt aus:
+
+\begin{figure}[H]
+    \centering
+    \label{fig:executespeed}
+    \begin{tikzpicture}
+        \begin{axis}[
+            enlargelimits=false,
+            xlabel=Menge der Primzahlen,
+            ylabel=Ausführungsdauer (ms),
+            %tick style={draw=none},
+            tick label style={font=\bfseries\large},
+            grid=major,
+            legend pos=north west,
+        ]
+        \addplot[
+            smooth,
+            color=blue,
+            mark=square,
+            mark size=2pt]
+        table [col sep=comma]
+        {resources/data/executespeed_qhs.csv};
+        \addlegendentry{QHS}
+        \addplot[
+            smooth,
+            color=red,
+            mark=square,
+            mark size=2pt]
+        table [col sep=comma]
+        {resources/data/executespeed_ths.csv};
+        \addlegendentry{THS}
+        \addplot[
+            smooth,
+            color=green,
+            mark=square,
+            mark size=2pt]
+        table [col sep=comma]
+        {resources/data/executespeed_c.csv};
+        \addlegendentry{GCC}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Vergleich der Ausführungsdauer ohne GCC Optimierung}
+\end{figure}
+
+Wie Grafik \ref{fig:executespeed} zeigt, wird das GCC Programm ohne Optimierung nur noch leicht schneller ausgeführt als die Programme der beiden anderen Compiler.
+Da ebenfalls weder der THS- noch der QHScompiler über Optimierungsmethoden verfügen, ist dies das erwartete Resultat.
+Aus zeitlichen Gründen war es mir nicht möglich Optimierung in meine beiden Compiler einzubauen.
+
+Zusammengefasst lässt sich sagen, dass ohne Optimierung mein alternativer Aufbau eines Compilers ungefähr gleich schnelle Ausführungsgeschwindigkeit liefert, wie ein traditioneller Compiler.
+Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler möglich ist und die Ausführungsdauer deutlich verringert, wie GCC in Grafik \ref{fig:executespeed_optimized} beweist.
+Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch deutlich schwierig wäre.
+Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine Syntax Analysis durchgeführt und nie ein AST generiert wird.
+Auch steht die Grundidee meines alternativen Aufbaus Optimierung stark im Weg.
+Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von Macro Expansion verwendeten Macros während der Kompilerung erst definiert werden.
+Daher kennt der QHScompiler vor der Kompilierung weder die Eingabe- noch die Ausgabesprache. Dies führt dazu, dass auch mögliche Optimierungsmethoden erst während dem Kompilieren gefunden werden können.
+Aus diesen Gründen wäre Optimierung für einen Compiler nach meinem alternativen Aufbau deutlich komplexer, wenn nicht sogar unmöglich.
 
 
 \section{Benutzerfreundlichkeit}
@@ -117,7 +177,8 @@ GCC und der THScompiler folgen beide exakt definiertem Syntax und Semantik. Dies
 Anfangs scheinen Semikolons am Ende jedes Statements vielleicht etwas unnötig, jedoch bemerkt man schnell, dass genau diese Pingeligkeit der Compiler für eine Programmiersprache äusserst wichtig ist.
 GCC fängt besonders gut Fehler früh ab und meldet diese. Der traditionelle Compiler ist somit sehr gut in puncto Benutzerfreundlichkeit.
 
-Der QHScompiler weisst hier hingegen einige Macken auf. Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
+Der QHScompiler weist bei der Benutzerfreundlichkeit hingegen einige Macken auf.
+Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
 Er führt ganz einfach und strickt nur aus was als Nächstes auftaucht. Somit führt ein fehlendes Zeichen nicht immer zu Fehlern. Folgendes Beispiel kompiliert einwandfrei und lässt sich auch problemlos ausführen.
 
 \begin{lstlisting}[language=QHS, caption=QHS mit fehlenden Tokens, label=eg:qhs-faulty-syntax-1]
@@ -132,7 +193,7 @@ int a = "69"    /* ; fehlt */
 foo a ) ;       /* ( fehlt */
 \end{lstlisting}
 
-Der QHS Code bei \ref{eg:qhs-faulty-syntax-2} kompiliert einwandfrei, jedoch ist der genierte Assembly Code fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument angesehen.
+Der QHS Code bei \ref{eg:qhs-faulty-syntax-2} kompiliert einwandfrei, jedoch ist der generierte Assembly Code fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument angesehen.
 
 Weiter sind auch die Fehlermeldungen des QHScompilers nicht immer besonders klar.
 
@@ -198,4 +259,4 @@ Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessa
 In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem \textit{Linker} kombinieren.
 
 Zusammengefasst führt das System der während der Kompilerung definierten Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung des Output-Codes.
-Der QHScompiler ist einem tradtionellen Compiler also stark unterlegen.
+Der QHScompiler ist einem traditionellen Compiler also stark unterlegen.

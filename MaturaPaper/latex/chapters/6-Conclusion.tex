@@ -1,1 +1,20 @@
 \chapter{Schluss}
+Der QHScompiler kann einem traditionellen Compiler leider nicht das Wasser reichen.
+%Als einziger Vorteil meines alternativen Aufbaus lässt sich dessen Offenheit für Erweiterung sehen.
+Trotzdem habe ich mit meiner Arbeit das erreicht, was ich mir erhofft hatte. Der Auslöser für meinen alternativen Ansatz war die Frage: Wieso werden Compiler so entwickelt, wie sie entwickelt werden? 
+Dies konnte ich für mich ganz klar beantworten. Die Syntax Analysis, die ich zuerst für unnötig hielt, erfüllt eine wichtige Aufgabe für Fehlermeldung und Optimierung.
+Ausserdem ist man dank ihr nicht auf verwirrende Methoden wie DelayedExecute oder TempAssign aus Abschnitt \ref{sec:qhs-funcs} angewiesen.
+Das Definieren der Macros und somit der Input- und Output-Sprache während der Kompilierung klingt zuerst verlockend, bringt jedoch auch Probleme fürs Optimieren des Output-Codes mit sich.
+Compiler folgen also mit guten Grund dem traditionellen Aufbau.
+Der QHScompiler ist somit kein bahnbrechender super Compiler, sondern eher ein Experiment.
+Ein Test für den traditionellen Aufbau von Compilern. Ein Test, den die traditionellen Compiler problemlos bestanden haben.
+
+Es hat mir sehr viel Spass gemacht meinen alternativen Ansatz zu entwickeln. Auch wenn es häufig frustriet, ist es doch viel aufregender einer eigenen Idee zu folgen, als einfach stur dem traditionellen Weg zu folgen.
+Sowohl bei der Entwicklung des QHS- als auch des THScompiler stiess ich häufig gegen eine Wand und bemerkte dies meist erst, als ich schon eine Woche daran verloren hatte.
+Sehr hilfreich war es dabei die Entwicklung parallel bereits in Worte zu fassen. Die Verschriftlichung meiner Gedanken half mir dabei ein Verständnis aufzubauen, wie mein Programm tatsächlich funktioniert.
+Leider ist mir dies erst sehr spät aufgefallen.
+
+Zuletzt möchte ich nochmals hervorheben wie wichtig die Vorlesung Compiler Construction der Universität Bern für diese Maturaarbeit war.
+Ohne diese wäre es für mich viel schwieriger gewesen den traditionellen Aufbau eines Compilers zu verstehen und umzusetzten.
+Auch basiert der Grossteil des Abschnitts \ref{cha:3-Tradional_Compiler} auf dieser Vorlesung.
+Wahrscheinlich wäre ich auch ohne die Vorlesung nie zu meinen alternativen Aufbau für Compiler inspiriert worden.
