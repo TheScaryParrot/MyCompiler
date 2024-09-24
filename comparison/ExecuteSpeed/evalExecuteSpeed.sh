@@ -1,7 +1,8 @@
 #!/bin/bash
 
 echo "C:"
-time ./ExecuteSpeedC > /dev/null
+echo "skipping C"
+#time ./ExecuteSpeedC > /dev/null
 
 echo ""
 echo ""
