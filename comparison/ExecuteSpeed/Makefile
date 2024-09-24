@@ -1,5 +1,5 @@
 ExecuteSpeed: ExecuteSpeed.c ExecuteSpeed.ths ExecuteSpeed.qhs
-	gcc -o ExecuteSpeedC ExecuteSpeed.c
+	gcc -O3 -o ExecuteSpeedC ExecuteSpeed.c
 
 	../../THSCompiler/THScompiler ExecuteSpeed.ths -s -o ExecuteSpeedTHS.o
 	ld ExecuteSpeedTHS.o ../thsLib/print.o -o ExecuteSpeedTHS

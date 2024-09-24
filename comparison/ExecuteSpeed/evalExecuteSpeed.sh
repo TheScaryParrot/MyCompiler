@@ -1,16 +1,18 @@
 #!/bin/bash
 
 echo "C:"
-echo "skipping C"
-#time ./ExecuteSpeedC > /dev/null
+#echo "skipping C"
+time ./ExecuteSpeedC > /dev/null
 
 echo ""
 echo ""
 
 echo "THS:"
-time ./ExecuteSpeedTHS > /dev/null
+echo "skipping THS"
+#time ./ExecuteSpeedTHS > /dev/null
 echo ""
 echo ""
 
 echo "QHS:"
-time ./ExecuteSpeedQHS > /dev/null
+echo "skipping QHS"
+#time ./ExecuteSpeedQHS > /dev/null
