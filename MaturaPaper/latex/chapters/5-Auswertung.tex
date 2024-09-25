@@ -53,17 +53,26 @@ Die durchschnittliche Dauer der Kompilierung ist in Abbildung \ref{fig:compilesp
 \caption{Vergleich der Kompilierungsdauer mit Log-Log Skalen}
 \end{figure}
 
-Interessant ist, dass sowohl der QHScomiler als auch GCC mit einer hohen Kompilierungsdauer bei einer tiefen Anzahl an Funktionen beginnen und sich später linear verhalten.
-Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt die Kompilierungsdauer mit einer steigenden Anzahl an Funktionen exponentiell an.
-Ab 10³ Kopien der Funktion wird GCC und daraufhin zwischen 10⁴ und 10⁵ Kopien auch der QHScompiler schneller als der THScompiler.
-Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Grundsätzlich sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
+Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt die Kompilierungsdauer mit einer zunehmenden Anzahl an Funktionen exponentiell an.
+Ab 10⁵ Kopien der Funktion kompiliert der THScompiler länger, als die beiden anderen Compiler.
+Bei noch grösseren Eingabedateien ist zu erwarten, dass der THScompilers weiterhin langsamer kompiliert als GCC und der QHScompiler.
+Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Theoretisch sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
 %Daher liegt der Fehler wahrscheinlich bei meinen eigenen Kenntnissen von C++.
-Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
-Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien 7-8 mal länger als GCC. 
-Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compiler Aufbau und viel mehr an meiner Implementation davon.
-%Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
-Daher überzeugt GCC und das traditionelle Compiler Model bei der Geschwindigkeit der Kompilierung mehr als mein alternativer Aufbau.
+Trotzdem kompiliert der THScompiler bei wenigen Kopien der Funktion deutlich schneller als GCC, obwohl beide Compiler dem traditionellen Aufbau folgen.
+Dies liegt wahrscheinlich daran, dass der THScompiler über weniger Funktionalitäten als GCC verfügt.
+Der QHScompiler, der einen ähnlichen Umfang wie der THScompiler umfasst, wird für kleine Eingabedateien klar vom THScompiler geschlagen.
 
+Sowohl der QHScomiler als auch GCC beginnen mit einer hohen Kompilierungsdauer bei einer tiefen Anzahl an Funktionen, verhalten sich später aber linear.
+Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
+Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien ungefähr 1.5 mal länger als GCC. 
+
+Somit schneidet sowohl bei kleinen als auch bei grossen Eingabedateien der traditionelle Compiler Aufbau besser ab, als mein alternatives Modell.
+%Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compiler Aufbau und viel mehr an meiner Implementation davon.
+%Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
+%Daher überzeugt GCC und das traditionelle Compiler Model bei der Geschwindigkeit der Kompilierung mehr als mein alternativer Aufbau.
+
+%Für kleine Eingabedateien ist also der THScompiler zu empfehlen, während GCC für grosse Eingabedateien am schnellsten kompiliert.
+%Somit schneidet der traditionelle Compiler Aufbau bei der Geschwindigkeit der Kompilierung besser ab als mein alternatives Modell.
 
 \section{Geschwindigkeit der Ausgabedatei} \label{sec:execute_speed}
 Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Wie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
@@ -244,7 +253,7 @@ Somit ist der QHScompiler bei der Meldung von Fehlern einerseits nicht sehr stre
 Deshalb komme ich zum Schluss, dass der traditionelle Compiler Aufbau mit syntaktischer und semantischer Analyse deutlich besser mit Fehlern umgehen kann als mein alternatives Model.
 
 \section{Offenheit für Erweiterung}
-C, als eine auch professionell verwendete Programmiersprache, umfässt eine Vielzahl an Features.
+C, als eine auch professionell verwendete Programmiersprache, umfasst eine Vielzahl an Features.
 Zum Beispiel lassen sich mittels Templates Datenstrukturen wie Stacks, Queues oder Vectors definieren, die Datentyp unabhängig sind.
 Mit Libraries lassen sich zudem komplexe Algorithmen einmal schreiben und später einfach wieder verwenden. Solche Funktionalitäten sind bei einem traditionellen Compiler möglich.
 
@@ -266,8 +275,8 @@ Beim Umgang mit Fehlern ist der QHScompiler weniger streng aber auch deutlich un
 Als einziger Vorteil lässt sich seine Offenheit für Erweiterung sehen.
 
 Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der Identifier besonders ineffizient ist. 
-Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr inenander verschachtelt.
-(...)
+Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr ineinander verschachtelt.
+Daher werden auch für kurzer Code sehr viele Identifiers ausgeführt. Generell liesse sich die Implementation der Identifier sicherlich stark verbessern und der gesamte QHScompiler optimieren.
 
 Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die syntaktische Analyse für die angenehme Verwendung eines Compilers äusserst wichtig ist.
 Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies, folge der fehlenden syntaktischen Analyse, nicht möglich.
