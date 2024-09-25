@@ -186,7 +186,7 @@ Traditionelle Compiler erscheinen dadurch manchmal etwas pingelig. Jedoch sind s
 
 Der QHScompiler arbeitet hingegen viel ungenauer.
 %Der QHScompiler weist bei der Umgang mit fehlerhaftem Code hingegen einige Macken auf.
-Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
+Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte \textit{Order} folgt oder nicht.
 Er führt konsequent nur aus, was als Nächstes auftaucht. Darum führt ein fehlendes Zeichen nicht immer zu Fehlern.
 Folgender Code soll dies veranschaulichen:
 
@@ -234,8 +234,8 @@ start
 
 Bei Auflistung \ref{eg:qhs-faulty-syntax-3} wird die Funktion foo ohne Parameter definiert, später jedoch mit einem Argument aufgerufen.
 Der QHScompiler verfügt über keine Möglichkeit, die Menge an Argumenten zu überprüfen, und meldet nicht direkt einen Fehler. 
-Sobald er jedoch versucht die Grösse des erwarteten Argumentes von der OrderQueue zu holen ist diese leer.
-Der QHScompiler meldet einen OrderQueue-Empty Error gefolgt von vielen Folgefehlern.
+Sobald er jedoch versucht die Grösse des erwarteten Argumentes von der \textit{OrderQueue} zu holen ist diese leer.
+Der QHScompiler meldet einen \textit{OrderQueue-Empty} Error gefolgt von vielen Folgefehlern.
 
 %Ein weiterer Kritikpunkt am QHScompiler wäre die fehlende semantische Analyse. Implizite Casts 
 
