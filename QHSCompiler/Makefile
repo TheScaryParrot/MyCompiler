@@ -1,5 +1,5 @@
 QHScompiler: QHScompiler.cpp
-	g++ QHScompiler.cpp -o QHScompiler
+	g++ -O3 QHScompiler.cpp -o QHScompiler
 
 QHScompiler.exe: QHScompiler.cpp
-	g++ QHScompiler.cpp -o QHScompiler.exe
+	g++ -O3 QHScompiler.cpp -o QHScompiler.exe

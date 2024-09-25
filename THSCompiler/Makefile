@@ -1,5 +1,5 @@
 THScompiler: THScompiler.cpp
-	g++ THScompiler.cpp -o THScompiler
+	g++ -O3 THScompiler.cpp -o THScompiler
 
 THScompiler.exe: THScompiler.cpp
-	g++ THScompiler.cpp -o THScompiler.exe
+	g++ -O3 THScompiler.cpp -o THScompiler.exe
