@@ -84,9 +84,10 @@ Ist die OrderQueue deaktiviert oder die Order orderQueue-proof, wird diese Order
 
 \section{Execute} \label{sec:qhs-execute}
 Execute ist der letzte Schritt des QHS-Zyklus. Hier wird der tatsächliche Assembly Code generiert. Je nach Typ der Order (Identifier, Instruction oder LiteralCode) läuft Execute sehr unterschiedlich ab.
+In den folgenden Abschnitten wird der Ablauf von Execute je nach Ordertyp erklärt.
 
 \subsection{Identifier}
-Ein Identifier ist ein an Anfang von Abschnitt \ref{cha:4-QHS_Compiler} erwähntes Macro. Die Macros sind in einem \textit{Environment} definiert.
+Identifier stehen für die am Anfang von Abschnitt \ref{cha:4-QHS_Compiler} erwähnten Macros. Diese Identifier sind in einem \textit{Environment} definiert.
 Hierbei handelt es sich um eine einfache Map, die einen Identifier mit einer Liste an Orders verknüpft.
 %In anderen Programmiersprachen werden Environments auch als Scope bezeichnet.
 Wenn nun ein Identifier in den Execute Schritt kommt, werden die dazugehörigen Orders auf den FetchStack aus Abschnitt \ref{sec:qhs-fetch} gelegt.
@@ -112,19 +113,19 @@ In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten In
     \vspace{3mm} % Adjust the height of the space between caption and tabular
     
     \begin{tabularx}{\textwidth}{l|X}
-    \textbf{\#enterOrderQueue}      & Aktiviert die OrderQueue. \\ \hline
-    \textbf{\#exitOrderQueue}       & Deaktiviert die OrderQueue. \\ \hline
-    \textbf{\#assign}               & Die erste Order der OrderQueue muss ein Identifier sein. Der Rest der Orders auf der OrderQueue wird als Definition für diesen Identifier festgelegt. \\ \hline
-    \textbf{\#assignToOne}          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der OrderQueue genommen und als Definition für den Identifier verwendet. \\ \hline
-    \textbf{\#force}                & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Validate und somit die OrderQueue. \\ \hline
-    %\textbf{\#lightForce}           & Ähnlich wird \#force, jedoch wird diese nur ausgeführt, wenn \textbf{explain this cuz they don't know OrderQueue depth} \\ \hline
-    \textbf{\#orderEnqueue}         & Die nächste Order wird sofort der OrderQueue hinzugefügt, auch wenn diese orderQueue-proof wäre. Execute wird übersprungen. \\ \hline
-    \textbf{\#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der OrderQueue gesetzt. \\ \hline
-    \textbf{\#deepFetch}            & Die nächste Order der Inputdatei wird oben auf den FetchStack gesetzt. Ermöglicht den Zugriff auf die Inputdatei innerhalb eines Identifiers. \\ \hline
-    \textbf{\#queueFetch}           & Die oberste Order der OrderQueue wird oben auf den FetchStack gesetzt. \\ \hline 
-    \textbf{\#pushEnv}              & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
-    \textbf{\#popEnv}               & Das neuste Environment der Environment Linked-List wird gelöscht. \\ \hline
-    \textbf{\#addToIdentifier}      & Die oberste Order der OrderQueue muss ein Identifier sein und die zweitoberste LiteralCode. Beide Orders werden als Zahl interpretiert und addiert.
+    \#enterOrderQueue      & Aktiviert die OrderQueue. \\ \hline
+    \#exitOrderQueue       & Deaktiviert die OrderQueue. \\ \hline
+    \#assign               & Die erste Order der OrderQueue muss ein Identifier sein. Der Rest der Orders auf der OrderQueue wird als Definition für diesen Identifier festgelegt. \\ \hline
+    \#assignToOne          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der OrderQueue genommen und als Definition für den Identifier verwendet. \\ \hline
+    \#force                & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Validate und somit die OrderQueue. \\ \hline
+    %\#lightForce           & Ähnlich wird \#force, jedoch wird diese nur ausgeführt, wenn \textbf{explain this cuz they don't know OrderQueue depth} \\ \hline
+    \#orderEnqueue         & Die nächste Order wird sofort der OrderQueue hinzugefügt, auch wenn diese orderQueue-proof wäre. Execute wird übersprungen. \\ \hline
+    \#orderFrontEnqueue    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der OrderQueue gesetzt. \\ \hline
+    \#deepFetch            & Die nächste Order der Inputdatei wird oben auf den FetchStack gesetzt. Ermöglicht den Zugriff auf die Inputdatei innerhalb eines Identifiers. \\ \hline
+    \#queueFetch           & Die oberste Order der OrderQueue wird oben auf den FetchStack gesetzt. \\ \hline 
+    \#pushEnv              & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
+    \#popEnv               & Das neuste Environment der Environment Linked-List wird gelöscht. \\ \hline
+    \#addToIdentifier      & Die oberste Order der OrderQueue muss ein Identifier sein und die zweitoberste LiteralCode. Beide Orders werden als Zahl interpretiert und addiert.
                                       Das Resultat wird im Identifier gespeichert.       
     \end{tabularx}
 \end{table}
@@ -156,7 +157,7 @@ für den QHScompiler definieren lässt.
 \subsection{Abkürzungen}
 In diesem Abschnitt wird viel QHS-Code als Beispiel verwendet.
 Um die Leserlichkeit von QHS zu verbessern, werden ein zuerst paar Identifier anstelle der umständlichen Instructions definiert.
-Diese sind in der folgenden Tabelle \ref{tab:shortcuts} aufgeführt.
+Diese Identifier sind in der folgenden Tabelle \ref{tab:shortcuts} aufgeführt.
 
 {
 \begin{table}[H]
@@ -422,8 +423,9 @@ add [rbp+16], [rbp+20]
 
 Wie das Beispiel der Funktionsdefinition zeigt lassen sich mit DelayedExecute und TempAssign auch syntaktisch komplexe Programmiersprachen in QHS definieren und mit dem QHScompiler kompilieren.
 
-Natürlich weist QHS noch viele weitere Identifier, die einen C-like Syntax ermöglichen, auf.
-Diese Identifier werden hier jedoch nicht weiter betrachtet, da diese einem ähnlichen Prinzip wie die beschriebenen Definitionen von Variablen und Funktionen folgen.
+Um einen C ähnlichen Syntax zu ermöglichen, braucht der QHScompiler noch viele weitere Identifier.
+%Natürlich weist QHS noch viele weitere Identifier, die einen C-like Syntax ermöglichen, auf.
+Da diese jedoch einem ähnlichen Prinzip wie die beschriebenen Definitionen von Variablen und Funktionen folgen, werde ich sie hier nicht weiter betrachten.
 
 
     

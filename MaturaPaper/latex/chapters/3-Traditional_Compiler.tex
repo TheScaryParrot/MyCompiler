@@ -23,8 +23,8 @@ Die von mit verwendeten Fachbegriffe entsprechen hierbei nicht immer denen aus A
 Als Basis für diese Kapitel dient grösstenteils eine Vorlesung der Universität Bern, die ich für freundlicherweise besuchen durfte.
 
 \section{Lexical Analysis}
-Meist werden Programme so geschrieben, dass wir Menschen sie lesen und verstehen können. Dafür verwendet man Buchstaben, Zahlen, Zeichen (wie + oder *) und Whitespaces (wie Leerzeichen oder Absätze).
-Diese sind jedoch für den Computer nicht sofort verständlich. Der erste Schritt beim Kompilieren ist daher die \textit{Lexical Analysis}. Diese Analyse wird von einem Teil des Compilers, dem \textit{Lexer}, durchgeführt.
+Meist werden Programme so geschrieben, dass wir Menschen sie lesen und verstehen können. Dafür verwendet man Buchstaben, Zahlen, Sonderzeichen (wie + oder *) und Whitespaces (wie Leerzeichen oder Absätze).
+Diese Zeichen sind jedoch für den Computer nicht sofort verständlich. Der erste Schritt beim Kompilieren ist daher die \textit{Lexical Analysis}. Diese Analyse wird von einem Teil des Compilers, dem \textit{Lexer}, durchgeführt.
 Die Aufgabe dieses Lexers ist es, die Inputdatei zu analysieren und die gefundenen Zeichen in sogenannte \textit{Tokens} zu verwandeln. Diese Tokens sind Datenstrukturen, die der Compiler versteht und mit denen er weiterarbeiten kann.
 
 Ein Beispiel der Lexical Analysis auf der Programmierspache C:
@@ -78,20 +78,23 @@ Daher befindet sich, wie in Abbildung \ref{fig:syntax-tree} ersichtlich, die Sub
 \section{Semantic Analysis}
 Semantik ist die Wissenschaft der Bedeutung von Wörtern einer Menschensprache. Bei einem Compiler geht es bei der \textit{Semantic Analysis} nicht um Bedeutung sondern um die Korrektheit von Expressions.
 Wird eine Variable nicht konform ihres Datentyps verwendet, zum Beispiel wenn zwei Strings dividiert werden sollen, wird dies während der Semantic Analysis entdeckt und gemeldet.
-Auch werden unbekannte Variablen und Funktionen in diesem Schritt abgefangen.
-Weiter wird der Datentyp einer Node an diese angebunden. Gegebenenfalls kann auch ein impliziter Cast, also ein impliziter Wechsel des Datentyps, hinzugefügt werden.
+Gegebenenfalls kann ein impliziter Cast, also ein impliziter Wechsel des Datentyps, hinzugefügt werden.
 So geben zum Beispiel manche Programmiersprachen bei der Division zweier Integers eine Float zurück.
+Auch werden unbekannte Variablen und Funktionen in diesem Schritt abgefangen.
+Weiter wird der Datentyp einer Node des AST an diese angebunden.
 
 \section{Code Generation} \label{sec:traditional_code_generation}
-\textit{Code Generation} ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss. Nun da unser Input-Code nicht mehr nur als Textfile, sondern als Intermediate Representation vorliegt,
-kann endlich Output-Code generiert werden. Eine geläufige Methode der Code Generation ist die sogennante \textit{Macro Expansion}. Hierbei wird der AST von unten nach oben schrittweise mit Teilen an Output-Code ersetzt.
+\textit{Code Generation} ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss.
+Da der Input-Code nicht mehr nur als Textfile, sondern als AST vorliegt, kann endlich Output-Code generiert werden. Eine geläufige Methode der Code Generation ist die sogenannte \textit{Macro Expansion}.
+Hierbei wird der AST von unten nach oben schrittweise mit Teilen an Output-Code ersetzt.
 Diese Output-Code Teile sind häufig von den darunterliegenden Nodes abhängig. 
 
 MAYBE FIGURE OR LISTING AS EXAMPLE
 
 \section{Optimization}
 Code Generation ist zwar der letzte Schritt beim Kompilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. \textit{Optimization} geschieht zwischen jedem der genannten Schritte und dies häufig mehrmals.
-Dabei geht es darum den Output-Code so effizient wie möglich zu machen. Effizient kann hierbei Verschiedenes bedeuten. Der Output-Code muss so schnell wie möglich ausgeführt werden,
-Memory sparsam verwenden und dazu noch eine möglichst kleine Datei sein. Optimization reicht vom Entfernen der Kommentare und Umstellen von mathematischen Operationen, bis zum Entfernen von ungebrauchten Variablen und sogenannten Deadstores.
+Dabei geht es darum den Output-Code so effizient wie möglich zu machen. Effizient kann hierbei verschiedenes bedeuten.
+Der Output-Code muss so schnell wie möglich ausgeführt werden, Memory sparsam verwenden und dazu noch eine möglichst kleine Datei umfassen. 
+Optimization reicht vom Überspringen der Kommentare und Umstellen von mathematischen Operationen, bis zum Entfernen von ungebrauchten Variablen und sogenannten Deadstores.
 Es muss von CPU Registern profitiert, mit Heap-Memory umgegangen und von Inline-Funktionen Gebrauch gemacht werden. Compiler Optimization ist also sehr vielseitig und komplex.
 Wie Optimization genau aussehen kann, wird daher in dieser Maturaarbeit nicht weiter betrachtet.

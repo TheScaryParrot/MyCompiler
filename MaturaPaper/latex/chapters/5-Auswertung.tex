@@ -1,11 +1,11 @@
-\chapter{Auswertung}
+\chapter{Auswertung des Compiler Vergleichs}
 Abschliessend will ich den QHScompiler, wie in Abschnitt \ref{cha:2-Vergleich} beschrieben, mit zwei weiteren Compilern vergleichen.
-Diese werden in Geschwindigkeit der Kompilierung, Geschwindigkeit des Output-Codes, Benutzerfreundlichkeit und Offenheit für Erweiterung bewertet. 
+Verglichen werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigkeit des Output-Codes, Umgang mit fehlerhaftem Code und Offenheit für Erweiterung. 
 
 \section{Geschwindigkeit der Kompilierung} \label{sec:compare-compilespeed}
 Für die Messung der Kompilierungsdauer wird eine Funktion, die prüft, ob eine Zahl eine Primzahl ist, kompiliert. Diese Funktion wurde so geschrieben, dass jedes Feature, das alle drei Compiler unterstützen, verwendet wird.
 Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und Loops. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt. Anschliessend wurde jedes Programm zehnmal kompiliert.
-Die durchschnittliche Dauer der Kompilierung ist in \ref{fig:compilespeed} ersichtlich.
+Die durchschnittliche Dauer der Kompilierung ist in Abbildung \ref{fig:compilespeed} ersichtlich.
 
 \begin{figure}[h!]
 \centering
@@ -53,20 +53,22 @@ Die durchschnittliche Dauer der Kompilierung ist in \ref{fig:compilespeed} ersic
 \caption{Vergleich der Kompilierungsdauer mit Log-Log Skalen}
 \end{figure}
 
-Interessant ist hierbei, dass sowohl QHS als auch GCC mit einer hohen Kompilierungsdauer beginnen und sich später linear verhalten.
-Zu Beginn glänzt THS zwar mit einer sehr schnellen Kompilierung, steigt daraufhin jedoch exponentiell an.
-Bei etwas mehr als 10³ Kopien der Funktion wird GCC und daraufhin zwischen 10⁴ und 10⁵ Kopien auch der QHScompiler schneller als der THScompiler.
+Interessant ist, dass sowohl der QHScomiler als auch GCC mit einer hohen Kompilierungsdauer bei einer tiefen Anzahl an Funktionen beginnen und sich später linear verhalten.
+Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt die Kompilierungsdauer mit einer steigenden Anzahl an Funktionen exponentiell an.
+Ab 10³ Kopien der Funktion wird GCC und daraufhin zwischen 10⁴ und 10⁵ Kopien auch der QHScompiler schneller als der THScompiler.
 Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Grundsätzlich sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
 %Daher liegt der Fehler wahrscheinlich bei meinen eigenen C++ Kenntnissen.
 Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
-Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien konsistent 7-8 mal länger als GCC. 
-Der QHScompiler ist somit deutlich geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am Aufbau des traditionellen Compilers und viel mehr an meiner Implementation davon.
-Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
+Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien 7-8 mal länger als GCC. 
+Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compiler Aufbau und viel mehr an meiner Implementation davon.
+%Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
+Daher überzeugt GCC und das traditionelle Compiler Model bei der Geschwindigkeit der Kompilierung mehr als mein alternativer Aufbau.
 
 
 \section{Geschwindigkeit des Output-Codes} \label{sec:execute_speed}
-Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Sowie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
-dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Der Algorithmus wurde von Hand in die jeweiligen Sprachen übersetzt und daraufhin für verschiedene Mengen an zu berechnenden Primzahlen je zehnmal ausgeführt.
+Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Wie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
+dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Der Algorithmus wurde für verschiedene Mengen an zu berechnenden Primzahlen je zehnmal ausgeführt und die Ausführungsdauer gemessen.
+In der folgenden Abbildung \ref{fig:executespeed_optimized} ist die durchschnittliche Ausführungsdauer der Programme nach Menge an berechneten Primzahlen dargestellt.
 
 \begin{figure}[H]
     \centering
@@ -113,7 +115,7 @@ dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet
 Wie in Abbildung \ref{fig:executespeed_optimized} ersichtlich, beginnen alle drei kompilierten Programme mit einer sehr tiefen Ausführungsdauer.
 Die Progamme des THS- und QHScompilers werden bis zum Schluss nahezu gleich schnell ausgeführt.
 Das von GCC generierte Programm ist jedoch deutlich schneller als die Programme des THS- und QHScompilers.
-Dies liegt ganz klar an den Optimierungsmethoden von GCC. Wenn man die Optimierung beim Kompilieren mit GCC deaktiviert, sieht die Grafik wie folgt aus:
+Dies liegt ganz klar an den Optimierungsmethoden von GCC. Wenn man die Optimierung beim Kompilieren mit GCC deaktiviert, sieht die Abbildung wie folgt aus:
 
 \begin{figure}[H]
     \centering
@@ -157,12 +159,12 @@ Dies liegt ganz klar an den Optimierungsmethoden von GCC. Wenn man die Optimieru
     \caption{Vergleich der Ausführungsdauer ohne GCC Optimierung}
 \end{figure}
 
-Wie Grafik \ref{fig:executespeed} zeigt, wird das GCC Programm ohne Optimierung nur noch leicht schneller ausgeführt als die Programme der beiden anderen Compiler.
+Wie Abbildung \ref{fig:executespeed} zeigt, wird das GCC Programm ohne Optimierung nur noch leicht schneller ausgeführt als die Programme der beiden anderen Compiler.
 Da ebenfalls weder der THS- noch der QHScompiler über Optimierungsmethoden verfügen, ist dies das erwartete Resultat.
 Aus zeitlichen Gründen war es mir nicht möglich Optimierung in meine beiden Compiler einzubauen.
 
 Zusammengefasst lässt sich sagen, dass ohne Optimierung mein alternativer Aufbau eines Compilers ungefähr gleich schnelle Ausführungsgeschwindigkeit liefert, wie ein traditioneller Compiler.
-Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler möglich ist und die Ausführungsdauer deutlich verringert, wie GCC in Grafik \ref{fig:executespeed_optimized} beweist.
+Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler möglich ist und die Ausführungsdauer deutlich verringert, wie GCC in Abbildung \ref{fig:executespeed_optimized} beweist.
 Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch deutlich schwierig wäre.
 Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine Syntax Analysis durchgeführt und nie ein AST generiert wird.
 Auch steht die Grundidee meines alternativen Aufbaus Optimierung stark im Weg.
@@ -171,31 +173,43 @@ Daher kennt der QHScompiler vor der Kompilierung weder die Eingabe- noch die Aus
 Aus diesen Gründen wäre Optimierung für einen Compiler nach meinem alternativen Aufbau deutlich komplexer, wenn nicht sogar unmöglich.
 
 
-\section{Benutzerfreundlichkeit}
-Benutzerfreundlichkeit ist im Gegensatz zu den beiden vorherigen Vergleichskriterien etwas Subjektives. Jedoch würde ich behaupten, dass auch hier das Urteil ziemlich klar ist.
-GCC und der THScompiler folgen beide exakt definiertem Syntax und Semantik. Dies ist ein Resultat des Lexers und des Parsers die noch diesen bestimmten Regeln geschrieben wurden.
-Anfangs scheinen Semikolons am Ende jedes Statements vielleicht etwas unnötig, jedoch bemerkt man schnell, dass genau diese Pingeligkeit der Compiler für eine Programmiersprache äusserst wichtig ist.
-GCC fängt besonders gut Fehler früh ab und meldet diese. Der traditionelle Compiler ist somit sehr gut in puncto Benutzerfreundlichkeit.
+\section{Umgang mit fehlerhaftem Code}
+%Die Umgang mit fehlerhaftem Code ist im Gegensatz zu den beiden vorherigen Vergleichskriterien ein subjektives Bewertungskriterium.
+%Ich werde mich besonders auf den Umgang mit 
+GCC und der THScompiler folgen beide einer exakt definierten Syntax und einer klaren Semantik.
+%Anfänglich scheinen Semikolons am Ende jedes Statements unnötig zu sein, jedoch wird schnell klar, dass genau diese Pingeligkeit der Compiler für eine Programmiersprache äusserst hilfreich ist.
+Wird die Syntax oder Semantik nicht eingehalten wird ein Fehler gemeldet.
+Dies ist ein Resultat der Syntax und Semantic Analysis, die nach bestimmten Regeln geschrieben wurden und diese Regeln exakt einhalten.
+%GCC fängt besonders gut Fehler früh ab und meldet diese. 
+%Der traditionelle Compiler ist somit sehr gut bezüglich Umgang mit fehlerhaftem Code.
+Traditionelle Compiler erscheinen dadurch manchmal etwas pingelig. Jedoch sind sie dafür sehr genau und hilfreich beim Finden und Melden von Fehlern.
 
-Der QHScompiler weist bei der Benutzerfreundlichkeit hingegen einige Macken auf.
+Der QHScompiler arbeitet hingegen viel ungenauer.
+%Der QHScompiler weist bei der Umgang mit fehlerhaftem Code hingegen einige Macken auf.
 Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
-Er führt ganz einfach und strickt nur aus was als Nächstes auftaucht. Somit führt ein fehlendes Zeichen nicht immer zu Fehlern. Folgendes Beispiel kompiliert einwandfrei und lässt sich auch problemlos ausführen.
+Er führt konsequent nur aus, was als Nächstes auftaucht. Darum führt ein fehlendes Zeichen nicht immer zu Fehlern.
+Folgender Code soll dies veranschaulichen:
 
 \begin{lstlisting}[language=QHS, caption=QHS mit fehlenden Tokens, label=eg:qhs-faulty-syntax-1]
 int a = "69"    /* ; fehlt */
 foo ( a  ;      /* ) fehlt */
 \end{lstlisting}
 
-Weder das Semikolon noch die schliessende Klammer bei \ref{eg:qhs-faulty-syntax-1} ist hierbei nötig und das Programm lässt sich problemlos kompilieren und ausführen. Jedoch kann dies auch anders laufen.
+Der Code aus Auflistung \ref{eg:qhs-faulty-syntax-1} lässt sich einwandfrei vom QHScompiler kompilieren und daraufhin ausführen.
+Weder das Fehlen des Semikolons noch der schliessenden Klammer führt bei QHScompiler auf eine Fehlermeldung.
+Die resultierende Ausgabedatei ist ebenfalls fehlerfrei und lässt sich einwandfrei ausführen. 
+Dies ist jedoch bei folgendem Beispiel nicht mehr der Fall.
 
-\begin{lstlisting}[language=QHS, caption=QHS mit fehlender (, label=eg:qhs-faulty-syntax-2]
+\begin{lstlisting}[language=QHS, caption=QHS mit fehlender öffnender Klammer, label=eg:qhs-faulty-syntax-2]
 int a = "69"    /* ; fehlt */
 foo a ) ;       /* ( fehlt */
 \end{lstlisting}
 
-Der QHS Code bei \ref{eg:qhs-faulty-syntax-2} kompiliert einwandfrei, jedoch ist der generierte Assembly Code fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument angesehen.
+Der Code bei Auflistung \ref{eg:qhs-faulty-syntax-2} kompiliert problemlos, der generierte Assembly Code ist jedoch fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument erkannt.
+Es entsteht also eine fehlerhafte Ausgabedatei, ohne dass der QHScompiler dies meldet.
 
-Weiter sind auch die Fehlermeldungen des QHScompilers nicht immer besonders klar.
+Führt die Kompilierung doch zu einer Fehlermeldung, ist diese nicht immer besonders verständlich.
+%Weiter sind die Fehlermeldungen des QHScompilers nicht immer besonders klar.
 
 \begin{lstlisting}[language=QHS, caption=QHS mit falscher Anzahl Argumente, label=eg:qhs-faulty-syntax-3]
 void foo ( ) { }
@@ -218,36 +232,43 @@ start
 [ERROR] Expected LiteralCode for #literalToIdentifier, got: NONE
 \end{lstlisting}
 
-Bei \ref{eg:qhs-faulty-syntax-3} wird die Funktion foo ohne Parameter definiert, später jedoch mit einem Argument aufgerufen. Der QHScompiler verfügt hierbei über keine Möglichkeit die Menge an Argumenten zu überprüfen
-und meldet nicht direkt einen Fehler. Als er jedoch versucht die Grösse des erwarteten Argumentes von der OrderQueue zu nehmen ist diese leer.
-Der QHScompiler meldet also einen OrderQueue-Empty Error gefolgt von vielen Folgefehlern.
+Bei Auflistung \ref{eg:qhs-faulty-syntax-3} wird die Funktion foo ohne Parameter definiert, später jedoch mit einem Argument aufgerufen.
+Der QHScompiler verfügt über keine Möglichkeit, die Menge an Argumenten zu überprüfen, und meldet nicht direkt einen Fehler. 
+Sobald er jedoch versucht die Grösse des erwarteten Argumentes von der OrderQueue zu holen ist diese leer.
+Der QHScompiler meldet einen OrderQueue-Empty Error gefolgt von vielen Folgefehlern.
 
 %Ein weiterer Kritikpunkt am QHScompiler wäre die fehlende Semantic Analysis. Implizite Casts 
 
-Somit ist der QHScompiler bei der Meldung von Fehlern einerseits weniger strikt, andererseits aber auch deutlich verwirrender und ungenauer als ein traditioneller Compiler.
-In meinen Augen triumphiert daher auch in dieser Kategorie der traditionelle Compiler über meinen QHScompiler.
+Somit ist der QHScompiler bei der Meldung von Fehlern einerseits nicht sehr streng, andererseits aber auch verwirrend und ungenau bei der Fehlermeldung.
+%In meinen Augen triumphiert daher auch in dieser Kategorie der traditionelle Compiler über meinen QHScompiler.
+Deshalb komme ich zum Schluss, dass der traditionelle Compiler Aufbau mit Syntax und Semantic Analysis deutlich besser mit Fehlern umgehen kann als mein alternatives Model.
 
 \section{Offenheit für Erweiterung}
-Als eine auch professionell verwendete Programmiersprache, hat C selbstverständlich eine Vielzahl an Features. Zum Beispiel lassen sich mithilfe von Templates Datentyp unabhängige Datenstrukturen wie Stacks, Queues oder Vectors definieren.
-Weiter lassen sich mit Libraries komplexe Algorithmen einmal schreiben und nachher ganz einfach wieder verwenden. All dies ist innerhalb eines traditionellen Compilers möglich.
+C, als eine auch professionell verwendete Programmiersprache, umfässt eine Vielzahl an Features.
+Zum Beispiel lassen sich mittels Templates Datenstrukturen wie Stacks, Queues oder Vectors definieren, die Datentyp unabhängig sind.
+Mit Libraries lassen sich zudem komplexe Algorithmen einmal schreiben und später einfach wieder verwenden. Solche Funktionalitäten sind bei einem traditionellen Compiler möglich.
 
-Libraries lassen sich ebenfalls mit dem QHScompiler verwenden. Templates sollten theoretisch ebenfalls möglich sein, jedoch habe ich dies nicht getestet.
-Jedoch unterstützt der QHScompiler, wie in Abschnitt \ref{cha:4-QHS_Compiler} bereits angetönt, noch weitere Möglichkeiten zur Erweiterung. 
-Denn es ist möglich eigene Identifier zu definieren. Mit den im Abschnitt \ref{sec:qhs-funcs} beschriebenen Techniken DelayedExecute und TempAssign
-lassen sich sogar selbstständig syntaktisch komplexe Code Strukturen bilden. Im Gegensatz zu einem traditionellen Compiler muss hierfür nicht einmal der QHScompiler angepasst werden.
-Dadurch kann man unterschiedliche Programmiersprachen mit dem QHScompiler kompilieren. Es ist sogar möglich die Programmiersprache innerhalb einer Datei zu wechseln.
-Leider ist die Definition der benötigten Macros für eine neue Programmiersprache nicht besonders intuitiv. 
+Mit dem QHScompiler lassen sich Libraries ebenfalls verwenden. Templates sollten theoretisch ebenfalls möglich sein, jedoch habe ich dies nicht getestet.
+Jedoch bietet der QHScompiler, wie in Abschnitt \ref{cha:4-QHS_Compiler} bereits angemerkt, noch weitere Möglichkeiten zur Erweiterung. 
+Das Definieren von Identifiern während der Kompilierung ermöglicht es ganz unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren.
+Gegebenenfalls falls kann die Programmiersprache sogar innerhalb der Eingabedatei geändert werden. 
+%Es ist möglich eigene Identifier zu definieren. 
+%Mit den im Abschnitt \ref{sec:qhs-funcs} beschriebenen Techniken DelayedExecute und TempAssign lassen sich sogar selbstständig syntaktisch komplexe Code Strukturen bilden.
+%Im Gegensatz zu einem traditionellen Compiler muss hierfür nicht einmal der QHScompiler angepasst werden.
+%Dadurch kann man unterschiedliche Programmiersprachen mit dem QHScompiler kompilieren. Es ist sogar möglich die Programmiersprache innerhalb einer Datei zu wechseln.
+Leider ist die Definition der benötigten Identifier für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die Abschnitt \ref{sec:qhs-funcs} erklärten DelayedExecute und TempAssign.
 Trotzdem würde ich sagen, dass der QHScompiler einem mehr Freiheit bei der Erweiterung bietet, als ein traditioneller Compiler.
 
 \section{Fazit}
-Im Vergleich mit traditionellen Compilern hat der QHScompiler nicht besonders gut abgeschnitten.
-Er ist sowohl in der Geschwindigkeit der Kompilierung als auch bei der eines kompilierten Programmes einem traditionellen Compiler unterlegen.
-Zudem ist der QHScompiler auch nicht besonders benutzerfreundlich und nicht wirklich angenehm zu verwenden. Als einziger Vorteil lässt sich seine Möglichkeit zur Erweiterung sehen.
+Im Vergleich mit traditionellen Compilern zeigt der von mir entwickelte QHScompiler einige Schwächen.
+Er ist sowohl in der Geschwindigkeit der Kompilierung als auch bei der Ausführungsdauer eines kompilierten Programmes einem traditionellen Compiler unterlegen.
+Beim Umgang mit Fehlern ist der QHScompiler weniger streng aber auch deutlich unpräziser und verwirrender als Compiler nach dem traditionellen Aufbau.
+Als einziger Vorteil lässt sich seine Offenheit für Erweiterung sehen.
 
 Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der Identifier besonders ineffizient ist. 
 Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig so verschachtelt, dass 
 
-Aus dem Vergleich der Benutzerfreundlichkeit wird ausserdem klar, dass die Syntax Analysis für die angenehme Verwendung eines Compilers äusserst wichtig ist.
+Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die Syntax Analysis für die angenehme Verwendung eines Compilers äusserst wichtig ist.
 Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies folge der fehlenden Syntax Analysis nicht möglich.
 
 Ausserdem ist ein AST, wie in Abschnitt \ref{sec:execute_speed} thematisiert, auch für die Optimierung der Ausgabedatei äusserst praktisch.
