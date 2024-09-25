@@ -1,6 +1,6 @@
 \chapter{Auswertung des Compiler Vergleichs}
 Abschliessend will ich den QHScompiler, wie in Abschnitt \ref{cha:2-Vergleich} beschrieben, mit zwei weiteren Compilern vergleichen.
-Verglichen werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigkeit des Output-Codes, Umgang mit fehlerhaftem Code und Offenheit für Erweiterung. 
+Verglichen werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigkeit der Ausgabedatei, Umgang mit fehlerhaftem Code und Offenheit für Erweiterung. 
 
 \section{Geschwindigkeit der Kompilierung} \label{sec:compare-compilespeed}
 Für die Messung der Kompilierungsdauer wird eine Funktion, die prüft, ob eine Zahl eine Primzahl ist, kompiliert. Diese Funktion wurde so geschrieben, dass jedes Feature, das alle drei Compiler unterstützen, verwendet wird.
@@ -57,7 +57,7 @@ Interessant ist, dass sowohl der QHScomiler als auch GCC mit einer hohen Kompili
 Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt die Kompilierungsdauer mit einer steigenden Anzahl an Funktionen exponentiell an.
 Ab 10³ Kopien der Funktion wird GCC und daraufhin zwischen 10⁴ und 10⁵ Kopien auch der QHScompiler schneller als der THScompiler.
 Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Grundsätzlich sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
-%Daher liegt der Fehler wahrscheinlich bei meinen eigenen C++ Kenntnissen.
+%Daher liegt der Fehler wahrscheinlich bei meinen eigenen Kenntnissen von C++.
 Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
 Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien 7-8 mal länger als GCC. 
 Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compiler Aufbau und viel mehr an meiner Implementation davon.
@@ -65,7 +65,7 @@ Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das 
 Daher überzeugt GCC und das traditionelle Compiler Model bei der Geschwindigkeit der Kompilierung mehr als mein alternativer Aufbau.
 
 
-\section{Geschwindigkeit des Output-Codes} \label{sec:execute_speed}
+\section{Geschwindigkeit der Ausgabedatei} \label{sec:execute_speed}
 Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Wie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
 dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Der Algorithmus wurde für verschiedene Mengen an zu berechnenden Primzahlen je zehnmal ausgeführt und die Ausführungsdauer gemessen.
 In der folgenden Abbildung \ref{fig:executespeed_optimized} ist die durchschnittliche Ausführungsdauer der Programme nach Menge an berechneten Primzahlen dargestellt.
@@ -222,7 +222,7 @@ start
     exit ;
 }
 
-%\noindent\hrulefill Output\noindent\hrulefill%
+%\noindent\hrulefill Ausgabe\noindent\hrulefill%
 [ERROR] Cannot dequeue, OrderQueue is empty!
 [ERROR] Expected LiteralCode for #literalToIdentifier at OrderQueue second, got: NONE
 [ERROR] Cannot dequeue, OrderQueue is empty!
@@ -266,18 +266,19 @@ Beim Umgang mit Fehlern ist der QHScompiler weniger streng aber auch deutlich un
 Als einziger Vorteil lässt sich seine Offenheit für Erweiterung sehen.
 
 Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der Identifier besonders ineffizient ist. 
-Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig so verschachtelt, dass 
+Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr inenander verschachtelt.
+(...)
 
 Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die Syntax Analysis für die angenehme Verwendung eines Compilers äusserst wichtig ist.
 Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies folge der fehlenden Syntax Analysis nicht möglich.
 
 Ausserdem ist ein AST, wie in Abschnitt \ref{sec:execute_speed} thematisiert, auch für die Optimierung der Ausgabedatei äusserst praktisch.
 Grundsätzlich ist Optimierung für den QHScompiler äusserst schwierig. Da die Eingabesprache während der Kompilierung erst definiert wird, müssten auch passende Optimierungsmethoden spontan gefunden werden.
-Dies äussert sich in einer langsameren Geschwindigkeit des Output-Codes.
+Dies äussert sich in einer langsameren Geschwindigkeit der Ausgabedatei.
 
 Der einzige Vorteil des QHScompilers liegt in der Offenheit für Erweiterung.
 Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
 In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem \textit{Linker} kombinieren.
 
-Zusammengefasst führt das System der während der Kompilerung definierten Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung des Output-Codes.
+Zusammengefasst führt das System der während der Kompilerung definierten Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
 Der QHScompiler ist einem traditionellen Compiler also stark unterlegen.

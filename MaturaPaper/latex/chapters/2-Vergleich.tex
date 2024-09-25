@@ -18,34 +18,34 @@ Der THScompiler dient mit ähnlichem Arbeitsaufwand, Optimierung und Niveau der 
 Geschrieben ist der THScompiler in C++ und kompiliert aus meiner eigenen Programmiersprache THS.
 \end{enumerate}
 
-\section{Anforderungen an die Compiler} \label{sec:requirements}
 Für die von mir entwickelten Compiler habe ich folgende Mindestanforderungen gestellt:
 
 \begin{table}[H]
     \centering
     \caption{Anforderungen an die Compiler}
+    \label{tab:requirements}
     \vspace{3mm} % Adjust the height of the space between caption and tabular
     
     \begin{tabular}{l|l}
-    Output als Assembly Code        & Die Ausgabesprache muss Assembly Code sein                               \\
-    C-like Syntax                   & Die Eingabesprache muss einen C-ähnlichen Syntax aufweisen               \\
+    Ausgabe als Assembly Code       & Die Ausgabesprache muss Assembly Code sein                               \\
+    C ähnlicher Syntax              & Die Eingabesprache muss einen C ähnlichen Syntax aufweisen               \\
     Variablen und Funktionen        & Lokale und globale Variablen sowie Funktionen müssen unterstützt werden  \\
     Branching und Loops             & If-Statements und einfache Loops müssen umsetzbar sein
     \end{tabular}
 \end{table}
 
-
-\section{Kriterien des Compiler-Vergleichs}
-Zum Schluss werden die drei Compiler nach folgenden Kriterien bewertet und verglichen.
+Die Kriterien des Vergleichs sind in Tabelle \ref{tab:criteria} aufgelistet.
+%Zum Schluss werden die drei Compiler nach folgenden Kriterien bewertet und verglichen.
 
 \begin{table}[H]
     \centering
     \caption{Vergleichskriterien der Compiler}
+    \label{tab:criteria}
     \vspace{3mm} % Adjust the height of the space between caption and tabular
 
     \begin{tabular}{l|l}
     Geschwindigkeit der Kompilierung    & Wie lange dauert die Kompilierung von Code?                       \\
-    Geschwindigkeit des Output-Codes    & Wie lange dauert die Ausführung des Output-Codes?                 \\
+    Geschwindigkeit der Ausgabedatei    & Wie lange dauert die Ausführung der Ausgabedatei?                 \\
     Umgang mit fehlerhaftem Code        & Wie geht der Compiler mit fehlerhaften Eingabedateien um?         \\
     Offenheit für Erweiterung           & Wie einfach kann die Eingabesprache erweitert werden?                                 
     \end{tabular}
