@@ -66,8 +66,8 @@ Dabei werden die bei der lexikalischen Analyse gefundenen Tokens ineinander vers
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.3]{resources/images/syntaxtree.svg.png}
-    \caption[Abstract Syntax Tree (https://en.wikipedia.org/wiki/Abstract\_syntax\_tree, besucht am 5.8.2024)]{Abstract Syntax Tree zum Euklidischen Algorithmus}
+    \includegraphics[scale=0.4]{resources/images/AST.pdf}
+    \caption[AST zum Euklidischen Algorithmus. (https://en.wikipedia.org/wiki/Abstract\_syntax\_tree, besucht am 5.8.2024)]{AST zum Euklidischen Algorithmus}
     \label{fig:syntax-tree}
 \end{figure}
 
@@ -80,9 +80,17 @@ Daher befindet sich, wie in Abbildung \ref{fig:syntax-tree} ersichtlich, die Sub
 Semantik ist die Wissenschaft der Bedeutung von Wörtern einer Menschensprache. Bei einem Compiler geht es bei der \textit{semantische Analyse} nicht um Bedeutung sondern um die Korrektheit von Expressions.
 Wird eine Variable nicht konform ihres Datentyps verwendet, zum Beispiel wenn zwei Strings dividiert werden sollen, wird dies während der semantischen Analyse entdeckt und gemeldet.
 Gegebenenfalls kann ein impliziter Cast, also ein impliziter Wechsel des Datentyps, hinzugefügt werden.
-So geben zum Beispiel manche Programmiersprachen bei der Division zweier Integers eine Float zurück.
+So geben zum Beispiel manche Programmiersprachen bei der Division zweier Ganzzahlen eine Fliesskommazahl zurück.
 Auch werden unbekannte Variablen und Funktionen in diesem Schritt abgefangen.
-Weiter wird der Datentyp einer Node des AST an diese angebunden.
+Weiter wird der Datentyp einer Node des AST an diese angebunden. Nach der semantischen Analyse sieht der AST aus Abbildung \ref{fig:syntax-tree} wie folgt aus:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{resources/images/AST_with_types.pdf}
+    \caption[AST nach der semantischen Analyse (Basierend auf Abbildung \ref{fig:syntax-tree})]{AST nach der semantischen Analyse}
+    \label{fig:syntax-tree-with-types}
+\end{figure}
+
 
 \section{Codegenerierung} \label{sec:traditional_code_generation}
 \textit{Codegenerierung} ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss.

@@ -1,0 +1,516 @@
+Während ich mich mit der Theorie hinter modernen Compilern befasste, stellte ich mir häufig die Frage: Wieso werden Compiler so entwickelt?
+Ich nahm mir daraufhin vor selbst einen alternativen Aufbau für Compiler zu entwickeln, mit dem Ziel zu verstehen, wieso sich das traditionelle Compiler Modell so gut bewährt.
+In dieser Maturaarbeit werde ich zuerst den traditionellen Aufbau von Compilern kurz beschreiben und mein eigenes alternatives Modell vorstellen.
+Die Umsetzung meiner Idee werde ich anhand eines selbstgeschriebenen alternativen Compilers erläutern.
+Dieser alternative Compiler wird daraufhin mit zwei traditionellen Compilern, wovon ich ebenfalls einen selbst geschrieben habe, verglichen.
+Zum Schluss werde ich die Resultate des Vergleichs einordnen und daraus Vor- und Nachteile des traditionellen Compiler Aufbaus ableiten.
+
+Einleitung
+In der Informatik beschreibt Compiler ein Programm, das Code aus einer Programmiersprache in eine andere Programmiersprache übersetzt. In dieser Hinsicht gleichen Compiler Übersetzern für Menschensprache.
+Genauso wie ein Übersetzer für die Kommunikation zwischen zwei verschiedensprachigen Menschen nötig ist, braucht man Compiler um die Kommunikation zwischen Mensch und Computer zu ermöglichen oder zumindest zu vereinfachen.
+Grundsätzlich ist es mit einer Assembly Sprache möglich, ohne Compiler einem Computer Befehle zu geben. Jedoch sind Assembly Sprachen, nicht besonders einfach zu verwenden.
+Compiler übersetzten von verständlicheren Programmiersprachen zu Assembly und ermöglichen daher ein viel einfacheres Schreiben von Programmen.
+Compiler unterscheiden sich jedoch grundsätzlich von Übersetzern in der Erwartungshaltung, die an sie gestellt wird. Menschensprache ist sehr komplex und nicht immer besonders eindeutig. 
+Programmiersprachen hingegen sind so definiert, dass sie keinen Raum für Missverständnisse oder Ungenauigkeit lassen. Genauso muss auch ein Compiler exakt und fehlerfrei übersetzen.
+Neben fehlerfrei muss die Kompilierung auch möglichst schnell sein. Dasselbe gilt natürlich auch für die resultierende Ausgabedatei. Dieser sollte optimal generiert werden, um die schlussendliche
+Ausführungsdauer so kurz wie möglich zu halten. Sollte sich doch einmal ein Fehler in der Eingabedatei befindet, muss dieser verständlich gemeldet werden. Compiler sind also keine simplen Programme und daher auch bis heute
+ein aktives Forschungsgebiet.
+
+Als ich mit meiner Maturaarbeit begann, war mein Ziel die Entwicklung eines einfachen Compilers zu einer C ähnlichen Programmiersprache. Unterstützt wurde ich darin freundlicherweise durch eine Vorlesung der Universität Bern.
+Während mir in dieser Vorlesung der theoretische Aufbau eines Compilers erklärt wurde, fragte ich mich trotzdem hin und wieder, wieso genau Compiler tatsächlich so aufgebaut sind und
+ob es nicht eine einfachere Möglichkeit gäbe. Als ich dann in den Sommerferien auf Probleme in der Entwicklung meines eigenen Compilers stiess, entschied ich mich einem von mir erdachten alternativen Aufbau für Compiler eine Chance zu geben. 
+
+In dieser Maturaarbeit werde ich anhand des "traditionellen" Compiler Aufbaus meine alternative Idee erklären und auf mögliche Probleme in der Umsetzung eingehen.
+Zum Schluss werde ich einen nach dem alternativen Aufbau entwickelten Compiler mit traditionellen Compilern vergleichen und damit Vor- und Nachteile der beiden Möglichkeiten aufzeigen.
+Für diese Maturaarbeit werden Grundkenntnisse von RegEx, Datenstrukturen und Assembly vorausgesetzt.
+
+    Um die Leistung meines alternativen Aufbaus eines Compilers zu testen, werde folgende drei Compiler vergleichen:
+
+
+Der QHScompiler ist der von mir nach meinem Aufbau entwickelte Compiler. Seine genaue Funktionsweise wird in Abschnitt  ausgeführt.
+Er ist in C++ geschrieben und verwendet meine eigene Programmiersprache QHS als Eingabesprache. 
+
+GCC ist der gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht inzwischen auch die Kompilierung von C++, Rust, Go, usw.
+Passend dazu lautet das Akronym GCC ausgeschrieben: GNU Compiler Collection.
+Für diesen Vergleich repräsentiert GCC den traditionellen Compiler Aufbau.
+
+Der THScompiler ist ebenfalls ein traditioneller Compiler. Der Unterschied zu GCC liegt jedoch darin, dass der THScompiler von mir selbst entwickelt wurde. 
+Er ist dadurch deutlich weniger optimiert und umfasst weniger Funktionen. In der Komplexität entspricht der THScompiler ungefähr dem QHScompiler.
+Der THScompiler dient mit ähnlichem Arbeitsaufwand, Optimierung und Niveau der Programmierung als "realistische" Konkurrenz zum QHScompiler.
+Geschrieben ist der THScompiler in C++ und kompiliert aus meiner eigenen Programmiersprache THS.
+
+Für die von mir entwickelten Compiler habe ich folgende Mindestanforderungen gestellt:
+
+
+         
+    
+    
+
+Die Kriterien des Vergleichs sind in Tabelle  aufgelistet.
+
+
+         
+
+    
+
+
+Funktionsweise traditioneller Compiler 
+Der traditionelle Aufbau eines Compilers lässt sich mit folgendem Schema veranschaulichen:
+
+    
+In dieser Arbeit werde ich mich auf die in der unteren Abbildung  dargestellten Schritte fokussieren.
+
+    
+Die von mit verwendeten Fachbegriffe entsprechen hierbei nicht immer denen aus Abbildung .
+
+Als Basis für diese Kapitel dient grösstenteils eine Vorlesung der Universität Bern, die ich für freundlicherweise besuchen durfte.
+
+Lexikalische Analyse
+Meist werden Programme so geschrieben, dass wir Menschen sie lesen und verstehen können. Dafür verwendet man Buchstaben, Zahlen, Sonderzeichen (wie + oder *) und Whitespaces (wie Leerzeichen oder Absätze).
+Diese Zeichen sind jedoch für den Computer nicht sofort verständlich. Der erste Schritt beim Kompilieren ist daher die lexikalische Analyse. Diese Analyse wird von einem Teil des Compilers, dem Lexer, durchgeführt.
+Die Aufgabe dieses Lexers ist es, die Eingabedatei zu analysieren und die gefundenen Zeichen in sogenannte Tokens zu verwandeln. Diese Tokens sind Datenstrukturen, die der Compiler versteht und mit denen er weiterarbeiten kann.
+
+Ein Beispiel der lexikalischen Analyse auf der Programmiersprache C:
+
+
+Der Lexer legt fest, welche Zeichen die Eingabe-Programmiersprache enthalten darf und welche Bedeutung ihnen zugesprochen wird. So ist zum Beispiel im Lexer festgelegt, dass ein + Zeichen als Addition interpretiert wird.
+Genauso wie im Listing  'if' als Keyword-Token gesehen wird, lässt sich im Lexer auch bestimmen, dass ein Wort wie 'else' als Keyword angesehen werden soll.
+
+Syntaktische Analyse
+Der Compiler hat nun die Zeichen der Eingabedatei in ein für ihn verständliches Format übersetzt.
+Jedoch fehlt dem Compiler noch das Verständnis für die Syntax der Eingabe-Programmiersprache.
+Die meisten High-Level Programmiersprachen weisen Syntaxregeln auf. Diese beinhalten, wie Funktionen und Variablen definiert werden oder mit welchen Punktvorstrich-Regeln Expressions evaluiert werden.
+In diesem Schritt führt der sogenannte Parser die syntaktische Analyse durch.
+Dabei werden die bei der lexikalischen Analyse gefundenen Tokens ineinander verschachtelt und in einen sogenannten Abstract Syntax Tree (AST) überführt.
+
+    
+Ein AST enthält somit nicht nur Informationen über die Tokens, sondern über die gesamten Strukturen und Abhängigkeiten, die sich aus den Tokens ergeben. Variabel- und Funktionsdefinitionen oder komplexe Statements wie 'if' oder 'for'
+sind im AST als Nodes enthalten. Wenn man die Nodes des AST von unten nach oben durchquert, erhält man die Reihenfolge der einzelnen Tokens ohne Abhängigkeitskonflikte.
+Eine Subtraktion kann zum Beispiel erst ausgeführt werden, wenn sowohl die linke als auch die rechte Zahl bekannt ist.
+Daher befindet sich, wie in Abbildung  ersichtlich, die Subtraktion über den beiden benötigten Werten im AST.
+
+Semantische Analyse
+Semantik ist die Wissenschaft der Bedeutung von Wörtern einer Menschensprache. Bei einem Compiler geht es bei der semantische Analyse nicht um Bedeutung sondern um die Korrektheit von Expressions.
+Wird eine Variable nicht konform ihres Datentyps verwendet, zum Beispiel wenn zwei Strings dividiert werden sollen, wird dies während der semantischen Analyse entdeckt und gemeldet.
+Gegebenenfalls kann ein impliziter Cast, also ein impliziter Wechsel des Datentyps, hinzugefügt werden.
+So geben zum Beispiel manche Programmiersprachen bei der Division zweier Ganzzahlen eine Fliesskommazahl zurück.
+Auch werden unbekannte Variablen und Funktionen in diesem Schritt abgefangen.
+Weiter wird der Datentyp einer Node des AST an diese angebunden. Nach der semantischen Analyse sieht der AST aus Abbildung  wie folgt aus:
+
+    
+
+Codegenerierung Codegenerierung ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss.
+Nun da die Eingabedatei als AST vorliegt, kann die Ausgabedatei generiert werden. Eine geläufige Methode der Codegenerierung ist die sogenannte Macro Expansion.
+Hierbei wird der AST von unten nach oben schrittweise mit Teilen an Ausgabecode ersetzt.
+Diese Ausgabecode-Teile sind häufig von den darunterliegenden Nodes abhängig. 
+
+MAYBE FIGURE OR LISTING AS EXAMPLE
+
+Optimierung
+Codegenerierung ist zwar der letzte Schritt beim Kompilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. Optimierung geschieht zwischen jedem der genannten Schritte und dies häufig mehrmals.
+Dabei geht es darum die Ausgabedatei so effizient wie möglich zu machen. Effizient kann hierbei verschiedenes bedeuten.
+Die Ausgabedatei muss so schnell wie möglich ausgeführt werden, Memory sparsam verwenden und dazu noch eine möglichst kleine Datei umfassen. 
+Optimierungsmethoden reichen vom Überspringen der Kommentare und Umstellen von mathematischen Operationen, bis zum Entfernen von ungebrauchten Variablen und sogenannten Deadstores.
+Es muss von CPU-Registern profitiert, mit Heap-Memory umgegangen und von Inline-Funktionen Gebrauch gemacht werden. Optimierung ist also sehr vielseitig und komplex.
+Wie Optimierung genau aussehen kann, wird daher in dieser Maturaarbeit nicht weiter betrachtet.
+
+Der QHScompiler Der QHScompiler basiert auf einem von mir erdachten alternativen Aufbau für einen Compiler. Diesem Aufbau liegt eine einfache Idee zugrunde:
+Die Macros die der Macro Expansion aus Abschnitt  sollen erst während der Kompilierung definiert werden. 
+Auf dieser Grundidee werde ich zwei Dinge aufbauen. Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesammte syntaktische Analyse zu überspringen und keinen AST generieren zu müssen.
+Zweitens sollte es rein durch die Veränderung von diesen Macros möglich sein jegliche Programmiersprache zu kompilieren. Man könnte also in einem Dokument verschiedene Programmiersprachen verwenden und
+müsste dazwischen bloss die jeweiligen Macros neu definieren. Das selbige gilt ebenfalls für die Ausgabesprache.
+Nur durch das Umdefinieren der Macros liesse sich die Ausgabesprache wechseln, ohne eine Änderung am Compiler vornehmen zu müssen.
+Um dies zu verwirklichen, folgt mein alternativer Ansatz einem Aufbau, der sich stark von einem traditionellen Compiler unterscheidet.
+
+Die Programmiersprache, in der sich meine Macros definieren lassen, bezeichne ich als QHS. Der Compiler der QHS versteht und kompiliert, nenne ich dazu passend den QHScompiler.
+QHS besteht wie die meisten anderen Programmiersprachen aus Wörtern. Im Kontext von QHS werden diese Wörter Orders genannt.
+Orders können drei verschiedenen Typen aufweisen: Identifiers, Instructions und LiteralCode.
+
+Wie diese drei Ordertypen genau funktionieren, wird in Abschnitt  ausführlicher erklärt.
+
+Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus (QHS-Zyklus) zugrunde, dessen Inspiration der Von-Neumann Zyklus ist.
+    
+Die Fetch-Phase Die Aufgabe der Fetch-Phase ist es die nächste Order, die verarbeitet werden soll, zu finden. In dieser Hinsicht gleicht die Fetch-Phase der lexikalische Analyse eines traditionellen Compilers.
+Der QHS-Zyklus beginnt bei der Fetch-Phase, dabei wird die erste Order aus der Eingabedatei extrahiert. In jeder weiteren Fetch-Phase wird die nächste Order aus der Eingabedatei geholt.
+Die Fetch-Phase ist auch dafür zuständig die nächste Order einem der drei Typen (Identifier, Instruction oder LiteralCode) zuzuordnen.
+Diese Ordertypen sind mit folgenden Regular Expressions definiert. Leerzeichen dienen als Trennung zwischen Orders und werden ignoriert.
+     
+    
+    
+
+Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum zwischen Zeichen differenziert wird. Während die lexikalische Analyse traditionell zwischen vielen verschiedenen Tokens unterscheidet,
+sind für den QHScompiler alle Zeichen (mit Ausnahme von  und ") gleichbedeutend.
+
+Normalerwiese erhält die Fetch-Phase die nächste Order aus der Eingabedatei. 
+Es ist jedoch möglich Orders der Eingabedatei voranzustellen. Diese Orders werden in der Fetch-Phase zuerst gefunden. Dies geschieht mithilfe des FetchStacks, auf den Orders gelegt werden können.
+In der nächsten Fetch-Phase wird immer die oberste Order des FetchStacks geholt und daraufhin vom FetchStack entfernt.
+Die Eingabedatei befindet sich auf dem untersten Platz des FetchStacks und wird somit nur verwendet, wenn der Stack ansonsten komplett leer ist.
+
+
+FETCHSTACK FIGURE
+
+
+
+
+
+
+
+
+
+
+Die Hauptanwendung des FetchStacks wird im Abschnitt  erklärt.
+Die Kompilierung ist beendet, sobald keine Order mehr auf dem FetchStack vorhanden ist.
+
+Die Validate-Phase Nachdem die nächste Order in der  Fetch-Phase gefunden wurde, wird diese Order an die Validate-Phase weitergegeben. Während der Validate-Phase kommt die OrderQueue ins Spiel.
+Dabei handelt es sich, wie der Name schon sagt, um eine Queue von Orders.
+Die Aufgabe der OrderQueue ist das Speichern und spätere Zurückholen von Orders. Die OrderQueue kann mit Instructions, die im Abschnitt  weiter ausgeführt werden, aktiviert und deaktiviert werden.
+Wenn eine Order in die Validate-Phase gelangt und die OrderQueue aktiviert ist, wird diese Order der OrderQueue hinzugefügt.
+Die Execute-Phase wird danach übersprungen und der QHS-Zyklus beginnt von neuem bei Fetch.
+Die Order wurde (ohne die Execute-Phase erreicht zu haben) auf der OrderQueue gespeichert. Später ist es mit Instructions möglich diese Order von der OrderQueue zu entfernen und auszuführen.
+
+Bestimmte Orders können jedoch orderQueue-proof, also immun gegen die OrderQueue, gemacht werden.
+Orders, die orderQueue-proof sind, werden an die Execute-Phase weitergegeben, auch wenn die OrderQueue aktiv ist.
+Dieses Prinzip ist zum Beispiel besonders bei der Instruction, welche die OrderQueue wieder deaktiviert, wichtig.
+Da diese Instruction ansonsten nicht zur Execute-Phase gelänge und somit die OrderQueue nie deaktiviert würde.
+Zu beachten ist, dass LiteralCode nicht orderQueue-proof sein kann.
+
+MAYBE CODESTACK FIGURE
+
+Ist die OrderQueue deaktiviert oder die Order orderQueue-proof, wird diese Order an den letzten Schritt Execute weitergegeben.
+
+Die Execute-Phase Während der Execute-Phase wird der tatsächliche Assembly Code generiert. Je nach Typ der Order (Identifier, Instruction oder LiteralCode) läuft die Execute-Phase sehr unterschiedlich ab.
+In den folgenden Abschnitten wird der Ablauf der Execute-Phase je nach Ordertyp erklärt.
+
+Identifier
+Identifier stehen für die am Anfang von Abschnitt  erwähnten Macros.
+Die Macros sind für den QHScompiler eine Liste an Orders.
+Identifier lassen sich zu einer Liste an Orders definieren.
+Wenn nun ein Identifier in die Execute-Phase gelangt, werden die dazugehörigen Orders auf den FetchStack aus Abschnitt  gelegt.
+Bei den nächsten Fetch-Phasen werden nun zuerst die zum Identifier gehörenden Orders nacheinander abgebaut. Einfach ausgedrückt wird der Identifier also durch seine Orders ersetzt.
+Als Beispiel seien folgende Identifier definiert:
+     
+    
+    
+
+Mit diesen Identifiern, wird nun folgender Code kompiliert:
+
+
+
+Die Identifier aus der Eingabe wurden mit ihren Definitionen ersetzt. Wie der Identifier id3 zeigt, ist es möglich Identifier ineinander zu verschachteln.
+
+Die Definitionen der Identifier sind in einem sogenannten Environment definiert.
+Bei einem Environment handelt es sich um eine einfache Map, die einen Identifier mit einer Liste an Orders verknüpft.
+Die bereits erwähnten Environments sind dabei in einer Linked-List gespeichert. Somit können neue Environments zu dieser Liste hinzugefügt und aus der Liste entfernt werden.
+Das letzte Environment der Liste ist das älteste und das erste Environment das neuste.
+Ein neuer Identifier wird immer zum ersten Environment hinzugefügt. Definitionen des gleichen Identifiers in älteren Environments werden nicht überschrieben oder gelöscht.
+Bei der Abfrage nach einem Identifier wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden, wird ein Error ausgegeben.
+
+Instructions
+
+Wenn eine Instruction in die Execute-Phase gelangt, wird die dazu definierte Funktion im QHScompiler ausgeführt.
+Diese Funktionen können Variablen im QHScompiler speichern, die OrderQueue aktivieren, Identifier definieren und vieles mehr. Instructions sind somit der Weg wie während der Kompilierung auf den QHScompiler einfluss genommen werden kann.
+In der Tabelle  sind ein paar der wichtigsten Instructions aufgelistet:
+
+
+         
+    
+    
+
+    
+Der QHScompiler umfasst 33 Instructions, wobei 5 dieser ausschliesslich fürs Debuggen des Compilers dienen.
+
+LiteralCode
+LiteralCode ist der Weg wie der QHScompiler Assembly Code generiert. Dieser ist sehr einfach. Wenn LiteralCode in die Execute-Phase gelangt, wird alles, das zwischen den Satzzeichen steht, in die Ausgabedatei geschrieben.
+Dies ist die einzige Möglichkeit des QHScompiler Assembly Code zu generieren. Einzig die LiteralCode-Orders bestimmen, was in die Ausgabedatei gelangt, und somit welcher Sprache diese Ausgabedatei folgt. 
+Durch das Anpassen der LiteralCode-Orders ist es also möglich die Ausgabesprache des QHScompilers zu ändern.
+
+
+Definition der Macros Somit ist der QHScompiler komplett. Grundsätzlich lässt sich mit QHS bereits jedes Programm schreiben und mit dem QHScompiler kompilieren. 
+Jedoch habe ich in Tabelle  festgelegt, dass die Eingabesprache einen C ähnlichen Syntax aufweisen muss.
+Um dies zu ermöglichen, muss man, wie zu Beginn von Abschnitt  erwähnt, bestimmte Macros also Identifier definieren.
+In diesem Abschnitt werde ich zeigen, wie sich diese Identifier auch für syntaktisch komplexe Programmiersprachen definieren lassen.
+Zur Veranschaulichung dienen Variablen und Funktionsdefinitionen.
+
+
+Der QHScompiler ist zwar komplett, die dazugehörige Programmiersprache QHS jedoch noch lange nicht.
+Grundsätzlich ist es möglich mit LiteralCode jedes Programm zu schreiben und zu kompilieren, jedoch handelt es sich dann nur um Assembly Code.
+Doch der Aufbau des QHScompilers ermöglicht es mit Identifiern eine komplexere Programmiersprache zu definieren. Ein fester Bestandteil ein jedes Programms, das mit dem QHScompiler kompiliert werden soll, ist ein Stück Code,
+das die jeweilige Programmiersprache definiert. Dieser Code wird im Kontext des QHScompilers Preamble genannt. Theoretisch ist es möglich durch das Anpassen dieses Preambles, 
+viele unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren. In diesem Abschnitt wird behandelt wie sich die Sprache QHS, welche die Kriterien aus Abschnitt  erfüllt,
+für den QHScompiler definieren lässt.
+
+Abkürzungen
+In diesem Abschnitt wird viel QHS-Code als Beispiel verwendet.
+Um die Leserlichkeit von QHS zu verbessern, werden ein zuerst paar Identifier anstelle der umständlichen Instructions definiert.
+Diese Identifier sind in der folgenden Tabelle  aufgeführt.
+
+
+     
+        
+    
+
+
+Weiter wird innerhalb von Kommentaren Pseudo-Code verwendet, um den QHS Code verständlicher zu erklären.
+Kommentare können mehrere Zeilen umfassen und beginnen immer mit /* und enden mit */.
+Der Kommentar /* X = "hello" pushEnv */ würde bedeuten,
+dass der Identifier X zu den Orders "hello" (LiteralCode) und pushEnv (Instruction) definiert wurde. 
+
+Auch wird bei längeren Identifier-Definitionen wird zuerst der zudefinierende Identifier getrennt von den restlichen Orders der OrderQueue hinzugefügt.
+Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
+
+EXAMPLE
+
+Identifier Parameter und Rückgabewert
+Mit den enterOrderQueue (rsp. [ ) und exitOrderQueue (rsp. ] ) Instructions kann innerhalb eines Identifiers die OrderQueue verwendet werden. Dies ermöglicht eine Art von Parameter und Rückgabewert für Identifier.
+Parameter werden vor dem Aufruf eines Identifiers der OrderQueue hinzugefügt. Diese können dann innerhalb des Identifiers verwendet werden.
+Genauso kann der Identifier Orders der OrderQueue hinzufügen und diese somit zurückgeben.
+
+
+
+Variablen Die Umsetzung von Variablen in QHS ist einfach.
+Um Platz für die Variable auf dem Stack zu schaffen, muss zuerst die Grösse der Variable in Bytes vom rsp subtrahiert werden.
+
+Dann wird für die Variable ein Identifier definiert, der zur Position der Variable auf dem Stack zeigt.
+Mit LiteralCode lässt sich dies wie folgt in QHS ausdrücken:
+
+
+Jedoch braucht man für diese Implementation immer noch viel LiteralCode und Assembly Kenntnisse. Um die Definition von Variablen C ähnlicher zu machen, lässt sich zum Beispiel ein var Identifier definieren.
+Dieser var Identifier nimmt die Grösse der Variable als Argument über die OrderQueue an. Um die in C geläufige Syntax der Definition einer Variable beizubehalten,
+wird der Name der Variable mit der deepFetch Instruction beschafft.
+
+
+
+Momentan erhält jede Variable jedoch noch die Addresse rbp-4, weswegen sich die Variablen gegenseitig überschreiben würden. Der momentane rbp-Offset muss also gespeichert und erhöht werden.
+Dafür wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 definiert. Mit der addToIdentifier Instruction, lässt sich nun rbpOffset erhöhen. Dies kann folgendermassen aussehen:
+
+
+
+Zuletzt lässt sich das umständliche Hinzufügen der Grösse der Variable sowie der var Identifier unter einem neuen Identifier zusammenfassen. Dies ist passenderweise die bekannte Bezeichnung für den Typen der Variable.
+
+
+
+
+Nun sieht die Definition und Verwendung einer Variable genau so aus, wie es in C gebräuchlich ist.
+Auf das Setzten von Variablen werde ich hier nicht weiter eingehen, da dies mit den Methoden, die im nächsten Abschnitt  erklärt werden, funktioniert.
+
+Funktionsdefinitionen Funktionen sind im Vergleich zu Variablen komplizierter. Nachfolgend sollen zwei der Probleme von Funktionsdefinitionen behandelt werden.
+Anhand einer Funktionsdefinition, wie sie zum Schluss aussehen sollte, will ich die beiden Probleme erläutern:
+
+
+
+Hier lässt sich bereits das erstes Problem feststellen. Im vorherigen Abschnitt  wurde der int Identifier für die Definition einer Variable verwendet. 
+Das int in der Auflistung  würde daher vom QHScompiler als Definition für eine Variable verstanden werden. Der Unterschied zwischen Variable- und Funktionsdefinition besteht hierbei in den Klammern,
+die auf den Namen folgen. Der QHScompiler müsste also beim int Identifier nach vorne schauen, ob sich eine Klammer nach dem Namen befindet, und folglich eine Variable- oder Funktionsdefinition ausführen.
+Bei einem traditionellen Compiler würde diese Überprüfung während der syntaktischen Analyse ausgeführt werden.
+Dies ist dem QHScompiler jedoch nicht möglich, da dieser, wie zu Beginn von Abschnitt  erläutert, über keine syntaktische Analyse verfügt.
+Glücklicherweise lässt sich dieses erste Problem lösen, ohne eine Änderung am QHScompiler vorzunehmen.
+Die Lösung basiert darauf, beim int Identifier sowohl eine Variable- als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
+Daraufhin werden zwei Identifier definiert, erstens eine Klammer für eine Funktionsdefinition und zweitens ein Semikolon für die Definition einer Variable.
+
+Befindet sich nach dem Namen eine Klammer, wird eine Funktionsdefinition ausgeführt, ist dort aber ein Semikolon wird eine Variable definiert.
+Dieses Konzept wird im weiteren als DelayedExecute bezeichnet. Das Ganze sieht danach wie folgt aus:
+
+
+
+
+
+Das zweite Problem sind die Parameter eine Funktionsdefinition. Diese sehen genau gleich aus wie die Definition einer Variable, sollten jedoch vom QHScompiler anders ausgeführt werden.
+Erstens sollte bei einer Parameterdefinition nicht der LiteralCode zur Subtraktion vom rsp hinzugefügt werden. Zweitens verwendet eine Parameterdefinition einen anderen rbp-Offset.
+Die Lösung liegt im Umdefinieren des definition Identifiers. Dieser ist momentan für die Definition von Variablen und Funktionen verantwortlich.
+Bei der Anfangsklammer der Funktionsdefinition wird der definition Identifier neu definiert, sodass er eine Parameterdefinition ausführt. Die vorherige Definition geht dank der pushEnv Instruction nicht verloren.
+Bei der schliessenden Klammer wird popEnv durchgeführt, und der definition Identifier ist wieder für Variablen und Funktionen zuständig. Diese Lösung wird im folgenden TempAssign genannt.
+Dies lässt sich in QHS wie folgt umsetzen:
+
+
+
+Der Identifier paramDefinition ist ähnlich wie der var Identifier aus Abschnitt .
+Es wird blos anstelle von rbpOffset ein neuer paramOffset Identifier verwendet und der Assembly Code fürs Subtrahieren vom rsp nicht hinzugefügt.
+
+Nun fehlt nur noch etwas an der Funktionsdefinition: Der Funktionsbody. Dieser ist vergleichsweise einfach. Die beiden geschwungenen Klammern werden zu einem leeren Identifier definiert und somit ignoriert.
+Der gesamte Code innerhalb des Body wird ganz normal vom QHScompiler ausgeführt und an die Ausgabedatei angehängt. Das Endresultat sieht wie folgt aus:
+
+
+
+
+Wie das Beispiel der Funktionsdefinition zeigt lassen sich mit DelayedExecute und TempAssign auch syntaktisch komplexe Programmiersprachen in QHS definieren und mit dem QHScompiler kompilieren.
+
+Um einen C ähnlichen Syntax zu ermöglichen, braucht der QHScompiler noch viele weitere Identifier.
+
+Da diese jedoch einem ähnlichen Prinzip wie die beschriebenen Definitionen von Variablen und Funktionen folgen, werde ich sie hier nicht weiter betrachten.
+
+
+    
+
+
+
+
+
+
+
+Auswertung des Compiler Vergleichs
+Abschliessend will ich den QHScompiler, wie in Abschnitt  beschrieben, mit zwei weiteren Compilern vergleichen.
+Verglichen werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigkeit der Ausgabedatei, Umgang mit fehlerhaftem Code und Offenheit für Erweiterung. 
+
+Geschwindigkeit der Kompilierung Für die Messung der Kompilierungsdauer wird eine Funktion, die prüft, ob eine Zahl eine Primzahl ist, kompiliert. Diese Funktion wurde so geschrieben, dass jedes Feature, das alle drei Compiler unterstützen, verwendet wird.
+Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und Loops. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt. Anschliessend wurde jedes Programm zehnmal kompiliert.
+Die durchschnittliche Dauer der Kompilierung ist in Abbildung  ersichtlich.
+
+
+
+Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt die Kompilierungsdauer mit einer zunehmenden Anzahl an Funktionen exponentiell an.
+Ab 10⁵ Kopien der Funktion kompiliert der THScompiler länger, als die beiden anderen Compiler.
+Bei noch grösseren Eingabedateien ist zu erwarten, dass der THScompilers weiterhin langsamer kompiliert als GCC und der QHScompiler.
+Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Theoretisch sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
+
+Trotzdem kompiliert der THScompiler bei wenigen Kopien der Funktion deutlich schneller als GCC, obwohl beide Compiler dem traditionellen Aufbau folgen.
+Dies liegt wahrscheinlich daran, dass der THScompiler über weniger Funktionalitäten als GCC verfügt.
+Der QHScompiler, der einen ähnlichen Umfang wie der THScompiler umfasst, wird für kleine Eingabedateien klar vom THScompiler geschlagen.
+
+Sowohl der QHScomiler als auch GCC beginnen mit einer hohen Kompilierungsdauer bei einer tiefen Anzahl an Funktionen, verhalten sich später aber linear.
+Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
+Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien ungefähr 1.5 mal länger als GCC. 
+
+Somit schneidet sowohl bei kleinen als auch bei grossen Eingabedateien der traditionelle Compiler Aufbau besser ab, als mein alternatives Modell.
+
+
+
+
+
+
+
+Geschwindigkeit der Ausgabedatei Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Wie bei der Funktion aus Abschnitt  ist dieser Algorithmus so geschrieben,
+dass er möglichst jedes von allen drei Compilern unterstütze Feature verwendet. Der Algorithmus wurde für verschiedene Mengen an zu berechnenden Primzahlen je zehnmal ausgeführt und die Ausführungsdauer gemessen.
+In der folgenden Abbildung  ist die durchschnittliche Ausführungsdauer der Programme nach Menge an berechneten Primzahlen dargestellt.
+
+
+            
+
+Wie in Abbildung  ersichtlich, beginnen alle drei kompilierten Programme mit einer sehr tiefen Ausführungsdauer.
+Die Progamme des THS- und QHScompilers werden bis zum Schluss nahezu gleich schnell ausgeführt.
+Das von GCC generierte Programm ist jedoch deutlich schneller als die Programme des THS- und QHScompilers.
+Dies liegt ganz klar an den Optimierungsmethoden von GCC. Wenn man die Optimierung beim Kompilieren mit GCC deaktiviert, sieht die Abbildung wie folgt aus:
+
+
+
+Wie Abbildung  zeigt, wird das GCC Programm ohne Optimierung nur noch leicht schneller ausgeführt als die Programme der beiden anderen Compiler.
+Da ebenfalls weder der THS- noch der QHScompiler über Optimierungsmethoden verfügen, ist dies das erwartete Resultat.
+Aus zeitlichen Gründen war es mir nicht möglich Optimierung in meine beiden Compiler einzubauen.
+
+Zusammengefasst lässt sich sagen, dass ohne Optimierung mein alternativer Aufbau eines Compilers ungefähr gleich schnelle Ausführungsgeschwindigkeit liefert, wie ein traditioneller Compiler.
+Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler möglich ist und die Ausführungsdauer deutlich verringert, wie GCC in Abbildung  beweist.
+Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch deutlich schwierig wäre.
+Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine syntaktische Analyse durchgeführt und nie ein AST generiert wird.
+Auch steht die Grundidee meines alternativen Aufbaus Optimierung stark im Weg.
+Wie zu Beginn von Abschnitt  beschrieben, basiert mein Ansatz darauf, dass die von Macro Expansion verwendeten Macros während der Kompilerung erst definiert werden.
+Daher kennt der QHScompiler vor der Kompilierung weder die Eingabe- noch die Ausgabesprache. Dies führt dazu, dass auch mögliche Optimierungsmethoden erst während dem Kompilieren gefunden werden können.
+Aus diesen Gründen wäre Optimierung für einen Compiler nach meinem alternativen Aufbau deutlich komplexer, wenn nicht sogar unmöglich.
+
+
+Umgang mit fehlerhaftem Code
+
+
+GCC und der THScompiler folgen beide einer exakt definierten Syntax und einer klaren Semantik.
+
+Wird die Syntax oder Semantik nicht eingehalten wird ein Fehler gemeldet.
+Dies ist ein Resultat der syntaktischen und semantischen Analyse, die nach bestimmten Regeln geschrieben wurden und diese Regeln exakt einhalten.
+
+
+Traditionelle Compiler erscheinen dadurch manchmal etwas pingelig. Jedoch sind sie dafür sehr genau und hilfreich beim Finden und Melden von Fehlern.
+
+Der QHScompiler arbeitet hingegen viel ungenauer.
+
+Wie im Abschnitt  bereits beschrieben, verfügt der QHScompiler über keine Möglichkeit zu überprüfen, ob eine bestimmte Order folgt oder nicht.
+Er führt konsequent nur aus, was als Nächstes auftaucht. Darum führt ein fehlendes Zeichen nicht immer zu Fehlern.
+Folgender Code soll dies veranschaulichen:
+
+
+Der Code aus Auflistung  lässt sich einwandfrei vom QHScompiler kompilieren und daraufhin ausführen.
+Weder das Fehlen des Semikolons noch der schliessenden Klammer führt bei QHScompiler auf eine Fehlermeldung.
+Die resultierende Ausgabedatei ist ebenfalls fehlerfrei und lässt sich einwandfrei ausführen. 
+Dies ist jedoch bei folgendem Beispiel nicht mehr der Fall.
+
+
+Der Code bei Auflistung  kompiliert problemlos, der generierte Assembly Code ist jedoch fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument erkannt.
+Es entsteht also eine fehlerhafte Ausgabedatei, ohne dass der QHScompiler dies meldet.
+
+Führt die Kompilierung doch zu einer Fehlermeldung, ist diese nicht immer besonders verständlich.
+
+
+
+
+Bei Auflistung  wird die Funktion foo ohne Parameter definiert, später jedoch mit einem Argument aufgerufen.
+Der QHScompiler verfügt über keine Möglichkeit, die Menge an Argumenten zu überprüfen, und meldet nicht direkt einen Fehler. 
+Sobald er jedoch versucht die Grösse des erwarteten Argumentes von der OrderQueue zu holen ist diese leer.
+Der QHScompiler meldet einen OrderQueue-Empty Error gefolgt von vielen Folgefehlern.
+
+
+
+Somit ist der QHScompiler bei der Meldung von Fehlern einerseits nicht sehr streng, andererseits aber auch verwirrend und ungenau bei der Fehlermeldung.
+
+Deshalb komme ich zum Schluss, dass der traditionelle Compiler Aufbau mit syntaktischer und semantischer Analyse deutlich besser mit Fehlern umgehen kann als mein alternatives Modell.
+
+Offenheit für Erweiterung
+C, als eine auch professionell verwendete Programmiersprache, umfasst eine Vielzahl an Features.
+Zum Beispiel lassen sich mittels Templates Datenstrukturen wie Stacks, Queues oder Vectors definieren, die Datentyp unabhängig sind.
+Mit Libraries lassen sich zudem komplexe Algorithmen einmal schreiben und später einfach wieder verwenden. Solche Funktionalitäten sind bei einem traditionellen Compiler möglich.
+
+Mit dem QHScompiler lassen sich Libraries ebenfalls verwenden. Templates sollten theoretisch ebenfalls möglich sein, jedoch habe ich dies nicht getestet.
+Jedoch bietet der QHScompiler, wie in Abschnitt  bereits angemerkt, noch weitere Möglichkeiten zur Erweiterung. 
+Das Definieren von Identifiern während der Kompilierung ermöglicht es ganz unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren.
+Gegebenenfalls falls kann die Programmiersprache sogar innerhalb der Eingabedatei geändert werden. 
+
+
+
+
+Leider ist die Definition der benötigten Identifier für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die Abschnitt  erklärten DelayedExecute und TempAssign.
+Trotzdem würde ich sagen, dass der QHScompiler einem mehr Freiheit bei der Erweiterung bietet, als ein traditioneller Compiler.
+
+Fazit
+Im Vergleich mit traditionellen Compilern zeigt der von mir entwickelte QHScompiler einige Schwächen.
+Er ist sowohl in der Geschwindigkeit der Kompilierung als auch bei der Ausführungsdauer eines kompilierten Programmes einem traditionellen Compiler unterlegen.
+Beim Umgang mit Fehlern ist der QHScompiler weniger streng aber auch deutlich unpräziser und verwirrender als Compiler nach dem traditionellen Aufbau.
+Als einziger Vorteil lässt sich seine Offenheit für Erweiterung sehen.
+
+Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der Identifier besonders ineffizient ist. 
+Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr ineinander verschachtelt.
+Daher werden auch für kurzer Code sehr viele Identifiers ausgeführt. Generell liesse sich die Implementation der Identifier sicherlich stark verbessern und der gesamte QHScompiler optimieren.
+
+Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die syntaktische Analyse für die angenehme Verwendung eines Compilers äusserst wichtig ist.
+Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies, folge der fehlenden syntaktischen Analyse, nicht möglich.
+
+Ausserdem ist ein AST, wie in Abschnitt  thematisiert, auch für die Optimierung der Ausgabedatei äusserst praktisch.
+Grundsätzlich ist Optimierung für den QHScompiler äusserst schwierig. Da die Eingabesprache während der Kompilierung erst definiert wird, müssten auch passende Optimierungsmethoden spontan gefunden werden.
+Dies äussert sich in einer langsameren Geschwindigkeit der Ausgabedatei.
+
+Der einzige Vorteil des QHScompilers liegt in der Offenheit für Erweiterung.
+Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
+In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem Linker kombinieren.
+
+Zusammengefasst führen während der Kompilerung definierte Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
+Der QHScompiler ist einem traditionellen Compiler also stark unterlegen.
+
+Schluss
+Der QHScompiler kann einem traditionellen Compiler im Vergleich leider nicht das Wasser reichen.
+
+Trotzdem habe ich mit meiner Arbeit das erreicht, was ich mir erhofft hatte. Der Auslöser für meinen alternativen Ansatz war die Frage: Wieso werden Compiler so entwickelt, wie sie entwickelt werden? 
+Dies konnte ich für mich ganz klar beantworten. Die syntaktische Analyse, die ich zuerst für unnötig hielt, erfüllt eine wichtige Aufgabe für Fehlermeldung und Optimierung.
+Ausserdem ist man dank ihr nicht auf verwirrende Methoden wie DelayedExecute oder TempAssign aus Abschnitt  angewiesen.
+Das Definieren der Macros und somit der Eingabe- und Ausgabesprache während der Kompilierung klingt zuerst verlockend, bringt jedoch auch Probleme fürs Optimieren der Ausgabedatei mit sich.
+Compiler folgen also aus gutem Grund dem traditionellen Aufbau.
+
+
+
+Es hat mir sehr viel Spass gemacht meinen alternativen Ansatz zu entwickeln. Auch wenn es häufig frustrieren kann, ist es doch viel aufregender einer eigenen Idee zu folgen, als einfach stur dem traditionellen Weg zu folgen.
+Sowohl bei der Entwicklung des QHS- als auch des THScompiler stiess ich häufig gegen eine Wand und bemerkte dies meist erst, als ich schon eine Woche daran verloren hatte.
+Sehr hilfreich war es dabei die Entwicklung parallel bereits in Worte zu fassen. Die Verschriftlichung meiner Gedanken half mir dabei ein Verständnis aufzubauen, wie mein Programm tatsächlich funktioniert.
+Leider ist mir dies erst sehr spät aufgefallen.
+
+Zuletzt möchte ich nochmals hervorheben, wie wichtig die Vorlesung Compiler Construction der Universität Bern für diese Maturaarbeit war.
+Ohne diese Vorlesung wäre es für mich viel schwieriger gefallen den traditionellen Aufbau eines Compilers zu verstehen und umzusetzen.
+
+
+Meine Maturaarbeit wie sie jetzt steht, wäre ohne die Vorlesung wahrscheinlich nicht möglich gewesen.
+
+
+
+

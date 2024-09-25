@@ -13,12 +13,12 @@ Orders können drei verschiedenen Typen aufweisen: \textit{Identifiers}, \textit
 %Bei Identifiers handelt es sich um die bereits erwähnten Macros, Instructions sind einfache vorprogrammierte Anweisungen an den QHScompiler und LiteralCode ist Text, der unverändert in die Ausgabedatei geschrieben wird.
 Wie diese drei Ordertypen genau funktionieren, wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
 
-Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus zugrunde, dessen Inspiration der Von-Neumann Zyklus ist.
+Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus (\textit{QHS-Zyklus}) zugrunde, dessen Inspiration der Von-Neumann Zyklus ist.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{resources/images/qhs-cycle.png}
-    \caption{Zyklus der QHS Kompilierung (QHS-Zyklus)}
+    \caption{Zyklus der QHS Kompilierung}
     \label{fig:qhs-cycle}
 \end{figure}
 
@@ -33,7 +33,7 @@ Diese \textit{Ordertypen} sind mit folgenden Regular Expressions definiert. Leer
     \caption{RegEx Definitionen der \textit{Ordertypen}}
     \vspace{3mm} % Adjust the height of the space between caption and tabular
     
-    \begin{tabular}{ll}
+    \begin{tabular}{l>{\listingFont\selectfont}l}
     \multicolumn{1}{l|}{identifier}        & \textless{}identiferChar\textgreater{}+                           \\ \hline
     \multicolumn{1}{l|}{instruction}       & \# \textless{}identiferChar\textgreater{}+                        \\ \hline
     \multicolumn{1}{l|}{literalCode}       & ".*"                                                              \\
@@ -90,17 +90,47 @@ Während der Execute-Phase wird der tatsächliche Assembly Code generiert. Je na
 In den folgenden Abschnitten wird der Ablauf der Execute-Phase je nach \textit{Ordertyp} erklärt.
 
 \subsection{Identifier}
-Identifier stehen für die am Anfang von Abschnitt \ref{cha:4-QHS_Compiler} erwähnten Macros. Diese Identifier sind in einem \textit{Environment} definiert.
-Bei einem Environment handelt es sich um eine einfache Map, die einen Identifier mit einer Liste an \textit{Orders} verknüpft.
-%In anderen Programmiersprachen werden Environments auch als Scope bezeichnet.
+Identifier stehen für die am Anfang von Abschnitt \ref{cha:4-QHS_Compiler} erwähnten Macros.
+Die Macros sind für den QHScompiler eine Liste an \textit{Orders}.
+Identifier lassen sich zu einer Liste an \textit{Orders} definieren.
 Wenn nun ein Identifier in die Execute-Phase gelangt, werden die dazugehörigen \textit{Orders} auf den FetchStack aus Abschnitt \ref{sec:qhs-fetch} gelegt.
 Bei den nächsten Fetch-Phasen werden nun zuerst die zum Identifier gehörenden \textit{Orders} nacheinander abgebaut. Einfach ausgedrückt wird der Identifier also durch seine \textit{Orders} ersetzt.
+Als Beispiel seien folgende Identifier definiert:
 
-EXAMPLE FIGURE?
+\begin{table}[H]
+    \centering
+    \caption{Definition von Beispiel Identifiern}
+    \vspace{3mm} % Adjust the height of the space between caption and tabular    
+    
+    \begin{tabular}{l|l}
+    \textbf{Identifier} & \textbf{Definition}   \\ \hline
+    \listingFont\selectfont id1 & \listingFont\selectfont "lit1"                                \\ \hline
+    \listingFont\selectfont id2 & \listingFont\selectfont \#inst2.1 "lit2" { }\#inst2.2         \\ \hline
+    \listingFont\selectfont id3 & \listingFont\selectfont id2 "lit3"     
+    \end{tabular}
+\end{table}
 
-Die bereits erwähnten Environments sind dabei in einer Linked-List gespeichert. Somit können neue Environments zu dieser Liste hinzugefügt und aus der Liste entfernt werden.
-Das letzte Environment der Liste ist das älteste und das erste Environment das neuste.
-Ein neuer Identifier wird immer zum ersten Environment hinzugefügt. Definitionen des gleichen Identifiers in älteren Environments werden nicht überschrieben oder gelöscht.
+Mit diesen Identifiern, wird nun folgender Code kompiliert:
+
+\begin{lstlisting}[language=QHS, caption=QHS Code zur Veranschaulichung von Identifiers]
+    "lit0.1"
+    id1
+    "lit0.2" id2
+    id3
+    %\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+    "lit0.1"
+    "lit1"
+    "lit0.2" #inst2.1 "lit2" #inst2.2
+    #inst2.1 "lit2" #inst2.2 "lit3"
+\end{lstlisting}
+
+Die Identifier aus der Eingabe wurden mit ihren Definitionen ersetzt. Wie der Identifier {\listingFont\selectfont id3} zeigt, ist es möglich Identifier ineinander zu verschachteln.
+
+Die Definitionen der Identifier sind in einem sogenannten \textit{Environment} definiert.
+Bei einem \textit{Environment} handelt es sich um eine einfache Map, die einen Identifier mit einer Liste an \textit{Orders} verknüpft.
+Die bereits erwähnten \textit{Environments} sind dabei in einer Linked-List gespeichert. Somit können neue \textit{Environments} zu dieser Liste hinzugefügt und aus der Liste entfernt werden.
+Das letzte \textit{Environment} der Liste ist das älteste und das erste \textit{Environment} das neuste.
+Ein neuer Identifier wird immer zum ersten \textit{Environment} hinzugefügt. Definitionen des gleichen Identifiers in älteren \textit{Environments} werden nicht überschrieben oder gelöscht.
 Bei der Abfrage nach einem Identifier wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden, wird ein Error ausgegeben.
 
 \subsection{Instructions}
@@ -127,8 +157,8 @@ In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten In
     {\listingFont\selectfont \#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die \textit{Order} wird jedoch an den ersten Platz der \textit{OrderQueue} gesetzt. \\ \hline
     {\listingFont\selectfont \#deepFetch}            & Die nächste \textit{Order} der Eingabedatei wird oben auf den FetchStack gesetzt. Ermöglicht den Zugriff auf die Eingabedatei innerhalb eines Identifiers. \\ \hline
     {\listingFont\selectfont \#queueFetch}           & Die erste \textit{Order} der \textit{OrderQueue} wird oben auf den FetchStack gesetzt. \\ \hline 
-    {\listingFont\selectfont \#pushEnv}              & Ein neues Environment wird der Environment Linked-List hinzugefügt. \\ \hline
-    {\listingFont\selectfont \#popEnv}               & Das neuste Environment der Environment Linked-List wird gelöscht. \\ \hline
+    {\listingFont\selectfont \#pushEnv}              & Ein neues \textit{Environment} wird der \textit{Environment-Linked-List} hinzugefügt. \\ \hline
+    {\listingFont\selectfont \#popEnv}               & Das neuste \textit{Environment} der \textit{Environment-Linked-List} wird gelöscht. \\ \hline
     {\listingFont\selectfont \#addToIdentifier}      & Die erste \textit{Order} der \textit{OrderQueue} muss ein Identifier sein und die zweiterste LiteralCode. Beide \textit{Orders} werden als Zahl interpretiert und addiert.
                                                        Das Resultat wird im Identifier gespeichert.       
     \end{tabularx}
@@ -216,7 +246,7 @@ foo                                 /* foo wird ausgeführt */
                                     geholt und ausgeführt */
 
 
-%\noindent\hrulefill Ausgabe\noindent\hrulefill%
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
 1 : 2
 return
 \end{lstlisting}
@@ -235,7 +265,7 @@ Mit LiteralCode lässt sich dies wie folgt in QHS ausdrücken:
 
 "add " a ", 5"
 
-%\noindent\hrulefill Ausgabe\noindent\hrulefill%
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
 sub rsp, 4
 add [rbp-4], 5
 \end{lstlisting}
@@ -259,7 +289,7 @@ wird der Name der Variable mit der \#deepFetch Instruction beschafft.
 
 "add " a ", 5"
     
-%\noindent\hrulefill Ausgabe\noindent\hrulefill%
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
 sub 4
 add [rbp-4], 5
 \end{lstlisting}
@@ -289,7 +319,7 @@ Dafür wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 defin
 "add " a ", 5"
 "sub " b ", 10"
     
-%\noindent\hrulefill Ausgabe\noindent\hrulefill%
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
 sub rsp, 4
 sub rsp, 8
 add [rbp-4], 5
@@ -313,7 +343,7 @@ int b
 "add " a ", 5"
 "sub " b ", 10"
         
-%\noindent\hrulefill Ausgabe\noindent\hrulefill%
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
 sub rsp, 4
 sub rsp, 8
 add [rbp-4], 5
@@ -423,7 +453,7 @@ int foo ( int param1 , int param2 )
     "add " param1 ", " param2
 }
 
-%\noindent\hrulefill Ausgabe\noindent\hrulefill%
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
 foo:
 add [rbp+16], [rbp+20]
 \end{lstlisting}

@@ -231,7 +231,7 @@ start
     exit ;
 }
 
-%\noindent\hrulefill Ausgabe\noindent\hrulefill%
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
 [ERROR] Cannot dequeue, OrderQueue is empty!
 [ERROR] Expected LiteralCode for #literalToIdentifier at OrderQueue second, got: NONE
 [ERROR] Cannot dequeue, OrderQueue is empty!
@@ -275,7 +275,7 @@ Beim Umgang mit Fehlern ist der QHScompiler weniger streng aber auch deutlich un
 Als einziger Vorteil lässt sich seine Offenheit für Erweiterung sehen.
 
 Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der Identifier besonders ineffizient ist. 
-Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr ineinander verschachtelt.
+Jeder Identifier benötigt zuerst eine Abfrage bei den \textit{Environments}. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr ineinander verschachtelt.
 Daher werden auch für kurzer Code sehr viele Identifiers ausgeführt. Generell liesse sich die Implementation der Identifier sicherlich stark verbessern und der gesamte QHScompiler optimieren.
 
 Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die syntaktische Analyse für die angenehme Verwendung eines Compilers äusserst wichtig ist.
@@ -289,5 +289,5 @@ Der einzige Vorteil des QHScompilers liegt in der Offenheit für Erweiterung.
 Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
 In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem \textit{Linker} kombinieren.
 
-Zusammengefasst führt das System der während der Kompilerung definierten Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
+Zusammengefasst führen während der Kompilerung definierte Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
 Der QHScompiler ist einem traditionellen Compiler also stark unterlegen.
