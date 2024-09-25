@@ -166,7 +166,7 @@ Aus zeitlichen Gründen war es mir nicht möglich Optimierung in meine beiden Co
 Zusammengefasst lässt sich sagen, dass ohne Optimierung mein alternativer Aufbau eines Compilers ungefähr gleich schnelle Ausführungsgeschwindigkeit liefert, wie ein traditioneller Compiler.
 Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler möglich ist und die Ausführungsdauer deutlich verringert, wie GCC in Abbildung \ref{fig:executespeed_optimized} beweist.
 Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch deutlich schwierig wäre.
-Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine Syntax Analysis durchgeführt und nie ein AST generiert wird.
+Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine syntaktische Analyse durchgeführt und nie ein AST generiert wird.
 Auch steht die Grundidee meines alternativen Aufbaus Optimierung stark im Weg.
 Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von Macro Expansion verwendeten Macros während der Kompilerung erst definiert werden.
 Daher kennt der QHScompiler vor der Kompilierung weder die Eingabe- noch die Ausgabesprache. Dies führt dazu, dass auch mögliche Optimierungsmethoden erst während dem Kompilieren gefunden werden können.
@@ -179,7 +179,7 @@ Aus diesen Gründen wäre Optimierung für einen Compiler nach meinem alternativ
 GCC und der THScompiler folgen beide einer exakt definierten Syntax und einer klaren Semantik.
 %Anfänglich scheinen Semikolons am Ende jedes Statements unnötig zu sein, jedoch wird schnell klar, dass genau diese Pingeligkeit der Compiler für eine Programmiersprache äusserst hilfreich ist.
 Wird die Syntax oder Semantik nicht eingehalten wird ein Fehler gemeldet.
-Dies ist ein Resultat der Syntax und Semantic Analysis, die nach bestimmten Regeln geschrieben wurden und diese Regeln exakt einhalten.
+Dies ist ein Resultat der syntaktischen und semantischen Analyse, die nach bestimmten Regeln geschrieben wurden und diese Regeln exakt einhalten.
 %GCC fängt besonders gut Fehler früh ab und meldet diese. 
 %Der traditionelle Compiler ist somit sehr gut bezüglich Umgang mit fehlerhaftem Code.
 Traditionelle Compiler erscheinen dadurch manchmal etwas pingelig. Jedoch sind sie dafür sehr genau und hilfreich beim Finden und Melden von Fehlern.
@@ -237,11 +237,11 @@ Der QHScompiler verfügt über keine Möglichkeit, die Menge an Argumenten zu ü
 Sobald er jedoch versucht die Grösse des erwarteten Argumentes von der OrderQueue zu holen ist diese leer.
 Der QHScompiler meldet einen OrderQueue-Empty Error gefolgt von vielen Folgefehlern.
 
-%Ein weiterer Kritikpunkt am QHScompiler wäre die fehlende Semantic Analysis. Implizite Casts 
+%Ein weiterer Kritikpunkt am QHScompiler wäre die fehlende semantische Analyse. Implizite Casts 
 
 Somit ist der QHScompiler bei der Meldung von Fehlern einerseits nicht sehr streng, andererseits aber auch verwirrend und ungenau bei der Fehlermeldung.
 %In meinen Augen triumphiert daher auch in dieser Kategorie der traditionelle Compiler über meinen QHScompiler.
-Deshalb komme ich zum Schluss, dass der traditionelle Compiler Aufbau mit Syntax und Semantic Analysis deutlich besser mit Fehlern umgehen kann als mein alternatives Model.
+Deshalb komme ich zum Schluss, dass der traditionelle Compiler Aufbau mit syntaktischer und semantischer Analyse deutlich besser mit Fehlern umgehen kann als mein alternatives Model.
 
 \section{Offenheit für Erweiterung}
 C, als eine auch professionell verwendete Programmiersprache, umfässt eine Vielzahl an Features.
@@ -269,8 +269,8 @@ Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analys
 Jeder Identifier benötigt zuerst eine Abfrage bei den Environments. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr inenander verschachtelt.
 (...)
 
-Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die Syntax Analysis für die angenehme Verwendung eines Compilers äusserst wichtig ist.
-Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies folge der fehlenden Syntax Analysis nicht möglich.
+Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die syntaktische Analyse für die angenehme Verwendung eines Compilers äusserst wichtig ist.
+Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies, folge der fehlenden syntaktischen Analyse, nicht möglich.
 
 Ausserdem ist ein AST, wie in Abschnitt \ref{sec:execute_speed} thematisiert, auch für die Optimierung der Ausgabedatei äusserst praktisch.
 Grundsätzlich ist Optimierung für den QHScompiler äusserst schwierig. Da die Eingabesprache während der Kompilierung erst definiert wird, müssten auch passende Optimierungsmethoden spontan gefunden werden.

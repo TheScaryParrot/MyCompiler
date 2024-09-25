@@ -22,14 +22,14 @@ Die von mit verwendeten Fachbegriffe entsprechen hierbei nicht immer denen aus A
 
 Als Basis für diese Kapitel dient grösstenteils eine Vorlesung der Universität Bern, die ich für freundlicherweise besuchen durfte.
 
-\section{Lexical Analysis}
+\section{Lexikalische Analyse}
 Meist werden Programme so geschrieben, dass wir Menschen sie lesen und verstehen können. Dafür verwendet man Buchstaben, Zahlen, Sonderzeichen (wie + oder *) und Whitespaces (wie Leerzeichen oder Absätze).
-Diese Zeichen sind jedoch für den Computer nicht sofort verständlich. Der erste Schritt beim Kompilieren ist daher die \textit{Lexical Analysis}. Diese Analyse wird von einem Teil des Compilers, dem \textit{Lexer}, durchgeführt.
+Diese Zeichen sind jedoch für den Computer nicht sofort verständlich. Der erste Schritt beim Kompilieren ist daher die \textit{lexikalische Analyse}. Diese Analyse wird von einem Teil des Compilers, dem \textit{Lexer}, durchgeführt.
 Die Aufgabe dieses Lexers ist es, die Eingabedatei zu analysieren und die gefundenen Zeichen in sogenannte \textit{Tokens} zu verwandeln. Diese Tokens sind Datenstrukturen, die der Compiler versteht und mit denen er weiterarbeiten kann.
 
-Ein Beispiel der Lexical Analysis auf der Programmiersprache C:
+Ein Beispiel der lexikalischen Analyse auf der Programmiersprache C:
 
-\begin{lstlisting}[language=C, label=eg:preLex, caption=C code vor Lexical Analysis]
+\begin{lstlisting}[language=C, label=eg:preLex, caption=C code vor der lexikalischen Analyse]
 int foo()
 {
     if (bar == 0)
@@ -41,7 +41,7 @@ int foo()
 }
 \end{lstlisting}
 
-\begin{lstlisting}[label=eg:postLex, caption=Tokens nach Lexical Analysis]
+\begin{lstlisting}[label=eg:postLex, caption=Tokens nach der lexikalische Analyse]
 Keyword         (keyword="int")
 Identifier      (id="foo")
 LParenthesis
@@ -57,12 +57,12 @@ LiteralInt      (value=0)
 Der Lexer legt fest, welche Zeichen die Eingabe-Programmiersprache enthalten darf und welche Bedeutung ihnen zugesprochen wird. So ist zum Beispiel im Lexer festgelegt, dass ein + Zeichen als Addition interpretiert wird.
 Genauso wie im Listing \ref{eg:postLex} {\listingFont\selectfont 'if'} als Keyword-Token gesehen wird, lässt sich im Lexer auch bestimmen, dass ein Wort wie {\listingFont\selectfont 'else'} als Keyword angesehen werden soll.
 
-\section{Syntax Analysis}
+\section{Syntaktische Analyse}
 Der Compiler hat nun die Zeichen der Eingabedatei in ein für ihn verständliches Format übersetzt.
 Jedoch fehlt dem Compiler noch das Verständnis für die Syntax der Eingabe-Programmiersprache.
 Die meisten High-Level Programmiersprachen weisen Syntaxregeln auf. Diese beinhalten, wie Funktionen und Variablen definiert werden oder mit welchen Punktvorstrich-Regeln Expressions evaluiert werden.
-In diesem Schritt führt der sogenannte \textit{Parser} die \textit{Syntax Analysis} durch.
-Dabei werden die bei der Lexical Analysis gefundenen Tokens ineinander verschachtelt und in einen sogenannten \textit{Abstract Syntax Tree (AST)} überführt.
+In diesem Schritt führt der sogenannte \textit{Parser} die \textit{syntaktische Analyse} durch.
+Dabei werden die bei der lexikalischen Analyse gefundenen Tokens ineinander verschachtelt und in einen sogenannten \textit{Abstract Syntax Tree (AST)} überführt.
 
 \begin{figure}[H]
     \centering
@@ -76,26 +76,26 @@ sind im AST als \textit{Nodes} enthalten. Wenn man die Nodes des AST von unten n
 Eine Subtraktion kann zum Beispiel erst ausgeführt werden, wenn sowohl die linke als auch die rechte Zahl bekannt ist.
 Daher befindet sich, wie in Abbildung \ref{fig:syntax-tree} ersichtlich, die Subtraktion über den beiden benötigten Werten im AST.
 
-\section{Semantic Analysis}
-Semantik ist die Wissenschaft der Bedeutung von Wörtern einer Menschensprache. Bei einem Compiler geht es bei der \textit{Semantic Analysis} nicht um Bedeutung sondern um die Korrektheit von Expressions.
-Wird eine Variable nicht konform ihres Datentyps verwendet, zum Beispiel wenn zwei Strings dividiert werden sollen, wird dies während der Semantic Analysis entdeckt und gemeldet.
+\section{Semantische Analyse}
+Semantik ist die Wissenschaft der Bedeutung von Wörtern einer Menschensprache. Bei einem Compiler geht es bei der \textit{semantische Analyse} nicht um Bedeutung sondern um die Korrektheit von Expressions.
+Wird eine Variable nicht konform ihres Datentyps verwendet, zum Beispiel wenn zwei Strings dividiert werden sollen, wird dies während der semantischen Analyse entdeckt und gemeldet.
 Gegebenenfalls kann ein impliziter Cast, also ein impliziter Wechsel des Datentyps, hinzugefügt werden.
 So geben zum Beispiel manche Programmiersprachen bei der Division zweier Integers eine Float zurück.
 Auch werden unbekannte Variablen und Funktionen in diesem Schritt abgefangen.
 Weiter wird der Datentyp einer Node des AST an diese angebunden.
 
-\section{Code Generation} \label{sec:traditional_code_generation}
-\textit{Code Generation} ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss.
-Nun da die Eingabedatei als AST vorliegt, kann die Ausgabedatei generiert werden. Eine geläufige Methode der Code Generation ist die sogenannte \textit{Macro Expansion}.
+\section{Codegenerierung} \label{sec:traditional_code_generation}
+\textit{Codegenerierung} ist der finale und oft auch komplexeste Schritt, der ein Compiler ausführen muss.
+Nun da die Eingabedatei als AST vorliegt, kann die Ausgabedatei generiert werden. Eine geläufige Methode der Codegenerierung ist die sogenannte \textit{Macro Expansion}.
 Hierbei wird der AST von unten nach oben schrittweise mit Teilen an Ausgabecode ersetzt.
 Diese Ausgabecode-Teile sind häufig von den darunterliegenden Nodes abhängig. 
 
 MAYBE FIGURE OR LISTING AS EXAMPLE
 
-\section{Optimization}
-Code Generation ist zwar der letzte Schritt beim Kompilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. \textit{Optimization} geschieht zwischen jedem der genannten Schritte und dies häufig mehrmals.
+\section{Optimierung}
+Codegenerierung ist zwar der letzte Schritt beim Kompilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. \textit{Optimierung} geschieht zwischen jedem der genannten Schritte und dies häufig mehrmals.
 Dabei geht es darum die Ausgabedatei so effizient wie möglich zu machen. Effizient kann hierbei verschiedenes bedeuten.
 Die Ausgabedatei muss so schnell wie möglich ausgeführt werden, Memory sparsam verwenden und dazu noch eine möglichst kleine Datei umfassen. 
-Optimization reicht vom Überspringen der Kommentare und Umstellen von mathematischen Operationen, bis zum Entfernen von ungebrauchten Variablen und sogenannten Deadstores.
-Es muss von CPU-Registern profitiert, mit Heap-Memory umgegangen und von Inline-Funktionen Gebrauch gemacht werden. Compiler Optimization ist also sehr vielseitig und komplex.
-Wie Optimization genau aussehen kann, wird daher in dieser Maturaarbeit nicht weiter betrachtet.
+Optimierungsmethoden reichen vom Überspringen der Kommentare und Umstellen von mathematischen Operationen, bis zum Entfernen von ungebrauchten Variablen und sogenannten Deadstores.
+Es muss von CPU-Registern profitiert, mit Heap-Memory umgegangen und von Inline-Funktionen Gebrauch gemacht werden. Optimierung ist also sehr vielseitig und komplex.
+Wie Optimierung genau aussehen kann, wird daher in dieser Maturaarbeit nicht weiter betrachtet.

@@ -1,7 +1,7 @@
 \chapter{Der QHScompiler} \label{cha:4-QHS_Compiler}
 Der QHScompiler basiert auf einem von mir erdachten alternativen Aufbau für einen Compiler. Diesem Aufbau liegt eine einfache Idee zugrunde:
 Die Macros die der Macro Expansion aus Abschnitt \ref{sec:traditional_code_generation} sollen erst während der Kompilierung definiert werden. 
-Auf dieser Grundidee werde ich zwei Dinge aufbauen. Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesammte Syntax Analysis zu überspringen und keinen AST generieren zu müssen.
+Auf dieser Grundidee werde ich zwei Dinge aufbauen. Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesammte syntaktische Analyse zu überspringen und keinen AST generieren zu müssen.
 Zweitens sollte es rein durch die Veränderung von diesen Macros möglich sein jegliche Programmiersprache zu kompilieren. Man könnte also in einem Dokument verschiedene Programmiersprachen verwenden und
 müsste dazwischen bloss die jeweiligen Macros neu definieren. Das selbige gilt ebenfalls für die Ausgabesprache.
 Nur durch das Umdefinieren der Macros liesse sich die Ausgabesprache wechseln, ohne eine Änderung am Compiler vornehmen zu müssen.
@@ -22,11 +22,10 @@ Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus zugrunde, dess
     \label{fig:qhs-cycle}
 \end{figure}
 
-\section{Fetch} \label{sec:qhs-fetch}
-Der \textit{QHS-Zyklus} beginnt mit \textit{Fetch}. 
-Die Aufgabe von Fetch ist es die nächste Order, die verarbeitet werden soll, zu finden. In dieser Hinsicht gleicht Fetch der Lexical Analysis eines traditionellen Compilers.
-Beim ersten Fetch wird die erste Order aus der Eingabedatei extrahiert. Bei jedem weiteren Fetch wird nun die nächste Order aus der Eingabedatei geholt.
-Fetch ist auch dafür zuständig die nächste Order einem der drei Typen (Identifier, Instruction oder LiteralCode) zuzuordenen.
+\section{Die Fetch-Phase} \label{sec:qhs-fetch}
+Die Aufgabe der \textit{Fetch-Phase} ist es die nächste Order, die verarbeitet werden soll, zu finden. In dieser Hinsicht gleicht die Fetch-Phase der lexikalische Analyse eines traditionellen Compilers.
+Der QHS-Zyklus beginnt bei der Fetch-Phase, dabei wird die erste Order aus der Eingabedatei extrahiert. In jeder weiteren Fetch-Phase wird die nächste Order aus der Eingabedatei geholt.
+Die Fetch-Phase ist auch dafür zuständig die nächste Order einem der drei Typen (Identifier, Instruction oder LiteralCode) zuzuordnen.
 Diese Ordertypen sind mit folgenden RegEx definiert. Whitespaces dienen als Trennung zwischen Orders und werden ignoriert.
 
 \begin{table}[h]
@@ -45,12 +44,12 @@ Diese Ordertypen sind mit folgenden RegEx definiert. Whitespaces dienen als Tren
     \end{tabular}
 \end{table}
 
-Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum zwischen Zeichen differenziert wird. Während die Lexical Analysis traditionell zwischen vielen verschiedenen Tokens unterscheidet,
+Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum zwischen Zeichen differenziert wird. Während die lexikalische Analyse traditionell zwischen vielen verschiedenen Tokens unterscheidet,
 sind für den QHScompiler alle Zeichen (mit Ausnahme von \# und ") gleichbedeutend.
 
-Bei einem Fetch kommt die nächste Order wie erwähnt von der Eingabedatei.
-Es ist jedoch möglich Orders voranzustellen. Diese Orders werden beim nächsten Fetch zuerst gefunden. Dies geschieht mithilfe des \textit{FetchStacks}, auf den Orders gelegt werden können.
-Beim nächsten Fetch wird immer die oberste Order des FetchStacks geholt und daraufhin vom FetchStack enfernt.
+Normalerwiese erhält die Fetch-Phase die nächste Order aus der Eingabedatei. 
+Es ist jedoch möglich Orders der Eingabedatei voranzustellen. Diese Orders werden in der Fetch-Phase zuerst gefunden. Dies geschieht mithilfe des \textit{FetchStacks}, auf den Orders gelegt werden können.
+In der nächsten Fetch-Phase wird immer die oberste Order des FetchStacks geholt und daraufhin vom FetchStack entfernt.
 Die Eingabedatei befindet sich auf dem untersten Platz des FetchStacks und wird somit nur verwendet, wenn der Stack ansonsten komplett leer ist.
 %Eine Order kann während jedem der drei Schritte des QHS-Zyklus auf den FetchStack gelegt werden.
 
@@ -68,30 +67,31 @@ FETCHSTACK FIGURE
 Die Hauptanwendung des FetchStacks wird im Abschnitt \ref{sec:qhs-execute} erklärt.
 Die Kompilierung ist beendet, sobald keine Order mehr auf dem FetchStack vorhanden ist.
 
-\section{Validate} \label{sec:qhs-Validate}
-Nachdem die nächste Order durch Fetch gefunden wurde, wird diese Order an Validate weitergegeben. Während dem Validate Schritt kommt die \textit{OrderQueue} ins Spiel. Hierbei handelt es sich, wie der Name schon sagt, um eine Queue an Orders.
+\section{Die Validate-Phase} \label{sec:qhs-Validate}
+Nachdem die nächste Order in der  Fetch-Phase gefunden wurde, wird diese Order an die Validate-Phase weitergegeben. Während der Validate-Phase kommt die \textit{OrderQueue} ins Spiel.
+Dabei handelt es sich, wie der Name schon sagt, um eine Queue an Orders.
 Die Aufgabe der OrderQueue ist das Speichern und spätere Zurückholen von Orders. Die OrderQueue kann mit Instructions, die im Abschnitt \ref{sec:qhs-execute} weiter ausgeführt werden, aktiviert und deaktiviert werden.
-Wenn eine Order in den Validate Schritt gelangt und die OrderQueue aktiviert ist, wird diese Order der OrderQueue hinzugefügt. Der Execute Schritt wird danach übersprungen und der QHS-Zyklus beginnt von neuem bei Fetch.
-Die Order wurde, ohne Execute erreicht zu haben, auf der OrderQueue gespeichert. Später ist es mit Instructions möglich diese Order von der OrderQueue zu entfernen und auszuführen.
+Wenn eine Order in die Validate-Phase gelangt und die OrderQueue aktiviert ist, wird diese Order der OrderQueue hinzugefügt. Die Execute-Phase wird danach übersprungen und der QHS-Zyklus beginnt von neuem bei Fetch.
+Die Order wurde, ohne die Execute-Phase erreicht zu haben, auf der OrderQueue gespeichert. Später ist es mit Instructions möglich diese Order von der OrderQueue zu entfernen und auszuführen.
 
-Bestimmte Orders können jedoch orderQueue-proof, also immun gegen die OrderQueue, gemacht werden. Orders, die orderQueue-proof sind, werden an Execute weitergegeben, auch wenn die OrderQueue aktiv ist.
-Dieses Prinzip ist zum Beispiel besonders bei der Instruction, welche die OrderQueue wieder deaktiviert, wichtig. Da diese Instruction ansonsten nicht zu Execute gelänge und somit die OrderQueue nie deaktiviert würde.
+Bestimmte Orders können jedoch orderQueue-proof, also immun gegen die OrderQueue, gemacht werden. Orders, die orderQueue-proof sind, werden an die Execute-Phase weitergegeben, auch wenn die OrderQueue aktiv ist.
+Dieses Prinzip ist zum Beispiel besonders bei der Instruction, welche die OrderQueue wieder deaktiviert, wichtig. Da diese Instruction ansonsten nicht zur Execute-Phase gelänge und somit die OrderQueue nie deaktiviert würde.
 Zu beachten ist, dass LiteralCode nicht orderQueue-proof sein kann.
 
 MAYBE CODESTACK FIGURE
 
 Ist die OrderQueue deaktiviert oder die Order orderQueue-proof, wird diese Order an den letzten Schritt Execute weitergegeben.
 
-\section{Execute} \label{sec:qhs-execute}
-Execute ist der letzte Schritt des QHS-Zyklus. Hier wird der tatsächliche Assembly Code generiert. Je nach Typ der Order (Identifier, Instruction oder LiteralCode) läuft Execute sehr unterschiedlich ab.
-In den folgenden Abschnitten wird der Ablauf von Execute je nach Ordertyp erklärt.
+\section{Die Execute-Phase} \label{sec:qhs-execute}
+Während der Execute-Phase wird der tatsächliche Assembly Code generiert. Je nach Typ der Order (Identifier, Instruction oder LiteralCode) läuft die Execute-Phase sehr unterschiedlich ab.
+In den folgenden Abschnitten wird der Ablauf der Execute-Phase je nach Ordertyp erklärt.
 
 \subsection{Identifier}
 Identifier stehen für die am Anfang von Abschnitt \ref{cha:4-QHS_Compiler} erwähnten Macros. Diese Identifier sind in einem \textit{Environment} definiert.
-Hierbei handelt es sich um eine einfache Map, die einen Identifier mit einer Liste an Orders verknüpft.
+Bei einem Environment handelt es sich um eine einfache Map, die einen Identifier mit einer Liste an Orders verknüpft.
 %In anderen Programmiersprachen werden Environments auch als Scope bezeichnet.
-Wenn nun ein Identifier in den Execute Schritt kommt, werden die dazugehörigen Orders auf den FetchStack aus Abschnitt \ref{sec:qhs-fetch} gelegt.
-Bei den nächsten Fetches werden nun zuerst die zum Identifier gehörenden Orders nacheinander abgebaut. Einfach ausgedrückt wird der Identifier mit seinen Orders ersetzt.
+Wenn nun ein Identifier in die Execute-Phase gelangt, werden die dazugehörigen Orders auf den FetchStack aus Abschnitt \ref{sec:qhs-fetch} gelegt.
+Bei den nächsten Fetch-Phasen werden nun zuerst die zum Identifier gehörenden Orders nacheinander abgebaut. Einfach ausgedrückt wird der Identifier mit seinen Orders ersetzt.
 
 EXAMPLE FIGURE?
 
@@ -101,8 +101,8 @@ Ein neuer Identifier wird immer zum obersten Environment hinzugefügt. Definitio
 Bei der Abfrage nach einem Identifier wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden, wird ein Error ausgegeben.
 
 \subsection{Instructions}
-Instructions sind die komplexesten Orders für den Execute Schritt. 
-Wenn eine Instruction in den Execute-Schritt gelangt, wird die dazu definierte Funktion im QHScompiler ausgeführt.
+%Instructions sind die komplexesten Orders für die Execute-Phase. 
+Wenn eine Instruction in die Execute-Phase gelangt, wird die dazu definierte Funktion im QHScompiler ausgeführt.
 Diese Funktionen können Variablen im QHScompiler speichern, die OrderQueue aktivieren, Identifier definieren und vieles mehr. Instructions sind somit der Weg wie während der Kompilierung auf den QHScompiler einfluss genommen werden kann.
 In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten Instructions aufgelistet:
 
@@ -117,9 +117,9 @@ In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten In
     \#exitOrderQueue       & Deaktiviert die OrderQueue. \\ \hline
     \#assign               & Die erste Order der OrderQueue muss ein Identifier sein. Der Rest der Orders auf der OrderQueue wird als Definition für diesen Identifier festgelegt. \\ \hline
     \#assignToOne          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere Order von der OrderQueue genommen und als Definition für den Identifier verwendet. \\ \hline
-    \#force                & Die nächste Order wird nach Fetch sofort an Execute weitergegeben. Überspringt Validate und somit die OrderQueue. \\ \hline
+    \#force                & Die nächste Order wird nach der Fetch-Phase sofort an die Execute-Phase weitergegeben. Überspringt Validate und somit die OrderQueue. \\ \hline
     %\#lightForce           & Ähnlich wird \#force, jedoch wird diese nur ausgeführt, wenn \textbf{explain this cuz they don't know OrderQueue depth} \\ \hline
-    \#orderEnqueue         & Die nächste Order wird sofort der OrderQueue hinzugefügt, auch wenn diese orderQueue-proof wäre. Execute wird übersprungen. \\ \hline
+    \#orderEnqueue         & Die nächste Order wird sofort der OrderQueue hinzugefügt, auch wenn diese orderQueue-proof wäre. Die Execute-Phase wird übersprungen. \\ \hline
     \#orderFrontEnqueue    & Ähnlich wie \#orderEnqueue. Die Order wird jedoch auf den obersten Platz der OrderQueue gesetzt. \\ \hline
     \#deepFetch            & Die nächste Order der Eingabedatei wird oben auf den FetchStack gesetzt. Ermöglicht den Zugriff auf die Eingabedatei innerhalb eines Identifiers. \\ \hline
     \#queueFetch           & Die oberste Order der OrderQueue wird oben auf den FetchStack gesetzt. \\ \hline 
@@ -133,14 +133,14 @@ In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten In
 Der QHScompiler umfässt \textbf{33} Instructions, wobei \textbf{5} dieser nur fürs Debugging des Compilers dienen.
 
 \subsection{LiteralCode}
-LiteralCode ist der Weg wie der QHScompiler Assembly Code generiert. Dieser ist sehr einfach. Wenn LiteralCode in den Execute Schritt gelangt, wird alles, das zwischen den Satzzeichen steht, in die Ausgabedatei geschrieben.
+LiteralCode ist der Weg wie der QHScompiler Assembly Code generiert. Dieser ist sehr einfach. Wenn LiteralCode in die Execute-Phase gelangt, wird alles, das zwischen den Satzzeichen steht, in die Ausgabedatei geschrieben.
 Dies ist die einzige Möglichkeit für den QHScompiler Assembly Code zu generieren. Somit könnte nur durch das Ändern einzelner LiteralCode Orders die Ausgabeprache des QHScompilers komplett geändert werden.
 
 
-\section{Bringing it all together} \label{sec:qhs-bringing-it-together}
+\section{Definition der Macros} \label{sec:qhs-macro_definitions}
 Somit ist der QHScompiler komplett. Grundsätzlich lässt sich mit QHS bereits jedes Programm schreiben. 
 Jedoch habe ich in Tabelle \ref{tab:requirements} festgelegt, dass die Eingabesprache einen C ähnlichen Syntax aufweisen muss.
-Um dies zu ermöglichen muss man, wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} erwähnt, bestimmte Macros also Identifier definieren.
+Um dies zu ermöglichen, muss man, wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} erwähnt, bestimmte Macros also Identifier definieren.
 In diesem Abschnitt werde ich zeigen, wie sich diese Identifier auch für syntaktisch komplexe Programmiersprachen definieren lassen.
 Zur Veranschaulichung dienen Variablen und Funktionsdefinitionen.
 
@@ -330,8 +330,8 @@ int foo ( int param1 , int param2 )
 Hier lässt sich bereits das erstes Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der \textit{int} Identifier für die Definition einer Variable verwendet. 
 Das \textit{int} in der Auflistung \ref{eg:qhs-function_goal} würde daher vom QHScompiler als Definition für eine Variable verstanden werden. Der Unterschied zwischen Variable und Funktionsdefinition besteht hierbei in den Klammern,
 die auf den Namen folgen. Der QHScompiler müsste also beim \textit{int} Identifier nach vorne schauen, ob sich eine Klammer nach dem Namen befindet, und folglich eine Variable oder Funktionsdefinition ausführen.
-Bei einem traditionellen Compiler würde diese Überprüfung während der Syntax Analysis ausgeführt werden.
-Dies ist dem QHScompiler jedoch nicht möglich, da dieser, wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} erläutert, über keine Syntax Analysis verfügt.
+Bei einem traditionellen Compiler würde diese Überprüfung während der syntaktischen Analyse ausgeführt werden.
+Dies ist dem QHScompiler jedoch nicht möglich, da dieser, wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} erläutert, über keine syntaktische Analyse verfügt.
 Glücklicherweise lässt sich dieses erste Problem lösen, ohne eine Änderung am QHScompiler vorzunehmen.
 Die Lösung basiert darauf, beim \textit{int} Identifier sowohl eine Variable als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
 Daraufhin werden zwei Identifier definiert, erstens eine Klammer für eine Funktionsdefinition und zweitens ein Semikolon für die Definition einer Variable.
