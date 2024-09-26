@@ -171,7 +171,7 @@
     #enterOrderQueue #orderEnqueue #force name #orderEnqueue #force name #orderEnqueue #force #orderToLiteralCode #exitOrderQueue #assign
 
     name ": " defineCode "
-    " 
+" 
 #exitOrderQueue #assign
 
 #enterOrderQueue roDataVar #exitOrderQueue
@@ -186,7 +186,7 @@
     #enterOrderQueue #orderEnqueue #force name #orderEnqueue #force name #orderEnqueue #force #orderToLiteralCode #exitOrderQueue #assign
 
     name ": " defineSpecifier " " value "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue dataVar #exitOrderQueue
@@ -203,7 +203,7 @@
     #enterOrderQueue #orderEnqueue #force name #orderEnqueue #force name #orderEnqueue #force #orderToLiteralCode #exitOrderQueue #assign
 
     name ": " defineSpecifier " " value "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue bssVar #exitOrderQueue
@@ -217,7 +217,7 @@
     #enterOrderQueue #orderEnqueue #force name #orderEnqueue #force name #orderEnqueue #force #orderToLiteralCode #exitOrderQueue #assign
 
     name ": resb " size "
-    "
+"
 
 #exitOrderQueue #assign
 
@@ -236,7 +236,7 @@
     defineVarIdentifier
 
     "sub rsp, " size "
-    "
+"
 
     #pushEnv
     
@@ -252,14 +252,14 @@
 
             #enterOrderQueue registerA #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterA #exitOrderQueue #assign
             "mov " name ", " registerA "
-            "
+"
         #exitOrderQueue #assign 
     #exitOrderQueue #assign
 
     #enterOrderQueue ;
         #popEnv
         "
-        "
+"
     #exitOrderQueue #assign 
 #exitOrderQueue #assign
 
@@ -272,9 +272,9 @@
     #enterOrderQueue register #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterA #exitOrderQueue #assign
 
     "mov " register ", " value "
-    "
+"
     "mov " location ", " register "
-    "
+"
 #exitOrderQueue #assign
 
 #enterComment return on OrderQueue #exitComment
@@ -313,13 +313,13 @@
 
     #enterOrderQueue ".text" #exitOrderQueue #setAssemblySection 
     resetRBPoffset "
-    "
+"
     "global _start" "
-    "
+"
     "_start:" "
-    "
+"
     "mov rbp, rsp" "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue defineFuncIdentifier #exitOrderQueue
@@ -360,9 +360,9 @@
     resetRBPoffset
 
     funcLabel ":" "
-    "
+"
     "mov rbp, rsp" "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue funcBodyEnd #exitOrderQueue
@@ -405,7 +405,7 @@
     #enterOrderQueue address "[" #orderEnqueue #force newRBPvar "]" #exitOrderQueue #assign
 
     "sub rsp, " size "
-    "
+"
 
     #enterOrderQueue #lightForce size #lightForce name #lightForce sizeSpecifier " [rbp+" #lightForce currentRBPoffset "]" #exitOrderQueue
     defineVarIdentifier
@@ -463,13 +463,13 @@
     #orderFrontEnqueue argSize #assignToOne
 
     "push rbp" "
-    "
+"
     "call " funcLabel "
-    "
+"
     "pop rbp" "
-    "
+"
     "add rsp, " argSize "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue initArguments #exitOrderQueue
@@ -481,7 +481,7 @@
     #enterOrderQueue "argOffset" #orderEnqueue #force argSize #exitOrderQueue #changeIntVar
 
     "sub rsp, " argSize "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue argument #exitOrderQueue
@@ -516,7 +516,7 @@
 
         #enterComment clear rax as expr will write partially over it. eg al #exitComment
         "xor rax, rax" "
-        "
+"
         #enterOrderQueue #lightForce size #exitOrderQueue
         #enterOrderQueue #lightForce #deepFetch #exitOrderQueue
         exprInit
@@ -527,9 +527,9 @@
             #popEnv
 
             "mov rsp, rbp" "
-            "
+"
             "ret" "
-            "
+"
         #exitOrderQueue #assign
     #exitOrderQueue #assign
 
@@ -537,9 +537,9 @@
         #popEnv
 
         "mov rsp, rbp" "
-        "
+"
         "ret" "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -560,108 +560,108 @@
     #enterOrderQueue registerD #enterOrderQueue #lightForce size #exitOrderQueue getRegisterD #exitOrderQueue #assign
 
     "mov " registerA ", " first "
-    "
+"
 
     #enterOrderQueue +
         "add " registerA ", " #deepFetch "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue -
         "sub " registerA ", " #deepFetch "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue *
         "mov " registerD ", " #deepFetch "
-        "
+"
         "mul " registerD "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue /
         "mov " registerB ", " #deepFetch "
-        "
+"
         "xor rdx, rdx" "
-        "
+"
         "div " registerB "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue ==
         "cmp " registerA ", " #deepFetch "
-        "
+"
         "sete dl" "
-        "
+"
         "xor rax, rax" "
-        "
+"
         "mov al, dl" "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue !=
         "cmp " registerA ", " #deepFetch "
-        "
+"
         "setne dl" "
-        "
+"
         "xor rax, rax" "
-        "
+"
         "mov al, dl" "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue <
         "cmp " registerA ", " #deepFetch "
-        "
+"
         "setl dl" "
-        "
+"
         "xor rax, rax" "
-        "
+"
         "mov al, dl" "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue <=
         "cmp " registerA ", " #deepFetch "
-        "
+"
         "setle dl" "
-        "
+"
         "xor rax, rax" "
-        "
+"
         "mov al, dl" "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue >
         "cmp " registerA ", " #deepFetch "
-        "
+"
         "setg dl" "
-        "
+"
         "xor rax, rax" "
-        "
+"
         "mov al, dl" "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue >=
         "cmp " registerA ", " #deepFetch "
-        "
+"
         "setge dl" "
-        "
+"
         "xor rax, rax" "
-        "
+"
         "mov al, dl" "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue &&
         "and " registerA ", " #deepFetch "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue ||
         "or " registerA ", " #deepFetch "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -678,7 +678,7 @@
         #popEnv
         #enterOrderQueue registerA #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterA #exitOrderQueue #assign
         "mov " var ", " registerA "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -696,7 +696,7 @@
         #enterOrderQueue registerA #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterA #exitOrderQueue #assign
 
         "add " var ", " registerA "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -714,7 +714,7 @@
         #enterOrderQueue registerA #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterA #exitOrderQueue #assign
 
         "sub " var ", " registerA "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -733,13 +733,13 @@
         #enterOrderQueue registerD #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterD #exitOrderQueue #assign
 
         "mov " registerD ", " registerA "
-        "
+"
         "mov " registerA ", " var "
-        "
+"
         "mul " registerD "
-        "
+"
         "mov " var ", " registerA "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -758,15 +758,15 @@
         #enterOrderQueue registerB #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterB #exitOrderQueue #assign
 
         "mov " registerB ", " registerA "
-        "
+"
         "xor rdx, rdx" "
-        "
+"
         "mov " registerA ", " var "
-        "
+"
         "div " registerB "
-        "
+"
         "mov " var ", " registerA "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -791,7 +791,7 @@
     #enterOrderQueue registerA #enterOrderQueue #orderEnqueue #force size #exitOrderQueue getRegisterA #exitOrderQueue #assign
 
     startLabel ":" "
-    "
+"
 
     #pushEnv
 
@@ -804,9 +804,9 @@
     #enterOrderQueue )
         #popEnv
         "test " registerA ", " registerA "
-        "
+"
         "jz " endLabel "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue {
@@ -817,9 +817,9 @@
         #popEnv
         #enterComment } = end of while loop #exitComment
         "jmp " startLabel "
-        "
+"
         endLabel ":" "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -842,9 +842,9 @@
     #enterOrderQueue )
         #popEnv
         "test " registerA ", " registerA "
-        "
+"
         "jz " endLabel "
-        "
+"
     #exitOrderQueue #assign
 
     #enterOrderQueue {
@@ -855,7 +855,7 @@
         #popEnv
         #enterComment } = end of if statement #exitComment
         endLabel ":" "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -872,9 +872,9 @@
     #enterComment expression result is still stored in registerA #exitComment
     #enterComment jumps on if expression is true; therefore when the if was executed #exitComment
     "test " registerA ", " registerA "
-    "
+"
     "jnz " endLabel "
-    "
+"
 
     #enterOrderQueue {
         #enterComment { = none #exitComment
@@ -884,7 +884,7 @@
         #popEnv
         #enterComment } = end of else statement #exitComment
         endLabel ":" "
-        "
+"
     #exitOrderQueue #assign
 #exitOrderQueue #assign
 
@@ -892,11 +892,11 @@
 #enterOrderQueue exit #exitOrderQueue
 #enterOrderQueue
     "mov rax, 60" "
-    "
+"
     "mov rdi, 0" "
-    "
+"
     "syscall" "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue rawPrint #exitOrderQueue
@@ -905,15 +905,15 @@
     #orderFrontEnqueue messageLength #assignToOne 
 
     "mov rax, 1" "
-    "
+"
     "mov rdi, 1" "
-    "
+"
     "mov rsi, " message "
-    "
+"
     "mov rdx, " messageLength "
-    "
+"
     "syscall" "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue print #exitOrderQueue
@@ -924,25 +924,25 @@
     #enterOrderQueue register #enterOrderQueue #orderEnqueue #force length #exitOrderQueue getRegisterA #exitOrderQueue #assign
 
     "sub rsp, " length "
-    "
+"
     "mov " register ", " message "
-    "
+"
     "mov [rsp], " register "
-    "
+"
 
     #enterOrderQueue "rsp" length #exitOrderQueue rawPrint "
-    "
+"
 
     "add rsp, " length "
-    "
+"
 #exitOrderQueue #assign
 
 #enterOrderQueue println #exitOrderQueue
 #enterOrderQueue
     print "
-    "
+"
 
     #enterOrderQueue "0xa" "1" #exitOrderQueue print "
-    "
+"
 
 #exitOrderQueue #assign

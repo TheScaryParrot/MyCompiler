@@ -24,6 +24,8 @@ class AssemblyCode
         // Remove empty lines
         if (this->currentSection->back() == '\n' && code.front() == '\n')
         {
+            if (code == "\n") return;
+
             code = code.substr(1);
         }
 
