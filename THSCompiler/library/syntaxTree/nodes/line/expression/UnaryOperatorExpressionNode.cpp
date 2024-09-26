@@ -22,6 +22,7 @@ class UnaryOperatorExpressionNode : public AbstractExpressionNode
     virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
     {
         // TODO: Unary operators
+        Logger.Log("Unary operators are not implemented yet", Logger::ERROR);
         return nullptr;
 
         std::shared_ptr<Variable> variable = this->value->TraverseExpression(codeGenerator, assemblyCode);
