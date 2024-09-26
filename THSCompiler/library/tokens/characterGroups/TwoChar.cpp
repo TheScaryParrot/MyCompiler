@@ -16,7 +16,8 @@ class TwoChar
         this->second = second;
     }
 
-    TwoChar(char* chars)
+    // For "aa", length is 3 because of the null terminator
+    TwoChar(const char chars[3])
     {
         this->first = chars[0];
         this->second = chars[1];

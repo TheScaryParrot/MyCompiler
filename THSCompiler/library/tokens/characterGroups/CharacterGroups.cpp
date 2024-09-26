@@ -32,13 +32,12 @@ static class CharacterGroups
     CharacterGroup PARENTHESIS_CLOSE = CharacterGroup(std::vector<TwoChar>{')'});
     CharacterGroup SEPERATOR = CharacterGroup(std::vector<TwoChar>{','});
 
-    // TODO: Add better TwoChar constructor to accept '==' instead of '=', '='
-    CharacterGroup EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('=', '=')});
-    CharacterGroup NOT_EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('!', '=')});
+    CharacterGroup EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{"=="});
+    CharacterGroup NOT_EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{"!="});
     CharacterGroup GREATER_THAN_OPERATOR = CharacterGroup(std::vector<TwoChar>{'>'});
     CharacterGroup LESS_THAN_OPERATOR = CharacterGroup(std::vector<TwoChar>{'<'});
-    CharacterGroup GREATER_THAN_OR_EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('>', '=')});
-    CharacterGroup LESS_THAN_OR_EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('<', '=')});
+    CharacterGroup GREATER_THAN_OR_EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{">="});
+    CharacterGroup LESS_THAN_OR_EQUAL_OPERATOR = CharacterGroup(std::vector<TwoChar>{"<="});
 
     CharacterGroup ADD_OPERATOR = CharacterGroup(std::vector<TwoChar>{'+'});
     CharacterGroup SUB_OPERATOR = CharacterGroup(std::vector<TwoChar>{'-'});
@@ -47,24 +46,24 @@ static class CharacterGroups
     CharacterGroup MOD_OPERATOR = CharacterGroup(std::vector<TwoChar>{'%'});
 
     CharacterGroup ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{'='});
-    CharacterGroup ADD_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('+', '=')});
-    CharacterGroup SUB_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('-', '=')});
-    CharacterGroup MUL_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('*', '=')});
-    CharacterGroup DIV_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('/', '=')});
-    CharacterGroup MOD_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('%', '=')});
+    CharacterGroup ADD_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{"+="});
+    CharacterGroup SUB_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{"-="});
+    CharacterGroup MUL_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{"*="});
+    CharacterGroup DIV_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{"/="});
+    CharacterGroup MOD_ASSIGN_OPERATOR = CharacterGroup(std::vector<TwoChar>{"%="});
 
-    CharacterGroup INCREMENT_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('+', '+')});
-    CharacterGroup DECREMENT_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('-', '-')});
+    CharacterGroup INCREMENT_OPERATOR = CharacterGroup(std::vector<TwoChar>{"++"});
+    CharacterGroup DECREMENT_OPERATOR = CharacterGroup(std::vector<TwoChar>{"--"});
 
     CharacterGroup NEGATE_OPERATOR = CharacterGroup(std::vector<TwoChar>{'-'});
 
     CharacterGroup NOT_OPERATOR = CharacterGroup(std::vector<TwoChar>{'!'});
-    CharacterGroup AND_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('&', '&')});
-    CharacterGroup OR_OPERATOR = CharacterGroup(std::vector<TwoChar>{TwoChar('|', '|')});
+    CharacterGroup AND_OPERATOR = CharacterGroup(std::vector<TwoChar>{"&&"});
+    CharacterGroup OR_OPERATOR = CharacterGroup(std::vector<TwoChar>{"||"});
 
-    CharacterGroup SINGLE_LINE_COMMENT = CharacterGroup(std::vector<TwoChar>{TwoChar('/', '/')});
-    CharacterGroup MULTI_LINE_COMMENT_START = CharacterGroup(std::vector<TwoChar>{TwoChar('/', '*')});
-    CharacterGroup MULTI_LINE_COMMENT_END = CharacterGroup(std::vector<TwoChar>{TwoChar('*', '/')});
+    CharacterGroup SINGLE_LINE_COMMENT = CharacterGroup(std::vector<TwoChar>{"//"});
+    CharacterGroup MULTI_LINE_COMMENT_START = CharacterGroup(std::vector<TwoChar>{"/*"});
+    CharacterGroup MULTI_LINE_COMMENT_END = CharacterGroup(std::vector<TwoChar>{"*/"});
 
     CharacterGroup DOT = CharacterGroup(std::vector<TwoChar>{'.'});
 
