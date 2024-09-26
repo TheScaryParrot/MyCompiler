@@ -113,12 +113,12 @@ Als Beispiel seien folgende Identifier definiert:
 Mit diesen Identifiern, wird nun folgender Code kompiliert:
 
 \begin{lstlisting}[language=QHS, caption=QHS Code zur Veranschaulichung von Identifiers]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 "lit0.1"
 id1
 "lit0.2" id2
 id3
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 "lit0.1"
 "lit1"
 "lit0.2" #inst2.1 "lit2" #inst2.2
@@ -148,11 +148,12 @@ In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten In
     
     \begin{tabularx}{\textwidth}{l|X}
     \textbf{Instruction}                             & \textbf{Beschreibung} \\ \hline
-    {\listingFont\selectfont \#enterOrderQueue}      & Aktiviert die \textit{OrderQueue}. \\ \hline
-    {\listingFont\selectfont \#exitOrderQueue}       & Deaktiviert die \textit{OrderQueue}. \\ \hline
+    {\listingFont\selectfont \#enterOrderQueue}      & Aktiviert die \textit{OrderQueue}. Diese Instruction ist \textit{orderQueue-proof}. \\ \hline
+    {\listingFont\selectfont \#exitOrderQueue}       & Deaktiviert die \textit{OrderQueue}. Diese Instruction ist \textit{orderQueue-proof}. \\ \hline
     {\listingFont\selectfont \#assign}               & Die erste \textit{Order} der \textit{OrderQueue} muss ein Identifier sein. Der Rest der \textit{Orders} auf der \textit{OrderQueue} wird als Definition für diesen Identifier festgelegt. \\ \hline
     {\listingFont\selectfont \#assignToOne}          & Wie \#assign, jedoch wird nach dem Identifier nur eine weitere \textit{Order} von der \textit{OrderQueue} genommen und als Definition für den Identifier verwendet. \\ \hline
-    {\listingFont\selectfont \#force}                & Die nächste \textit{Order} wird nach der Fetch-Phase sofort an die Execute-Phase weitergegeben. Überspringt Validate und somit die \textit{OrderQueue}. \\ \hline
+    {\listingFont\selectfont \#force}                & Die nächste \textit{Order} wird nach der Fetch-Phase sofort an die Execute-Phase weitergegeben. Überspringt Validate und somit die \textit{OrderQueue}.
+                                                       Diese Instruction ist \textit{orderQueue-proof}. \\ \hline
     %{\listingFont\selectfont \#lightForce}           & Ähnlich wird \#force, jedoch wird diese nur ausgeführt, wenn \textbf{explain this cuz they don't know OrderQueue depth} \\ \hline
     {\listingFont\selectfont \#orderEnqueue}         & Die nächste \textit{Order} wird sofort dem Ende der \textit{OrderQueue} hinzugefügt, auch wenn diese \textit{Order} \textit{orderQueue-proof} wäre. Die Execute-Phase wird übersprungen. \\ \hline
     {\listingFont\selectfont \#orderFrontEnqueue}    & Ähnlich wie \#orderEnqueue. Die \textit{Order} wird jedoch an den ersten Platz der \textit{OrderQueue} gesetzt. \\ \hline
@@ -190,7 +191,7 @@ viele unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren. I
 für den QHScompiler definieren lässt.
 \fi
 
-\subsection{Abkürzungen}
+\subsection{Die QHS Notation} \label{sec:qhs-notation}
 In diesem Abschnitt wird viel QHS-Code als Beispiel verwendet.
 Um die Leserlichkeit von QHS zu verbessern, werden ein zuerst paar Identifier anstelle der umständlichen Instructions definiert.
 Diese Identifier sind in der folgenden Tabelle \ref{tab:shortcuts} aufgeführt.
@@ -198,7 +199,7 @@ Diese Identifier sind in der folgenden Tabelle \ref{tab:shortcuts} aufgeführt.
 {
 \begin{table}[H]
     \centering
-    \caption{Identifier als Abkürzung von Instruction}
+    \caption{Identifier als Abkürzung von Instructions}
     \vspace{3mm} % Adjust the height of the space between caption and tabular
     \label{tab:shortcuts}
     
@@ -223,67 +224,218 @@ dass der Identifier {\listingFont\selectfont X} zu den \textit{Orders} {\listing
 Auch wird bei längeren Identifier-Definitionen wird zuerst der zu definierende Identifier getrennt von den restlichen \textit{Orders} der \textit{OrderQueue} hinzugefügt.
 Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
 
-\subsection{HOW TO IDENTIFIER DEFINITION}
-Wie die Definition von Identifiern abläuft, soll hier an einem Beispiel schrittweise erklärt werden.
+\subsection{Beispiele zu Identifier-Definitionen}
+Wie die Definition von Identifiern ablaufen kann, soll in diesem Abschnitt an einigen Beispielen erklärt werden.
 
-\begin{lstlisting}[language=QHS, caption=EINGABE BEISPIEL, numbers=left, stepnumber=1]
+{
+\begin{multicols}{2}
+\begin{lstlisting}[language=QHS, label=eg:howto_id1-3, caption=Beispiel zu gewöhnlichen Identifier-Definitionen, numbers=left, stepnumber=1]
+%\ruleEingabe%
 [ id1 "lit1" ] ->
-[ id2 "lit2" #inst2 id1 ] >>
-[ id3 #inst3 ] >>
-[ id4 "lit4.1" ] [ "lit4.2" ] >>
+[ id2 "lit2.1" "lit2.2" id1 ] >>
+[ id3 "lit3.1" ] [ "lit3.2" ] >>
 
+id1 \n
+id2 \n
+id3
+
+%\ruleAusgabe%
+
+lit1
+lit2.1 lit2.2 lit1
+lit3.1 lit3.2
+\end{lstlisting}
+\columnbreak
+\iffalse
+    In Linie 1 wird zuerst die \textit{OrderQueue} geöffnet und die Orders {\selectListingFont id1} und {\selectListingFont "lit1"{}} hinzugefügt.
+    Schliessen sieht die \textit{OrderQueue} wie folgt aus:
+    \centerline{\selectListingFont id1 "lit1"{}}
+    Mit {\selectListingFont ->} wird die erste \textit{Order} der \textit{OrderQueue} ({\selectListingFont id1}) zu der zweiten \textit{Order} ({\selectListingFont "lit1"{}}) definiert.
+    \break
+    In Linie 2 kommt {\selectListingFont id2}, {\selectListingFont "lit2"{}}, {\selectListingFont \#inst2} und {\selectListingFont id1} auf die \textit{OrderQueue}. Diese sieht daraufhin wie folgt aus:
+    \centerline{\selectListingFont id2 "lit2"{} \#inst2 id1}
+    Der Identifier {\selectListingFont >>} definiert die erste \textit{Order} der \textit{OrderQueue} ({\selectListingFont id2}) zu allen restlichen \textit{Order} auf der \textit{OrderQueue}.
+    Die Definition von {\selectListingFont id2} ist daraufhin:
+    \centerline{\selectListingFont id2 = "lit2"{} \#inst2 id1}
+\fi
+Die Linien 1 und 2 definieren die folgenden beiden Identifier: \break
+\centerline{\selectListingFont id1 = "lit1"{}}
+\centerline{\selectListingFont id2 = "lit2.1"{} "lit2.2"{} id1}
+In Linie 3 wird die \textit{OrderQueue} zwischendurch deaktiviert und wieder aktiviert.
+Dies hat keinen Einfluss auf die Kompilierung und wird daher, wie in Abschnitt \ref{sec:qhs-notation} erwähnt, für die Verbesserung der Leserlichkeit von langen Identifier-Definitionen verwendet.
+Die \textit{OrderQueue} sieht vor dem {\selectListingFont >>} wie folgt aus, wobei das linkste Element das erste darstellt:  \break
+\centerline{\selectListingFont id3 "lit3.1"{} "lit3.2"{}}
+Wie gewohnt wird {\selectListingFont id3} mit {\selectListingFont >>} definiert: \break
+\centerline{\selectListingFont id3 = "lit3.1"{} "lit3.2"{}}
+\end{multicols}
+}
+
+{
+\begin{multicols}{2}
+\begin{lstlisting}[language=QHS, caption=Beispiel zu {\selectListingFont \#assignToOne}, numbers=left, stepnumber=1]
+%\ruleEingabe%
+[ id4 "lit4" ] >>
 [ id5 "lit5" id6 ] ->
 [ "lit6" ] >>
 
-[ "lit7" ]
-#orderFrontEnqueue id7
->>
+id4 \n
+id5 \n
+id6
 
+
+
+%\ruleAusgabe%
+
+lit4
+lit5
+lit6
+\end{lstlisting}
+\columnbreak
+Die Definition von {\selectListingFont id4} ist hier ähnlich wie in Linie 1 der Auflistung \ref{eg:howto_id1-3}.
+Jedoch wird hier anstelle von {\selectListingFont ->} ({\selectListingFont \#assignToOne}) der Identifier {\selectListingFont >>} ({\selectListingFont \#assign}) verwendet.
+Da sich in beiden Fällen jedoch nur eine weitere \textit{Order} neben dem Identifier auf der \textit{OrderQueue} befinden, macht die Verwendung von {\selectListingFont >>} keinen Unterschied.
+Bei Linie 2 und 3 ist dies jedoch anders. Zuerst werden drei \textit{Orders} auf die \textit{OrderQueue} gelegt. Der Identifier {\selectListingFont ->} definiert daraufhin {\selectListingFont id5} wie folgt: \break
+\centerline{\selectListingFont id5 = "lit5"{}}
+Der Identifier {\selectListingFont id6} verweilt auf der \textit{OrderQueue}.
+Erst nachdem {\selectListingFont "lit6"{}} der \textit{OrderQueue} hinzugefügt wurde, wird {\selectListingFont id6} durch {\selectListingFont >>} definiert: \break
+\centerline{\selectListingFont id6 = "lit6"{}}
+\end{multicols}
+}
+
+{
+\begin{multicols}{2}
+\begin{lstlisting}[language=QHS, caption=Beispiel zu {\selectListingFont \#orderFrontEnqueue}, numbers=left, stepnumber=1]
+%\ruleEingabe%
+[ "lit7.1" ]
+#orderFrontEnqueue id7
+[ "lit7.2" ] >>
+
+id7
+
+
+
+%\ruleAusgabe%
+
+lit7.1 lit7.2
+\end{lstlisting}
+\columnbreak
+Zuerst gelangt {\selectListingFont "lit7.1"{}} auf die \textit{OrderQueue}.
+Daraufhin wird mit der Instruction {\selectListingFont \#orderFrontEnqueue} der Identifier {\selectListingFont id7} auf die erste Position der \textit{OrderQueue} gesetzt.
+Die \textit{OrderQueue} sieht daraufhin wie folgt aus.
+\centerline{\selectListingFont id7 "lit7.1"{}}
+Der LiteralCode {\selectListingFont "lit7.2"{}} wird normal hinten an die \textit{OrderQueue} angefügt.
+Da sich der Identifer {\selectListingFont id7} auf dem ersten Platz der \textit{OrderQueue} befinden, kann dieser definiert werden: \break
+\centerline{\selectListingFont id7 = "lit7.1"{} "lit7.2"{}}
+\end{multicols}
+}
+
+{
+\begin{multicols}{2}
+\begin{lstlisting}[language=QHS, label=eg:howto-id8, caption=Beispiel zu doppelter Aktivierung der \textit{OrderQueue}, numbers=left, stepnumber=1]
+%\ruleEingabe%
 [ id8 ]
 [
-    id1
-    "lit8.1" \n
-
+    "lit8.1"
     [ "lit8.2" ]
 ] >>
 
-[ id9 ]
+id8
+
+
+%\ruleAusgabe%
+
+lit8.1
+Die OrderQueue enthält: "lit8.2"
+\end{lstlisting}
+\columnbreak
+In Auflistung \ref{eg:howto-id8} wird eine Identifier-Definition auf mehrere Zeilen geteilt. Dies dient der besseren Leserlichkeit und kompiliert gleich wie eine Definition auf nur einer Linie.
+Auf Linie 4 werden {\selectListingFont [} ({\selectListingFont \#enterOrderQueue}) und {\selectListingFont ]} ({\selectListingFont \#exitOrderQueue}) innerhalb einer bereits aktiven \textit{OrderQueue} verwendet.
+Im QHScompiler ist dies so implementiert, dass die beiden Identifier nicht ausgeführt und normal der \textit{OrderQueue} hinzugefügt werden. Die \textit{OrderQueue} enthält nach Linie 4 folgende Orders: \break
+\centerline{\selectListingFont id8 "lit8.1"{} [ "lit8.2"{} ] }
+Die Identifier {\selectListingFont [} und {\selectListingFont ]} gelangen normal in die \textit{OrderQueue} und damit auch in die Definition von {\selectListingFont id8}: \break
+\centerline{\selectListingFont id8 = "lit8.1"{} [ "lit8.2"{} ] }
+\end{multicols}
+}
+
+{
+\begin{multicols}{2}
+\begin{lstlisting}[language=QHS, label=eg:howto-id9, caption=Beispiel zu {\selectListingFont \#force} , numbers=left, stepnumber=1]
+%\ruleEingabe%
+[ id9 "lit9" ] >>
+
+[ id10 ]
 [
     ! id9
     [ ! id9 ]
 ] >>
 
+id9  \n
+id10
+
+
+
+
+%\ruleAusgabe%
+
+lit9
+lit9
+Die OrderQueue enthält: "lit9"
 \end{lstlisting}
+\columnbreak
+Zuerst wird in Linie 1 der Identifier {\selectListingFont id9} wie gewohnt definiert. In Linie 5 wird der Identifier {\selectListingFont !} ({\selectListingFont \#force}) verwendet.
+Die Instruction {\selectListingFont \#force} ist orderQueue-proof und zwingt den QHScompiler dazu, die nächste Order an die Execute-Phase weiterzugeben, obwohl die \textit{OrderQueue} aktiv ist.
+Der Identifier {\selectListingFont id9} wird daher mit seiner Definition ersetzt. Die \textit{OrderQueue} sieht nach Linie 5 wie folgt aus: \break
+\centerline{\selectListingFont id10 "lit9"{}}
+In Linie 6 wird daraufhin der Identifer {\selectListingFont !} erneut verwendet. Dieses Mal jedoch innerhalb einer doppelten Aktivierung der \textit{OrderQueue}, wie in Beispiel \ref{eg:howto-id8}.
+In diesem Fall gelangen auch Orders die \textit{orderQueue-proof} sind, nicht zur Execute-Phase. Der Identifier {\selectListingFont !} wird normal der \textit{OrderQueue} hinzugefügt.
+Die folgende Definition von {\selectListingFont id10} lautet: \break
+\centerline{\selectListingFont id10 = "lit9"{} [ ! id9 ]}
+\end{multicols}
+}
 
-\begin{lstlisting}[language=QHS, caption=ENVIRONMENTS BEISPIEL, numbers=left, stepnumber=1]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
-[ id1 "lit1" ] >>
-[ id2 "lit2" ] >>
+{
+\begin{multicols}{2}
+\begin{lstlisting}[language=QHS, caption=Beispiel zu \textit{Environments}, numbers=left, stepnumber=1]
+%\ruleEingabe%
+[ id11 "lit11.1" ] >>
+[ id12 "lit12" ] >>
 
-id1 " " id2 \n
+id11 " " id12 \n
 
 #pushEnv
 
-[ id1 "lit3" ] >>
-
-id1 " " id2
+[ id11 "lit11.2" ] >>
+id11 " " id12 \n
 
 #popEnv
 
-id1 " " id2
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
-lit1 lit2
-lit3 lit2
-lit1 lit2
+id11 " " id12
+%\ruleAusgabe%
+lit11.1 lit12
+lit11.2 lit12
+lit11.1 lit12
 \end{lstlisting}
+\columnbreak
+Die Identifier {\selectListingFont id11} und {\selectListingFont id12} werden gewöhnlich definiert und angwendet. Daraufhin wird mit {\selectListingFont \#pushEnv} ein neues \textit{Environment} hinzugefügt.
+In diesem \textit{Environment} wird {\selectListingFont id11} umdefiniert. In Linie 11 wird die neuste Definition der beiden Identifier verwendet. Für {\selectListingFont id11} ist dies: \break
+\centerline{\selectListingFont id11 = "lit11.2"}
+Der Identifier {\selectListingFont id12} ist immer noch wie folgt definiert: \break
+\centerline{\selectListingFont id12 = "lit12"}
+Mit der Instruction {\selectListingFont \#popEnv} wird das neuste \textit{Environment} gelöscht und die Umdefinition von {\selectListingFont id11} vergessen.
+Die Definition vom Identifier {\selectListingFont id11} ist wieder:
+\centerline{\selectListingFont id11 = "lit11.1"}
+\end{multicols}
+}
 
-\subsection{Identifier Parameter und Rückgabewert}
-Mit den \#enterOrderQueue (rsp. [ ) und \#exitOrderQueue (rsp. ] ) Instructions kann innerhalb eines Identifiers die \textit{OrderQueue} verwendet werden. Dies ermöglicht eine Art von Parameter und Rückgabewert für Identifier.
+
+
+\subsection{Parameter und Rückgabewert für Identifier}
+Mit den \#enterOrderQueue (resp. [ ) und \#exitOrderQueue (resp. ] ) Instructions kann innerhalb eines Identifiers die \textit{OrderQueue} verwendet werden. Dies ermöglicht eine Art von Parameter und Rückgabewert für Identifier.
 Parameter werden vor dem Aufruf eines Identifiers der \textit{OrderQueue} hinzugefügt. Diese können dann innerhalb des Identifiers verwendet werden.
 Genauso kann der Identifier \textit{Orders} der \textit{OrderQueue} hinzufügen und diese somit zurückgeben.
 
 \begin{lstlisting}[language=QHS, caption=Verwendung von Parametern und Rückgabewert eines Identifiers]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 [ foo ]
 [
     #orderFrontEnqueue param1 ->    /* param1 = erstes Argument */
@@ -300,7 +452,7 @@ foo                                 /* foo wird ausgeführt */
                                     geholt und ausgeführt */
 
 
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 Argument 1 : Argument 2
 Rückgabewert
 \end{lstlisting}
@@ -314,13 +466,13 @@ Dann wird für die Variable ein Identifier definiert, der zur Position der Varia
 Mit LiteralCode lässt sich dies wie folgt in QHS ausdrücken:
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit LiteralCode]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 "sub rsp, 4" \n
 [ a "[rbp-4]" ] >>      /* a = "[rbp-4]" */
 
 "add " a ", 5"
 
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 sub rsp, 4
 add [rbp-4], 5
 \end{lstlisting}
@@ -330,7 +482,7 @@ Dieser \textit{var} Identifier nimmt die Grösse der Variable als Argument über
 wird der Name der Variable mit der \#deepFetch Instruction beschafft.
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit \textit{var} Identifier]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 [ var ]
 [
     #orderFrontEnqueue size ->          /* size = argument1 */
@@ -345,7 +497,7 @@ wird der Name der Variable mit der \#deepFetch Instruction beschafft.
 
 "add " a ", 5"
     
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 sub 4
 add [rbp-4], 5
 \end{lstlisting}
@@ -355,7 +507,7 @@ Dafür wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 defin
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=QHS, label=eg:qhs-vardefinition, caption=Definition einer Variable mit rbpOffset]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 [ rbpOffset "0" ] >>                    /* rbpOffset = "0" */
 
 [ var ]
@@ -376,7 +528,7 @@ Dafür wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 defin
 "add " a ", 5"
 "sub " b ", 10"
     
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 sub rsp, 4
 sub rsp, 8
 add [rbp-4], 5
@@ -387,7 +539,7 @@ sub [rbp-12], 10
 Zuletzt lässt sich das umständliche Hinzufügen der Grösse der Variable sowie der \textit{var} Identifier unter einem neuen Identifier zusammenfassen. Dies ist passenderweise die bekannte Bezeichnung für den Typen der Variable.
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit \textit{int} Identifier]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 (...)
 
 [ int ] 
@@ -401,7 +553,7 @@ int b
 "add " a ", 5"
 "sub " b ", 10"
         
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 sub rsp, 4
 sub rsp, 8
 add [rbp-4], 5
@@ -506,13 +658,13 @@ Nun fehlt nur noch etwas an der Funktionsdefinition: Der Funktionsbody. Dieser i
 Der gesamte Code innerhalb des Body wird ganz normal vom QHScompiler ausgeführt und an die Ausgabedatei angehängt. Das Endresultat sieht wie folgt aus:
 
 \begin{lstlisting}[language=QHS, caption=Finale Definition einer Funktion in QHS]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 int foo ( int param1 , int param2 )
 {
     "add " param1 ", " param2
 }
 
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 foo:
 add [rbp+16], [rbp+20]
 \end{lstlisting}

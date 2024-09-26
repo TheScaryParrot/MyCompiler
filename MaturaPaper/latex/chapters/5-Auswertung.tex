@@ -221,7 +221,7 @@ Führt die Kompilierung doch zu einer Fehlermeldung, ist diese nicht immer beson
 %Weiter sind die Fehlermeldungen des QHScompilers nicht immer besonders klar.
 
 \begin{lstlisting}[language=QHS, caption=QHS mit falscher Anzahl Argumente, label=eg:qhs-faulty-syntax-3]
-%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+%\ruleEingabe%
 void foo ( ) { }
 
 start
@@ -232,7 +232,7 @@ start
     exit ;
 }
 
-%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+%\ruleAusgabe%
 [ERROR] Cannot dequeue, OrderQueue is empty!
 [ERROR] Expected LiteralCode for #literalToIdentifier at OrderQueue second, got: NONE
 [ERROR] Cannot dequeue, OrderQueue is empty!

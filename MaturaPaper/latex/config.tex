@@ -34,6 +34,7 @@
 \renewcommand{\lstlistlistingname}{Auflistungsverzeichnis}
 \usepackage{xcolor}
 \newcommand*{\listingFont}{\ttfamily}
+\newcommand*{\selectListingFont}{\listingFont\selectfont}
 \lstdefinelanguage{QHS}
 {
     %morekeywords={\textgreater\textgreater},
@@ -69,6 +70,11 @@
     numberstyle=\listingFont
 }
 
+% Used for lines in listings
+\newcommand*{\ruleEingabe}{\noindent\hrulefill { }Eingabe \noindent\hrulefill}
+\newcommand*{\ruleAusgabe}{\noindent\hrulefill { }Ausgabe \noindent\hrulefill}
+
+
 % Used for better float placement
 \usepackage{float}
 
@@ -80,5 +86,10 @@
 % Externalize pgfplots for faster compilation
 %\usepgfplotslibrary{external}
 %\tikzexternalize
+
+% Allows spliting of page into 2 parts
+\usepackage{multicol}
+\setlength\columnsep{20pt} % distance between columns
+
 
 
