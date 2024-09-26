@@ -113,15 +113,16 @@ Als Beispiel seien folgende Identifier definiert:
 Mit diesen Identifiern, wird nun folgender Code kompiliert:
 
 \begin{lstlisting}[language=QHS, caption=QHS Code zur Veranschaulichung von Identifiers]
-    "lit0.1"
-    id1
-    "lit0.2" id2
-    id3
-    %\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
-    "lit0.1"
-    "lit1"
-    "lit0.2" #inst2.1 "lit2" #inst2.2
-    #inst2.1 "lit2" #inst2.2 "lit3"
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+"lit0.1"
+id1
+"lit0.2" id2
+id3
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+"lit0.1"
+"lit1"
+"lit0.2" #inst2.1 "lit2" #inst2.2
+#inst2.1 "lit2" #inst2.2 "lit3"
 \end{lstlisting}
 
 Die Identifier aus der Eingabe wurden mit ihren Definitionen ersetzt. Wie der Identifier {\listingFont\selectfont id3} zeigt, ist es möglich Identifier ineinander zu verschachteln.
@@ -209,20 +210,72 @@ Diese Identifier sind in der folgenden Tabelle \ref{tab:shortcuts} aufgeführt.
     {\listingFont\selectfont -\textgreater{}}               & \#assignToOne                  \\ \hline
     {\listingFont\selectfont !}                             & \#force                        \\ \hline
     %{\listingFont\selectfont ?!}                            & \#lightForce                   \\ \hline
-    {\listingFont\selectfont \textbackslash{}n}             & Eine neue Zeile im Ausgabedatei
+    {\listingFont\selectfont \textbackslash{}n}             & Eine neue Zeile in der Ausgabedatei
     \end{tabular}
 \end{table}
 }
 
 Weiter wird innerhalb von Kommentaren Pseudo-Code verwendet, um den QHS Code verständlicher zu erklären.
 Kommentare können mehrere Zeilen umfassen und beginnen immer mit {\listingFont\selectfont /*} und enden mit {\listingFont\selectfont*/}.
-Der Kommentar {\listingFont\selectfont /* X = "hello" \#pushEnv */} würde bedeuten,
-dass der Identifier {\listingFont\selectfont X} zu den \textit{Orders} {\listingFont\selectfont "hello" (LiteralCode)} und {\listingFont\selectfont \#pushEnv (Instruction)} definiert wurde. 
+Der Kommentar {\listingFont\selectfont /* X = "hello" { }\#pushEnv */} würde bedeuten,
+dass der Identifier {\listingFont\selectfont X} zu den \textit{Orders} {\listingFont\selectfont "hello" { }(LiteralCode)} und {\listingFont\selectfont \#pushEnv (Instruction)} definiert wurde. 
 
-Auch wird bei längeren Identifier-Definitionen wird zuerst der zudefinierende Identifier getrennt von den restlichen \textit{Orders} der \textit{OrderQueue} hinzugefügt.
+Auch wird bei längeren Identifier-Definitionen wird zuerst der zu definierende Identifier getrennt von den restlichen \textit{Orders} der \textit{OrderQueue} hinzugefügt.
 Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
 
-EXAMPLE
+\subsection{HOW TO IDENTIFIER DEFINITION}
+Wie die Definition von Identifiern abläuft, soll hier an einem Beispiel schrittweise erklärt werden.
+
+\begin{lstlisting}[language=QHS, caption=EINGABE BEISPIEL, numbers=left, stepnumber=1]
+[ id1 "lit1" ] ->
+[ id2 "lit2" #inst2 id1 ] >>
+[ id3 #inst3 ] >>
+[ id4 "lit4.1" ] [ "lit4.2" ] >>
+
+[ id5 "lit5" id6 ] ->
+[ "lit6" ] >>
+
+[ "lit7" ]
+#orderFrontEnqueue id7
+>>
+
+[ id8 ]
+[
+    id1
+    "lit8.1" \n
+
+    [ "lit8.2" ]
+] >>
+
+[ id9 ]
+[
+    ! id9
+    [ ! id9 ]
+] >>
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=QHS, caption=ENVIRONMENTS BEISPIEL, numbers=left, stepnumber=1]
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
+[ id1 "lit1" ] >>
+[ id2 "lit2" ] >>
+
+id1 " " id2 \n
+
+#pushEnv
+
+[ id1 "lit3" ] >>
+
+id1 " " id2
+
+#popEnv
+
+id1 " " id2
+%\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
+lit1 lit2
+lit3 lit2
+lit1 lit2
+\end{lstlisting}
 
 \subsection{Identifier Parameter und Rückgabewert}
 Mit den \#enterOrderQueue (rsp. [ ) und \#exitOrderQueue (rsp. ] ) Instructions kann innerhalb eines Identifiers die \textit{OrderQueue} verwendet werden. Dies ermöglicht eine Art von Parameter und Rückgabewert für Identifier.
@@ -230,6 +283,7 @@ Parameter werden vor dem Aufruf eines Identifiers der \textit{OrderQueue} hinzug
 Genauso kann der Identifier \textit{Orders} der \textit{OrderQueue} hinzufügen und diese somit zurückgeben.
 
 \begin{lstlisting}[language=QHS, caption=Verwendung von Parametern und Rückgabewert eines Identifiers]
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
 [ foo ]
 [
     #orderFrontEnqueue param1 ->    /* param1 = erstes Argument */
@@ -237,29 +291,30 @@ Genauso kann der Identifier \textit{Orders} der \textit{OrderQueue} hinzufügen 
 
     param1 " : " param2 \n          /* param1 + " : " + param2 + "\n" */
 
-    [ "return" ]                    /* "return" wird der OrderQueue hinzugefügt */
+    [ "Rückgabewert" ]              /* "Rückgabewert" wird der OrderQueue hinzugefügt */
 ] >>
 
-[ "1" "2" ]                         /* 2 Argumente werden der OrderQueue hinzugefügt */
+[ "Argument 1" "Argument 2" ]       /* 2 Argumente werden der OrderQueue hinzugefügt */
 foo                                 /* foo wird ausgeführt */
 #queueFetch                         /* Die zurückgegebene Order wird von der OrderQueue
                                     geholt und ausgeführt */
 
 
 %\noindent\hrulefill { }Ausgabe \noindent\hrulefill%
-1 : 2
-return
+Argument 1 : Argument 2
+Rückgabewert
 \end{lstlisting}
 
 
 \subsection{Variablen} \label{sec:qhs-vars}
 Die Umsetzung von Variablen in QHS ist einfach.
-Um Platz für die Variable auf dem Stack zu schaffen, muss zuerst die Grösse der Variable in Bytes vom rsp subtrahiert werden.
+Um Platz für die Variable auf dem Stack zu schaffen, muss zuerst die Grösse der Variable (für dieses Beispiel 4 bytes für eine \textit{int}) vom rsp subtrahiert werden.
 %Zuerst soll der Assembly Code für das Abziehen der Grösse der Variable vom Stack-Pointer hinzugefügt werden.
 Dann wird für die Variable ein Identifier definiert, der zur Position der Variable auf dem Stack zeigt.
 Mit LiteralCode lässt sich dies wie folgt in QHS ausdrücken:
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit LiteralCode]
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
 "sub rsp, 4" \n
 [ a "[rbp-4]" ] >>      /* a = "[rbp-4]" */
 
@@ -275,6 +330,7 @@ Dieser \textit{var} Identifier nimmt die Grösse der Variable als Argument über
 wird der Name der Variable mit der \#deepFetch Instruction beschafft.
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit \textit{var} Identifier]
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
 [ var ]
 [
     #orderFrontEnqueue size ->          /* size = argument1 */
@@ -299,6 +355,7 @@ Dafür wird bereits am Anfang des Programms ein Identifier rbpOffset als 0 defin
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=QHS, label=eg:qhs-vardefinition, caption=Definition einer Variable mit rbpOffset]
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
 [ rbpOffset "0" ] >>                    /* rbpOffset = "0" */
 
 [ var ]
@@ -329,7 +386,8 @@ sub [rbp-12], 10
 
 Zuletzt lässt sich das umständliche Hinzufügen der Grösse der Variable sowie der \textit{var} Identifier unter einem neuen Identifier zusammenfassen. Dies ist passenderweise die bekannte Bezeichnung für den Typen der Variable.
 
-\begin{lstlisting}[language=QHS, caption=Definition einer Variable mit \textit{int} Identifier] 
+\begin{lstlisting}[language=QHS, caption=Definition einer Variable mit \textit{int} Identifier]
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
 (...)
 
 [ int ] 
@@ -448,6 +506,7 @@ Nun fehlt nur noch etwas an der Funktionsdefinition: Der Funktionsbody. Dieser i
 Der gesamte Code innerhalb des Body wird ganz normal vom QHScompiler ausgeführt und an die Ausgabedatei angehängt. Das Endresultat sieht wie folgt aus:
 
 \begin{lstlisting}[language=QHS, caption=Finale Definition einer Funktion in QHS]
+%\noindent\hrulefill { }Eingabe \noindent\hrulefill%
 int foo ( int param1 , int param2 )
 {
     "add " param1 ", " param2
