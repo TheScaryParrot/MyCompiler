@@ -80,17 +80,21 @@ class FuncDeclarationNode : public AbstractDeclarationNode
 
         this->body->Traverse(codeGenerator, assemblyCode);
 
+        // Adds exit at the end of start function
         if (isStartFunction)
         {
             AssemblyCodeGenerator.AddPostStartBody(assemblyCode);
         }
+        /*
+        This part could be added to add ret at the end of EVERY function even if a return is already present
+        As this does generate lot of unnecessary rets, it is not added
         else
         {
             AssemblyCodeGenerator.AddPostBody(assemblyCode);
         }
 
         // Add ret always at the end, not perfect but works
-        assemblyCode->AddLine(new AssemblyInstructionLine("ret"));
+        assemblyCode->AddLine(new AssemblyInstructionLine("ret")); */
 
         codeGenerator->PopEnvironment(assemblyCode);
     }

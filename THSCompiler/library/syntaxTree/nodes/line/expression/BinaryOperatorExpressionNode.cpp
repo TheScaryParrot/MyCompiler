@@ -48,18 +48,18 @@ class BinaryOperatorExpressionNode : public AbstractExpressionNode
         while (operatorExpressionIterator != this->operatorExpressionPairs.end())
         {
             OperatorExpressionPair* operatorExpression = *operatorExpressionIterator;
-            AbstractExpressionNode* expression = operatorExpression->expression;
-            bool requiresAXRegister = expression->RequiresAXRegister() && left->location->IsAXregister();
+            AbstractExpressionNode* rightExpression = operatorExpression->expression;
+            bool requiresAXRegister = rightExpression->RequiresAXRegister() && left->location->IsAXregister();
             std::shared_ptr<Variable> stackLocation = nullptr;
 
             if (requiresAXRegister)
             {
-                // Push left to stack
+                // Push left to stack as AX will be used by rightExpression
                 stackLocation = std::shared_ptr<Variable>(codeGenerator->GetNewLocalVariable(left->type, false, assemblyCode));
                 codeGenerator->ApplyBinaryOperatorOnVariables(stackLocation, left, EOperators::ASSIGN_OPERATOR, assemblyCode);
             }
 
-            std::shared_ptr<Variable> right = expression->TraverseExpression(codeGenerator, assemblyCode);
+            std::shared_ptr<Variable> right = rightExpression->TraverseExpression(codeGenerator, assemblyCode);
 
             if (requiresAXRegister)
             {

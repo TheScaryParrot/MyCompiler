@@ -8,6 +8,9 @@ class PrimitiveType : public Type
     virtual void GenerateAssign(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
                                 AssemblyCode* assemblyCode) override
     {
+        // No need to generate assign if the locations are the same
+        if (destination->ToAssemblyString() == source->ToAssemblyString()) return;
+
         GenerateUsualBinaryOperation(destination, source, "mov", assemblyCode);
     }
 

@@ -15,8 +15,6 @@ mov rax, rbp
 sub rax, 1
 ret 
 add rsp, 2
-mov rsp, rbp
-ret 
 Hello2:
 mov rbp, rsp
 sub rsp, 4
@@ -33,8 +31,6 @@ mov rax, rbp
 sub rax, 4
 ret 
 add rsp, 8
-mov rsp, rbp
-ret 
 extern _print
 global _start
 _start:
@@ -206,13 +202,11 @@ mov dword [rbp-58], edx
 mov eax, dword [rbp-50]
 mov edx, 5
 mul edx
-mov eax, eax
 sub rsp, 4
 mov dword [rbp-62], eax
 mov eax, 2
 mov edx, dword [rbp-54]
 mul edx
-mov eax, eax
 sub eax, 4
 mov edx, eax
 mov eax, dword [rbp-62]
@@ -245,9 +239,11 @@ add rsp, 70
 mov eax, 60
 xor edi, edi
 syscall 
-ret 
+section .bss
 bool3: resb 1
 float3: resb 4
+section .data
 bool2: db 0
+section .rodata
 bool1: db 1
 float2: dd 1.714286
