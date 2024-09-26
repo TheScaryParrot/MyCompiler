@@ -119,4 +119,9 @@ int _start(/*int argc, char argv*/)
     int int4 = int4_1 * 5 + (int4_2 * 2 - 4) - 1 * (int4_3 + 1) * int4_2 / 2;  // 12
     int4 += 53;                                                   // 65 -> A
     _print(4, int4);
+
+    // testing modulo
+
+    int int5 = 150;
+    _print(4, int5 % 80); // 70 -> F
 }

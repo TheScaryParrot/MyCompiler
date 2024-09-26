@@ -92,11 +92,11 @@ class PrimitiveType : public Type
             return;
         }
 
+        // As div uses rdx:rax as dividend, we need to reset rdx to 0
         AssemblyInstructionLine* resetRDX = new AssemblyInstructionLine("xor");
         resetRDX->AddArgument("rdx");
         resetRDX->AddArgument("rdx");
         assemblyCode->AddLine(resetRDX);
-        // As div uses rdx:rax as dividend, we need to reset rdx to 0
         // Make sure B register is used in case of source needing a register
         GenerateBinaryOperationOnAXregister(destination, source, "div", assemblyCode, true);
     }
@@ -104,7 +104,32 @@ class PrimitiveType : public Type
     virtual void GenerateMod(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
                              AssemblyCode* assemblyCode) override
     {
-        // TODO: Add mod instruction
+        // As div uses rdx:rax as dividend, we need to reset rdx to 0
+        AssemblyInstructionLine* resetRDX = new AssemblyInstructionLine("xor");
+        resetRDX->AddArgument("rdx");
+        resetRDX->AddArgument("rdx");
+        assemblyCode->AddLine(resetRDX);
+        // If source needs a register save it in BX
+        if (source->RequiresRegister())
+        {
+            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode, true);
+        }
+
+        // Move destination to AX register, as div uses rdx:rax as dividend
+        std::shared_ptr<IVariableLocation> axRegister = destination;
+        if (!destination->IsAXregister())
+        {
+            axRegister = std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(this->GetSize(), assemblyCode));
+            GenerateAssign(axRegister, destination, assemblyCode);
+        }
+
+        // generate div instruction
+        GenerateUsualUnaryOperation(source, "div", assemblyCode);
+
+        // Remainder of div instruction is stored in rdx, so move it to destination
+        std::shared_ptr<IVariableLocation> dxRegister =
+            std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewDXRegisterVarLocation(this->GetSize(), assemblyCode));
+        GenerateAssign(destination, dxRegister, assemblyCode);
     }
 
     virtual void GenerateNot(std::shared_ptr<IVariableLocation> destination, AssemblyCode* assemblyCode) override

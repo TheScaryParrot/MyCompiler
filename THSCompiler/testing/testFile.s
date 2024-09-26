@@ -272,7 +272,24 @@ push rbp
 call _print
 pop rbp
 add rsp, 8
-add rsp, 70
+sub rsp, 4
+mov edx, 150
+mov dword [rbp-74], edx
+mov eax, dword [rbp-74]
+xor rdx, rdx
+mov ebx, 80
+div ebx
+mov eax, edx
+sub rsp, 4
+mov dword [rbp-78], eax
+sub rsp, 4
+mov edx, 4
+mov dword [rbp-82], edx
+push rbp
+call _print
+pop rbp
+add rsp, 8
+add rsp, 74
 mov eax, 60
 xor edi, edi
 syscall 
