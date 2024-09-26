@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../varLocation/constVarLocations/IntConstVarLocation.cpp"
 #include "../Type.cpp"
 
 class PrimitiveType : public Type
@@ -29,12 +30,68 @@ class PrimitiveType : public Type
     virtual void GenerateMul(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
                              AssemblyCode* assemblyCode) override
     {
+        // If source is multiple of 2, we can use shift left instead of mul
+        IntConstVarLocation* intSource = dynamic_cast<IntConstVarLocation*>(source.get());
+        unsigned int power;
+        if (intSource != nullptr && intSource->IsMultipleOfTwo(&power))
+        {
+            std::shared_ptr<IVariableLocation> axRegister = destination;
+            // If the destination is not ax, we need to move it to ax first
+            if (!destination->IsAXregister())
+            {
+                std::shared_ptr<IVariableLocation> axRegister =
+                    std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(this->GetSize(), assemblyCode));
+                GenerateAssign(axRegister, destination, assemblyCode);
+            }
+
+            AssemblyInstructionLine* line = new AssemblyInstructionLine("shl");
+            line->AddArgument(ConstructVarLocationAccess(destination));
+            line->AddArgument(std::to_string(power));
+            assemblyCode->AddLine(line);
+
+            // Revert the destination if it was not ax
+            if (!destination->IsAXregister())
+            {
+                GenerateAssign(destination, axRegister, assemblyCode);
+            }
+
+            return;
+        }
+
         GenerateBinaryOperationOnAXregister(destination, source, "mul", assemblyCode);
     }
 
     virtual void GenerateDiv(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
                              AssemblyCode* assemblyCode) override
     {
+        // If source is multiple of 2, we can use shift right instead of div
+        IntConstVarLocation* intSource = dynamic_cast<IntConstVarLocation*>(source.get());
+        unsigned int power;
+        if (intSource != nullptr && intSource->IsMultipleOfTwo(&power))
+        {
+            std::shared_ptr<IVariableLocation> axRegister = destination;
+            // If the destination is not ax, we need to move it to ax first
+            if (!destination->IsAXregister())
+            {
+                std::shared_ptr<IVariableLocation> axRegister =
+                    std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(this->GetSize(), assemblyCode));
+                GenerateAssign(axRegister, destination, assemblyCode);
+            }
+
+            AssemblyInstructionLine* line = new AssemblyInstructionLine("shr");
+            line->AddArgument(ConstructVarLocationAccess(destination));
+            line->AddArgument(std::to_string(power));
+            assemblyCode->AddLine(line);
+
+            // Revert the destination if it was not ax
+            if (!destination->IsAXregister())
+            {
+                GenerateAssign(destination, axRegister, assemblyCode);
+            }
+
+            return;
+        }
+
         AssemblyInstructionLine* resetRDX = new AssemblyInstructionLine("xor");
         resetRDX->AddArgument("rdx");
         resetRDX->AddArgument("rdx");

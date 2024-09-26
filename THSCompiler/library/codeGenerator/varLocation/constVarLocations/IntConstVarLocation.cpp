@@ -12,6 +12,28 @@ class IntConstVarLocation : public IConstVarLocation
    public:
     IntConstVarLocation(int value) { this->value = value; }
 
+    /// @brief Returns wheter the value is a multiple of 2
+    /// @param power If not nullptr, is set so that 2^power will be the value
+    bool IsMultipleOfTwo(unsigned int* power = nullptr)
+    {
+        // If the value is odd immediately return false
+        if (value & 1) return false;
+
+        if (power == nullptr) return true;
+
+        // Calculate the power of 2
+        *power = 1;
+        int temp = value / 2;
+
+        while (temp % 2 == 0)
+        {
+            temp /= 2;
+            (*power)++;
+        }
+
+        return true;
+    }
+
     virtual IVariableLocation* Clone() override { return new IntConstVarLocation(value); }
 
     virtual std::string ToAssemblyString() override { return std::to_string(value); }

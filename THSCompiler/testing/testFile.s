@@ -204,9 +204,8 @@ mov edx, 5
 mul edx
 sub rsp, 4
 mov dword [rbp-62], eax
-mov eax, 2
-mov edx, dword [rbp-54]
-mul edx
+mov eax, dword [rbp-54]
+shl eax, 1
 sub eax, 4
 mov edx, eax
 mov eax, dword [rbp-62]
@@ -218,6 +217,9 @@ add eax, 1
 mov edx, eax
 mov eax, 1
 mul edx
+mov edx, dword [rbp-54]
+mul edx
+shr eax, 1
 mov edx, eax
 mov eax, dword [rbp-66]
 sub eax, edx
