@@ -32,6 +32,12 @@ class BinaryOperatorExpressionNode : public AbstractExpressionNode
 
         auto operatorExpressionIterator = this->operatorExpressionPairs.begin();
 
+        // If there are no operators, return the first variable
+        if (operatorExpressionIterator == this->operatorExpressionPairs.end())
+        {
+            return firstVariable;
+        }
+
         std::shared_ptr<Variable> left = nullptr;
 
         if (firstVariable->IsInline())
@@ -82,6 +88,29 @@ class BinaryOperatorExpressionNode : public AbstractExpressionNode
 
         left->isFinal = true;  // Make the result final
         return std::shared_ptr<Variable>(left);
+    }
+
+    virtual void TraverseConditionalJump(std::string label, bool inverseCondition, CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
+    {
+        // --- If last operator is not a comparison operator, use standard implementation ---
+        OperatorExpressionPair* lastOperatorExpression = operatorExpressionPairs.back();
+
+        if (!codeGenerator->IsConditionalOperator(lastOperatorExpression->op))  // Standard implementation
+        {
+            AbstractExpressionNode::TraverseConditionalJump(label, inverseCondition, codeGenerator, assemblyCode);
+            return;
+        }
+
+        // --- Generate optimized conditional jump ---
+
+        // Last expression is removed from the list, as it needn't be processed
+        operatorExpressionPairs.pop_back();
+
+        std::shared_ptr<Variable> left = this->TraverseExpression(codeGenerator, assemblyCode);
+        std::shared_ptr<Variable> right = lastOperatorExpression->expression->TraverseExpression(codeGenerator, assemblyCode);
+
+        // Generate conditional jump
+        codeGenerator->GenerateConditionalJump(left, right, inverseCondition, lastOperatorExpression->op, label, assemblyCode);
     }
 
     virtual std::string ToString() override

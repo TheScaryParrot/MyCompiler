@@ -57,14 +57,8 @@ mov byte [rbp-30], dl
 mov edx, dword [rbp-22]
 mov dword [rbp-31], edx
 sub rsp, 4
-mov eax, dword [rbp-8]
-cmp eax, dword [rbp-4]
-sete al
-movzx eax, al
-test eax, eax
-jz JL2 
 sub rsp, 4
-mov edx, 66
+mov edx, 70
 mov dword [rbp-34], edx
 sub rsp, 4
 mov edx, 4
@@ -75,12 +69,59 @@ pop rbp
 add rsp, 8
 jmp JL1 
 JL2:
-mov eax, dword [rbp-8]
-cmp eax, dword [rbp-4]
-setl al
-movzx eax, al
-test eax, eax
-jz JL3 
+sub rsp, 4
+mov edx, 71
+mov dword [rbp-34], edx
+sub rsp, 4
+mov edx, 4
+mov dword [rbp-38], edx
+push rbp
+call _print
+pop rbp
+add rsp, 8
+JL1:
+jmp JL4 
+sub rsp, 4
+mov edx, 71
+mov dword [rbp-34], edx
+sub rsp, 4
+mov edx, 4
+mov dword [rbp-38], edx
+push rbp
+call _print
+pop rbp
+add rsp, 8
+jmp JL3 
+JL4:
+sub rsp, 4
+mov edx, 70
+mov dword [rbp-34], edx
+sub rsp, 4
+mov edx, 4
+mov dword [rbp-38], edx
+push rbp
+call _print
+pop rbp
+add rsp, 8
+JL3:
+mov edx, dword [rbp-8]
+cmp edx, [rbp-4]
+jne JL6 
+sub rsp, 4
+mov edx, 66
+mov dword [rbp-34], edx
+sub rsp, 4
+mov edx, 4
+mov dword [rbp-38], edx
+push rbp
+call _print
+pop rbp
+add rsp, 8
+jmp JL5 
+JL6:
+mov edx, dword [rbp-8]
+cmp edx, [rbp-4]
+jge JL7 
 sub rsp, 4
 mov edx, 67
 mov dword [rbp-34], edx
@@ -91,8 +132,8 @@ push rbp
 call _print
 pop rbp
 add rsp, 8
-jmp JL1 
-JL3:
+jmp JL5 
+JL7:
 sub rsp, 4
 mov edx, 68
 mov dword [rbp-34], edx
@@ -103,41 +144,35 @@ push rbp
 call _print
 pop rbp
 add rsp, 8
-JL1:
+JL5:
 sub rsp, 4
 mov edx, 10
 mov dword [rbp-34], edx
-JL5:
-mov eax, dword [rbp-34]
-cmp eax, 0
-setg al
-movzx eax, al
-test eax, eax
-jz JL4 
+JL9:
+mov edx, dword [rbp-34]
+cmp edx, 0
+jle JL8 
 mov edx, 1
 sub dword [rbp-34], edx
-jmp JL5 
-JL4:
+jmp JL9 
+JL8:
 sub rsp, 4
 mov edx, __float32__(3.000000)
 mov dword [rbp-38], edx
 sub rsp, 4
 mov edx, 0
 mov dword [rbp-42], edx
-JL8:
-mov eax, dword [rbp-42]
-cmp eax, 10
-setl al
-movzx eax, al
-test eax, eax
-jz JL6 
+JL12:
+mov edx, dword [rbp-42]
+cmp edx, 10
+jge JL10 
 mov edx, __float32__(1.000000)
 add dword [rbp-38], edx
-JL7:
+JL11:
 mov edx, 2
 add dword [rbp-42], edx
-jmp JL8 
-JL6:
+jmp JL12 
+JL10:
 add rsp, 4
 sub rsp, 4
 mov edx, dword [rbp-31]

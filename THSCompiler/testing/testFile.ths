@@ -54,6 +54,28 @@ int _start(/*int argc, char argv*/)
     MyType myType3 = {int1, bool1, float1};
     int noInitInt;
 
+    // This should be optimized
+    if (true)
+    {
+        _print(4, 70); // 70 -> F
+    }
+    else
+    {
+        _print(4, 71); // 71 -> G
+    }
+
+    inline int optimizedInt1 = 2;
+    inline int optimizedInt2 = 3;
+
+    if (optimizedInt1 == optimizedInt2)
+    {
+        _print(4, 71); // 71 -> G
+    }
+    else
+    {
+        _print(4, 70); // 70 -> F
+    }
+
     if (int3 == int2)
     {
         _print(4, 66);

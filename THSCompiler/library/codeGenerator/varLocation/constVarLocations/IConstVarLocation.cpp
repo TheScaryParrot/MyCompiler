@@ -29,4 +29,6 @@ class IConstVarLocation : public IVariableLocation
     virtual IConstVarLocation* GenerateNeg() = 0;
     virtual IConstVarLocation* GenerateInc() = 0;
     virtual IConstVarLocation* GenerateDec() = 0;
+
+    virtual bool IsZero() = 0;
 };

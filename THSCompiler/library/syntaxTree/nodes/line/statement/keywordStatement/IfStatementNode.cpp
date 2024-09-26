@@ -49,9 +49,10 @@ class IfStatementNode : public AbstractKeywordStatementNode
 
         elseLabels.push_back(endLabel);
 
-        std::shared_ptr<Variable> condition = this->expression->TraverseExpression(codeGenerator, assemblyCode);
-        codeGenerator->GenerateConditionalJump(condition, elseLabels[0], assemblyCode);
+        // Jump to first elif, else or end if condition is false
+        this->expression->TraverseConditionalJump(elseLabels[0], true, codeGenerator, assemblyCode);
 
+        // If body
         this->statement->Traverse(codeGenerator, assemblyCode);
         assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + endLabel));
 
@@ -61,8 +62,8 @@ class IfStatementNode : public AbstractKeywordStatementNode
         {
             assemblyCode->AddLine(new AssemblyLabelLine(elseLabels[elseCounter]));
 
-            std::shared_ptr<Variable> elifCondition = elif->expression->TraverseExpression(codeGenerator, assemblyCode);
-            codeGenerator->GenerateConditionalJump(elifCondition, elseLabels[elseCounter + 1], assemblyCode);
+            // Jump to next elif, else or end if condition is false
+            elif->expression->TraverseConditionalJump(elseLabels[elseCounter + 1], true, codeGenerator, assemblyCode);
 
             elif->statement->Traverse(codeGenerator, assemblyCode);
             assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + endLabel));

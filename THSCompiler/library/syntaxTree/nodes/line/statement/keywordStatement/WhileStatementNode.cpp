@@ -27,8 +27,8 @@ class WhileStatementNode : public AbstractKeywordStatementNode
 
         assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
 
-        std::shared_ptr<Variable> condition = this->expression->TraverseExpression(codeGenerator, assemblyCode);
-        codeGenerator->GenerateConditionalJump(condition, codeGenerator->GetBreakLabel(), assemblyCode);
+        // Jump to break if condition is false
+        this->expression->TraverseConditionalJump(codeGenerator->GetBreakLabel(), true, codeGenerator, assemblyCode);
 
         this->statement->Traverse(codeGenerator, assemblyCode);
         assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + codeGenerator->GetContinueLabel()));

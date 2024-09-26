@@ -68,6 +68,43 @@ class CodeGenerator
     }
     void ClearParameterCounter() { AssemblyCodeGenerator.ClearParameterCounter(); }
 
+    IConstVarLocation* PerformConstantBinaryOperatorOnVariables(IConstVarLocation* left, IConstVarLocation* right, EOperators op)
+    {
+        switch (op)
+        {
+            case EOperators::ADD_OPERATOR:
+                return left->GenerateAdd(right);
+            case EOperators::SUB_OPERATOR:
+                return left->GenerateSub(right);
+            case EOperators::MUL_OPERATOR:
+                return left->GenerateMul(right);
+            case EOperators::DIV_OPERATOR:
+                return left->GenerateDiv(right);
+            case EOperators::MOD_OPERATOR:
+                return left->GenerateMod(right);
+            case EOperators::AND_OPERATOR:
+                return left->GenerateAnd(right);
+            case EOperators::OR_OPERATOR:
+                return left->GenerateOr(right);
+            case EOperators::EQUAL_OPERATOR:
+                return left->GenerateEqual(right);
+            case EOperators::NOT_EQUAL_OPERATOR:
+                return left->GenerateNotEqual(right);
+            case EOperators::LESS_THAN_OPERATOR:
+                return left->GenerateLess(right);
+            case EOperators::LESS_THAN_OR_EQUAL_OPERATOR:
+                return left->GenerateLessEqual(right);
+            case EOperators::GREATER_THAN_OPERATOR:
+                return left->GenerateGreater(right);
+                break;
+            case EOperators::GREATER_THAN_OR_EQUAL_OPERATOR:
+                return left->GenerateGreaterEqual(right);
+            default:
+                Logger.Log("Unknown operator for constant binary operation", Logger::ERROR);
+                return nullptr;
+        }
+    }
+
     /// @brief Applies operator on two variables. If both variables are inline then the result is also inline. If only left is inline a new
     /// localVariable will be created and returned.
     /// @return Where the result is stored
@@ -115,51 +152,7 @@ class CodeGenerator
                     return nullptr;
                 }
 
-                IConstVarLocation* result = nullptr;
-
-                switch (op)
-                {
-                    case EOperators::ADD_OPERATOR:
-                        result = leftConstLocation->GenerateAdd(rightConstLocation);
-                        break;
-                    case EOperators::SUB_OPERATOR:
-                        result = leftConstLocation->GenerateSub(rightConstLocation);
-                        break;
-                    case EOperators::MUL_OPERATOR:
-                        result = leftConstLocation->GenerateMul(rightConstLocation);
-                        break;
-                    case EOperators::DIV_OPERATOR:
-                        result = leftConstLocation->GenerateDiv(rightConstLocation);
-                        break;
-                    case EOperators::MOD_OPERATOR:
-                        result = leftConstLocation->GenerateMod(rightConstLocation);
-                        break;
-                    case EOperators::AND_OPERATOR:
-                        result = leftConstLocation->GenerateAnd(rightConstLocation);
-                        break;
-                    case EOperators::OR_OPERATOR:
-                        result = leftConstLocation->GenerateOr(rightConstLocation);
-                        break;
-                    case ::EOperators::EQUAL_OPERATOR:
-                        result = leftConstLocation->GenerateEqual(rightConstLocation);
-                        break;
-                    case EOperators::NOT_EQUAL_OPERATOR:
-                        result = leftConstLocation->GenerateNotEqual(rightConstLocation);
-                        break;
-                    case EOperators::LESS_THAN_OPERATOR:
-                        result = leftConstLocation->GenerateLess(rightConstLocation);
-                        break;
-                    case EOperators::LESS_THAN_OR_EQUAL_OPERATOR:
-                        result = leftConstLocation->GenerateLessEqual(rightConstLocation);
-                        break;
-                    case EOperators::GREATER_THAN_OPERATOR:
-                        result = leftConstLocation->GenerateGreater(rightConstLocation);
-                        break;
-                    case EOperators::GREATER_THAN_OR_EQUAL_OPERATOR:
-                        result = leftConstLocation->GenerateGreaterEqual(rightConstLocation);
-                        break;
-                }
-
+                IConstVarLocation* result = PerformConstantBinaryOperatorOnVariables(leftConstLocation, rightConstLocation, op);
                 return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(result), left->type, true));
             }
             else
@@ -261,22 +254,133 @@ class CodeGenerator
         environmentLinkedList.AddJumpLabel("continue", AssemblyCodeGenerator.GetNewJumpLabel());
     }
 
-    void GenerateConditionalJump(std::shared_ptr<Variable> condition, std::string jumpIfFalseLabel, AssemblyCode* assemblyCode)
+    bool IsConditionalOperator(EOperators op)
     {
-        // Set zero flag if condition is 0 by using test instruction
-        AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("test");
-        std::shared_ptr<IVariableLocation> secondLocation = condition->location;
-
-        if (condition->location->RequiresRegister())
+        switch (op)
         {
-            secondLocation.reset(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(condition->type->GetSize(), assemblyCode));
-            condition->type->GenerateAssign(secondLocation, condition->location, assemblyCode);
+            case EOperators::EQUAL_OPERATOR:
+            case EOperators::NOT_EQUAL_OPERATOR:
+            case EOperators::LESS_THAN_OPERATOR:
+            case EOperators::LESS_THAN_OR_EQUAL_OPERATOR:
+            case EOperators::GREATER_THAN_OPERATOR:
+            case EOperators::GREATER_THAN_OR_EQUAL_OPERATOR:
+                return true;
+            default:
+                return false;
+        }
+    }
+    std::string GetConditionalJump(EOperators conditionalOperator)
+    {
+        switch (conditionalOperator)
+        {
+            case EOperators::EQUAL_OPERATOR:
+                return "je";
+            case EOperators::NOT_EQUAL_OPERATOR:
+                return "jne";
+            case EOperators::LESS_THAN_OPERATOR:
+                return "jl";
+            case EOperators::LESS_THAN_OR_EQUAL_OPERATOR:
+                return "jle";
+            case EOperators::GREATER_THAN_OPERATOR:
+                return "jg";
+            case EOperators::GREATER_THAN_OR_EQUAL_OPERATOR:
+                return "jge";
+            default:
+                Logger.Log("Unknown operator for conditional jump", Logger::ERROR);
+                return "";
+        }
+    }
+    EOperators InverseConditionalOperator(EOperators conditionalOperator)
+    {
+        switch (conditionalOperator)
+        {
+            case EOperators::EQUAL_OPERATOR:
+                return EOperators::NOT_EQUAL_OPERATOR;
+            case EOperators::NOT_EQUAL_OPERATOR:
+                return EOperators::EQUAL_OPERATOR;
+            case EOperators::LESS_THAN_OPERATOR:
+                return EOperators::GREATER_THAN_OR_EQUAL_OPERATOR;
+            case EOperators::LESS_THAN_OR_EQUAL_OPERATOR:
+                return EOperators::GREATER_THAN_OPERATOR;
+            case EOperators::GREATER_THAN_OPERATOR:
+                return EOperators::LESS_THAN_OR_EQUAL_OPERATOR;
+            case EOperators::GREATER_THAN_OR_EQUAL_OPERATOR:
+                return EOperators::LESS_THAN_OPERATOR;
+            default:
+                Logger.Log("Unknown operator for conditional jump", Logger::ERROR);
+                return EOperators::EQUAL_OPERATOR;
+        }
+    }
+
+    /// @brief Generates a comparison and jump to label if the comparison is true
+    /// @param conditionalOperator Condition to check. Must be a comparison operator
+    /// @param label Label to jump to if the condition is true
+    void GenerateConditionalJump(std::shared_ptr<Variable> left, std::shared_ptr<Variable> right, bool inverseCondition,
+                                 EOperators conditionalOperator, std::string label, AssemblyCode* assemblyCode)
+    {
+        if (left == nullptr)
+        {
+            Logger.Log("Left Variable in GenerateConditionalJump is null", Logger::ERROR);
+            return;
         }
 
-        cmpLine->AddArgument(condition->location->ToAssemblyString());
-        cmpLine->AddArgument(secondLocation->ToAssemblyString());
+        if (right == nullptr)
+        {
+            Logger.Log("Right Variable in GenerateConditionalJump is null", Logger::ERROR);
+            return;
+        }
+
+        if (!left->type->CanApplyToThis(right->type.get()))
+        {
+            Logger.Log("Condition " + left.get()->ToString() + " must be of type bool for conditional jump", Logger::ERROR);
+            return;
+        }
+
+        std::shared_ptr<IVariableLocation> leftLocation = left->location;
+        std::shared_ptr<IVariableLocation> rightLocation = right->location;
+
+        if (inverseCondition) conditionalOperator = InverseConditionalOperator(conditionalOperator);
+
+        if (left->IsInline() && right->IsInline())
+        {
+            // Calculate the result of the comparison
+            IConstVarLocation* result = PerformConstantBinaryOperatorOnVariables(
+                dynamic_cast<IConstVarLocation*>(leftLocation.get()), dynamic_cast<IConstVarLocation*>(rightLocation.get()), conditionalOperator);
+
+            // Jump if the result is not zero (true)
+            if (!result->IsZero())
+            {
+                assemblyCode->AddLine(new AssemblyInstructionLine("jmp " + label));
+            }
+
+            delete result;
+            return;
+        }
+
+        std::string jump = GetConditionalJump(conditionalOperator);
+
+        if (jump == "")
+        {
+            Logger.Log("Unknown operator for conditional jump", Logger::ERROR);
+            return;
+        }
+
+        // If a register is required, save the left variable in DX
+        bool requiresRegister = leftLocation->RequiresRegister() && rightLocation->RequiresRegister();
+        if (requiresRegister)
+        {
+            // Overwrite the left variable
+            leftLocation = std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewDXRegisterVarLocation(left->type->GetSize(), assemblyCode));
+            left->type->GenerateAssign(leftLocation, left->location, assemblyCode);
+        }
+
+        // Compare the two variables
+        AssemblyInstructionLine* cmpLine = new AssemblyInstructionLine("cmp");
+        cmpLine->AddArgument(leftLocation->ToAssemblyString());
+        cmpLine->AddArgument(rightLocation->ToAssemblyString());
         assemblyCode->AddLine(cmpLine);
-        // Jump if is zero
-        assemblyCode->AddLine(new AssemblyInstructionLine("jz " + jumpIfFalseLabel));
+
+        // jump if condition is true
+        assemblyCode->AddLine(new AssemblyInstructionLine(jump + " " + label));
     }
 };

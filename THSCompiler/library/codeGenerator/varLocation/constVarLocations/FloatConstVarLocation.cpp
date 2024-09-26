@@ -171,4 +171,6 @@ class FloatConstVarLocation : public IConstVarLocation
         Logger.Log("Cannot decrement inline float", Logger::ERROR);
         return nullptr;
     }
+
+    virtual bool IsZero() override { return value == 0; };
 };

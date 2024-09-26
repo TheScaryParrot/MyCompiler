@@ -128,4 +128,6 @@ class BoolConstVarLocation : public IConstVarLocation
         Logger.Log("Cannot decrement inline bool", Logger::ERROR);
         return nullptr;
     }
+
+    virtual bool IsZero() override { return !value; }
 };

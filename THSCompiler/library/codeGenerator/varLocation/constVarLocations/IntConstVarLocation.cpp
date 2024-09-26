@@ -208,4 +208,6 @@ class IntConstVarLocation : public IConstVarLocation
     virtual IConstVarLocation* GenerateNeg() override { return new IntConstVarLocation(-value); }
     virtual IConstVarLocation* GenerateInc() override { return new IntConstVarLocation(value + 1); }
     virtual IConstVarLocation* GenerateDec() override { return new IntConstVarLocation(value - 1); }
+
+    virtual bool IsZero() override { return value == 0; }
 };

@@ -35,8 +35,8 @@ class ForStatementNode : public AbstractKeywordStatementNode
         std::string startLabel = AssemblyCodeGenerator.GetNewJumpLabel();
         assemblyCode->AddLine(new AssemblyLabelLine(startLabel));
 
-        std::shared_ptr<Variable> condition = this->condition->TraverseExpression(codeGenerator, assemblyCode);
-        codeGenerator->GenerateConditionalJump(condition, codeGenerator->GetBreakLabel(), assemblyCode);
+        // Jump to break if condition is false
+        this->condition->TraverseConditionalJump(codeGenerator->GetBreakLabel(), true, codeGenerator, assemblyCode);
 
         this->statement->Traverse(codeGenerator, assemblyCode);
         assemblyCode->AddLine(new AssemblyLabelLine(codeGenerator->GetContinueLabel()));
