@@ -66,13 +66,13 @@ Sowohl der QHScomiler als auch GCC beginnen mit einer hohen Kompilierungsdauer b
 Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
 Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien ungefähr 1.5 mal länger als GCC. 
 
-Somit schneidet sowohl bei kleinen als auch bei grossen Eingabedateien der traditionelle Compiler Aufbau besser ab, als mein alternatives Modell.
-%Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compiler Aufbau und viel mehr an meiner Implementation davon.
+Somit schneidet sowohl bei kleinen als auch bei grossen Eingabedateien der traditionelle Compileraufbau besser ab, als mein alternatives Modell.
+%Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compileraufbau und viel mehr an meiner Implementation davon.
 %Daher würde ich in dieser Kategorie des Vergleichs den Sieg für den traditionellen Compiler aussprechen.
-%Daher überzeugt GCC und das traditionelle Compiler Modell bei der Geschwindigkeit der Kompilierung mehr als mein alternativer Aufbau.
+%Daher überzeugt GCC und das traditionelle Compilermodell bei der Geschwindigkeit der Kompilierung mehr als mein alternativer Aufbau.
 
 %Für kleine Eingabedateien ist also der THScompiler zu empfehlen, während GCC für grosse Eingabedateien am schnellsten kompiliert.
-%Somit schneidet der traditionelle Compiler Aufbau bei der Geschwindigkeit der Kompilierung besser ab als mein alternatives Modell.
+%Somit schneidet der traditionelle Compileraufbau bei der Geschwindigkeit der Kompilierung besser ab als mein alternatives Modell.
 
 \section{Geschwindigkeit der Ausgabedatei} \label{sec:execute_speed}
 Die Geschwindigkeit eines kompilierten Programmes wird anhand eines Algorithmus zur Berechnung von Primzahlen gemessen. Wie bei der Funktion aus Abschnitt \ref{sec:compare-compilespeed} ist dieser Algorithmus so geschrieben,
@@ -177,7 +177,7 @@ Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler m
 Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch deutlich schwierig wäre.
 Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine syntaktische Analyse durchgeführt und nie ein AST generiert wird.
 Auch steht die Grundidee meines alternativen Aufbaus Optimierung stark im Weg.
-Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von Macro Expansion verwendeten Macros während der Kompilerung erst definiert werden.
+Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von der \textit{Macro Expansion} verwendeten Macros während der Kompilerung erst definiert werden.
 Daher kennt der QHScompiler vor der Kompilierung weder die Eingabe- noch die Ausgabesprache. Dies führt dazu, dass auch mögliche Optimierungsmethoden erst während dem Kompilieren gefunden werden können.
 Aus diesen Gründen wäre Optimierung für einen Compiler nach meinem alternativen Aufbau deutlich komplexer, wenn nicht sogar unmöglich.
 
@@ -251,7 +251,7 @@ Der QHScompiler meldet einen \textit{OrderQueue-Empty} Error gefolgt von vielen 
 
 Somit ist der QHScompiler bei der Meldung von Fehlern einerseits nicht sehr streng, andererseits aber auch verwirrend und ungenau bei der Fehlermeldung.
 %In meinen Augen triumphiert daher auch in dieser Kategorie der traditionelle Compiler über meinen QHScompiler.
-Deshalb komme ich zum Schluss, dass der traditionelle Compiler Aufbau mit syntaktischer und semantischer Analyse deutlich besser mit Fehlern umgehen kann als mein alternatives Modell.
+Deshalb komme ich zum Schluss, dass der traditionelle Compileraufbau mit syntaktischer und semantischer Analyse deutlich besser mit Fehlern umgehen kann als mein alternatives Modell.
 
 \section{Offenheit für Erweiterung}
 Als eine auch professionell verwendete Programmiersprache umfasst C eine Vielzahl an Features.

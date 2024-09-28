@@ -1,6 +1,6 @@
 \chapter{Der QHScompiler} \label{cha:4-QHS_Compiler}
 Der QHScompiler basiert auf einem von mir erdachten alternativen Aufbau für einen Compiler. Diesem Aufbau liegt eine einfache Idee zugrunde:
-Die Macros die der Macro Expansion aus Abschnitt \ref{sec:traditional_code_generation} sollen erst während der Kompilierung definiert werden. 
+Die Macros die der \textit{Macro Expansion} aus Abschnitt \ref{sec:traditional_code_generation} sollen erst während der Kompilierung definiert werden. 
 Auf dieser Grundidee werde ich zwei Dinge aufbauen. Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesammte syntaktische Analyse zu überspringen und keinen AST generieren zu müssen.
 Zweitens sollte es rein durch die Veränderung von diesen Macros möglich sein jegliche Programmiersprache zu kompilieren. Man könnte also in einem Dokument verschiedene Programmiersprachen verwenden und
 müsste dazwischen bloss die jeweiligen Macros neu definieren. Das selbige gilt ebenfalls für die Ausgabesprache.
