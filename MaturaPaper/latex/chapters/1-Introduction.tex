@@ -1,21 +1,21 @@
 \chapter{Einleitung}
-In der Informatik beschreibt \textit{Compiler} ein Programm, das Code aus einer Programmiersprache in eine andere Programmiersprache übersetzt. In dieser Hinsicht gleichen Compiler Übersetzern für Menschensprache.
-Genauso wie ein Übersetzer für die Kommunikation zwischen zwei verschiedensprachigen Menschen nötig ist, braucht man Compiler um die Kommunikation zwischen Mensch und Computer zu ermöglichen oder zumindest zu vereinfachen.
+In der Informatik beschreibt Compiler ein Programm, das Code aus einer Programmiersprache in eine andere Programmiersprache übersetzt. In dieser Hinsicht gleichen Compiler Übersetzern für Menschensprache.
+Genau wie ein Übersetzer für die Kommunikation zwischen zwei verschiedensprachigen Menschen nötig ist, braucht man Compiler um die Kommunikation zwischen Mensch und Computer zu ermöglichen oder zumindest zu vereinfachen.
 Grundsätzlich ist es mit einer Assembly-Sprache möglich, ohne Compiler einem Computer Befehle zu geben. Jedoch sind Assembly-Sprachen, nicht besonders einfach zu verwenden.
-Compiler übersetzten von verständlicheren Programmiersprachen zu Assembly und ermöglichen daher ein viel einfacheres Schreiben von Programmen.
-Compiler unterscheiden sich jedoch grundsätzlich von Übersetzern in der Erwartungshaltung, die an sie gestellt wird. Menschensprache ist sehr komplex und nicht immer besonders eindeutig. 
+Compiler übersetzten von für Menschen verständlicheren Programmiersprachen zu Computersprachen und ermöglichen daher ein viel einfacheres Schreiben von Programmen.
+Compiler unterscheiden sich jedoch grundsätzlich von Übersetzern in der Erwartungshaltung, die an sie gestellt wird. Menschensprache ist sehr komplex und nicht immer eindeutig. 
 Programmiersprachen hingegen sind so definiert, dass sie keinen Raum für Missverständnisse oder Ungenauigkeit lassen. Genauso muss auch ein Compiler exakt und fehlerfrei übersetzen.
-Neben fehlerfrei muss die Kompilierung auch möglichst schnell sein. Dasselbe gilt natürlich auch für die resultierende Ausgabedatei. Dieser sollte optimal generiert werden, um die schlussendliche
-Ausführungsdauer so kurz wie möglich zu halten. Sollte sich doch einmal ein Fehler in der Eingabedatei befindet, muss dieser verständlich gemeldet werden. Compiler sind also keine simplen Programme und daher auch bis heute
+Neben fehlerfrei muss die Kompilierung auch möglichst schnell sein. Dasselbe gilt natürlich auch für die resultierende Ausgabedatei. Diese sollte optimal generiert werden, um die schlussendliche
+Ausführungsdauer so kurz wie möglich zu halten. Sollte sich doch einmal ein Fehler in der Eingabedatei befindet, muss der Compiler diesen verständlich melden. Compiler sind also keine simplen Programme und daher auch bis heute
 ein aktives Forschungsgebiet.
 
-Als ich mit meiner Maturaarbeit begann, war mein Ziel die Entwicklung eines einfachen Compilers zu einer C ähnlichen Programmiersprache. Unterstützt wurde ich darin freundlicherweise durch eine Vorlesung der Universität Bern \cite{Lecture}.
-Während mir in dieser Vorlesung der theoretische Aufbau eines Compilers erklärt wurde, fragte ich mich trotzdem hin und wieder, wieso genau Compiler tatsächlich so aufgebaut sind und
+Als ich mit meiner Maturaarbeit begann, war mein Ziel die Entwicklung eines einfachen Compilers zu einer C ähnlichen Programmiersprache. Unterstützt wurde ich dabei durch eine Vorlesung der Universität Bern \cite{Lecture}.
+Während mir in dieser Vorlesung der theoretische Aufbau eines Compilers erklärt wurde, fragte ich mich trotzdem hin und wieder, wieso genau Compiler so aufgebaut sind und
 ob es nicht eine einfachere Möglichkeit gäbe. Als ich dann in den Sommerferien auf Probleme in der Entwicklung meines eigenen Compilers stiess, entschied ich mich einem von mir erdachten alternativen Aufbau für Compiler eine Chance zu geben. 
 
-In dieser Maturaarbeit werde ich anhand des "traditionellen" Compileraufbaus meine alternative Idee erklären und auf mögliche Probleme in der Umsetzung eingehen.
+In dieser Maturaarbeit werde ich anhand des "traditionellen"{} Compileraufbaus meine alternative Idee erklären und auf mögliche Probleme in der Umsetzung eingehen.
 Zum Schluss werde ich einen nach dem alternativen Aufbau entwickelten Compiler mit traditionellen Compilern vergleichen und damit Vor- und Nachteile der beiden Möglichkeiten aufzeigen.
-Für diese Maturaarbeit werden Grundkenntnisse von RegEx, Datenstrukturen und Assembly vorausgesetzt.
+Für diese Maturaarbeit werden Grundkenntnisse von \textit{Regular Expressions}, Datenstrukturen und Assembly vorausgesetzt.
 
 \iffalse
     Jedoch ist die zugrundeliegende Aufgabe eines Comilers gar nicht so kompliziert.
