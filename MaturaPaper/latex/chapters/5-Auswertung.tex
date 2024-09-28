@@ -4,7 +4,7 @@ Verglichen werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigk
 
 \section{Geschwindigkeit der Kompilierung} \label{sec:compare-compilespeed}
 Für die Messung der Kompilierungsdauer wird eine Funktion, die prüft, ob eine Zahl eine Primzahl ist, kompiliert. Diese Funktion wurde so geschrieben, dass jedes Feature, das alle drei Compiler unterstützen, verwendet wird.
-Dazu gehören Variablen, Funktionen und Expressions sowie If-Else-Statements und Loops. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt. Anschliessend wurde jedes Programm zehnmal kompiliert.
+Dazu gehören Variablen, Funktionen und Expressions sowie If-Statements und Loops. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt. Anschliessend wurde jedes Programm zehnmal kompiliert.
 Die durchschnittliche Dauer der Kompilierung ist in Abbildung \ref{fig:compilespeed} ersichtlich.
 
 \begin{figure}[h!]
@@ -254,19 +254,19 @@ Somit ist der QHScompiler bei der Meldung von Fehlern einerseits nicht sehr stre
 Deshalb komme ich zum Schluss, dass der traditionelle Compiler Aufbau mit syntaktischer und semantischer Analyse deutlich besser mit Fehlern umgehen kann als mein alternatives Modell.
 
 \section{Offenheit für Erweiterung}
-C, als eine auch professionell verwendete Programmiersprache, umfasst eine Vielzahl an Features.
+Als eine auch professionell verwendete Programmiersprache umfasst C eine Vielzahl an Features.
 Zum Beispiel lassen sich mittels Templates Datenstrukturen wie Stacks, Queues oder Vectors definieren, die Datentyp unabhängig sind.
 Mit Libraries lassen sich zudem komplexe Algorithmen einmal schreiben und später einfach wieder verwenden. Solche Funktionalitäten sind bei einem traditionellen Compiler möglich.
 
 Mit dem QHScompiler lassen sich Libraries ebenfalls verwenden. Templates sollten theoretisch ebenfalls möglich sein, jedoch habe ich dies nicht getestet.
 Jedoch bietet der QHScompiler, wie in Abschnitt \ref{cha:4-QHS_Compiler} bereits angemerkt, noch weitere Möglichkeiten zur Erweiterung. 
-Das Definieren von Identifiern während der Kompilierung ermöglicht es ganz unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren.
+Das Definieren von \textit{Identifiern} während der Kompilierung ermöglicht es ganz unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren.
 Gegebenenfalls falls kann die Programmiersprache sogar innerhalb der Eingabedatei geändert werden. 
-%Es ist möglich eigene Identifier zu definieren. 
+%Es ist möglich eigene \textit{Identifier} zu definieren. 
 %Mit den im Abschnitt \ref{sec:qhs-funcs} beschriebenen Techniken DelayedExecute und TempAssign lassen sich sogar selbstständig syntaktisch komplexe Code Strukturen bilden.
 %Im Gegensatz zu einem traditionellen Compiler muss hierfür nicht einmal der QHScompiler angepasst werden.
 %Dadurch kann man unterschiedliche Programmiersprachen mit dem QHScompiler kompilieren. Es ist sogar möglich die Programmiersprache innerhalb einer Datei zu wechseln.
-Leider ist die Definition der benötigten Identifier für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die Abschnitt \ref{sec:qhs-funcs} erklärten DelayedExecute und TempAssign.
+Leider ist die Definition der benötigten \textit{Identifier} für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die Abschnitt \ref{sec:qhs-funcs} erklärten DelayedExecute und TempAssign.
 Trotzdem würde ich sagen, dass der QHScompiler einem mehr Freiheit bei der Erweiterung bietet, als ein traditioneller Compiler.
 
 \section{Fazit}
@@ -275,9 +275,9 @@ Er ist sowohl in der Geschwindigkeit der Kompilierung als auch bei der Ausführu
 Beim Umgang mit Fehlern ist der QHScompiler weniger streng aber auch deutlich unpräziser und verwirrender als Compiler nach dem traditionellen Aufbau.
 Als einziger Vorteil lässt sich seine Offenheit für Erweiterung sehen.
 
-Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der Identifier besonders ineffizient ist. 
-Jeder Identifier benötigt zuerst eine Abfrage bei den \textit{Environments}. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind Identifiers häufig sehr ineinander verschachtelt.
-Daher werden auch für kurzer Code sehr viele Identifiers ausgeführt. Generell liesse sich die Implementation der Identifier sicherlich stark verbessern und der gesamte QHScompiler optimieren.
+Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der \textit{Identifier} besonders ineffizient ist. 
+Jeder \textit{Identifier} benötigt zuerst eine Abfrage bei den \textit{Environments}. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind \textit{Identifier} häufig sehr ineinander verschachtelt.
+Daher werden auch für kurzer Code sehr viele \textit{Identifier} ausgeführt. Generell liesse sich die Implementation der \textit{Identifier} sicherlich stark verbessern und der gesamte QHScompiler optimieren.
 
 Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die syntaktische Analyse für die angenehme Verwendung eines Compilers äusserst wichtig ist.
 Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies, folge der fehlenden syntaktischen Analyse, nicht möglich.
@@ -290,5 +290,5 @@ Der einzige Vorteil des QHScompilers liegt in der Offenheit für Erweiterung.
 Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
 In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem \textit{Linker} kombinieren.
 
-Zusammengefasst führen während der Kompilerung definierte Identifier zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
+Zusammengefasst führen während der Kompilerung definierte \textit{Identifier} zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
 Der QHScompiler ist einem traditionellen Compiler also stark unterlegen.
