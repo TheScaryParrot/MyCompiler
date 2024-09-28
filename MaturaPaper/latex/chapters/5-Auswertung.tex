@@ -4,7 +4,8 @@ Verglichen werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigk
 
 \section{Geschwindigkeit der Kompilierung} \label{sec:compare-compilespeed}
 Für die Messung der Kompilierungsdauer wird eine Funktion, die prüft, ob eine Zahl eine Primzahl ist, kompiliert. Diese Funktion wurde so geschrieben, dass jedes Feature, das alle drei Compiler unterstützen, verwendet wird.
-Dazu gehören Variablen, Funktionen und Expressions sowie If-Statements und Loops. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt. Anschliessend wurde jedes Programm zehnmal kompiliert.
+Dazu gehören Variablen, Funktionen und \textit{Expressions} sowie Verzweigungen und Schleifen. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt.
+Anschliessend wurde jedes Programm zehnmal kompiliert.
 Die durchschnittliche Dauer der Kompilierung ist in Abbildung \ref{fig:compilespeed} ersichtlich.
 
 \begin{figure}[h!]
@@ -50,11 +51,11 @@ Die durchschnittliche Dauer der Kompilierung ist in Abbildung \ref{fig:compilesp
     \addlegendentry{GCC}
     \end{axis}
 \end{tikzpicture}
-\caption{Vergleich der Kompilierungsdauer mit Log-Log Skalen}
+\caption{Vergleich der Kompilierungsdauer mit logarithmischen Skalen}
 \end{figure}
 
 Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt die Kompilierungsdauer mit einer zunehmenden Anzahl an Funktionen exponentiell an.
-Ab 10⁵ Kopien der Funktion kompiliert der THScompiler länger, als die beiden anderen Compiler.
+Ab hunderttausend Kopien der Funktion kompiliert der THScompiler länger, als die beiden anderen Compiler.
 Bei noch grösseren Eingabedateien ist zu erwarten, dass der THScompilers weiterhin langsamer kompiliert als GCC und der QHScompiler.
 Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Theoretisch sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
 %Daher liegt der Fehler wahrscheinlich bei meinen eigenen Kenntnissen von C++.
@@ -64,7 +65,7 @@ Der QHScompiler, der einen ähnlichen Umfang wie der THScompiler umfasst, wird f
 
 Sowohl der QHScomiler als auch GCC beginnen mit einer hohen Kompilierungsdauer bei einer tiefen Anzahl an Funktionen, verhalten sich später aber linear.
 Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
-Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien ungefähr 1.5 mal länger als GCC. 
+Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien ungefähr 1,5-mal länger als GCC. 
 
 Somit schneidet sowohl bei kleinen als auch bei grossen Eingabedateien der traditionelle Compileraufbau besser ab, als mein alternatives Modell.
 %Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compileraufbau und viel mehr an meiner Implementation davon.
@@ -122,7 +123,7 @@ In der folgenden Abbildung \ref{fig:executespeed_optimized} ist die durchschnitt
 \end{figure}
 
 Wie in Abbildung \ref{fig:executespeed_optimized} ersichtlich, beginnen alle drei kompilierten Programme mit einer sehr tiefen Ausführungsdauer.
-Die Progamme des THS- und QHScompilers werden bis zum Schluss nahezu gleich schnell ausgeführt.
+Die Programme des THS- und QHScompilers werden bis zum Schluss nahezu gleich schnell ausgeführt.
 Das von GCC generierte Programm ist jedoch deutlich schneller als die Programme des THS- und QHScompilers.
 Dies liegt ganz klar an den Optimierungsmethoden von GCC. Wenn man die Optimierung beim Kompilieren mit GCC deaktiviert, sieht die Abbildung wie folgt aus:
 
@@ -177,7 +178,7 @@ Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler m
 Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch deutlich schwierig wäre.
 Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine syntaktische Analyse durchgeführt und nie ein AST generiert wird.
 Auch steht die Grundidee meines alternativen Aufbaus Optimierung stark im Weg.
-Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von der \textit{Macro Expansion} verwendeten Macros während der Kompilerung erst definiert werden.
+Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von der \textit{Macro Expansion} verwendeten Macros während der Kompilierung erst definiert werden.
 Daher kennt der QHScompiler vor der Kompilierung weder die Eingabe- noch die Ausgabesprache. Dies führt dazu, dass auch mögliche Optimierungsmethoden erst während dem Kompilieren gefunden werden können.
 Aus diesen Gründen wäre Optimierung für einen Compiler nach meinem alternativen Aufbau deutlich komplexer, wenn nicht sogar unmöglich.
 
@@ -199,7 +200,7 @@ Wie im Abschnitt \ref{sec:qhs-funcs} bereits beschrieben, verfügt der QHScompil
 Er führt konsequent nur aus, was als Nächstes auftaucht. Darum führt ein fehlendes Zeichen nicht immer zu Fehlern.
 Folgender Code soll dies veranschaulichen:
 
-\begin{lstlisting}[language=QHS, caption=QHS mit fehlenden Tokens, label=eg:qhs-faulty-syntax-1]
+\begin{lstlisting}[language=QHS, caption=QHS mit fehlenden \textit{Tokens}, label=eg:qhs-faulty-syntax-1]
 int a = "69"    /* ; fehlt */
 foo ( a  ;      /* ) fehlt */
 \end{lstlisting}
@@ -214,7 +215,7 @@ int a = "69"    /* ; fehlt */
 foo a ) ;       /* ( fehlt */
 \end{lstlisting}
 
-Der Code bei Auflistung \ref{eg:qhs-faulty-syntax-2} kompiliert problemlos, der generierte Assembly Code ist jedoch fehlerhaft. Die Funktion foo wird nicht ausgeführt und die Variable a nicht als Argument erkannt.
+Der Code bei Auflistung \ref{eg:qhs-faulty-syntax-2} kompiliert problemlos, der generierte Assembly-Code ist jedoch fehlerhaft. Die Funktion {\selectListingFont foo} wird nicht ausgeführt und die Variable a nicht als Argument erkannt.
 Es entsteht also eine fehlerhafte Ausgabedatei, ohne dass der QHScompiler dies meldet.
 
 Führt die Kompilierung doch zu einer Fehlermeldung, ist diese nicht immer besonders verständlich.
@@ -242,10 +243,10 @@ start
 [ERROR] Expected LiteralCode for #literalToIdentifier, got: NONE
 \end{lstlisting}
 
-Bei Auflistung \ref{eg:qhs-faulty-syntax-3} wird die Funktion foo ohne Parameter definiert, später jedoch mit einem Argument aufgerufen.
+Bei Auflistung \ref{eg:qhs-faulty-syntax-3} wird die Funktion {\selectListingFont foo} ohne Parameter definiert, später jedoch mit einem Argument aufgerufen.
 Der QHScompiler verfügt über keine Möglichkeit, die Menge an Argumenten zu überprüfen, und meldet nicht direkt einen Fehler. 
 Sobald er jedoch versucht die Grösse des erwarteten Argumentes von der \textit{OrderQueue} zu holen ist diese leer.
-Der QHScompiler meldet einen \textit{OrderQueue-Empty} Error gefolgt von vielen Folgefehlern.
+Der QHScompiler meldet einen Fehler gefolgt von vielen Folgefehlern.
 
 %Ein weiterer Kritikpunkt am QHScompiler wäre die fehlende semantische Analyse. Implizite Casts 
 
@@ -266,7 +267,7 @@ Gegebenenfalls falls kann die Programmiersprache sogar innerhalb der Eingabedate
 %Mit den im Abschnitt \ref{sec:qhs-funcs} beschriebenen Techniken DelayedExecute und TempAssign lassen sich sogar selbstständig syntaktisch komplexe Code Strukturen bilden.
 %Im Gegensatz zu einem traditionellen Compiler muss hierfür nicht einmal der QHScompiler angepasst werden.
 %Dadurch kann man unterschiedliche Programmiersprachen mit dem QHScompiler kompilieren. Es ist sogar möglich die Programmiersprache innerhalb einer Datei zu wechseln.
-Leider ist die Definition der benötigten \textit{Identifier} für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die Abschnitt \ref{sec:qhs-funcs} erklärten DelayedExecute und TempAssign.
+Leider ist die Definition der benötigten \textit{Identifier} für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die Abschnitt \ref{sec:qhs-funcs} erklärten \textit{DelayedExecute} und \textit{TempAssign}.
 Trotzdem würde ich sagen, dass der QHScompiler einem mehr Freiheit bei der Erweiterung bietet, als ein traditioneller Compiler.
 
 \section{Fazit}
@@ -290,5 +291,5 @@ Der einzige Vorteil des QHScompilers liegt in der Offenheit für Erweiterung.
 Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
 In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem \textit{Linker} kombinieren.
 
-Zusammengefasst führen während der Kompilerung definierte \textit{Identifier} zu hohen Kompierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
+Zusammengefasst führen während der Kompilierung definierte \textit{Identifier} zu hohen Kompilierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
 Der QHScompiler ist einem traditionellen Compiler also stark unterlegen.

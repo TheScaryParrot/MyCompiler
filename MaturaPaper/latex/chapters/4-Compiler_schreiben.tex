@@ -1,7 +1,7 @@
 \chapter{Der QHScompiler} \label{cha:4-QHS_Compiler}
 Der QHScompiler basiert auf einem von mir erdachten alternativen Aufbau für einen Compiler. Diesem Aufbau liegt eine einfache Idee zugrunde:
 Die Macros die der \textit{Macro Expansion} aus Abschnitt \ref{sec:traditional_code_generation} sollen erst während der Kompilierung definiert werden. 
-Auf dieser Grundidee werde ich zwei Dinge aufbauen. Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesammte syntaktische Analyse zu überspringen und keinen AST generieren zu müssen.
+Auf dieser Grundidee werde ich zwei Dinge aufbauen. Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesamte syntaktische Analyse zu überspringen und keinen AST generieren zu müssen.
 Zweitens sollte es rein durch die Veränderung von diesen Macros möglich sein jegliche Programmiersprache zu kompilieren. Man könnte also in einem Dokument verschiedene Programmiersprachen verwenden und
 müsste dazwischen bloss die jeweiligen Macros neu definieren. Das selbige gilt ebenfalls für die Ausgabesprache.
 Nur durch das Umdefinieren der Macros liesse sich die Ausgabesprache wechseln, ohne eine Änderung am Compiler vornehmen zu müssen.
@@ -11,7 +11,7 @@ Die Programmiersprache, in der sich meine Macros definieren lassen, bezeichne ic
 QHS besteht wie die meisten anderen Programmiersprachen aus Wörtern. Im Kontext von QHS werden diese Wörter \textit{Orders} genannt.
 Orders können drei verschiedenen Typen aufweisen: \textit{Identifiers}, \textit{Instructions} und \textit{LiteralCode}.
 %Bei \textit{Identifiers} handelt es sich um die bereits erwähnten Macros, \textit{Instructions} sind einfache vorprogrammierte Anweisungen an den QHScompiler und \textit{LiteralCode} ist Text, der unverändert in die Ausgabedatei geschrieben wird.
-Wie diese drei Ordertypen genau funktionieren, wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
+Wie diese drei \textit{Ordertypen} genau funktionieren, wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
 
 Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus (\textit{QHS-Zyklus}) zugrunde, dessen Inspiration der Von-Neumann Zyklus ist.
 
@@ -23,10 +23,10 @@ Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus (\textit{QHS-Z
 \end{figure}
 
 \section{Die \textit{Fetch-Phase}} \label{sec:qhs-fetch}
-Die Aufgabe der \textit{Fetch-Phase} ist es die nächste \textit{Order}, die verarbeitet werden soll, zu finden. In dieser Hinsicht gleicht die \textit{Fetch-Phase} der lexikalische Analyse eines traditionellen Compilers.
+Die Aufgabe der \textit{Fetch-Phase} ist es die nächste \textit{Order}, die verarbeitet werden soll, zu finden. In dieser Hinsicht gleicht die \textit{Fetch-Phase} der lexikalischen Analyse eines traditionellen Compilers.
 Der QHS-Zyklus beginnt bei der \textit{Fetch-Phase}, dabei wird die erste \textit{Order} aus der Eingabedatei extrahiert. In jeder weiteren \textit{Fetch-Phase} wird die nächste \textit{Order} aus der Eingabedatei geholt.
 Die \textit{Fetch-Phase} ist auch dafür zuständig die nächste \textit{Order} einem der drei Typen (\textit{Identifier}, \textit{Instruction} oder \textit{LiteralCode}) zuzuordnen.
-Diese \textit{Ordertypen} sind mit folgenden Regular Expressions definiert. Leerzeichen dienen als Trennung zwischen \textit{Orders} und werden ignoriert.
+Diese \textit{Ordertypen} sind mit folgenden Regular-Expressions definiert. Leerzeichen dienen als Trennung zwischen \textit{Orders} und werden ignoriert.
 
 \begin{table}[h]
     \centering
@@ -44,7 +44,7 @@ Diese \textit{Ordertypen} sind mit folgenden Regular Expressions definiert. Leer
     \end{tabular}
 \end{table}
 
-Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum zwischen Zeichen differenziert wird. Während die lexikalische Analyse traditionell zwischen vielen verschiedenen Tokens unterscheidet,
+Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum zwischen Zeichen differenziert wird. Während die lexikalische Analyse traditionell zwischen vielen verschiedenen \textit{Tokens} unterscheidet,
 sind für den QHScompiler alle Zeichen (mit Ausnahme von {\listingFont\selectfont \#} und {\listingFont\selectfont "{}}) gleichbedeutend.
 
 Normalerweise erhält die \textit{Fetch-Phase} die nächste \textit{Order} aus der Eingabedatei. 
@@ -53,7 +53,7 @@ In der nächsten \textit{Fetch-Phase} wird immer die oberste \textit{Order} des 
 Die Eingabedatei befindet sich auf dem untersten Platz des \textit{FetchStacks} und wird somit nur verwendet, wenn der Stack ansonsten komplett leer ist.
 %Eine \textit{Order} kann während jedem der drei Schritte des QHS-Zyklus auf den \textit{FetchStack} gelegt werden.
 
-FETCHSTACK FIGURE
+%FETCHSTACK FIGURE
 
 %Während der Laufzeit des QHScompilers könnte der \textit{FetchStack} folgendermassen aussehen:
 %
@@ -83,7 +83,7 @@ Dieses Prinzip ist zum Beispiel besonders bei der \textit{Instruction}, welche d
 Da diese \textit{Instruction} ansonsten nicht zur \textit{Execute-Phase} gelänge und somit die \textit{OrderQueue} nie deaktiviert würde.
 Zu beachten ist, dass \textit{LiteralCode} nicht \textit{orderQueue-proof} sein kann.
 
-MAYBE CODESTACK FIGURE
+%MAYBE OrderQueue FIGURE
 
 Ist die \textit{OrderQueue} deaktiviert oder die \textit{Order} \textit{orderQueue-proof}, wird diese \textit{Order} an den letzten Schritt Execute weitergegeben.
 
@@ -131,7 +131,7 @@ Die \textit{Identifier} aus der Eingabe wurden mit ihren Definitionen ersetzt. W
 
 Die Definitionen der \textit{Identifier} sind in einem sogenannten \textit{Environment} definiert.
 Bei einem \textit{Environment} handelt es sich um eine einfache Map, die einen \textit{Identifier} mit einer Liste an \textit{Orders} verknüpft.
-Die bereits erwähnten \textit{Environments} sind dabei in einer Linked-List gespeichert. Somit können neue \textit{Environments} zu dieser Liste hinzugefügt und aus der Liste entfernt werden.
+Die bereits erwähnten \textit{Environments} sind dabei in einer verketteten Liste gespeichert. Neue \textit{Environments} können dieser Liste hinzugefügt und aus der Liste entfernt werden.
 Das letzte \textit{Environment} der Liste ist das älteste und das erste \textit{Environment} das neuste.
 Ein neuer \textit{Identifier} wird immer zum ersten \textit{Environment} hinzugefügt. Definitionen des gleichen \textit{Identifiers} in älteren \textit{Environments} werden nicht überschrieben oder gelöscht.
 Bei der Abfrage nach einem \textit{Identifier} wird immer die neuste vorhandene Definition zurückgegeben. Ist keine vorhanden, wird ein Error ausgegeben.
@@ -140,7 +140,7 @@ Bei der Abfrage nach einem \textit{Identifier} wird immer die neuste vorhandene 
 %\textit{Instructions} sind die komplexesten \textit{Orders} für die \textit{Execute-Phase}. 
 Wenn eine \textit{Instruction} in die \textit{Execute-Phase} gelangt, wird die dazu definierte Funktion im QHScompiler ausgeführt.
 Diese Funktionen können Variablen im QHScompiler speichern, die \textit{OrderQueue} aktivieren, \textit{Identifier} definieren und vieles mehr.
-\textit{Instructions} sind somit der Weg wie während der Kompilierung auf den QHScompiler einfluss genommen werden kann.
+\textit{Instructions} sind somit der Weg wie während der Kompilierung auf den QHScompiler Einfluss genommen werden kann.
 In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten \textit{Instructions} aufgelistet:
 
 \begin{table}[H]
@@ -157,18 +157,18 @@ In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten \t
                                                        Der Rest der \textit{Orders} auf der \textit{OrderQueue} wird als Definition für diesen \textit{Identifier} festgelegt. \\ \hline
     {\listingFont\selectfont \#assignToOne}          & Wie {\listingFont\selectfont \#assign}, jedoch wird nach dem \textit{Identifier} nur eine weitere \textit{Order} von der \textit{OrderQueue} genommen und 
                                                        als Definition für den \textit{Identifier} verwendet. \\ \hline
-    {\listingFont\selectfont \#force}                & Die nächste \textit{Order} wird nach der \textit{Fetch-Phase} sofort an die \textit{Execute-Phase} weitergegeben. Überspringt Validate und somit die \textit{OrderQueue}.
-                                                       Diese \textit{Instruction} ist \textit{orderQueue-proof}. \\ \hline
+    {\listingFont\selectfont \#force}                & Die nächste \textit{Order} wird nach der \textit{Fetch-Phase} sofort an die \textit{Execute-Phase} weitergegeben.
+                                                       Überspringt die \textit{Validate-Phase} und somit die \textit{OrderQueue}. Diese \textit{Instruction} ist \textit{orderQueue-proof}. \\ \hline
     %{\listingFont\selectfont \#lightForce}           & Ähnlich wird {\listingFont\selectfont \#force}, jedoch wird diese nur ausgeführt, wenn \textbf{explain this cuz they don't know OrderQueue depth} \\ \hline
     {\listingFont\selectfont \#orderEnqueue}         & Die nächste \textit{Order} wird sofort dem Ende der \textit{OrderQueue} hinzugefügt, auch wenn diese \textit{Order} \textit{orderQueue-proof} wäre.
                                                        Die \textit{Execute-Phase} wird übersprungen. \\ \hline
     {\listingFont\selectfont \#orderFrontEnqueue}    & Ähnlich wie {\listingFont\selectfont \#orderEnqueue}. Die \textit{Order} wird jedoch an den ersten Platz der \textit{OrderQueue} gesetzt. \\ \hline
     {\listingFont\selectfont \#deepFetch}            & Die nächste \textit{Order} der Eingabedatei wird oben auf den \textit{FetchStack} gesetzt. Ermöglicht den Zugriff auf die Eingabedatei innerhalb eines \textit{Identifiers}. \\ \hline
     {\listingFont\selectfont \#queueFetch}           & Die erste \textit{Order} der \textit{OrderQueue} wird oben auf den \textit{FetchStack} gesetzt. \\ \hline 
-    {\listingFont\selectfont \#pushEnv}              & Ein neues \textit{Environment} wird der \textit{Environment-Linked-List} hinzugefügt. \\ \hline
-    {\listingFont\selectfont \#popEnv}               & Das neuste \textit{Environment} der \textit{Environment-Linked-List} wird gelöscht. \\ \hline
-    {\listingFont\selectfont \#addToIdentifier}      & Die erste \textit{Order} der \textit{OrderQueue} muss ein \textit{Identifier} sein und die zweiterste \textit{LiteralCode}. Beide \textit{Orders} werden als Zahl interpretiert und addiert.
-                                                       Das Resultat wird im \textit{Identifier} gespeichert.       
+    {\listingFont\selectfont \#pushEnv}              & Ein neues \textit{Environment} wird der \textit{Environment-Liste} hinzugefügt. \\ \hline
+    {\listingFont\selectfont \#popEnv}               & Das neuste \textit{Environment} der \textit{Environment-Liste} wird gelöscht. \\ \hline
+    {\listingFont\selectfont \#addToIdentifier}      & Die erste \textit{Order} der \textit{OrderQueue} muss ein \textit{Identifier} sein und die zweite \textit{LiteralCode}. Die Definition des \textit{Identifiers} muss eine Zahl sein.
+                                                       Der \textit{LiteralCode} wird zu dieser Zahl addiert und im \textit{Identifier} gespeichert.       
     \end{tabularx}
 \end{table}
 
@@ -225,8 +225,8 @@ Diese \textit{Identifier} sind in der folgenden Tabelle \ref{tab:shortcuts} aufg
 
 Weiter wird innerhalb von Kommentaren Pseudo-Code verwendet, um den QHS-Code verständlicher zu erklären.
 Kommentare können mehrere Zeilen umfassen und beginnen immer mit {\listingFont\selectfont /*} und enden mit {\listingFont\selectfont*/}.
-Der Kommentar {\listingFont\selectfont /* X = "hello" { }\#pushEnv */} würde bedeuten,
-dass der \textit{Identifier} {\listingFont\selectfont X} zu den \textit{Orders} {\listingFont\selectfont "hello"{}} (\textit{LiteralCode}) und {\listingFont\selectfont \#pushEnv} (\textit{Instruction}) definiert wurde. 
+Der Kommentar {\listingFont\selectfont /* X = "test" { }\#pushEnv */} würde bedeuten,
+dass der \textit{Identifier} {\listingFont\selectfont X} zu den \textit{Orders} {\listingFont\selectfont "test"{}} (\textit{LiteralCode}) und {\listingFont\selectfont \#pushEnv} (\textit{Instruction}) definiert wurde. 
 
 Auch wird bei längeren \textit{Identifier}-Definitionen wird zuerst der zu definierende \textit{Identifier} getrennt von den restlichen \textit{Orders} der \textit{OrderQueue} hinzugefügt.
 Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
@@ -357,7 +357,7 @@ Die OrderQueue enthält: "lit8.2"
 \columnbreak
 In Auflistung \ref{eg:howto-id8} wird eine \textit{Identifier}-Definition auf mehrere Zeilen geteilt. Dies dient der besseren Leserlichkeit und kompiliert gleich wie eine Definition auf nur einer Linie.
 Auf Linie 4 werden {\selectListingFont [} ({\selectListingFont \#enterOrderQueue}) und {\selectListingFont ]} ({\selectListingFont \#exitOrderQueue}) innerhalb einer bereits aktiven \textit{OrderQueue} verwendet.
-Im QHScompiler ist dies so implementiert, dass die beiden \textit{Identifier} nicht ausgeführt und normal der \textit{OrderQueue} hinzugefügt werden. Die \textit{OrderQueue} enthält nach Linie 4 folgende Orders: \break
+Im QHScompiler ist dies so implementiert, dass die beiden \textit{Identifier} nicht ausgeführt und normal der \textit{OrderQueue} hinzugefügt werden. Die \textit{OrderQueue} enthält nach Linie 4 folgende \textit{Orders}: \break
 \centerline{\selectListingFont id8 "lit8.1"{} [ "lit8.2"{} ] }
 Die \textit{Identifier} {\selectListingFont [} und {\selectListingFont ]} gelangen normal in die \textit{OrderQueue} und damit auch in die Definition von {\selectListingFont id8}: \break
 \centerline{\selectListingFont id8 = "lit8.1"{} [ "lit8.2"{} ] }
@@ -390,11 +390,11 @@ Die OrderQueue enthält: "lit9"
 \end{lstlisting}
 \columnbreak
 Zuerst wird in Linie 1 der \textit{Identifier} {\selectListingFont id9} wie gewohnt definiert. In Linie 5 wird der \textit{Identifier} {\selectListingFont !} ({\selectListingFont \#force}) verwendet.
-Die \textit{Instruction} {\selectListingFont \#force} ist orderQueue-proof und zwingt den QHScompiler dazu, die nächste Order an die \textit{Execute-Phase} weiterzugeben, obwohl die \textit{OrderQueue} aktiv ist.
+Die \textit{Instruction} {\selectListingFont \#force} ist \textit{orderQueue-proof} und zwingt den QHScompiler dazu, die nächste \textit{Order} an die \textit{Execute-Phase} weiterzugeben, obwohl die \textit{OrderQueue} aktiv ist.
 Der \textit{Identifier} {\selectListingFont id9} wird daher mit seiner Definition ersetzt. Die \textit{OrderQueue} sieht nach Linie 5 wie folgt aus: \break
 \centerline{\selectListingFont id10 "lit9"{}}
-In Linie 6 wird daraufhin der Identifer {\selectListingFont !} erneut verwendet. Dieses Mal jedoch innerhalb einer doppelten Aktivierung der \textit{OrderQueue}, wie in Beispiel \ref{eg:howto-id8}.
-In diesem Fall gelangen auch Orders die \textit{orderQueue-proof} sind, nicht zur \textit{Execute-Phase}. Der \textit{Identifier} {\selectListingFont !} wird normal der \textit{OrderQueue} hinzugefügt.
+In Linie 6 wird daraufhin der \textit{Identifer} {\selectListingFont !} erneut verwendet. Dieses Mal jedoch innerhalb einer doppelten Aktivierung der \textit{OrderQueue}, wie in Beispiel \ref{eg:howto-id8}.
+In diesem Fall gelangen auch \textit{Orders} die \textit{orderQueue-proof} sind, nicht zur \textit{Execute-Phase}. Der \textit{Identifier} {\selectListingFont !} wird normal der \textit{OrderQueue} hinzugefügt.
 Die folgende Definition von {\selectListingFont id10} lautet: \break
 \centerline{\selectListingFont id10 = "lit9"{} [ ! id9 ]}
 \end{multicols}
@@ -428,7 +428,7 @@ In diesem \textit{Environment} wird {\selectListingFont id11} umdefiniert. In Li
 \centerline{\selectListingFont id11 = "lit11.2"}
 Der \textit{Identifier} {\selectListingFont id12} ist immer noch wie folgt definiert: \break
 \centerline{\selectListingFont id12 = "lit12"}
-Mit der \textit{Instruction} {\selectListingFont \#popEnv} wird das neuste \textit{Environment} gelöscht und die Umdefinition von {\selectListingFont id11} vergessen.
+Mit der \textit{Instruction} {\selectListingFont \#popEnv} wird das neuste \textit{Environment} gelöscht und die geänderte Definition von {\selectListingFont id11} vergessen.
 Die Definition vom \textit{Identifier} {\selectListingFont id11} ist wieder:
 \centerline{\selectListingFont id11 = "lit11.1"}
 \end{multicols}
@@ -469,8 +469,7 @@ Rückgabewert
 
 \subsection{Variablen} \label{sec:qhs-vars}
 Die Umsetzung von Variablen in QHS ist einfach.
-Um Platz für die Variable auf dem Stack zu schaffen, muss zuerst die Grösse der Variable (für dieses Beispiel 4 bytes für eine \textit{int}) vom rsp subtrahiert werden.
-%Zuerst soll der Assembly-Code für das Abziehen der Grösse der Variable vom Stack-Pointer hinzugefügt werden.
+Um Platz für die Variable auf dem Stack zu schaffen, muss zuerst die Grösse der Variable (für dieses Beispiel 4 bytes für eine \textit{int}) vom \textit{Stack-Pointer} subtrahiert werden.
 Dann wird für die Variable ein \textit{Identifier} definiert, der zur Position der Variable auf dem Stack zeigt.
 Mit \textit{LiteralCode} lässt sich dies wie folgt in QHS ausdrücken:
 
@@ -488,7 +487,7 @@ add [rbp-4], 5
 
 Jedoch braucht man für diese Implementation immer noch viel \textit{LiteralCode} und Assembly Kenntnisse.
 Um die Definition von Variablen C ähnlicher zu machen, lässt sich zum Beispiel ein {\selectListingFont var} \textit{Identifier} definieren.
-Dieser{\selectListingFont var} \textit{Identifier} nimmt die Grösse der Variable als Argument über die \textit{OrderQueue} an. Um die in C geläufige Syntax der Definition einer Variable beizubehalten,
+Dieser {\selectListingFont var} \textit{Identifier} nimmt die Grösse der Variable als Argument über die \textit{OrderQueue} an. Um die in C geläufige Syntax der Definition einer Variable beizubehalten,
 wird der Name der Variable mit der {\listingFont\selectfont \#deepFetch} \textit{Instruction} beschafft.
 
 \begin{lstlisting}[language=QHS, caption=Definition einer Variable mit {\selectListingFont var} \textit{Identifier}]
@@ -512,8 +511,9 @@ sub 4
 add [rbp-4], 5
 \end{lstlisting}
 
-Momentan erhält jede Variable jedoch noch die Addresse rbp-4, weswegen sich die Variablen gegenseitig überschreiben würden. Der momentane rbp-Offset muss also gespeichert und erhöht werden.
-Dafür wird bereits am Anfang des Programms ein \textit{Identifier} rbpOffset als 0 definiert. Mit der {\listingFont\selectfont \#addToIdentifier} \textit{Instruction}, lässt sich nun rbpOffset erhöhen. Dies kann folgendermassen aussehen:
+Momentan erhält jede Variable jedoch noch die Adresse {\selectListingFont rbp-4}, weswegen sich die Variablen gegenseitig überschreiben würden. Der momentane Abstand zum Base-Pointer muss also gespeichert und erhöht werden.
+Dafür wird bereits am Anfang des Programms ein \textit{Identifier} {\selectListingFont rbpOffset} als 0 definiert.
+Mit der {\listingFont\selectfont \#addToIdentifier} \textit{Instruction}, lässt sich nun {\selectListingFont rbpOffset} erhöhen. Dies kann folgendermassen aussehen:
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[language=QHS, label=eg:qhs-vardefinition, caption=Definition einer Variable mit rbpOffset]
@@ -585,7 +585,7 @@ int foo ( int param1 , int param2 )
 }
 \end{lstlisting}
 
-Hier lässt sich bereits das erstes Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der {\selectListingFont int} \textit{Identifier} für die Definition einer Variable verwendet. 
+Hier lässt sich bereits das erste Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der {\selectListingFont int} \textit{Identifier} für die Definition einer Variable verwendet. 
 Das {\selectListingFont int} in der Auflistung \ref{eg:qhs-function_goal} würde daher vom QHScompiler als Definition für eine Variable verstanden werden.
 Der Unterschied zwischen Variable- und Funktionsdefinition besteht hierbei in den Klammern, die auf den Namen folgen.
 Der QHScompiler müsste also beim {\selectListingFont int} \textit{Identifier} nach vorne schauen, ob sich eine Klammer nach dem Namen befindet, und folglich eine Variable- oder Funktionsdefinition ausführen.
@@ -639,11 +639,11 @@ Dieses Konzept wird im weiteren als \textit{DelayedExecute} bezeichnet. Das Ganz
 
 
 Das zweite Problem sind die Parameter eine Funktionsdefinition. Diese sehen genau gleich aus wie die Definition einer Variable, sollten jedoch vom QHScompiler anders ausgeführt werden.
-Erstens sollte bei einer Parameterdefinition nicht der \textit{LiteralCode} zur Subtraktion vom rsp hinzugefügt werden. Zweitens verwendet eine Parameterdefinition einen anderen rbp-Offset.
-Die Lösung liegt im Umdefinieren des \textit{definition} \textit{Identifiers}. Dieser ist momentan für die Definition von Variablen und Funktionen verantwortlich.
-Bei der Anfangsklammer der Funktionsdefinition wird der \textit{definition} \textit{Identifier} neu definiert, sodass er eine Parameterdefinition ausführt.
+Erstens sollte bei einer Parameterdefinition nicht der \textit{LiteralCode} zur Subtraktion vom \textit{Stack-Pointer} hinzugefügt werden. Zweitens verwendet eine Parameterdefinition einen anderen rbp-Offset.
+Die Lösung liegt im Umdefinieren des {\selectListingFont definition} \textit{Identifiers}. Dieser ist momentan für die Definition von Variablen und Funktionen verantwortlich.
+Bei der Anfangsklammer der Funktionsdefinition wird der {\selectListingFont definition} \textit{Identifier} neu definiert, sodass er eine Parameterdefinition ausführt.
 Die vorherige Definition geht dank der {\listingFont\selectfont \#pushEnv} \textit{Instruction} nicht verloren.
-Bei der schliessenden Klammer wird {\listingFont\selectfont \#popEnv} durchgeführt, und der \textit{definition} \textit{Identifier} ist wieder für Variablen und Funktionen zuständig.
+Bei der schliessenden Klammer wird {\listingFont\selectfont \#popEnv} durchgeführt, und der {\selectListingFont definition} \textit{Identifier} ist wieder für Variablen und Funktionen zuständig.
 Diese Lösung wird im folgenden \textit{TempAssign} genannt.
 Dies lässt sich in QHS wie folgt umsetzen:
 
@@ -665,8 +665,8 @@ Dies lässt sich in QHS wie folgt umsetzen:
 \end{lstlisting}
 \end{minipage}
 
-Der \textit{Identifier} \textit{paramDefinition} ist ähnlich wie der {\selectListingFont var} \textit{Identifier} aus Abschnitt \ref{sec:qhs-vars}.
-Es wird blos anstelle von \textit{rbpOffset} ein neuer \textit{paramOffset} \textit{Identifier} verwendet und der Assembly-Code fürs Subtrahieren vom rsp nicht hinzugefügt.
+Der \textit{Identifier} {\selectListingFont paramDefinition} ist ähnlich wie der {\selectListingFont var} \textit{Identifier} aus Abschnitt \ref{sec:qhs-vars}.
+Es wird blos anstelle von {\selectListingFont rbpOffset} ein neuer {\selectListingFont paramOffset} \textit{Identifier} verwendet und der Assembly-Code fürs Subtrahieren vom \textit{Stack-Pointer} nicht hinzugefügt.
 
 Nun fehlt nur noch etwas an der Funktionsdefinition: Der Funktionsbody. Dieser ist vergleichsweise einfach. Die beiden geschwungenen Klammern werden zu einem leeren \textit{Identifier} definiert und somit ignoriert.
 Der gesamte Code innerhalb des Body wird ganz normal vom QHScompiler ausgeführt und an die Ausgabedatei angehängt. Das Endresultat sieht wie folgt aus:
