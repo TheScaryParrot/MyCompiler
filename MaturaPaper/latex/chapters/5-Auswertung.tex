@@ -1,12 +1,12 @@
 \chapter{Auswertung des Compiler Vergleichs}
 Abschliessend will ich den QHScompiler, wie in Abschnitt \ref{cha:2-Vergleich} beschrieben, mit zwei weiteren Compilern vergleichen.
-Verglichen werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigkeit der Ausgabedatei, Umgang mit fehlerhaftem Code und Offenheit für Erweiterung. 
+Bewertet werden die Compiler in Geschwindigkeit der Kompilierung, Geschwindigkeit der Ausgabedatei, Umgang mit fehlerhaftem Code und Offenheit für Erweiterung. 
 
 \section{Geschwindigkeit der Kompilierung} \label{sec:compare-compilespeed}
 Für die Messung der Kompilierungsdauer wird eine Funktion, die prüft, ob eine Zahl eine Primzahl ist, kompiliert. Diese Funktion wurde so geschrieben, dass jedes Feature, das alle drei Compiler unterstützen, verwendet wird.
-Dazu gehören Variablen, Funktionen und \textit{Expressions} sowie Verzweigungen und Schleifen. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in das Programm eingefügt.
+Dazu gehören Variablen, Funktionen und \textit{Expressions} sowie Verzweigungen und Schleifen. Die Funktion wurde in die jeweiligen Sprachen übersetzt und mehrmals in ein Programm eingefügt.
 Anschliessend wurde jedes Programm zehnmal kompiliert.
-Die durchschnittliche Dauer der Kompilierung ist in Abbildung \ref{fig:compilespeed} ersichtlich.
+Die durchschnittliche Dauer der Kompilierung nach Menge an Kopien der Funktion in der Eingabedatei ist in Abbildung \ref{fig:compilespeed} ersichtlich.
 
 \begin{figure}[h!]
 \centering
@@ -54,18 +54,18 @@ Die durchschnittliche Dauer der Kompilierung ist in Abbildung \ref{fig:compilesp
 \caption{Vergleich der Kompilierungsdauer mit logarithmischen Skalen}
 \end{figure}
 
-Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt die Kompilierungsdauer mit einer zunehmenden Anzahl an Funktionen exponentiell an.
+Der THScompiler glänzt bei einer kleinen Programmgrösse mit einer sehr schnellen Kompilierung, doch steigt seine Kompilierungsdauer mit einer zunehmenden Grösse der Eingabedatei exponentiell an.
 Ab hunderttausend Kopien der Funktion kompiliert der THScompiler länger, als die beiden anderen Compiler.
 Bei noch grösseren Eingabedateien ist zu erwarten, dass der THScompilers weiterhin langsamer kompiliert als GCC und der QHScompiler.
 Für die exponentielle Kompilerungsdauer des THScompilers habe ich leider keine Erklärung. Theoretisch sollten alle Schritte, die der THScompiler durchläuft, eine lineare Komplexität aufweisen.
 %Daher liegt der Fehler wahrscheinlich bei meinen eigenen Kenntnissen von C++.
-Trotzdem kompiliert der THScompiler bei wenigen Kopien der Funktion deutlich schneller als GCC, obwohl beide Compiler dem traditionellen Aufbau folgen.
+Bei wenigen Kopien der Funktion kompiliert der THScompiler deutlich schneller als GCC, obwohl beide Compiler dem traditionellen Aufbau folgen.
 Dies liegt wahrscheinlich daran, dass der THScompiler über weniger Funktionalitäten als GCC verfügt.
 Der QHScompiler, der einen ähnlichen Umfang wie der THScompiler umfasst, wird für kleine Eingabedateien klar vom THScompiler geschlagen.
 
-Sowohl der QHScomiler als auch GCC beginnen mit einer hohen Kompilierungsdauer bei einer tiefen Anzahl an Funktionen, verhalten sich später aber linear.
+Sowohl der QHScomiler als auch GCC beginnen mit einer hohen Kompilierungsdauer für eine tiefen Anzahl an Funktionen, verhalten sich später aber linear.
 Der Unterschied zwischen den Kompilierungsdauern von GCC und dem QHScompiler erscheint durch die logarithmischen Skalen konstant.
-Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über 10² Funktionskopien ungefähr 1,5-mal länger als GCC. 
+Tatsächlich braucht der QHScompiler aber ab einer Programmgrösse über hundert Funktionskopien ungefähr 1,5-mal länger als GCC. 
 
 Somit schneidet sowohl bei kleinen als auch bei grossen Eingabedateien der traditionelle Compileraufbau besser ab, als mein alternatives Modell.
 %Der QHScompiler ist somit deutlich von GCC geschlagen. Wie GCC zeigt, liegt das Problem der exponentiellen Kompilierungsdauer des THScompilers nicht am traditionellen Compileraufbau und viel mehr an meiner Implementation davon.
@@ -175,10 +175,10 @@ Aus zeitlichen Gründen war es mir nicht möglich Optimierung in meine beiden Co
 
 Zusammengefasst lässt sich sagen, dass ohne Optimierung mein alternativer Aufbau eines Compilers ungefähr gleich schnelle Ausführungsgeschwindigkeit liefert, wie ein traditioneller Compiler.
 Trotzdem muss man anmerken, dass Optimierung bei einem traditionellen Compiler möglich ist und die Ausführungsdauer deutlich verringert, wie GCC in Abbildung \ref{fig:executespeed_optimized} beweist.
-Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch deutlich schwierig wäre.
-Traditionelle Compiler haben die Möglichkeit Optimierungen auf dem AST auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine syntaktische Analyse durchgeführt und nie ein AST generiert wird.
-Auch steht die Grundidee meines alternativen Aufbaus Optimierung stark im Weg.
-Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von der \textit{Macro Expansion} verwendeten Macros während der Kompilierung erst definiert werden.
+Ich kann mir vorstellen, dass Optimierung für einen nach meinem alternativen Aufbau entwickelten Compiler jedoch sehr schwierig wäre.
+Traditionelle Compiler haben die Möglichkeit Optimierungen auf Zwischencode auszuführen. Für meinem alternativen Compiler ist dies nicht möglich, da gar keine syntaktische Analyse durchgeführt und nie ein Zwischencode generiert wird.
+Auch steht die Grundidee meines alternativen Aufbaus der Optimierung stark im Weg.
+Wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} beschrieben, basiert mein Ansatz darauf, dass die von der \textit{Macro Expansion} verwendeten Macros erst während der Kompilierung definiert werden.
 Daher kennt der QHScompiler vor der Kompilierung weder die Eingabe- noch die Ausgabesprache. Dies führt dazu, dass auch mögliche Optimierungsmethoden erst während dem Kompilieren gefunden werden können.
 Aus diesen Gründen wäre Optimierung für einen Compiler nach meinem alternativen Aufbau deutlich komplexer, wenn nicht sogar unmöglich.
 
@@ -192,7 +192,7 @@ Wird die Syntax oder Semantik nicht eingehalten wird ein Fehler gemeldet.
 Dies ist ein Resultat der syntaktischen und semantischen Analyse, die nach bestimmten Regeln geschrieben wurden und diese Regeln exakt einhalten.
 %GCC fängt besonders gut Fehler früh ab und meldet diese. 
 %Der traditionelle Compiler ist somit sehr gut bezüglich Umgang mit fehlerhaftem Code.
-Traditionelle Compiler erscheinen dadurch manchmal etwas pingelig. Jedoch sind sie dafür sehr genau und hilfreich beim Finden und Melden von Fehlern.
+Traditionelle Compiler erscheinen dadurch manchmal etwas pingelig, sind dafür sehr genau und hilfreich beim Finden und Melden von Fehlern.
 
 Der QHScompiler arbeitet hingegen viel ungenauer.
 %Der QHScompiler weist bei der Umgang mit fehlerhaftem Code hingegen einige Macken auf.
@@ -206,7 +206,7 @@ foo ( a  ;      /* ) fehlt */
 \end{lstlisting}
 
 Der Code aus Auflistung \ref{eg:qhs-faulty-syntax-1} lässt sich einwandfrei vom QHScompiler kompilieren und daraufhin ausführen.
-Weder das Fehlen des Semikolons noch der schliessenden Klammer führt bei QHScompiler auf eine Fehlermeldung.
+Weder das Fehlen des Semikolons noch der schliessenden Klammer meldet der QHScompiler als Fehler.
 Die resultierende Ausgabedatei ist ebenfalls fehlerfrei und lässt sich einwandfrei ausführen. 
 Dies ist jedoch bei folgendem Beispiel nicht mehr der Fall.
 
@@ -259,7 +259,7 @@ Als eine auch professionell verwendete Programmiersprache umfasst C eine Vielzah
 Zum Beispiel lassen sich mittels Templates Datenstrukturen wie Stacks, Queues oder Vectors definieren, die Datentyp unabhängig sind.
 Mit Libraries lassen sich zudem komplexe Algorithmen einmal schreiben und später einfach wieder verwenden. Solche Funktionalitäten sind bei einem traditionellen Compiler möglich.
 
-Mit dem QHScompiler lassen sich Libraries ebenfalls verwenden. Templates sollten theoretisch ebenfalls möglich sein, jedoch habe ich dies nicht getestet.
+Mit dem QHScompiler lassen sich Libraries ebenfalls verwenden. Templates sollten theoretisch auch möglich sein, jedoch habe ich dies nicht getestet.
 Jedoch bietet der QHScompiler, wie in Abschnitt \ref{cha:4-QHS_Compiler} bereits angemerkt, noch weitere Möglichkeiten zur Erweiterung. 
 Das Definieren von \textit{Identifiern} während der Kompilierung ermöglicht es ganz unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren.
 Gegebenenfalls falls kann die Programmiersprache sogar innerhalb der Eingabedatei geändert werden. 
@@ -267,7 +267,7 @@ Gegebenenfalls falls kann die Programmiersprache sogar innerhalb der Eingabedate
 %Mit den im Abschnitt \ref{sec:qhs-funcs} beschriebenen Techniken DelayedExecute und TempAssign lassen sich sogar selbstständig syntaktisch komplexe Code Strukturen bilden.
 %Im Gegensatz zu einem traditionellen Compiler muss hierfür nicht einmal der QHScompiler angepasst werden.
 %Dadurch kann man unterschiedliche Programmiersprachen mit dem QHScompiler kompilieren. Es ist sogar möglich die Programmiersprache innerhalb einer Datei zu wechseln.
-Leider ist die Definition der benötigten \textit{Identifier} für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die Abschnitt \ref{sec:qhs-funcs} erklärten \textit{DelayedExecute} und \textit{TempAssign}.
+Leider ist die Definition der benötigten \textit{Identifier} für eine Programmiersprache nicht besonders intuitiv und benötigt Methoden, wie die in Abschnitt \ref{sec:qhs-funcs} erklärten \textit{DelayedExecute} und \textit{TempAssign}.
 Trotzdem würde ich sagen, dass der QHScompiler einem mehr Freiheit bei der Erweiterung bietet, als ein traditioneller Compiler.
 
 \section{Fazit}
@@ -278,7 +278,7 @@ Als einziger Vorteil lässt sich seine Offenheit für Erweiterung sehen.
 
 Mithilfe eines Profilers habe ich die Kompilierungsdauer des QHScompilers analysiert. Daraus schloss ich, dass das System der \textit{Identifier} besonders ineffizient ist. 
 Jeder \textit{Identifier} benötigt zuerst eine Abfrage bei den \textit{Environments}. Diese Abfrage ist an sich keine aufwendige Sache, jedoch sind \textit{Identifier} häufig sehr ineinander verschachtelt.
-Daher werden auch für kurzer Code sehr viele \textit{Identifier} ausgeführt. Generell liesse sich die Implementation der \textit{Identifier} sicherlich stark verbessern und der gesamte QHScompiler optimieren.
+Daher werden auch für kurzen Code sehr viele \textit{Identifier} ausgeführt. Generell liesse sich die Implementation der \textit{Identifier} sicherlich stark verbessern und der gesamte QHScompiler optimieren.
 
 Aus dem Vergleich der Umgang mit fehlerhaftem Code wird ausserdem klar, dass die syntaktische Analyse für die angenehme Verwendung eines Compilers äusserst wichtig ist.
 Durch den Parser lassen sich Fehler in der Eingabedatei früh finden und genau Melden. Dem QHScompiler ist dies, folge der fehlenden syntaktischen Analyse, nicht möglich.
@@ -288,7 +288,7 @@ Grundsätzlich ist Optimierung für den QHScompiler äusserst schwierig. Da die 
 Dies äussert sich in einer langsameren Geschwindigkeit der Ausgabedatei.
 
 Der einzige Vorteil des QHScompilers liegt in der Offenheit für Erweiterung.
-Das Wechseln der Programmiersprache innerhalb einer Datei ist definitv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
+Das Wechseln der Programmiersprache innerhalb einer Datei ist definitiv interessant, jedoch habe ich noch kein Beispiel gefunden, wofür dieser Wechsel nötig wäre.
 In den meisten Fällen könnte man auch die Teile mit unterschiedlichen Sprachen auf mehrere Dateien aufteilen, einzeln kompilieren und danach mit einem \textit{Linker} kombinieren.
 
 Zusammengefasst führen während der Kompilierung definierte \textit{Identifier} zu hohen Kompilierungsdauern, ungenauem Umgang mit Fehlern und mangelhafter Optimierung der Ausgabedatei.
