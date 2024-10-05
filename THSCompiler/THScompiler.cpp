@@ -53,11 +53,13 @@ void Assemble(std::string inFile, std::string outFile, bool deleteInFile)
     }
 }
 
-void Link(std::string inFile, std::string outFile, bool deleteInFile)
+void Link(std::string inFile, std::string outFile, bool deleteInFile, std::vector<std::string> linkFiles)
 {
     Logger.Log("Linking " + inFile + " to " + outFile, Logger::INFO);
 
-    std::string command = "ld " + inFile + " -o " + outFile;
+    std::string command = "ld " + inFile;
+    for (std::string linkFile : linkFiles) command += " " + linkFile;
+    command += +" -o " + outFile;
     system(command.c_str());
 
     if (deleteInFile)
@@ -78,6 +80,11 @@ int main(int argc, char const* argv[])
     program.add_argument("-s", "--assemble").help("Only compile and assemble, do not link").default_value(false).implicit_value(true);
     program.add_argument("-k", "--keep").help("Keep temporary files").default_value(false).implicit_value(true);
 
+    program.add_argument("--link-files")
+        .help("Include files in linking process")
+        .nargs(argparse::nargs_pattern::at_least_one)
+        .default_value(std::vector<std::string>());
+
     try
     {
         program.parse_args(argc, argv);
@@ -92,6 +99,7 @@ int main(int argc, char const* argv[])
     std::string filePath = program.get<std::string>("file");
     AssemblyCode* outCode = CompileFile(filePath);
     bool deleteTempFiles = !program.get<bool>("--keep");
+    std::vector<std::string> linkFiles = program.get<std::vector<std::string>>("--link-files");
 
     if (program["--compile"] == true)
     {
@@ -106,7 +114,7 @@ int main(int argc, char const* argv[])
     {
         OutToFile(outCode, "a.s");
         Assemble("a.s", "a.o", deleteTempFiles);
-        Link("a.o", program.get<std::string>("--output"), deleteTempFiles);
+        Link("a.o", program.get<std::string>("--output"), deleteTempFiles, linkFiles);
     }
 
     delete outCode;

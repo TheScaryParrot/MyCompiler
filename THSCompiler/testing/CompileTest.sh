@@ -1,6 +1,5 @@
 #!/bin/bash
 
-time ../THScompiler testFile.ths -o testFile.o -s -k
-ld lib/print.o lib/mod.o lib/toChar.o testFile.o -o testFile
+time ../THScompiler testFile.ths -o testFile -k --link-files lib/print.o lib/mod.o lib/toChar.o
 mv a.s testFile.s
-rm testFile.o
+rm a.o
