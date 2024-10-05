@@ -12,7 +12,7 @@ class LogicalConstValueNode : public AbstractConstValueNode
     virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
     {
         std::shared_ptr<Type> type = codeGenerator->GetType("bool");
-        IVariableLocation* location = codeGenerator->ConstructLogicalConstVariableLocation(this->GetValue());
+        IVariableLocation* location = new BoolConstVarLocation(value);
         return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(location), type, true));
     }
 

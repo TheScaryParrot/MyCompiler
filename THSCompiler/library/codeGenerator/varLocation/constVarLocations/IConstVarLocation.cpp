@@ -2,6 +2,7 @@
 
 #include "../IVariableLocation.cpp"
 
+/// @brief Interface for constant variable locations (eg 5) Allows for operation evaluation at compile time.
 class IConstVarLocation : public IVariableLocation
 {
    public:
@@ -30,5 +31,6 @@ class IConstVarLocation : public IVariableLocation
     virtual IConstVarLocation* GenerateInc() = 0;
     virtual IConstVarLocation* GenerateDec() = 0;
 
+    /// @brief Returns whether the constant is zero. Used for optimizing useless operations (eg. if false)
     virtual bool IsZero() = 0;
 };

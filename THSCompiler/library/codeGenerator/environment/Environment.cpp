@@ -15,7 +15,7 @@ class Environment
     std::map<std::string, std::string> jumpLabels;
 
    public:
-    unsigned int* localVariableOffset;
+    unsigned int* localVariableOffset;  // Stores local variable offset
     Environment(unsigned int localVariableOffset) { this->localVariableOffset = new unsigned int(localVariableOffset); }
     ~Environment() { delete localVariableOffset; }
 

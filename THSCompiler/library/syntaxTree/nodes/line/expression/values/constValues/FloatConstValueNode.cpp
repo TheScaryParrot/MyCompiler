@@ -12,7 +12,7 @@ class FloatConstValueNode : public AbstractConstValueNode
     virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
     {
         std::shared_ptr<Type> type = codeGenerator->GetType("float");
-        IVariableLocation* location = codeGenerator->ConstructFloatConstVaribaleLocation(this->GetValue());
+        IVariableLocation* location = new FloatConstVarLocation(value);
         return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(location), type, true));
     }
 

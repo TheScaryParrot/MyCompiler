@@ -5,6 +5,7 @@
 #include "types/Type.cpp"
 #include "varLocation/IVariableLocation.cpp"
 
+/// @brief Represents a variable in the code generator. Contains a location, type, and whether the variable is final.
 class Variable
 {
    public:

@@ -55,7 +55,7 @@ class BinaryOperatorExpressionNode : public AbstractExpressionNode
         {
             OperatorExpressionPair* operatorExpression = *operatorExpressionIterator;
             AbstractExpressionNode* rightExpression = operatorExpression->expression;
-            bool requiresAXRegister = rightExpression->RequiresAXRegister() && left->location->IsAXregister();
+            bool requiresAXRegister = rightExpression->RequiresAXRegister() && left->location->IsRegister();
             std::shared_ptr<Variable> stackLocation = nullptr;
 
             if (requiresAXRegister)
@@ -69,7 +69,7 @@ class BinaryOperatorExpressionNode : public AbstractExpressionNode
 
             if (requiresAXRegister)
             {
-                if (right->location->IsAXregister())
+                if (right->location->IsRegister())
                 {
                     // Safes the result (AX register) in DX register
                     std::shared_ptr<IVariableLocation> DXregister =

@@ -37,7 +37,7 @@ class PrimitiveType : public Type
         {
             std::shared_ptr<IVariableLocation> axRegister = destination;
             // If the destination is not ax, we need to move it to ax first
-            if (!destination->IsAXregister())
+            if (!destination->IsRegister())
             {
                 std::shared_ptr<IVariableLocation> axRegister =
                     std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(this->GetSize(), assemblyCode));
@@ -50,7 +50,7 @@ class PrimitiveType : public Type
             assemblyCode->AddLine(line);
 
             // Revert the destination if it was not ax
-            if (!destination->IsAXregister())
+            if (!destination->IsRegister())
             {
                 GenerateAssign(destination, axRegister, assemblyCode);
             }
@@ -71,7 +71,7 @@ class PrimitiveType : public Type
         {
             std::shared_ptr<IVariableLocation> axRegister = destination;
             // If the destination is not ax, we need to move it to ax first
-            if (!destination->IsAXregister())
+            if (!destination->IsRegister())
             {
                 std::shared_ptr<IVariableLocation> axRegister =
                     std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(this->GetSize(), assemblyCode));
@@ -84,7 +84,7 @@ class PrimitiveType : public Type
             assemblyCode->AddLine(line);
 
             // Revert the destination if it was not ax
-            if (!destination->IsAXregister())
+            if (!destination->IsRegister())
             {
                 GenerateAssign(destination, axRegister, assemblyCode);
             }
@@ -117,7 +117,7 @@ class PrimitiveType : public Type
 
         // Move destination to AX register, as div uses rdx:rax as dividend
         std::shared_ptr<IVariableLocation> axRegister = destination;
-        if (!destination->IsAXregister())
+        if (!destination->IsRegister())
         {
             axRegister = std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewAXRegisterVarLocation(this->GetSize(), assemblyCode));
             GenerateAssign(axRegister, destination, assemblyCode);
@@ -268,7 +268,7 @@ class PrimitiveType : public Type
             source = AssignIVarLocationToRegister(source, assemblyCode, useBX);
         }
 
-        if (destination->IsAXregister())
+        if (destination->IsRegister())
         {
             GenerateUsualUnaryOperation(source, operation, assemblyCode);
             return;

@@ -68,6 +68,7 @@ static class PredictiveParser
     SyntaxTree* Parse(TokenList* tokens) { return new SyntaxTree(Parse_GlobalCode(tokens)); }
 
    private:
+    /// @brief Consumes and returns next token from TokenList and checks if it is the given expected token. Prints an error message if it is not.
     template <typename T>
     T* ConsumeNext(TokenList* tokens, T& expectedToken)
     {
@@ -75,18 +76,20 @@ static class PredictiveParser
 
         if (!tokens->HasNext())
         {
-            Logger.Log("Unexpected end of file; expected " + expectedToken.ToString(), Logger::ERROR);
+            Logger.Log("Unexpected end of file expected " + expectedToken.ToString(), Logger::ERROR);
             return nullptr;
         }
 
         if (!tokens->IsPeekOfTokenType(expectedToken))
         {
-            Logger.Log("Unexpected token: " + tokens->Peek()->ToString() + "; expected " + expectedToken.ToString(), Logger::ERROR);
+            Logger.Log("Unexpected token: " + tokens->Peek()->ToString() + " expected " + expectedToken.ToString(), Logger::ERROR);
             return nullptr;
         }
 
         return tokens->Next<T>();
     }
+
+    // Explaination for the different Nodes can be found in predictive-parser-table.ods under theoretical_documents in the project root
 
     bool LookAhead_GlobalCode(TokenList* tokens);
     GlobalCodeNode* Parse_GlobalCode(TokenList* tokens);

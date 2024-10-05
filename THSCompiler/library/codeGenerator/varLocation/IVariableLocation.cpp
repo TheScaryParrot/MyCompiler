@@ -19,6 +19,6 @@ class IVariableLocation
     /// @brief Whether this location requires a size keyword in the assembly code (eg. DWORD [rbp+1])
     virtual bool RequiresSizeKeyword() = 0;
 
-    ///@brief Whether this location is the alu register
-    virtual bool IsAXregister() { return false; };
+    ///@brief Whether this location is a register
+    virtual bool IsRegister() { return false; };
 };

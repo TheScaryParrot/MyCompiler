@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../codeGenerator/varLocation/AXRegisterVarLocation.cpp"
+#include "../codeGenerator/varLocation/RegisterVarLocation.cpp"
 #include "../codeGenerator/varLocation/RegistryPointerVarLocation.cpp"
 #include "AssemblyCode.cpp"
 #include "AssemblyInstructionLine.cpp"
@@ -8,7 +8,7 @@
 static class AssemblyCodeGenerator
 {
    private:
-    unsigned int* localVariableOffset;
+    unsigned int* localVariableOffset;  // Refrence to the local variable offset stored in the environment
     unsigned int parameterOffset = 16;
 
     unsigned int jumpLabelCounter = 1;
@@ -35,13 +35,13 @@ static class AssemblyCodeGenerator
         switch (size)
         {
             case 1:
-                return new AXRegisterVarLocation("al");
+                return new RegisterVarLocation("al");
             case 2:
-                return new AXRegisterVarLocation("ax");
+                return new RegisterVarLocation("ax");
             case 4:
-                return new AXRegisterVarLocation("eax");
+                return new RegisterVarLocation("eax");
             case 8:
-                return new AXRegisterVarLocation("rax");
+                return new RegisterVarLocation("rax");
         }
 
         Logger.Log("Invalid size for registry variable location " + std::to_string(size), Logger::ERROR);
@@ -53,13 +53,13 @@ static class AssemblyCodeGenerator
         switch (size)
         {
             case 1:
-                return new AXRegisterVarLocation("dl");
+                return new RegisterVarLocation("dl");
             case 2:
-                return new AXRegisterVarLocation("dx");
+                return new RegisterVarLocation("dx");
             case 4:
-                return new AXRegisterVarLocation("edx");
+                return new RegisterVarLocation("edx");
             case 8:
-                return new AXRegisterVarLocation("rdx");
+                return new RegisterVarLocation("rdx");
         }
 
         Logger.Log("Invalid size for registry variable location " + std::to_string(size), Logger::ERROR);
@@ -71,13 +71,13 @@ static class AssemblyCodeGenerator
         switch (size)
         {
             case 1:
-                return new AXRegisterVarLocation("bl");
+                return new RegisterVarLocation("bl");
             case 2:
-                return new AXRegisterVarLocation("bx");
+                return new RegisterVarLocation("bx");
             case 4:
-                return new AXRegisterVarLocation("ebx");
+                return new RegisterVarLocation("ebx");
             case 8:
-                return new AXRegisterVarLocation("rbx");
+                return new RegisterVarLocation("rbx");
         }
 
         Logger.Log("Invalid size for registry variable location " + std::to_string(size), Logger::ERROR);

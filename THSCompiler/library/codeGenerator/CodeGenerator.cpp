@@ -16,6 +16,7 @@
 #include "varLocation/constVarLocations/FloatConstVarLocation.cpp"
 #include "varLocation/constVarLocations/IntConstVarLocation.cpp"
 
+/// @brief Class containing many helper functions for code generation, is accessed by the AST nodes using a visitor pattern
 class CodeGenerator
 {
    private:
@@ -159,7 +160,7 @@ class CodeGenerator
             {
                 // If the right location is AX safe it in DX and left in AX. This ensures 1. AX is not overriden, 2. that always AX and never DX is
                 // returned as the result
-                if (right->location->IsAXregister())
+                if (right->location->IsRegister())
                 {
                     std::shared_ptr<IVariableLocation> dxRegister =
                         std::shared_ptr<IVariableLocation>(AssemblyCodeGenerator.GetNewDXRegisterVarLocation(right->type->GetSize(), assemblyCode));
@@ -223,21 +224,17 @@ class CodeGenerator
         return left;
     }
 
-    IVariableLocation* ConstructLogicalConstVariableLocation(bool value) { return new BoolConstVarLocation(value); }
-    IVariableLocation* ConstructIntConstVariableLocation(int value) { return new IntConstVarLocation(value); }
-    IVariableLocation* ConstructFloatConstVaribaleLocation(float value) { return new FloatConstVarLocation(value); }
-
     void PushNewEnvironment()
     {
         environmentLinkedList.PushEnvironment(new Environment(*environmentLinkedList.GetLocalVariableOffset()));
-        AssemblyCodeGenerator.SetLocalVariableOffset(environmentLinkedList.GetLocalVariableOffset());
+        AssemblyCodeGenerator.SetLocalVariableOffset(environmentLinkedList.GetLocalVariableOffset());  // Update reference to local variable offset
     }
     void PopEnvironment(AssemblyCode* assemblyCode)
     {
         unsigned int oldOffset = *environmentLinkedList.GetLocalVariableOffset();
         environmentLinkedList.PopEnvironment();
         unsigned int* newOffset = environmentLinkedList.GetLocalVariableOffset();
-        AssemblyCodeGenerator.SetLocalVariableOffset(newOffset);
+        AssemblyCodeGenerator.SetLocalVariableOffset(newOffset);  // Update reference to local variable offset
 
         if (oldOffset != *newOffset)
         {
@@ -315,6 +312,7 @@ class CodeGenerator
     /// @brief Generates a comparison and jump to label if the comparison is true
     /// @param conditionalOperator Condition to check. Must be a comparison operator
     /// @param label Label to jump to if the condition is true
+    /// @param inverseCondition If true the conditionalOperator is inverted
     void GenerateConditionalJump(std::shared_ptr<Variable> left, std::shared_ptr<Variable> right, bool inverseCondition,
                                  EOperators conditionalOperator, std::string label, AssemblyCode* assemblyCode)
     {

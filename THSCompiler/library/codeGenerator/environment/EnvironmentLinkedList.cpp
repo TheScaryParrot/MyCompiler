@@ -2,15 +2,15 @@
 
 #include "Environment.cpp"
 
-struct EnvironmentLinkedListElement
-{
-    Environment* environment;
-    EnvironmentLinkedListElement* next;
-};
-
 class EnvironmentLinkedList
 {
    private:
+    struct EnvironmentLinkedListElement
+    {
+        Environment* environment;
+        EnvironmentLinkedListElement* next;
+    };
+
     EnvironmentLinkedListElement* head;
 
    public:

@@ -57,11 +57,11 @@ int _start(/*int argc, char argv*/)
     // This should be optimized
     if (true)
     {
-        _print(4, 70); // 70 -> F
+        _print(4, 70);  // 70 -> F
     }
     else
     {
-        _print(4, 71); // 71 -> G
+        _print(4, 71);  // 71 -> G
     }
 
     inline int optimizedInt1 = 2;
@@ -69,11 +69,11 @@ int _start(/*int argc, char argv*/)
 
     if (optimizedInt1 == optimizedInt2)
     {
-        _print(4, 71); // 71 -> G
+        _print(4, 71);  // 71 -> G
     }
     else
     {
-        _print(4, 70); // 70 -> F
+        _print(4, 70);  // 70 -> F
     }
 
     if (int3 == int2)
@@ -117,11 +117,11 @@ int _start(/*int argc, char argv*/)
     // testing complex expressions
 
     int int4 = int4_1 * 5 + (int4_2 * 2 - 4) - 1 * (int4_3 + 1) * int4_2 / 2;  // 12
-    int4 += 53;                                                   // 65 -> A
+    int4 += 53;                                                                // 65 -> A
     _print(4, int4);
 
     // testing modulo
 
     int int5 = 150;
-    _print(4, int5 % 80); // 70 -> F
+    _print(4, int5 % 80);  // 70 -> F
 }

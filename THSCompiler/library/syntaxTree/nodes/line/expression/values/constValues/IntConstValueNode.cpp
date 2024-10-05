@@ -12,7 +12,7 @@ class IntConstValueNode : public AbstractConstValueNode
     virtual std::shared_ptr<Variable> TraverseExpression(CodeGenerator* codeGenerator, AssemblyCode* assemblyCode) override
     {
         std::shared_ptr<Type> type = codeGenerator->GetType("int");
-        IVariableLocation* location = codeGenerator->ConstructIntConstVariableLocation(this->GetValue());
+        IVariableLocation* location = new IntConstVarLocation(value);
         return std::shared_ptr<Variable>(new Variable(std::shared_ptr<IVariableLocation>(location), type, true));
     }
 
