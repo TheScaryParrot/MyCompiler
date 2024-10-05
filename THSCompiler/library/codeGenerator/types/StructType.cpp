@@ -1,9 +1,9 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 #include "../../utils/Logger.cpp"
-#include "../../utils/Map.cpp"
 #include "../Variable.cpp"
 #include "../varLocation/RegistryPointerVarLocation.cpp"
 #include "Type.cpp"
@@ -41,35 +41,34 @@ class StructType : public Type
 {
    private:
     unsigned int size;
-    Map<std::string, Property> properties;
+    std::vector<Property> properties;               // List of properties in the order they were added
+    std::map<std::string, size_t> propertyIndexes;  // Map of property names to their index in the properties vector
 
    public:
     StructType() { size = 0; }
 
-    Property AddProperty(std::string name, std::shared_ptr<Type> type)
+    Property AddProperty(const std::string name, std::shared_ptr<Type> type)
     {
         Property property = Property(type, size);
-        properties.Insert(name, property);
+        propertyIndexes[name] = properties.size();
+        properties.push_back(property);
         size += type->GetSize();
         return property;
     }
 
-    Property GetProperty(size_t index) { return properties.At(index).second; }
-
-    std::shared_ptr<Variable> ApplyProperty(std::string name, std::shared_ptr<IVariableLocation> location)
+    inline std::shared_ptr<Variable> ApplyProperty(const std::string name, std::shared_ptr<IVariableLocation> location)
     {
-        return properties.Get(name).Apply(location);
+        const size_t index = propertyIndexes[name];
+        return properties[index].Apply(location);
     }
 
     virtual void GenerateAssign(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
                                 AssemblyCode* assemblyCode) override
     {
-        for (size_t i = 0; i < properties.Size(); i++)
+        for (Property property : properties)
         {
-            std::string propertyName = properties.At(i).first;
-
-            std::shared_ptr<Variable> destinationProperty = ApplyProperty(propertyName, destination);
-            std::shared_ptr<Variable> sourceProperty = ApplyProperty(propertyName, source);
+            std::shared_ptr<Variable> destinationProperty = property.Apply(destination);
+            std::shared_ptr<Variable> sourceProperty = property.Apply(source);
 
             destinationProperty->type->GenerateAssign(destinationProperty->location, sourceProperty->location, assemblyCode);
         }
@@ -161,11 +160,10 @@ class StructType : public Type
 
     virtual void GenerateStackPush(std::shared_ptr<IVariableLocation> source, AssemblyCode* assemblyCode) override
     {
-        for (size_t i = 0; i < properties.Size(); i++)
+        for (Property property : properties)
         {
-            std::string propertyName = properties.At(i).first;
-            std::shared_ptr<Variable> property = ApplyProperty(propertyName, source);
-            property->type->GenerateStackPush(property->location, assemblyCode);
+            std::shared_ptr<Variable> propertyVariable = property.Apply(source);
+            propertyVariable->type->GenerateStackPush(propertyVariable->location, assemblyCode);
         }
     }
 
@@ -175,18 +173,26 @@ class StructType : public Type
         if (otherStruct == nullptr) return false;
 
         // Can be applied if all the properties are the same
-        if (properties.Size() != otherStruct->properties.Size()) return false;
+        auto thisIterator = properties.begin();
+        auto otherIterator = otherStruct->properties.begin();
 
-        for (size_t i = 0; i < properties.Size(); i++)
+        while (thisIterator != properties.end())
         {
-            Property thisProperty = this->GetProperty(i);
-            Property otherProperty = otherStruct->GetProperty(i);
+            // other is empty but this is not
+            if (otherIterator == otherStruct->properties.end()) return false;
 
-            if (!thisProperty.type->CanApplyToThis(otherProperty.type.get())) return false;
-            if (!thisProperty.offset == otherProperty.offset) return false;
+            // Check whether the properties are the same
+            // std::cout << thisIterator << " " << otherIterator->first << std::endl;
+            // std::cout << thisIterator->type << " " << otherIterator->type << std::endl;
+            if (!thisIterator->type->CanApplyToThis(otherIterator->type.get())) return false;
+            if (thisIterator->offset != otherIterator->offset) return false;
+
+            thisIterator++;
+            otherIterator++;
         }
 
-        return true;
+        // Return true if other is empty aswell
+        return otherIterator == otherStruct->properties.end();
     }
 
     virtual unsigned int GetSize() override { return size; }

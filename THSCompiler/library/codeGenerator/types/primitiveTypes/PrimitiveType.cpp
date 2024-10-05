@@ -112,7 +112,7 @@ class PrimitiveType : public Type
         // If source needs a register save it in BX
         if (source->RequiresRegister())
         {
-            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode, true);
+            source = AssignIVarLocationToRegister(source, assemblyCode, true);
         }
 
         // Move destination to AX register, as div uses rdx:rax as dividend
@@ -226,7 +226,7 @@ class PrimitiveType : public Type
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
-            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+            source = AssignIVarLocationToRegister(source, assemblyCode);
         }
 
         AssemblyInstructionLine* line = new AssemblyInstructionLine("cmp");
@@ -250,7 +250,7 @@ class PrimitiveType : public Type
     {
         if (destination->RequiresRegister() && source->RequiresRegister())
         {
-            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode);
+            source = AssignIVarLocationToRegister(source, assemblyCode);
         }
 
         AssemblyInstructionLine* line = new AssemblyInstructionLine(operation);
@@ -265,7 +265,7 @@ class PrimitiveType : public Type
     {
         if (source->RequiresRegister())
         {
-            source = ShortSafeIVarlocationOfThisTypeInRegister(source, assemblyCode, useBX);
+            source = AssignIVarLocationToRegister(source, assemblyCode, useBX);
         }
 
         if (destination->IsAXregister())

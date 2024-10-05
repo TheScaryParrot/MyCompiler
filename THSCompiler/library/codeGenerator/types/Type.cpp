@@ -73,9 +73,9 @@ class Type
     virtual unsigned int GetSize() = 0;
 
     /// @brief Saves the value of the location in a D register and returns the register location
-    /// @param useBX whether to use BX register instead of DX
-    std::shared_ptr<IVariableLocation> ShortSafeIVarlocationOfThisTypeInRegister(std::shared_ptr<IVariableLocation> location,
-                                                                                 AssemblyCode* assemblyCode, bool useBX = false)
+    /// @param useBX whether to use B instead of D register
+    std::shared_ptr<IVariableLocation> AssignIVarLocationToRegister(std::shared_ptr<IVariableLocation> location, AssemblyCode* assemblyCode,
+                                                                    bool useBX = false)
     {
         std::shared_ptr<IVariableLocation> registerVarLocation;
 
