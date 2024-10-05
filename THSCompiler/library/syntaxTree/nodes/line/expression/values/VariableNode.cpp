@@ -37,7 +37,7 @@ class VariableNode : public AbstractValueNode
                 return nullptr;
             }
 
-            variable = structType->ApplyProperty(this->ids[i], variable->location);
+            variable = structType->GetProperty(this->ids[i], variable->location);
         }
 
         return variable;

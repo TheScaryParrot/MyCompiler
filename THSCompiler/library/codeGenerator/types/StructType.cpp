@@ -21,7 +21,7 @@ class Property
     }
     Property() = default;
 
-    std::shared_ptr<Variable> Apply(std::shared_ptr<IVariableLocation> location)
+    std::shared_ptr<Variable> GetFromStructLocation(std::shared_ptr<IVariableLocation> location)
     {
         RegistryPointerVarLocation* newLocation = dynamic_cast<RegistryPointerVarLocation*>(location->Clone());
 
@@ -56,10 +56,11 @@ class StructType : public Type
         return property;
     }
 
-    inline std::shared_ptr<Variable> ApplyProperty(const std::string name, std::shared_ptr<IVariableLocation> location)
+    /// @brief Returns a Variable to the property with the given name from the given struct location
+    inline std::shared_ptr<Variable> GetProperty(const std::string name, std::shared_ptr<IVariableLocation> structBaseLocation)
     {
         const size_t index = propertyIndexes[name];
-        return properties[index].Apply(location);
+        return properties[index].GetFromStructLocation(structBaseLocation);
     }
 
     virtual void GenerateAssign(std::shared_ptr<IVariableLocation> destination, std::shared_ptr<IVariableLocation> source,
@@ -67,8 +68,8 @@ class StructType : public Type
     {
         for (Property property : properties)
         {
-            std::shared_ptr<Variable> destinationProperty = property.Apply(destination);
-            std::shared_ptr<Variable> sourceProperty = property.Apply(source);
+            std::shared_ptr<Variable> destinationProperty = property.GetFromStructLocation(destination);
+            std::shared_ptr<Variable> sourceProperty = property.GetFromStructLocation(source);
 
             destinationProperty->type->GenerateAssign(destinationProperty->location, sourceProperty->location, assemblyCode);
         }
@@ -162,7 +163,7 @@ class StructType : public Type
     {
         for (Property property : properties)
         {
-            std::shared_ptr<Variable> propertyVariable = property.Apply(source);
+            std::shared_ptr<Variable> propertyVariable = property.GetFromStructLocation(source);
             propertyVariable->type->GenerateStackPush(propertyVariable->location, assemblyCode);
         }
     }

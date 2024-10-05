@@ -40,7 +40,7 @@ class StructNode : public AbstractValueNode
         for (size_t i = 0; i < propertyAssigns.size(); i++)
         {
             std::pair<Property, std::shared_ptr<Variable>> propertyAssign = propertyAssigns[i];
-            std::shared_ptr<Variable> l_value = propertyAssign.first.Apply(structVariable->location);
+            std::shared_ptr<Variable> l_value = propertyAssign.first.GetFromStructLocation(structVariable->location);
             std::shared_ptr<Variable> r_value = propertyAssign.second;
 
             l_value->type->GenerateAssign(l_value->location, r_value->location, assemblyCode);

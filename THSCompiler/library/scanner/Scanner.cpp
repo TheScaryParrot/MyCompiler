@@ -8,10 +8,24 @@
 #include "../tokens/TokenWithValue.cpp"
 #include "../tokens/Tokens.cpp"
 #include "../tokens/characterGroups/CharacterGroups.cpp"
+#include "../utils/Logger.cpp"
 
 static class Scanner
 {
    private:
+    bool TryConsumeCharacterGroup(InputFile* file, const char consumedCharacter, const char peekCharacter, CharacterGroup& characterGroup)
+    {
+        const unsigned int match = characterGroup.Match(consumedCharacter, peekCharacter);
+
+        if (!match) return false;
+
+        // Consume peekCharacter if both characters were matched
+        if (match == 2) file->ReadNext();
+        return true;
+    }
+
+    /// @brief If the consumed and peek character match the character group token, the token is added to the tokens list
+    /// @return Whether the character group token was added
     bool TryAddCharacterGroupToken(InputFile* file, TokenList* tokens, CharacterGroupToken& token, char consumedCharacter, char peekCharacter)
     {
         unsigned int match = token.Match(consumedCharacter, peekCharacter);
@@ -25,9 +39,11 @@ static class Scanner
         return true;
     }
 
-    bool TryAddKeywordToken(TokenList* tokens, std::string keyword, KeywordToken& token)
+    /// @brief If the given identifier corresponds to the KeywordToken the KeywordToken is added
+    /// @return Whether the identifier is the keyword
+    bool TryAddKeywordToken(TokenList* tokens, std::string identifier, KeywordToken& token)
     {
-        if (token.IsThisKeyword(keyword))
+        if (token.IsThisKeyword(identifier))
         {
             tokens->AddToken(token.New(lineCounter));
             return true;
@@ -36,34 +52,38 @@ static class Scanner
         return false;
     }
 
-    bool TryAddKeyword(TokenList* tokens, std::string keyword)
+    /// @brief If the given identifier is a keyword, add the corresponding token to the tokens list
+    /// @return whether the identifier is a keyword
+    bool TryAddKeyword(TokenList* tokens, std::string identifier)
     {
-        if (TryAddKeywordToken(tokens, keyword, Tokens.IF_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.ELSE_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.ELIF_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.IF_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.ELSE_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.ELIF_KEYWORD)) return true;
 
-        if (TryAddKeywordToken(tokens, keyword, Tokens.WHILE_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.FOR_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.BREAK_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.CONTINUE_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.WHILE_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.FOR_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.BREAK_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.CONTINUE_KEYWORD)) return true;
 
-        if (TryAddKeywordToken(tokens, keyword, Tokens.LOGICAL_TRUE_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.LOGICAL_FALSE_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.LOGICAL_TRUE_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.LOGICAL_FALSE_KEYWORD)) return true;
 
-        if (TryAddKeywordToken(tokens, keyword, Tokens.RETURN_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.VOID_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.RETURN_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.VOID_KEYWORD)) return true;
 
-        if (TryAddKeywordToken(tokens, keyword, Tokens.FINAL_KEYWORD)) return true;
-        if (TryAddKeywordToken(tokens, keyword, Tokens.INLINE_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.FINAL_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.INLINE_KEYWORD)) return true;
 
-        if (TryAddKeywordToken(tokens, keyword, Tokens.TYPEDEF_KEYWORD)) return true;
+        if (TryAddKeywordToken(tokens, identifier, Tokens.TYPEDEF_KEYWORD)) return true;
 
         return false;
     }
 
-    bool TryAddCompilerInstructionToken(TokenList* tokens, std::string instruction, CompilerInstructionToken& token)
+    /// @brief If the given identifier corresponds to the CompilerInstructionToken the CompilerInstructionToken is added
+    /// @return Whether the identifier is the compiler instruction
+    bool TryAddCompilerInstructionToken(TokenList* tokens, std::string identifier, CompilerInstructionToken& token)
     {
-        if (token.IsThisInstruction(instruction))
+        if (token.IsThisInstruction(identifier))
         {
             tokens->AddToken(token.New(lineCounter));
             return true;
@@ -72,10 +92,12 @@ static class Scanner
         return false;
     }
 
-    bool TryAddCompilerInstruction(TokenList* tokens, std::string instruction)
+    /// @brief If the given identifier is a compiler instruction, add the corresponding token to the tokens list
+    /// @return whether the identifier is a compiler instruction
+    bool TryAddCompilerInstruction(TokenList* tokens, std::string identifier)
     {
-        if (TryAddCompilerInstructionToken(tokens, instruction, Tokens.EXTERN_INSTRUCTION)) return true;
-        if (TryAddCompilerInstructionToken(tokens, instruction, Tokens.GLOBAL_INSTRUCTION)) return true;
+        if (TryAddCompilerInstructionToken(tokens, identifier, Tokens.EXTERN_INSTRUCTION)) return true;
+        if (TryAddCompilerInstructionToken(tokens, identifier, Tokens.GLOBAL_INSTRUCTION)) return true;
 
         return false;
     }
@@ -87,18 +109,12 @@ static class Scanner
     {
         TokenList* tokens = new TokenList();
 
-        if (!file->IsGood())
-        {
-            throw "Can't scan InputFile. file is not good";
-        }
+        if (!file->IsGood()) throw "Can't scan InputFile. file is not good";
 
         while (!file->IsEndOfFile())
         {
             char character = file->ReadNext();
             char peekCharacter = file->PeekNext();
-
-            // used for caching the last result of a CharacterGroup::Match() call
-            unsigned int match = 0;
 
             if (CharacterGroups.NEWLINE.Match(character, peekCharacter))
             {
@@ -121,7 +137,7 @@ static class Scanner
             if (TryAddCharacterGroupToken(file, tokens, Tokens.SEPERATOR_TOKEN, character, peekCharacter)) continue;
 
             // --- Comments ---
-            if (CharacterGroups.SINGLE_LINE_COMMENT.Match(character, peekCharacter))
+            if (TryConsumeCharacterGroup(file, character, peekCharacter, CharacterGroups.SINGLE_LINE_COMMENT))
             {
                 while (file->PeekNext() != '\n')
                 {
@@ -131,22 +147,13 @@ static class Scanner
                 continue;
             }
 
-            match = CharacterGroups.MULTI_LINE_COMMENT_START.Match(character, peekCharacter);
-
-            if (match)
+            if (TryConsumeCharacterGroup(file, character, peekCharacter, CharacterGroups.MULTI_LINE_COMMENT_START))
             {
-                if (match == 2) file->ReadNext();
-
-                match = CharacterGroups.MULTI_LINE_COMMENT_END.Match(character, file->PeekNext());
-
-                while (!match)
+                do
                 {
                     character = file->ReadNext();
-                    match = CharacterGroups.MULTI_LINE_COMMENT_END.Match(character, file->PeekNext());
-                }
-
-                // If multi line comment end is two characters long we need to consume the second character
-                if (match == 2) file->ReadNext();
+                    peekCharacter = file->PeekNext();
+                } while (!TryConsumeCharacterGroup(file, character, peekCharacter, CharacterGroups.MULTI_LINE_COMMENT_END));
 
                 continue;
             }
@@ -188,28 +195,17 @@ static class Scanner
             }
 
             // --- String ---
-            match = CharacterGroups.STRING_DELIMITOR.Match(character, peekCharacter);
-
-            if (match)
+            if (TryConsumeCharacterGroup(file, character, peekCharacter, CharacterGroups.STRING_DELIMITOR))
             {
                 std::string string = "";
-
-                if (match == 2)
-                    file->ReadNext();  // Consume the second character of the string delimitor, if it's a two character
-                                       // delimitor
 
                 while (true)
                 {
                     character = file->ReadNext();      // Read next
                     peekCharacter = file->PeekNext();  // Peek next
 
-                    match = CharacterGroups.STRING_DELIMITOR.Match(character, peekCharacter);
-
-                    if (match)
+                    if (TryConsumeCharacterGroup(file, character, peekCharacter, CharacterGroups.STRING_DELIMITOR))
                     {
-                        if (match == 2)
-                            file->ReadNext();  // Consume the second character of the string delimitor, if it's a two
-                                               // character delimitor
                         break;
                     }
 
@@ -247,8 +243,7 @@ static class Scanner
 
             if (TryAddCharacterGroupToken(file, tokens, Tokens.EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
             if (TryAddCharacterGroupToken(file, tokens, Tokens.NOT_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
-            // less/greater than or equal operators must be checked after less/greater than operators as otherwise they are parsed as two separate
-            // tokens
+            // less/greater or equal operators must be checked before less/greater operators as otherwise they are parsed as two separate tokens
             if (TryAddCharacterGroupToken(file, tokens, Tokens.GREATER_THAN_OR_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
             if (TryAddCharacterGroupToken(file, tokens, Tokens.LESS_THAN_OR_EQUAL_OPERATOR_TOKEN, character, peekCharacter)) continue;
             if (TryAddCharacterGroupToken(file, tokens, Tokens.GREATER_THAN_OPERATOR_TOKEN, character, peekCharacter)) continue;
@@ -283,7 +278,7 @@ static class Scanner
             if (TryAddCharacterGroupToken(file, tokens, Tokens.NOT_OPERATOR_TOKEN, character, peekCharacter)) continue;
 
             // --- Unknown Token ---
-            std::cout << "Unknown token: " << character << "\n";
+            Logger.Log("Unknown token: " + character, Logger::ERROR);
         }
 
         return tokens;
