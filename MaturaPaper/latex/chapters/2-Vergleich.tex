@@ -3,13 +3,18 @@ Um meinen alternativen Compileraufbau zu testen, werde ich folgende drei Compile
 
 \begin{enumerate}
 \item
-Der QHScompiler ist der von mir nach meinem Aufbau entwickelte Compiler. Seine genaue Funktionsweise wird in Abschnitt \ref{cha:4-QHS_Compiler} ausgeführt.
+Der QHScompiler ist der von mir nach meinem Aufbau entwickelte Compiler. Seine genaue Funktionsweise wird in Kapitel \ref{cha:4-QHS_Compiler} ausgeführt.
 Er ist in C++ geschrieben und verwendet meine eigene Programmiersprache QHS als Eingabesprache. 
 
 \item
-GCC ist der gebräuchlichste Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht inzwischen auch die Kompilierung von C++, Rust, Go, usw.
-Passend dazu lautet das Akronym GCC ausgeschrieben: GNU Compiler Collection.
+Bei der Veröffentlichung im Jahr 1987 stand das Akronym GCC noch für GNU C Compiler. Heute ist GCC die GNU Compiler Collection, eine Sammlung an Compilern für verschiedene Programmiersprachen, darunter C, C++, Rust, etc.
+Für diesen Vergleich verwende ich den C Compiler aus der GNU Compiler Collection (Version 12.4).
+Jede weitere Verwendung der Abkürzung GCC referiert auf diese Version des C Compilers.
 Für diesen Vergleich repräsentiert GCC den traditionellen Compileraufbau.
+
+%GCC ist ein Compiler für die Programmiersprache C. Veröffentlicht im Jahre 1987 wird GCC bis heute weiterentwickelt und ermöglicht inzwischen auch die Kompilierung von C++, Rust, Go, usw.
+%Passend dazu lautet das Akronym GCC ausgeschrieben: GNU Compiler Collection.
+%Für diesen Vergleich repräsentiert GCC den traditionellen Compileraufbau.
 
 \item
 Der THScompiler ist ebenfalls ein traditioneller Compiler. Der Unterschied zu GCC liegt jedoch darin, dass der THScompiler von mir selbst entwickelt wurde. 
@@ -18,7 +23,7 @@ Der THScompiler dient mit ähnlichem Arbeitsaufwand, Optimierung und Niveau der 
 Geschrieben ist der THScompiler in C++ und kompiliert aus meiner eigenen Programmiersprache THS.
 \end{enumerate}
 
-Für die von mir entwickelten Compiler habe ich folgende Mindestanforderungen gestellt:
+An die von mir entwickelten Compiler habe ich folgende Mindestanforderungen gestellt:
 
 \begin{table}[H]
     \centering
@@ -27,15 +32,16 @@ Für die von mir entwickelten Compiler habe ich folgende Mindestanforderungen ge
     \vspace{3mm} % Adjust the height of the space between caption and tabular
     
     \begin{tabular}{l|l}
-    Ausgabe als Assembly-Code       & Die Ausgabesprache muss Assembly sein                                    \\
+    Ausgabe als Assembly-Code       & Die Ausgabesprache muss x86 Assembly sein                                \\
     C ähnlicher Syntax              & Die Eingabesprache muss einen C ähnlichen Syntax aufweisen               \\
     Variablen und Funktionen        & Lokale und globale Variablen sowie Funktionen müssen unterstützt werden  \\
     Verzweigungen und Schleifen     & Verzweigungen und Schleifen müssen umsetzbar sein
     \end{tabular}
 \end{table}
 
-Die Kriterien des Vergleichs sind in Tabelle \ref{tab:criteria} aufgelistet.
+%Die Kriterien des Vergleichs sind in Tabelle \ref{tab:criteria} aufgelistet.
 %Zum Schluss werden die drei Compiler nach folgenden Kriterien bewertet und verglichen.
+Dabei sollen die Compiler in folgenden Kriterien verglichen werden:
 
 \begin{table}[H]
     \centering

@@ -1,14 +1,14 @@
 \chapter{Der QHScompiler} \label{cha:4-QHS_Compiler}
-Der QHScompiler, wie in Abschnitt \ref{cha:2-Vergleich} bereits angesprochen, basiert auf einem von mir erdachten alternativen Aufbau für einen Compiler. Diesem Aufbau liegt eine einfache Idee zugrunde:
-Die Macros der \textit{Macro Expansion} aus Abschnitt \ref{sec:traditional_code_generation} sollen erst während der Kompilierung innerhalb der Eingabedatei definiert werden. 
+Der QHScompiler, wie in Kapitel \ref{cha:2-Vergleich} bereits angesprochen, basiert auf einem von mir erdachten alternativen Aufbau für einen Compiler. Diesem Aufbau liegt eine einfache Idee zugrunde:
+Die Macros der \textit{Macro Expansion} aus Abschnitt \ref{sec:traditional_code_generation} sollen erst während der Kompilierung innerhalb der Eingabedatei und nicht im Compiler definiert werden. 
 Auf dieser Grundidee werde ich zwei Dinge aufbauen. Erstens halte ich es für möglich, mit der richtigen Verwendung von Macros die gesamte syntaktische Analyse zu überspringen und keinen AST generieren zu müssen.
 Zweitens sollte es rein durch die Veränderung von diesen Macros möglich sein jegliche Programmiersprache zu kompilieren. Man könnte also in einem Dokument verschiedene Programmiersprachen verwenden und
-müsste dazwischen bloss die jeweiligen Macros neu definieren. Das selbige gilt ebenfalls für die Ausgabesprache.
+müsste dazwischen bloss die jeweiligen Macros neu definieren. Das gleiche gilt ebenfalls für die Ausgabesprache.
 Nur durch das Umdefinieren der Macros liesse sich die Ausgabesprache wechseln, ohne eine Änderung am Compiler vornehmen zu müssen.
 Um dies zu verwirklichen, unterscheidet sich der QHScompiler stark von traditionellen Compilern.
 %Um dies zu verwirklichen, folgt mein alternativer Ansatz einem Aufbau, der sich stark von einem traditionellen Compiler unterscheidet.
 
-Die Programmiersprache, in der sich meine Macros definieren lassen, bezeichne ich als QHS. Der Compiler der QHS versteht und kompiliert, nenne ich dazu passend den QHScompiler.
+Die Programmiersprache, in der sich diese Macros definieren lassen, bezeichne ich als QHS. Der Compiler der QHS versteht und kompiliert, wird dazu passend QHScompiler genannt.
 QHS besteht wie die meisten anderen Programmiersprachen aus Wörtern. Im Kontext von QHS werden diese Wörter \textit{Orders} genannt.
 Orders können drei verschiedenen Typen aufweisen: \textit{Identifiers}, \textit{Instructions} und \textit{LiteralCode}.
 %Bei \textit{Identifiers} handelt es sich um die bereits erwähnten Macros, \textit{Instructions} sind einfache vorprogrammierte Anweisungen an den QHScompiler und \textit{LiteralCode} ist Text, der unverändert in die Ausgabedatei geschrieben wird.
@@ -83,18 +83,18 @@ Bestimmte \textit{Orders} können jedoch \textit{orderQueue-proof}, also immun g
 \textit{Orders}, die \textit{orderQueue-proof} sind, werden an die \textit{Execute-Phase} weitergegeben, auch wenn die \textit{OrderQueue} aktiv ist.
 Dieses Prinzip ist zum Beispiel besonders bei der \textit{Instruction}, welche die \textit{OrderQueue} wieder deaktiviert, wichtig.
 Da diese \textit{Instruction} ansonsten nicht zur \textit{Execute-Phase} gelänge und somit die \textit{OrderQueue} nie deaktiviert würde.
-Zu beachten ist, dass \textit{LiteralCode} nicht \textit{orderQueue-proof} sein kann.
+%Zu beachten ist, dass \textit{LiteralCode} nicht \textit{orderQueue-proof} sein kann.
 
 %MAYBE OrderQueue FIGURE
 
 Ist die \textit{OrderQueue} deaktiviert oder die \textit{Order} \textit{orderQueue-proof}, gelangt diese \textit{Order} zur \textit{Execute-Phase}.
 
 \section{Die \textit{Execute-Phase}} \label{sec:qhs-execute}
-Während der \textit{Execute-Phase} wird der tatsächliche Assembly-Code generiert. Je nach Typ der \textit{Order} (\textit{Identifier}, \textit{Instruction} oder \textit{LiteralCode}) läuft die \textit{Execute-Phase} sehr unterschiedlich ab.
+Während der \textit{Execute-Phase} wird die Ausgabedatei generiert. Je nach Typ der \textit{Order} (\textit{Identifier}, \textit{Instruction} oder \textit{LiteralCode}) läuft die \textit{Execute-Phase} sehr unterschiedlich ab.
 In den folgenden Abschnitten wird der Ablauf der \textit{Execute-Phase} je nach \textit{Ordertyp} erklärt.
 
 \subsection{\textit{Identifier} in der \textit{Execute-Phase}}
-\textit{Identifier} stehen für die am Anfang von Abschnitt \ref{cha:4-QHS_Compiler} erwähnten Macros.
+\textit{Identifier} stehen für die am Anfang von Kapitel \ref{cha:4-QHS_Compiler} erwähnten Macros.
 Die Macros sind für den QHScompiler eine Liste an \textit{Orders}.
 \textit{Identifier} lassen sich zu einer Liste an \textit{Orders} definieren.
 Wenn nun ein \textit{Identifier} in die \textit{Execute-Phase} gelangt, werden die dazugehörigen \textit{Orders} auf den \textit{FetchStack} aus Abschnitt \ref{sec:qhs-fetch} gelegt.
@@ -144,7 +144,7 @@ In Abschnitt \ref{sec:howto-identifiers} werden \textit{Environments} anhand ein
 Wenn eine \textit{Instruction} in die \textit{Execute-Phase} gelangt, wird die dazu definierte Funktion im QHScompiler ausgeführt.
 Diese Funktionen können \textit{Identifier} definieren, die \textit{OrderQueue} aktivieren, Zahlen addieren und vieles mehr.
 \textit{Instructions} sind somit der Weg wie während der Kompilierung auf den QHScompiler Einfluss genommen werden kann.
-In der Tabelle \ref{tab:important_instructions} sind ein paar der wichtigsten \textit{Instructions} aufgelistet:
+In der Tabelle \ref{tab:important_instructions} sind \textit{Instructions} aufgelistet, die in späteren Beispielen verwendet werden.
 
 \begin{table}[H]
     \centering
@@ -186,8 +186,8 @@ Durch das Anpassen der \textit{LiteralCode-Orders} ist es also möglich die Ausg
 
 \section{Definition der Macros} \label{sec:qhs-macro_definitions}
 Somit ist der QHScompiler komplett. Grundsätzlich lässt sich mit \textit{LiteralCode} bereits jedes Programm schreiben und mit dem QHScompiler kompilieren. 
-Jedoch habe ich in Abschnitt \ref{cha:2-Vergleich} festgelegt, dass die Eingabesprache einen C ähnlichen Syntax aufweisen und die Ausgabesprache Assembly sein muss.
-Um dies zu ermöglichen, muss man, wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} erwähnt, bestimmte Macros also \textit{Identifier} definieren.
+Jedoch muss, wie in Kapitel \ref{cha:2-Vergleich} festgelegt, ie Eingabesprache eine C-ähnliche Syntax aufweisen und die Ausgabesprache Assembly sein.
+Um dies zu ermöglichen, muss man, wie zu Beginn von Kapitel \ref{cha:4-QHS_Compiler} erwähnt, bestimmte Macros, also \textit{Identifier}, definieren.
 In diesem Abschnitt werde ich zeigen, wie sich diese \textit{Identifier} auch für syntaktisch komplexe Programmiersprachen definieren lassen.
 Zur Veranschaulichung dienen Variablen und Funktionsdefinitionen.
 
@@ -231,11 +231,11 @@ Kommentare können mehrere Zeilen umfassen und beginnen immer mit {\listingFont\
 Der Kommentar {\listingFont\selectfont /* X = "test" { }\#pushEnv */} würde bedeuten,
 dass der \textit{Identifier} {\listingFont\selectfont X} zu den \textit{Orders} {\listingFont\selectfont "test"{}} (\textit{LiteralCode}) und {\listingFont\selectfont \#pushEnv} (\textit{Instruction}) definiert wurde. 
 
-Auch wird bei längeren \textit{Identifier}-Definitionen wird zuerst der zu definierende \textit{Identifier} getrennt von den restlichen \textit{Orders} der \textit{OrderQueue} hinzugefügt.
-Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
+%Auch wird bei längeren \textit{Identifier}-Definitionen zuerst der zu definierende \textit{Identifier} getrennt von den restlichen \textit{Orders} der \textit{OrderQueue} hinzugefügt.
+%Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
 
 \subsection{Beispiele zu \textit{Identifier}-Definitionen} \label{sec:howto-identifiers}
-Wie die Definition von \textit{Identifiern} ablaufen kann, wird hier an einigen Beispielen erklärt.
+Wie die Definition von \textit{Identifiern} ablaufen kann, wird in diesem Abschnitt an einigen Beispielen erklärt.
 
 \begin{minipage}{\linewidth}
 \begin{multicols}{2}
@@ -362,7 +362,7 @@ lit8.1
 Die OrderQueue enthält: "lit8.2"
 \end{lstlisting}
 \columnbreak
-In Auflistung \ref{eg:howto-id8} wird eine \textit{Identifier}-Definition auf mehrere Zeilen geteilt. Dies dient der besseren Leserlichkeit und kompiliert gleich wie eine Definition auf nur einer Linie.
+In Auflistung \ref{eg:howto-id8} wird eine \textit{Identifier}-Definition auf mehrere Zeilen aufgeteilt. Dies dient der besseren Leserlichkeit und kompiliert gleich wie eine Definition auf nur einer Linie.
 Auf Linie 5 werden {\selectListingFont [} ({\selectListingFont \#enterOrderQueue}) und {\selectListingFont ]} ({\selectListingFont \#exitOrderQueue}) innerhalb einer bereits aktiven \textit{OrderQueue} verwendet.
 Im QHScompiler ist dies so implementiert, dass die beiden \textit{Identifier} nicht ausgeführt und normal der \textit{OrderQueue} hinzugefügt werden. Die \textit{OrderQueue} enthält nach Linie 5 folgende \textit{Orders}: \break
 \centerline{\selectListingFont id8 "lit8.1"{} [ "lit8.2"{} ] }
@@ -449,7 +449,7 @@ Die Definition vom \textit{Identifier} {\selectListingFont id11} ist wieder:
 Mit den {\listingFont\selectfont \#enterOrderQueue} (resp. {\listingFont\selectfont [} ) und {\listingFont\selectfont \#exitOrderQueue} (resp. {\listingFont\selectfont ]} ) \textit{Instructions}
 kann innerhalb eines \textit{Identifiers} die \textit{OrderQueue} verwendet werden.
 Dies ermöglicht eine Art von Parameter und Rückgabewert für \textit{Identifier}.
-Parameter werden vor dem Aufruf eines \textit{Identifiers} der \textit{OrderQueue} hinzugefügt. Diese können dann innerhalb des \textit{Identifiers} verwendet werden.
+Vor dem Aufruf eines \textit{Identifiers} lassen sich \textit{Orders} der \textit{OrderQueue} hinzugefügen. Diese \textit{Orders} können dann innerhalb des \textit{Identifiers} wie Parameter verwendet werden.
 Genauso kann der \textit{Identifier} \textit{Orders} der \textit{OrderQueue} hinzufügen und diese somit zurückgeben.
 
 \begin{lstlisting}[language=QHS, caption=Verwendung von Parametern und Rückgabewert eines \textit{Identifiers}]
@@ -604,7 +604,7 @@ Das {\selectListingFont int} in der Auflistung \ref{eg:qhs-function_goal} würde
 Der Unterschied zwischen Variable- und Funktionsdefinition besteht hierbei in den Klammern, die auf den Namen folgen.
 Der QHScompiler müsste also beim {\selectListingFont int} \textit{Identifier} nach vorne schauen, ob sich eine Klammer nach dem Namen befindet, und folglich eine Variable- oder Funktionsdefinition ausführen.
 Bei einem traditionellen Compiler würde diese Überprüfung während der syntaktischen Analyse ausgeführt werden.
-Dies ist dem QHScompiler jedoch nicht möglich, da dieser, wie zu Beginn von Abschnitt \ref{cha:4-QHS_Compiler} erläutert, über keine syntaktische Analyse verfügt.
+Dies ist dem QHScompiler jedoch nicht möglich, da dieser, wie zu Beginn von Kapitel \ref{cha:4-QHS_Compiler} erläutert, über keine syntaktische Analyse verfügt.
 Glücklicherweise lässt sich dieses erste Problem lösen, ohne eine Änderung am QHScompiler vorzunehmen.
 Die Lösung basiert darauf, beim {\selectListingFont int} \textit{Identifier} sowohl eine Variable- als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
 Daraufhin werden zwei \textit{Identifier} definiert, erstens eine Klammer für eine Funktionsdefinition und zweitens ein Semikolon für die Definition einer Variable.
@@ -653,7 +653,9 @@ Dieses Konzept wird im weiteren als \textit{DelayedExecute} bezeichnet. Das Ganz
 
 
 Das zweite Problem sind die Parameter einer Funktionsdefinition. Diese sehen genau gleich aus wie die Definition einer Variable, sollten jedoch vom QHScompiler anders ausgeführt werden.
-Erstens sollte bei einer Parameterdefinition nicht der \textit{LiteralCode} zur Subtraktion vom \textit{Stack-Pointer} hinzugefügt werden. Zweitens verwendet eine Parameterdefinition einen anderen rbp-Offset.
+Erstens wird bei der Definition von Variablen aus Abschnitt \ref{sec:qhs-vars} \textit{LiteralCode} zur Subtraktion vom \textit{Stack-Pointer} verwendet. Diese Subtraktion braucht es bei Parameterdefinition nicht.
+%Erstens sollte bei einer Parameterdefinition nicht der \textit{LiteralCode} zur Subtraktion vom \textit{Stack-Pointer}, wie bei Definition von Variablen aus Abschnitt \ref{sec:qhs-vars}, hinzugefügt werden.
+Zweitens verwendet eine Parameterdefinition einen anderen rbp-Offset als Definitionen von Variablen.
 Die Lösung liegt im Umdefinieren des {\selectListingFont definition} \textit{Identifiers}. Dieser ist momentan für die Definition von Variablen und Funktionen verantwortlich.
 Bei der Anfangsklammer der Funktionsdefinition wird der {\selectListingFont definition} \textit{Identifier} neu definiert, sodass er eine Parameterdefinition ausführt.
 Die vorherige Definition geht dank der {\listingFont\selectfont \#pushEnv} \textit{Instruction} nicht verloren.

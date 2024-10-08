@@ -5,30 +5,31 @@ Der traditionelle Aufbau eines Compilers lässt sich mit folgendem Schema verans
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.2]{resources/images/mountain.png}
-    \caption[Schritte, die ein Compiler durchläuft (https://github.com/munificent/craftinginterpreters, besucht am 5.8.2024)]{Schritte, die ein Compiler durchläuft}
+    \caption{Schritte, die ein Compiler durchläuft \cite{img:Compiler-steps}}
     \label{fig:mountain}
 \end{figure}
 
-In dieser Arbeit werde ich mich auf die in der unteren Abbildung \ref{fig:mountain-edited} dargestellten Schritte fokussieren.
+Ein traditioneller Compiler beginnt unten links bei der Eingabedatei (\textit{Source Code}). Über verschiedene Wege wird die Ausgabedatei als \textit{High-level Language}, \textit{Bytecode} oder \textit{Machinecode} generiert.
+In dieser Arbeit werde ich mich lediglich auf die in der unteren Abbildung \ref{fig:mountain-edited} dargestellten Schritte fokussieren.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.2]{resources/images/mountain-edited.png}
-    \caption[Schritte, die in dieser Arbeit behandelt werden (Basierend auf Abbildung \ref{fig:mountain})]{Schritte, die in dieser Arbeit behandelt werden}
+    \caption{Schritte, die in dieser Arbeit behandelt werden (Basierend auf \cite{img:Compiler-steps})}
     \label{fig:mountain-edited}
 \end{figure}
 
 Die in dieser Maturaarbeit verwendeten Fachbegriffe entsprechen nicht immer denen aus Abbildung \ref{fig:mountain-edited}.
 Bei der ersten Verwendung dieser Fachbegriffe wird jeweils die alternative aus Abbildung \ref{fig:mountain-edited} in Klammern angegeben.
 
-Als Basis für diese Kapitel dienen die Quellen \cite{CompilersDragon} und \cite{Lecture}.
+Als Basis für diese Kapitel dient das Buch \textit{Compilers: Principles, Techniques, and Tools (2nd Edition)} \cite{CompilersDragon} und eine Vorlesung der Universität Bern zum Thema Compiler Construction \cite{Lecture}.
 
 \section{Lexikalische Analyse (\textit{Scanning})}
-Meist werden Programme so geschrieben, dass wir Menschen sie lesen und verstehen können. Dafür verwendet man Buchstaben, Zahlen, Sonderzeichen (wie + oder *) und Leerzeichen.
+Meist werden Programme so geschrieben, dass wir Menschen sie lesen und verstehen können. Dafür verwendet man Buchstaben, Zahlen, Leerzeichen und Sonderzeichen (wie {\selectListingFont +} oder {\selectListingFont *}).
 Diese Zeichen sind jedoch für den Computer nicht sofort verständlich. Der erste Schritt beim Kompilieren ist daher die lexikalische Analyse. Diese Analyse wird von einem Teil des Compilers, dem \textit{Lexer}, durchgeführt.
 Die Aufgabe des \textit{Lexers} ist es, die Eingabedatei abzuarbeiten und die gefundenen Zeichen in sogenannte \textit{Tokens} zu verwandeln. Diese \textit{Tokens} sind Datenstrukturen, die der Compiler versteht und mit denen er weiterarbeiten kann.
 
-Ein Beispiel der lexikalischen Analyse auf der Programmiersprache C:
+Ein Beispiel der lexikalischen Analyse für die der Programmiersprache C:
 
 \begin{lstlisting}[language=C, label=eg:preLex, caption=C code vor lexikalischer Analyse]
 int foo()
@@ -55,20 +56,20 @@ LiteralInt      (value=0)
 [...]
 \end{lstlisting}
 
-Der \textit{Lexer} legt fest, welche Zeichen die Eingabesprache enthalten darf und welche Bedeutung ihnen zugesprochen wird. So ist zum Beispiel im \textit{Lexer} festgelegt, dass ein + Zeichen als Addition interpretiert wird.
+Der \textit{Lexer} legt fest, welche Zeichen die Eingabesprache enthalten darf und welche Bedeutung ihnen zugesprochen wird. So ist zum Beispiel im \textit{Lexer} festgelegt, dass ein {\selectListingFont +} Zeichen als Addition interpretiert wird.
 Genauso wie im Listing \ref{eg:postLex} {\listingFont\selectfont 'if'} als \textit{Keyword-Token} gesehen wird, lässt sich im \textit{Lexer} auch bestimmen, dass ein Wort wie {\listingFont\selectfont 'else'} als Keyword angesehen werden soll.
 
 \section{Syntaktische Analyse (\textit{Parsing})}
 Der Compiler hat nun die Zeichen der Eingabedatei in ein für ihn verständliches Format übersetzt.
 Jedoch fehlt dem Compiler noch das Verständnis für die Syntax der Eingabe-Programmiersprache.
-Die meisten High-Level Programmiersprachen weisen Syntaxregeln auf. Diese beinhalten, wie Funktionen und Variablen definiert werden oder mit welchen Präzedenzregeln \textit{Expressions} evaluiert werden.
+Die meisten High-Level Programmiersprachen weisen Syntaxregeln auf. Diese beinhalten, wie Funktionen und Variablen definiert werden oder mit welchen Präzedenzregeln mathematische Ausdrücke evaluiert werden.
 In diesem Schritt führt der sogenannte \textit{Parser} die syntaktische Analyse durch.
 Dabei werden die bei der lexikalischen Analyse gefundenen \textit{Tokens} ineinander verschachtelt und in einen sogenannten \textit{Abstract Syntax Tree} (AST) überführt.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.4]{resources/images/AST.pdf}
-    \caption[AST zum euklidischen Algorithmus. (https://en.wikipedia.org/wiki/Abstract\_syntax\_tree, besucht am 5.8.2024)]{AST zum euklidischen Algorithmus}
+    \caption{AST zum euklidischen Algorithmus (Basierend auf \cite{img:AST})}
     \label{fig:syntax-tree}
 \end{figure}
 
@@ -81,7 +82,7 @@ Daher befindet sich, wie in Abbildung \ref{fig:syntax-tree} ersichtlich, die Sub
 \section{Semantische Analyse (\textit{Analysis})}
 Semantik ist die Wissenschaft der Bedeutung von Wörtern einer Menschensprache. Bei einem Compiler geht es bei der semantischen Analyse jedoch nicht um die Bedeutung, sondern um die Korrektheit von \textit{Expressions}.
 Wird eine Variable nicht konform ihres Datentyps verwendet, zum Beispiel wenn zwei Strings dividiert werden sollen, wird dies während der semantischen Analyse entdeckt und gemeldet.
-Gegebenenfalls kann ein impliziter Cast, also ein automatischer Wechsel des Datentyps, hinzugefügt werden.
+Gegebenenfalls kann ein impliziter Cast, also eine automatische Umwandlung des Datentyps, hinzugefügt werden.
 So geben zum Beispiel manche Programmiersprachen bei der Division zweier Ganzzahlen eine Fliesskommazahl zurück.
 Auch werden unbekannte Variablen und Funktionen in diesem Schritt abgefangen.
 Hauptsächlich werden Datentypen an die \textit{Nodes} des AST angebunden. Nach der semantischen Analyse sieht der AST aus Abbildung \ref{fig:syntax-tree} wie folgt aus:
@@ -89,12 +90,12 @@ Hauptsächlich werden Datentypen an die \textit{Nodes} des AST angebunden. Nach 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.4]{resources/images/AST_with_types.pdf}
-    \caption[AST nach der semantischen Analyse (Basierend auf Abbildung \ref{fig:syntax-tree})]{AST nach der semantischen Analyse}
+    \caption{AST nach der semantischen Analyse (Basierend auf \cite{img:AST})}
     \label{fig:syntax-tree-with-types}
 \end{figure}
 
 Der AST wird nach der semantischen Analyse als Zwischencode (\textit{Intermediate Representation}) bezeichnet.
-Da dieser Zwischencode in den weiteren Beispielen jedoch weiterhin dem Aufbau eines AST folgt, werde ich auch weiter den Begriff AST verwenden.
+Da dieser Zwischencode in den weiteren Beispielen jedoch weiterhin dem Aufbau eines AST folgt, wird auch weiterhin der Begriff AST verwendet.
 
 
 \section{Codegenerierung} \label{sec:traditional_code_generation}
@@ -106,17 +107,18 @@ Diese Ausgabecode-Teile sind häufig von den darunterliegenden \textit{Nodes} ab
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.4]{resources/images/AST_macro_expansion.pdf}
-    \caption[AST nach \textit{Macro Expansion}. (Basierend auf Abbildung \ref{fig:syntax-tree})]{AST nach \textit{Macro Expansion}}
+    \caption{AST nach \textit{Macro Expansion} (Basierend auf \cite{img:AST})}
     \label{fig:syntax-tree-after-macro-expansion}
 \end{figure}
 
 Nach der \textit{Macro Expansion} lässt die Ausgabedatei einfach aus dem AST generieren.
 
 \section{Optimierung}
-Codegenerierung ist zwar der letzte Schritt beim Kompilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet. Optimierung geschieht zwischen jedem der genannten Schritte und dies häufig mehrmals.
-Dabei geht es darum die Ausgabedatei so effizient wie möglich zu machen. Effizient kann hierbei verschiedenes bedeuten.
+Codegenerierung ist zwar der letzte Schritt beim Kompilieren, trotzdem wurde eine wichtige Aufgabe des Compilers noch nicht betrachtet.
+Optimierung geschieht zwischen jedem der genannten Schritte.
+Dabei geht es darum die Ausgabe so effizient wie möglich zu machen. Effizient kann hierbei verschiedenes bedeuten.
 Die Ausgabedatei muss so schnell wie möglich ausgeführt werden, Arbeitsspeicher sparsam verwenden und dazu noch eine möglichst kleine Datei umfassen. 
-Optimierungsmethoden reichen vom Überspringen der Kommentare und Umstellen von mathematischen Operationen, bis zum Entfernen von ungebrauchten Variablen und sogenannten \textit{Deadstores}.
+Optimierungsmethoden reichen vom Überspringen der Kommentare und Umstellen von mathematischen Operationen, bis zum Entfernen von ungebrauchten Variablen und unnötigem Code.
 Es muss von CPU-Registern profitiert, mit Heap-Arbeitsspeicher umgegangen und von Inlinefunktionen Gebrauch gemacht werden. % inline als deutsches Wort source: https://learn.microsoft.com/de-de/cpp/cpp/inline-functions-cpp?view=msvc-170
 Optimierung ist also sehr vielseitig und komplex.
-Wie Optimierung genau aussehen kann, wird daher in dieser Maturaarbeit nicht weiter betrachtet.
+Wie Optimierung genau funktioniert, wird in dieser Arbeit nicht weiter betrachtet.
