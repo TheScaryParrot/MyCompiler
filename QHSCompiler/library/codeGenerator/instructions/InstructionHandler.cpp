@@ -356,54 +356,6 @@ static class InstructionHandler
                                  return true;
                              },
                              false, false)},
-        {"getStringVar", Instruction(
-                             [](AbstractGenerator* generator) -> bool
-                             {
-                                 Order nameOrder = generator->DequeueFromOrderQueue();
-                                 if (nameOrder.GetType() != Order::LiteralCode)
-                                 {
-                                     Logger.Log(
-                                         "Tried getStringVar but order from OrderQueue is not "
-                                         "direct code",
-                                         Logger::ERROR);
-                                     return true;
-                                 }
-
-                                 std::string& generatorVarName = nameOrder.GetName();
-                                 std::string value = generator->GetStringGeneratorVar(generatorVarName);
-                                 generator->PutInFront(Order(value, Order::LiteralCode, nameOrder.GetLine()));
-                                 return true;
-                             },
-                             false, false)},
-        {"setStringVar", Instruction(
-                             [](AbstractGenerator* generator) -> bool
-                             {
-                                 Order nameOrder = generator->DequeueFromOrderQueue();
-                                 if (nameOrder.GetType() != Order::LiteralCode)
-                                 {
-                                     Logger.Log(
-                                         "Tried setStringGeneratorVar but first order (name) from "
-                                         "OrderQueue is not direct code",
-                                         Logger::ERROR);
-                                     return true;
-                                 }
-
-                                 Order valueOrder = generator->DequeueFromOrderQueue();
-                                 if (valueOrder.GetType() != Order::LiteralCode)
-                                 {
-                                     Logger.Log(
-                                         "Tried setStringGeneratorVar but second order (value) from "
-                                         "OrderQueue is not direct code",
-                                         Logger::ERROR);
-                                     return true;
-                                 }
-
-                                 std::string& generatorVarName = nameOrder.GetName();
-                                 std::string& value = valueOrder.GetName();
-                                 generator->SetStringGeneratorVar(generatorVarName, value);
-                                 return true;
-                             },
-                             false, false)},
         {"setAssemblySection", Instruction(
                                    [](AbstractGenerator* generator) -> bool
                                    {

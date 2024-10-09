@@ -80,18 +80,6 @@ class AbstractGenerator
     }
     void SetIntGeneratorVar(std::string& name, int value) { intGeneratorVars.Set(name, value); }
 
-    std::string GetStringGeneratorVar(std::string& name)
-    {
-        if (!stringGeneratorVars.Contains(name))
-        {
-            Logger.Log("No string generator variable found with name: " + name, Logger::ERROR);
-            return "";
-        }
-
-        return stringGeneratorVars.Get(name);
-    }
-    void SetStringGeneratorVar(std::string& name, std::string& value) { stringGeneratorVars.Set(name, value); }
-
     AssemblyCode* assemblyCode = new AssemblyCode();
 
     void AddToAssemblyCode(std::string& code) { this->assemblyCode->AddCode(code); }
