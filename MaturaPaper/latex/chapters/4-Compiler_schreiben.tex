@@ -18,7 +18,7 @@ Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus (\textit{QHS-Z
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.6]{resources/images/qhs-cycle.png}
+    \includegraphics[scale=0.75]{resources/images/qhs-cycle.png}
     \caption{Zyklus der QHS Kompilierung}
     \label{fig:qhs-cycle}
 \end{figure}
@@ -69,12 +69,12 @@ Die Eingabedatei befindet sich auf dem untersten Platz des \textit{FetchStacks} 
 Die Hauptanwendung des \textit{FetchStacks} wird im Abschnitt \ref{sec:qhs-execute} erklärt.
 Die Kompilierung ist beendet, sobald keine \textit{Order} mehr auf dem \textit{FetchStack} vorhanden ist.
 
-\section{Die \textit{Validate-Phase}} \label{sec:qhs-Validate}
-Nachdem die nächste \textit{Order} in der  \textit{Fetch-Phase} gefunden wurde, wird diese \textit{Order} an die \textit{Validate-Phase} weitergegeben. Während der \textit{Validate-Phase} kommt die \textit{OrderQueue} ins Spiel.
+\section{Die \textit{Enqueue-Phase}} \label{sec:qhs-Enqueue}
+Nachdem die nächste \textit{Order} in der  \textit{Fetch-Phase} gefunden wurde, wird diese \textit{Order} an die \textit{Enqueue-Phase} weitergegeben. Während der \textit{Enqueue-Phase} kommt die \textit{OrderQueue} ins Spiel.
 Dabei handelt es sich, wie der Name schon sagt, um eine Queue von \textit{Orders}.
 Die Aufgabe der \textit{OrderQueue} ist das Speichern und spätere Zurückholen von \textit{Orders}.
 Die \textit{OrderQueue} kann mit \textit{Instructions}, die im Abschnitt \ref{sec:qhs-execute} weiter ausgeführt werden, aktiviert und deaktiviert werden.
-Wenn eine \textit{Order} in die \textit{Validate-Phase} gelangt und die \textit{OrderQueue} aktiviert ist, wird diese \textit{Order} der \textit{OrderQueue} hinzugefügt.
+Wenn eine \textit{Order} in die \textit{Enqueue-Phase} gelangt und die \textit{OrderQueue} aktiviert ist, wird diese \textit{Order} der \textit{OrderQueue} hinzugefügt.
 Die \textit{Execute-Phase} wird danach übersprungen und der QHS-Zyklus beginnt von neuem bei Fetch.
 Die \textit{Order} wurde (ohne die \textit{Execute-Phase} erreicht zu haben) auf der \textit{OrderQueue} gespeichert.
 Später ist es mit \textit{Instructions} möglich diese \textit{Order} von der \textit{OrderQueue} zu entfernen und auszuführen.
@@ -161,7 +161,7 @@ In der Tabelle \ref{tab:important_instructions} sind \textit{Instructions} aufge
     {\listingFont\selectfont \#assignToOne}          & Wie {\listingFont\selectfont \#assign}, jedoch wird nach dem \textit{Identifier} nur eine weitere \textit{Order} von der \textit{OrderQueue} genommen und 
                                                        als Definition für den \textit{Identifier} verwendet. \\ \hline
     {\listingFont\selectfont \#force}                & Die nächste \textit{Order} wird nach der \textit{Fetch-Phase} sofort an die \textit{Execute-Phase} weitergegeben.
-                                                       Überspringt die \textit{Validate-Phase} und somit die \textit{OrderQueue}. Diese \textit{Instruction} ist \textit{orderQueue-proof}. \\ \hline
+                                                       Überspringt die \textit{Enqueue-Phase} und somit die \textit{OrderQueue}. Diese \textit{Instruction} ist \textit{orderQueue-proof}. \\ \hline
     %{\listingFont\selectfont \#lightForce}           & Ähnlich wird {\listingFont\selectfont \#force}, jedoch wird diese nur ausgeführt, wenn \textbf{explain this cuz they don't know OrderQueue depth} \\ \hline
     {\listingFont\selectfont \#orderEnqueue}         & Die nächste \textit{Order} wird sofort dem Ende der \textit{OrderQueue} hinzugefügt, auch wenn diese \textit{Order} \textit{orderQueue-proof} wäre.
                                                        Die \textit{Execute-Phase} wird übersprungen. \\ \hline
