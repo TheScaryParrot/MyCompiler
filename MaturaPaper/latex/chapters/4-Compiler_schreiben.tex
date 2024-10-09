@@ -201,7 +201,7 @@ viele unterschiedliche Programmiersprachen mit dem QHScompiler zu kompilieren. I
 für den QHScompiler definieren lässt.
 \fi
 
-\subsection{Die QHS Notation} \label{sec:qhs-notation}
+\subsection{Die QHS-Notation} \label{sec:qhs-notation}
 In diesem Abschnitt wird viel QHS-Code als Beispiel verwendet.
 Um die Leserlichkeit von QHS zu verbessern, werden zuerst paar \textit{Identifier} anstelle der umständlichen \textit{Instructions} definiert.
 Diese \textit{Identifier} sind in der folgenden Tabelle \ref{tab:shortcuts} aufgeführt.
@@ -243,7 +243,7 @@ Wie die Definition von \textit{Identifiern} ablaufen kann, wird in diesem Abschn
 %\ruleEingabe%
 [ id1 "lit1" ] ->
 [ id2 "lit2.1" "lit2.2" id1 ] >>
-[ id3 "lit3.1" ] [ "lit3.2" ] >>
+[ id3 ] [ "lit3.1" "lit3.2" ] >>
 
 id1 \n
 id2 \n
@@ -272,7 +272,7 @@ Die Linien 2 und 3 definieren die folgenden beiden \textit{Identifier}: \break
 \centerline{\selectListingFont id1 = "lit1"{}}
 \centerline{\selectListingFont id2 = "lit2.1"{} "lit2.2"{} id1}
 In Linie 4 wird die \textit{OrderQueue} zwischendurch deaktiviert und wieder aktiviert.
-Dies hat keinen Einfluss auf die Kompilierung und wird daher, wie in Abschnitt \ref{sec:qhs-notation} erwähnt, für die Verbesserung der Leserlichkeit von langen \textit{Identifier}-Definitionen verwendet.
+Dies hat keinen Einfluss auf die Kompilierung und wird daher für die Verbesserung der Leserlichkeit von langen \textit{Identifier}-Definitionen verwendet.
 Die \textit{OrderQueue} sieht vor dem {\selectListingFont >>} wie folgt aus, wobei das linkste Element das erste darstellt:  \break
 \centerline{\selectListingFont id3 "lit3.1"{} "lit3.2"{}}
 Wie gewohnt wird {\selectListingFont id3} mit {\selectListingFont >>} definiert: \break
