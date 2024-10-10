@@ -40,7 +40,7 @@ Diese \textit{Ordertypen} sind mit folgenden Regular-Expressions definiert. Leer
     \multicolumn{1}{l|}{instruction}       & \#{[}\textasciicircum \textbackslash{}s{]}+                      \\ \hline
     \multicolumn{1}{l|}{literalCode}       & ".*"                                                              \\
     %                                       &                                                                   \\
-    %\textless{}identiferChar\textgreater{} & = {[}\textasciicircum{}\# "\textless{}whitespace\textgreater{}{]} \\
+    %\textless{}identifierChar\textgreater{} & = {[}\textasciicircum{}\# "\textless{}whitespace\textgreater{}{]} \\
     %\textless{}whitespace\textgreater{}    & = SPACE | NEWLINE | TAB
     
     \end{tabular}
@@ -75,7 +75,9 @@ Da diese \textit{Instruction} ansonsten nicht zur \textit{Execute-Phase} geläng
 
 %MAYBE OrderQueue FIGURE
 
-Ist die \textit{OrderQueue} deaktiviert oder die \textit{Order} \textit{orderQueue-proof}, gelangt diese \textit{Order} zur \textit{Execute-Phase}.
+%Die \textit{Order} gelangt zur \textit{Execute-Phase}, wenn die \textit{Order} \textit{orderQueue-proof} oder die \textit{OrderQueue} deaktiviert ist.
+
+Ist die \textit{OrderQueue} deaktiviert oder die \textit{Order} \textit{orderQueue-proof}, gelangt die \textit{Order} zur \textit{Execute-Phase}.
 
 \section{Die \textit{Execute-Phase}} \label{sec:qhs-execute}
 Während der \textit{Execute-Phase} wird die Ausgabedatei generiert. Je nach Typ der \textit{Order} (\textit{Identifier}, \textit{Instruction} oder \textit{LiteralCode}) läuft die \textit{Execute-Phase} sehr unterschiedlich ab.
@@ -239,6 +241,7 @@ id1 \n
 id2 \n
 id3
 
+
 %\ruleAusgabe%
 
 lit1
@@ -263,7 +266,7 @@ Die Linien 2 und 3 definieren die folgenden beiden \textit{Identifier}: \break
 \centerline{\selectListingFont id2 = "lit2.1"{} "lit2.2"{} id1}
 In Linie 4 wird die \textit{OrderQueue} zwischendurch deaktiviert und wieder aktiviert.
 Dies hat keinen Einfluss auf die Kompilierung und wird daher für die Verbesserung der Leserlichkeit von langen \textit{Identifier}-Definitionen verwendet.
-Die \textit{OrderQueue} sieht vor dem {\selectListingFont >>} wie folgt aus, wobei das linkste Element das erste darstellt:  \break
+Die \textit{OrderQueue} sieht vor dem {\selectListingFont >>} auf Linie 4 wie folgt aus, wobei die linkste \textit{Order} die erste \textit{Order} der \textit{OrderQueue} darstellt:  \break
 \centerline{\selectListingFont id3 "lit3.1"{} "lit3.2"{}}
 Wie gewohnt wird {\selectListingFont id3} mit {\selectListingFont >>} definiert: \break
 \centerline{\selectListingFont id3 = "lit3.1"{} "lit3.2"{}}
@@ -326,7 +329,7 @@ Daraufhin wird mit der \textit{Instruction} {\selectListingFont \#orderFrontEnqu
 Die \textit{OrderQueue} sieht daraufhin wie folgt aus:
 \centerline{\selectListingFont id7 "lit7.1"{}}
 Der \textit{LiteralCode} {\selectListingFont "lit7.2"{}} wird normal hinten an die \textit{OrderQueue} angefügt.
-Da sich der Identifer {\selectListingFont id7} auf dem ersten Platz der \textit{OrderQueue} befinden, kann dieser definiert werden: \break
+Da sich der Identifier {\selectListingFont id7} auf dem ersten Platz der \textit{OrderQueue} befinden, kann dieser definiert werden: \break
 \centerline{\selectListingFont id7 = "lit7.1"{} "lit7.2"{}}
 \end{multicols}
 \end{minipage}
@@ -391,7 +394,7 @@ Zuerst wird in Linie 2 der \textit{Identifier} {\selectListingFont id9} wie gewo
 Die \textit{Instruction} {\selectListingFont \#force} ist \textit{orderQueue-proof} und zwingt den QHScompiler dazu, die nächste \textit{Order} an die \textit{Execute-Phase} weiterzugeben, obwohl die \textit{OrderQueue} aktiv ist.
 Der \textit{Identifier} {\selectListingFont id9} wird daher mit seiner Definition ersetzt. Die \textit{OrderQueue} sieht nach Linie 6 wie folgt aus: \break
 \centerline{\selectListingFont id10 "lit9"{}}
-In Linie 7 wird daraufhin der \textit{Identifer} {\selectListingFont !} erneut verwendet. Dieses Mal jedoch innerhalb einer doppelten Aktivierung der \textit{OrderQueue}, wie in Beispiel \ref{eg:howto-id8}.
+In Linie 7 wird daraufhin der \textit{Identifier} {\selectListingFont !} erneut verwendet. Dieses Mal jedoch innerhalb einer doppelten Aktivierung der \textit{OrderQueue}, wie in Beispiel \ref{eg:howto-id8}.
 In diesem Fall gelangen auch \textit{Orders} die \textit{orderQueue-proof} sind, nicht zur \textit{Execute-Phase}. Der \textit{Identifier} {\selectListingFont !} wird normal der \textit{OrderQueue} hinzugefügt.
 Die folgende Definition von {\selectListingFont id10} lautet: \break
 \centerline{\selectListingFont id10 = "lit9"{} [ ! id9 ]}
@@ -423,7 +426,7 @@ lit11.1 lit12
 \end{lstlisting}
 \columnbreak
 Die \textit{Identifier} {\selectListingFont id11} und {\selectListingFont id12} werden gewöhnlich definiert und verwendet. Daraufhin wird mit {\selectListingFont \#pushEnv} ein neues \textit{Environment} hinzugefügt.
-In diesem \textit{Environment} wird {\selectListingFont id11} umdefiniert. In Linie 12 wird die neuste Definition der beiden \textit{Identifier} verwendet. Für {\selectListingFont id11} ist dies: \break
+In diesem \textit{Environment} wird {\selectListingFont id11} umdefiniert. In Linie 10 wird die neuste Definition der beiden \textit{Identifier} verwendet. Für {\selectListingFont id11} ist dies: \break
 \centerline{\selectListingFont id11 = "lit11.2"}
 Der Definition des {\selectListingFont id12} \textit{Identifiers} ist unverändert: \break
 \centerline{\selectListingFont id12 = "lit12"}
@@ -495,7 +498,7 @@ wird der Name der Variable mit der {\listingFont\selectfont \#deepFetch} \textit
 [ var ]
 [
     #orderFrontEnqueue size ->          /* size = erstes Argument */
-    [ name ! #deepFetch ] >>            /* name = Was nach dem var Identifer folgt */
+    [ name ! #deepFetch ] >>            /* name = Was nach dem var Identifier folgt */
 
     "sub rsp, " size \n
 
