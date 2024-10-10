@@ -14,7 +14,7 @@ Orders können drei verschiedenen Typen aufweisen: \textit{Identifiers}, \textit
 %Bei \textit{Identifiers} handelt es sich um die bereits erwähnten Macros, \textit{Instructions} sind einfache vorprogrammierte Anweisungen an den QHScompiler und \textit{LiteralCode} ist Text, der unverändert in die Ausgabedatei geschrieben wird.
 Wie diese drei \textit{Ordertypen} genau funktionieren, wird in Abschnitt \ref{sec:qhs-execute} ausführlicher erklärt.
 
-Der Kompilierung durch den QHScompiler steht ein einfacher Zyklus (\textit{QHS-Zyklus}) zugrunde, dessen Inspiration der Von-Neumann Zyklus ist.
+Der Kompilierung durch den QHScompiler liegt ein einfacher Zyklus, der QHS-Zyklus, zugrunde.
 
 \begin{figure}[h!]
     \centering
@@ -50,24 +50,12 @@ Im Vergleich zu traditionellen Compilern fällt auf, dass beim QHScompiler kaum 
 sind für den QHScompiler alle Zeichen (mit Ausnahme von {\listingFont\selectfont \#} und {\listingFont\selectfont "{}}) gleichbedeutend.
 
 Normalerweise erhält die \textit{Fetch-Phase} die nächste \textit{Order} aus der Eingabedatei. 
-Es ist jedoch möglich \textit{Orders} der Eingabedatei voranzustellen. Diese \textit{Orders} werden in der \textit{Fetch-Phase} zuerst gefunden. Dies geschieht mithilfe des \textit{FetchStacks}, auf den \textit{Orders} gelegt werden können.
+Es ist jedoch möglich, \textit{Orders} der Eingabedatei voranzustellen. Diese \textit{Orders} werden in der \textit{Fetch-Phase} vor der nächsten \textit{Order} der Eingabedatei gefunden.
+Dies geschieht mithilfe des \textit{FetchStacks}, auf den \textit{Orders} gelegt werden können.
 In der nächsten \textit{Fetch-Phase} wird immer die oberste \textit{Order} des \textit{FetchStacks} geholt und daraufhin vom \textit{FetchStack} entfernt.
 Die Eingabedatei befindet sich auf dem untersten Platz des \textit{FetchStacks} und wird somit nur verwendet, wenn der Stack ansonsten komplett leer ist.
-%Eine \textit{Order} kann während jedem der drei Schritte des QHS-Zyklus auf den \textit{FetchStack} gelegt werden.
-
-%FETCHSTACK FIGURE
-
-%Während der Laufzeit des QHScompilers könnte der \textit{FetchStack} folgendermassen aussehen:
-%
-%\begin{figure}[h!]
-%    \centering
-%    \includegraphics[scale=1.1]{resources/images/fetch-stack.png}
-%    \caption{Struktur des \textit{FetchStacks} UPDATE}
-%    \label{fig:fetchstack}
-%\end{figure}
-%
-Die Hauptanwendung des \textit{FetchStacks} wird im Abschnitt \ref{sec:qhs-execute} erklärt.
-Die Kompilierung ist beendet, sobald keine \textit{Order} mehr auf dem \textit{FetchStack} vorhanden ist.
+Wann und wie \textit{Orders} auf den \textit{FetchStack} gelegt werden, wird im Abschnitt \ref{sec:qhs-execute} erklärt.
+Die Kompilierung ist beendet, sobald der \textit{FetchStack} leer ist.
 
 \section{Die \textit{Enqueue-Phase}} \label{sec:qhs-Enqueue}
 Nachdem die nächste \textit{Order} in der  \textit{Fetch-Phase} gefunden wurde, wird diese \textit{Order} an die \textit{Enqueue-Phase} weitergegeben. Während der \textit{Enqueue-Phase} kommt die \textit{OrderQueue} ins Spiel.
@@ -221,15 +209,17 @@ Diese \textit{Identifier} sind in der folgenden Tabelle \ref{tab:shortcuts} aufg
     {\listingFont\selectfont -\textgreater{}}               & {\listingFont\selectfont \#assignToOne}                  \\ \hline
     {\listingFont\selectfont !}                             & {\listingFont\selectfont \#force}                        \\ \hline
     %{\listingFont\selectfont ?!}                            & {\listingFont\selectfont \#lightForce}                   \\ \hline
-    {\listingFont\selectfont \textbackslash{}n}             & Eine neue Zeile in der Ausgabedatei
+    {\listingFont\selectfont \textbackslash{}n}             & Eine neue Zeile in der Ausgabedatei                      \\ \hline
+    {\listingFont\selectfont /*}                            & Beginn eines Kommentars                                  \\ \hline
+    {\listingFont\selectfont */}                            & Ende eines Kommentars
     \end{tabular}
 \end{table}
 }
 
-Weiter wird innerhalb von Kommentaren Pseudo-Code verwendet, um den QHS-Code verständlicher zu erklären.
+Innerhalb von Kommentaren wird Pseudo-Code verwendet, um den QHS-Code verständlicher zu erklären.
 Kommentare können mehrere Zeilen umfassen und beginnen immer mit {\listingFont\selectfont /*} und enden mit {\listingFont\selectfont*/}.
 Der Kommentar {\listingFont\selectfont /* X = "test" { }\#pushEnv */} würde bedeuten,
-dass der \textit{Identifier} {\listingFont\selectfont X} zu den \textit{Orders} {\listingFont\selectfont "test"{}} (\textit{LiteralCode}) und {\listingFont\selectfont \#pushEnv} (\textit{Instruction}) definiert wurde. 
+dass der \textit{Identifier} {\listingFont\selectfont X} als Folge der \textit{Orders} {\listingFont\selectfont "test"{}} (\textit{LiteralCode}) und {\listingFont\selectfont \#pushEnv} (\textit{Instruction}) definiert wurde. 
 
 %Auch wird bei längeren \textit{Identifier}-Definitionen zuerst der zu definierende \textit{Identifier} getrennt von den restlichen \textit{Orders} der \textit{OrderQueue} hinzugefügt.
 %Diese Separation dient der besseren Leserlichkeit und hat keinen Einfluss auf die Kompilierung des Codes.
@@ -601,12 +591,12 @@ int foo ( int param1 , int param2 )
 
 Hier lässt sich bereits das erste Problem feststellen. Im vorherigen Abschnitt \ref{sec:qhs-vars} wurde der {\selectListingFont int} \textit{Identifier} für die Definition einer Variable verwendet. 
 Das {\selectListingFont int} in der Auflistung \ref{eg:qhs-function_goal} würde daher vom QHScompiler als Definition für eine Variable verstanden werden.
-Der Unterschied zwischen Variable- und Funktionsdefinition besteht hierbei in den Klammern, die auf den Namen folgen.
-Der QHScompiler müsste also beim {\selectListingFont int} \textit{Identifier} nach vorne schauen, ob sich eine Klammer nach dem Namen befindet, und folglich eine Variable- oder Funktionsdefinition ausführen.
+Der Unterschied zwischen Variablen- und Funktionsdefinition besteht hierbei in den Klammern, die auf den Namen folgen.
+Der QHScompiler müsste also beim {\selectListingFont int} \textit{Identifier} nach vorne schauen, ob sich eine Klammer nach dem Namen befindet, und folglich eine Variablen- oder Funktionsdefinition ausführen.
 Bei einem traditionellen Compiler würde diese Überprüfung während der syntaktischen Analyse ausgeführt werden.
 Dies ist dem QHScompiler jedoch nicht möglich, da dieser, wie zu Beginn von Kapitel \ref{cha:4-QHS_Compiler} erläutert, über keine syntaktische Analyse verfügt.
 Glücklicherweise lässt sich dieses erste Problem lösen, ohne eine Änderung am QHScompiler vorzunehmen.
-Die Lösung basiert darauf, beim {\selectListingFont int} \textit{Identifier} sowohl eine Variable- als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
+Die Lösung basiert darauf, beim {\selectListingFont int} \textit{Identifier} sowohl eine Variablen- als auch eine Funktionsdefinition vorzubereiten, aber keine der beiden bereits auszuführen.
 Daraufhin werden zwei \textit{Identifier} definiert, erstens eine Klammer für eine Funktionsdefinition und zweitens ein Semikolon für die Definition einer Variable.
 %Daraufhin wird eine Klammer als \textit{Identifier} für eine Funktionsdefinition und ein Semikolon für die Definition einer Variable definiert.
 Befindet sich nach dem Namen eine Klammer, wird eine Funktionsdefinition ausgeführt, ist dort aber ein Semikolon wird eine Variable definiert.
